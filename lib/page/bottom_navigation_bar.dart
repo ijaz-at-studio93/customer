@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/page/Insights/Insights_home_page.dart';
 import 'package:sallon_customer/page/home/home_page.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
@@ -16,7 +17,11 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _selectedIndex == 0 ? const HomePage() : SizedBox(),
+      body: _selectedIndex == 0
+          ? const HomePage()
+          : _selectedIndex == 1
+              ? SizedBox()
+              : InsightsHomePage(),
       extendBody: false,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -41,7 +46,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
             ),
             label: 'Home',
           ),
-          BottomNavigationBarItem(
+          /* BottomNavigationBarItem(
             icon: Image.asset(
               AssetsConstant.home,
               height: 35,
@@ -51,13 +56,13 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                   : ColorConstant.grayTextColor,
             ),
             label: 'Explore',
-          ),
+          ),*/
           BottomNavigationBarItem(
             icon: Image.asset(
               AssetsConstant.bookings,
               height: 35,
               width: 35,
-              color: _selectedIndex == 2
+              color: _selectedIndex == 1
                   ? ColorConstant.primaryColor
                   : ColorConstant.grayTextColor,
             ),
@@ -68,7 +73,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
               AssetsConstant.insights,
               height: 35,
               width: 35,
-              color: _selectedIndex == 3
+              color: _selectedIndex == 2
                   ? ColorConstant.primaryColor
                   : ColorConstant.grayTextColor,
             ),

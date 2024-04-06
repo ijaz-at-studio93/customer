@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 
 import '../../../project_specific/text_theme.dart';
+import '../stylist_saloon_details_page.dart';
 
 class SelectedFavArtistCardWidget extends StatelessWidget {
   final VoidCallback onPress;
@@ -55,13 +56,11 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
                 )
               ],
             ),
-
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   Text(
                     "Sourabh Kumar",
                     textScaler: const TextScaler.linear(0.85),
@@ -87,24 +86,30 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Container(
-              height: 31,
-              width: 158,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(56),
-                  border: Border.all(
-                    color: ColorConstant.primaryColor,
-                  )),
-              child: Center(
-                child: Text(
-                  "Select Artist",
-                  style: AppTextTheme.medium.copyWith(
-                      color: ColorConstant.primaryColor, fontSize: 13),
+            GestureDetector(
+              onTap: () {},
+              child: Container(
+                height: 31,
+                width: 158,
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(56),
+                    border: Border.all(
+                      color: ColorConstant.primaryColor,
+                    )),
+                child: Center(
+                  child: Text(
+                    "Select Artist",
+                    style: AppTextTheme.medium.copyWith(
+                        color: ColorConstant.primaryColor, fontSize: 13),
+                  ),
                 ),
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.back();
+                Get.to(() => const StylistSaloonDetailsPage());
+              },
               child: Text(
                 "View Profile",
                 style: AppTextTheme.medium.copyWith(

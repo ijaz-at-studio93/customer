@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/page/artist/selecting_artist_bottom_sheet.dart';
+import 'package:sallon_customer/page/stylist/selecting_artist_bottom_sheet.dart';
 import 'package:sallon_customer/page/home/widget/over_view_list_tile_widget.dart';
 import 'package:sallon_customer/page/home/widget/stylist_list_grid_widget.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
@@ -34,11 +32,11 @@ class _SaloonAfterSelectingServicesPageState
             _headerWidget(),
             const SizedBox(height: 5),
             _tabBarView(),
-            const SizedBox(height: 120),
+            const SizedBox(height: 110)
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: isSelectedTab == 1
           ? Container(
               width: Get.width,
@@ -599,6 +597,7 @@ class _SaloonAfterSelectingServicesPageState
                               dashLength: 2,
                               dashColor: ColorConstant.grayTextColor,
                             ),
+                            const SizedBox(height: 15),
                           ],
                         ),
                       ),
@@ -665,7 +664,9 @@ class _SaloonAfterSelectingServicesPageState
                         // Total number of items
                         itemBuilder: (context, index) {
                           return  StylistListGridWidget(
-                            onPress: (){},
+                            onPress: (){
+
+                            },
                           );
                         },
                       ),
