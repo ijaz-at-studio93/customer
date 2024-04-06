@@ -9,21 +9,26 @@ class AuthController extends GetxController {
   bool get isDialogShow => _isDialogShow.value;
   set setIsDialogShow(val) => _isDialogShow.value = val;
 
+  final Rx<bool> _isFavService = false.obs;
+  bool get isFavService => _isFavService.value;
+  set isFavServiceSelect(val) => _isFavService.value = val;
+
+  final Rx<bool> _isSelectMenu = false.obs;
+  bool get isSelectMenu => _isSelectMenu.value;
+  set isSelectMenu(val) => _isSelectMenu.value = val;
 
 /*------ Store Map ------*/
 /*  final Rx<ModelName> _userResponseModel = ModelName().obs;
   UserResponseModel get userResponseModel => _userResponseModel.value;
   set setUser(usr) => _userResponseModel.value = usr;*/
 
-
- /*------ Store List ------*/
-  /*final RxList<ModelName> _getCategoryList =
+/*------ Store List ------*/
+/*final RxList<ModelName> _getCategoryList =
       <ModelName>[].obs;
   List<ModelName> get categoryList => _getCategoryList;*/
 
-
-  /*Login API Calling and store user data SharedPrefs*/
- /* login(
+/*Login API Calling and store user data SharedPrefs*/
+/* login(
       {required String email,
       required String password,
       required VoidCallback callback}) async {
@@ -32,7 +37,7 @@ class AuthController extends GetxController {
       _userResponseModel.value = await AuthAPI.doLogin(email, password);
       await userDataStoreToSharedPrefs(_userResponseModel.value);
       await getCategoryList();
-      *//*Route Here*//*
+      */ /*Route Here*/ /*
       if (_userResponseModel.value.emailAddress != "") {
         callback.call();
       }
@@ -43,10 +48,8 @@ class AuthController extends GetxController {
     }
   }*/
 
-
-
-  /*Store userDataStoreToSharedPrefs Data*/
-  /*Future<void> userDataStoreToSharedPrefs(UserResponseModel model) async {
+/*Store userDataStoreToSharedPrefs Data*/
+/*Future<void> userDataStoreToSharedPrefs(UserResponseModel model) async {
     _userResponseModel.value = model;
     debugPrint(model.toString());
     if (model.token != null) {
@@ -59,16 +62,16 @@ class AuthController extends GetxController {
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, true);
   }*/
 
-  /*------------------ init User Data ------------------ */
-  /*initUserData() async {
+/*------------------ init User Data ------------------ */
+/*initUserData() async {
     try {
       _socialLoginProgress.value = true;
       if (SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
-        *//*user Profile Model*//*
+        */ /*user Profile Model*/ /*
         _userResponseModel.value = await AuthAPI.getProfile();
         userDataStoreToSharedPrefs(_userResponseModel.value);
         await getCategoryList();
-        *//*without Profile  api*//*
+        */ /*without Profile  api*/ /*
         // debugPrint(_userResponseModel.value.token);
         // _userResponseModel.value = UserResponseModel.fromJson(SharedPrefs.read(PrefConstants.userModel));
         // userDataStoreToSharedPrefs(_userResponseModel.value);
@@ -80,10 +83,8 @@ class AuthController extends GetxController {
     }
   }*/
 
-
-
 /*------------------- RestAPP --------------*/
- /* resetApp() async {
+/* resetApp() async {
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, false);
     await SharedPrefs.writeValue(PrefConstants.isSocialLogin, false);
     await SharedPrefs.writeValue(PrefConstants.isFirstTime, true);

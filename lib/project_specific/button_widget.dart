@@ -1,4 +1,4 @@
-import 'package:sallon_customer/constant/colorconstant.dart';
+import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -19,11 +19,11 @@ class ButtonWidget extends StatelessWidget {
     return GestureDetector(
       onTap: onPress,
       child: Container(
-        height: 50,
+        height: 45,
         width: Get.width,
         decoration: BoxDecoration(
           color: color,
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: Center(
           child: Text(

@@ -1,26 +1,26 @@
 class AssetsConstant {
-  /*------------- Image --------*/
-  static const String backgroundImage = "assets/images/background.png";
-  static const String bgImage = "assets/images/bgImage.png";
-  static const String appIcon = "assets/images/icon.png";
-  static const String logoPng = "assets/images/logo.png";
-  static const String numerologyBg = "assets/images/numerology_bg.png";
-  static const String service1 = "assets/images/service1.png";
-  static const String service2 = "assets/images/service2.png";
-  static const String service3 = "assets/images/service3.png";
-  static const String service4 = "assets/images/service4.png";
-
   /*-------------------- Horoscope Image ----------- */
-  static const String aries = "assets/icon/image-1.png";
-  static const String taurus = "assets/icon/image-2.png";
-  static const String gemini = "assets/icon/image-3.png";
-  static const String cancer = "assets/icon/image-4.png";
-  static const String leo = "assets/icon/image-5.png";
-  static const String virgo = "assets/icon/image-6.png";
-  static const String libra = "assets/icon/image-7.png";
-  static const String scorpio = "assets/icon/image-8.png";
-  static const String sagittarius = "assets/icon/image-9.png";
-  static const String capricorn = "assets/icon/image-10.png";
-  static const String aquarius = "assets/icon/image-11.png";
-  static const String pisces = "assets/icon/image-12.png";
+  static const String bookings = "assets/icon/Bookings.png";
+  static const String home = "assets/icon/home.png";
+  static const String insights = "assets/icon/Insights.png";
+  static const String location = "assets/icon/location.png";
+  static const String man = "assets/icon/man.png";
+  static const String search = "assets/icon/search.png";
+  static const String woman = "assets/icon/woman.png";
+  static const String filter = "assets/icon/filter.png";
+  static const String arrowDown = "assets/icon/arrow_down.png";
+  static const String locationNewIcon = "assets/icon/location_new_icon.png";
+  static const String likeBlank = "assets/icon/like_blank.png";
+  static const String epMenu = "assets/icon/ep_menu.png";
+  static const String xMark = "assets/icon/xmark.png";
+  static const String backArrow = "assets/icon/back_arrow.png";
+  static const String iconSearch = "assets/icon/icon_search.png";
+  static const String shareIcon = "assets/icon/share.png";
+  static const String calender = "assets/icon/calender.png";
+  static const String locationShare = "assets/icon/location_share.png";
+  static const String manWalk = "assets/icon/man_walk.png";
+
+  /*--------------- Image ------------*/
+  static const String offer = "assets/images/offer.png";
+
 }

@@ -1,4 +1,4 @@
-import 'package:sallon_customer/constant/colorconstant.dart';
+import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:flutter/material.dart';
 
 class ProgressBarView extends StatelessWidget {
