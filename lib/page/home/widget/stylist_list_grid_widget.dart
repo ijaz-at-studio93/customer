@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
+import '../../stylist/stylist_saloon_details_page.dart';
+
 class StylistListGridWidget extends StatelessWidget {
   final VoidCallback onPress;
   const StylistListGridWidget({super.key, required this.onPress});
@@ -84,7 +86,9 @@ class StylistListGridWidget extends StatelessWidget {
               ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Get.to(() => const StylistSaloonDetailsPage());
+              },
               child: Text(
                 "View Profile",
                 style: AppTextTheme.medium.copyWith(

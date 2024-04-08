@@ -87,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               InkWell(
                 onTap: () {
-                  Get.offAll(()=> BottomNavBarPage());
+                  Get.offAll(()=> const BottomNavBarPage());
                 },
                 child: Container(
                   height: 40,

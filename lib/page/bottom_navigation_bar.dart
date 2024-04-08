@@ -21,7 +21,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
           ? const HomePage()
           : _selectedIndex == 1
               ? SizedBox()
-              : InsightsHomePage(),
+              : const InsightsHomePage(),
       extendBody: false,
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
@@ -38,8 +38,8 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
           BottomNavigationBarItem(
             icon: Image.asset(
               AssetsConstant.home,
-              height: 35,
-              width: 35,
+              height: 24,
+              width: 24,
               color: _selectedIndex == 0
                   ? ColorConstant.primaryColor
                   : ColorConstant.grayTextColor,
@@ -60,8 +60,8 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
           BottomNavigationBarItem(
             icon: Image.asset(
               AssetsConstant.bookings,
-              height: 35,
-              width: 35,
+              height: 24,
+              width: 24,
               color: _selectedIndex == 1
                   ? ColorConstant.primaryColor
                   : ColorConstant.grayTextColor,
@@ -71,8 +71,8 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
           BottomNavigationBarItem(
             icon: Image.asset(
               AssetsConstant.insights,
-              height: 35,
-              width: 35,
+              height: 24,
+              width: 24,
               color: _selectedIndex == 2
                   ? ColorConstant.primaryColor
                   : ColorConstant.grayTextColor,

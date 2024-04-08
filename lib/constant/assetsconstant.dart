@@ -19,6 +19,10 @@ class AssetsConstant {
   static const String calender = "assets/icon/calender.png";
   static const String locationShare = "assets/icon/location_share.png";
   static const String manWalk = "assets/icon/man_walk.png";
+  static const String offerIcon = "assets/icon/offer.png";
+  static const String eveningSLot = "assets/icon/EveningSLot.png";
+  static const String daySlot = "assets/icon/DaySlot.png";
+  static const String playIcon = "assets/icon/play_Icon.png";
 
   /*--------------- Image ------------*/
   static const String offer = "assets/images/offer.png";

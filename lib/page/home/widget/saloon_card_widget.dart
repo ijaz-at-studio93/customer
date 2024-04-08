@@ -58,7 +58,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         }
                       },
                       child: Obx(
-                        () => Container(
+                            () => Container(
                           width: 38,
                           height: 38,
                           decoration: const BoxDecoration(
@@ -67,19 +67,38 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           child: Center(
                             child: _authController.isFavService
                                 ? const Icon(
-                                    CupertinoIcons.heart_fill,
-                                    color: Colors.red,
-                                  )
+                              CupertinoIcons.heart_fill,
+                              color: Colors.red,
+                            )
                                 : Image.asset(
-                                    AssetsConstant.likeBlank,
-                                    height: 20,
-                                    width: 20,
-                                  ),
+                              AssetsConstant.likeBlank,
+                              height: 20,
+                              width: 20,
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
+                  Positioned(
+                    top: 10,
+                    left: 12,
+                    child: Container(
+                      height: 30,
+                      width: Get.width * 0.39,
+                      decoration: BoxDecoration(
+                          color: ColorConstant.topRatedColor,
+                          borderRadius: BorderRadius.circular(6)),
+                      child: Center(
+                        child: Text(
+                          "Hair Style •₹200 Onwards",
+                          style: AppTextTheme.medium.copyWith(
+                              color: ColorConstant.whiteColor, fontSize: 12),
+                        ),
+                      ),
+                    ),
+                  ),
+
                   Positioned(
                       bottom: 10,
                       left: 15,

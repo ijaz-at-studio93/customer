@@ -87,7 +87,9 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             GestureDetector(
-              onTap: () {},
+              onTap: () {
+                Get.back();
+              },
               child: Container(
                 height: 31,
                 width: 158,

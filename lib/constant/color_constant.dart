@@ -18,4 +18,10 @@ class ColorConstant {
   static const Color redBgColor = Color(0xffCF6666);
   static const Color dividerColor = Color(0xffE0E0E0);
   static const Color topRatedColor = Color(0xff696A6B);
+  static const Color divider2Color = Color(0xffE8E8E8);
+  static const Color selectTimeSlotBorder = Color(0xffEEEEEE);
+  static const Color editProduct = Color(0xffE2E2E2);
+  static const Color editBgProduct = Color(0xffF2F2F2);
+  static const Color removeStroke = Color(0xffE63232);
+  static const Color removeBgStroke = Color(0xffFFE9E9);
 }

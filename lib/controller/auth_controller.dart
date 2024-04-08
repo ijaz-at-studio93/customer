@@ -17,6 +17,10 @@ class AuthController extends GetxController {
   bool get isSelectMenu => _isSelectMenu.value;
   set isSelectMenu(val) => _isSelectMenu.value = val;
 
+  final Rx<bool> _isInsightsFav = false.obs;
+  bool get isInsightsFav => _isInsightsFav.value;
+  set isInsightsFavSelect(val) => _isInsightsFav.value = val;
+
 /*------ Store Map ------*/
 /*  final Rx<ModelName> _userResponseModel = ModelName().obs;
   UserResponseModel get userResponseModel => _userResponseModel.value;
