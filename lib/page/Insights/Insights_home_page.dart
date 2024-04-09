@@ -24,7 +24,7 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
         leading:const SizedBox(),
         centerTitle: true,
         title: Text(
-          "Social",
+          "Insights",
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),

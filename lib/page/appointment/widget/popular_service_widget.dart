@@ -84,6 +84,7 @@ class PopularServiceWidget extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
+
               Container(
                 width: 100,
                 height: 30,

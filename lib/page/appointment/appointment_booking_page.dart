@@ -43,10 +43,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         child: Column(
           children: [
             SizedBox(
-              height: 200,
-              width: Get.width,
-                child:_customBackgroundExample()
-            ),
+                height: 200,
+                width: Get.width,
+                child: _customBackgroundExample()),
             /*----------- Popular Service By Your Artist ---------------*/
             Container(
               width: Get.width,
@@ -228,15 +227,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                 ),
                 Text(
                   "₹4,000",
-                  style: AppTextTheme.bold.copyWith(
-                      fontSize: 19, color: ColorConstant.blackColor),
+                  style: AppTextTheme.bold
+                      .copyWith(fontSize: 19, color: ColorConstant.blackColor),
                 )
               ],
             ),
             GestureDetector(
-              onTap: (){
-
-                Get.to(()=>const QRCodePage());
+              onTap: () {
+                Get.to(() => const QRCodePage());
               },
               child: Container(
                 height: 45,
@@ -300,8 +298,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       headerProps: const EasyHeaderProps(
           monthPickerType: MonthPickerType.switcher,
           dateFormatter: DateFormatter.dayOnly()
-        // fullDateDMY(),
-      ),
+          // fullDateDMY(),
+          ),
       dayProps: const EasyDayProps(
         dayStructure: DayStructure.dayStrDayNum,
         activeDayStyle: DayStyle(
@@ -313,5 +311,4 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       ),
     );
   }
-
 }

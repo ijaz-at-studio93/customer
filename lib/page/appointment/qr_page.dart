@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:get/get.dart';
+import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:ticket_widget/ticket_widget.dart';
@@ -53,7 +54,7 @@ class _QRCodePageState extends State<QRCodePage> {
                   left: 0,
                   child: TicketWidget(
                     isCornerRounded: true,
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(23),
                     width: Get.width,
                     height: Get.height * 0.64,
                     child: Column(
@@ -146,7 +147,7 @@ class _QRCodePageState extends State<QRCodePage> {
                           decoration: const BoxDecoration(
                               color: ColorConstant.divider2Color),
                         ),
-                        const SizedBox(height: 15),
+                        const SizedBox(height: 10),
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -173,70 +174,12 @@ class _QRCodePageState extends State<QRCodePage> {
                           ),
                         ),
                         const SizedBox(height: 15),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            SizedBox(
-                              width: Get.width*0.45,
-                              child: Text(
-                                maxLines: 2,
-                                "Do you Have any concerned of taking without your face?",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 13),
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                InkWell(
-                                   onTap: (){
-                                     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const BottomNavBarPage()), (route) => false);
-                                   },
-                                  child: Container(
-                                    height: 31,
-                                    width: 64,
-                                    decoration: BoxDecoration(
-                                      color: ColorConstant.primaryColor,
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "Yes",
-                                        style: AppTextTheme.medium.copyWith(
-                                            color: ColorConstant.whiteColor,
-                                            fontSize: 13),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                InkWell(
-                                  onTap: (){
-                                    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const BottomNavBarPage()), (route) => false);
-                                  },
-                                  child: Container(
-                                    height: 31,
-                                    width: 64,
-                                    decoration: BoxDecoration(
-                                      color: ColorConstant.pinkBgColor,
-                                      border: Border.all(
-                                        color: ColorConstant.pinkStrokeColor
-                                      ),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        "No",
-                                        style: AppTextTheme.medium.copyWith(
-                                            color: ColorConstant.primaryColor,
-                                            fontSize: 13),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
+                        Center(
+                          child: Text(
+                            "AU86286HH",
+                            style: AppTextTheme.medium.copyWith(
+                                fontSize: 13, color: ColorConstant.blackColor),
+                          ),
                         )
                       ],
                     ),
@@ -246,6 +189,17 @@ class _QRCodePageState extends State<QRCodePage> {
             ),
           )
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Get.offAll(()=> const BottomNavBarPage());
+        },
+        backgroundColor: ColorConstant.removeStroke,
+        child: Image.asset(
+          AssetsConstant.sosIcon,
+          width: 42,
+          height: 19,
+        ),
       ),
     );
   }

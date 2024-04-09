@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
@@ -9,6 +10,8 @@ import 'package:sallon_customer/page/home/widget/menu_dialog_widget.dart';
 import 'package:sallon_customer/page/home/widget/saloon_card_widget.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+
+import '../profile/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -41,9 +44,9 @@ class _HomePageState extends State<HomePage> {
                 itemCount: 5,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  return   SaloonCardWidget(
-                    onPress: (){
-                      Get.to(()=> const SaloonAfterSelectingServicesPage());
+                  return SaloonCardWidget(
+                    onPress: () {
+                      Get.to(() => const SaloonAfterSelectingServicesPage());
                     },
                   );
                 }),
@@ -122,15 +125,20 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
-          Container(
-            width: 42,
-            height: 42,
-            decoration: const BoxDecoration(
-                shape: BoxShape.circle, color: ColorConstant.primaryColor),
-            child: Center(
-              child: Text("AB",
-                  style: AppTextTheme.bold
-                      .copyWith(color: ColorConstant.whiteColor, fontSize: 20)),
+          GestureDetector(
+            onTap: () {
+              Get.to(() => const ProfilePage());
+            },
+            child: Container(
+              width: 42,
+              height: 42,
+              decoration: const BoxDecoration(
+                  shape: BoxShape.circle, color: ColorConstant.primaryColor),
+              child: Center(
+                child: Text("AB",
+                    style: AppTextTheme.bold.copyWith(
+                        color: ColorConstant.whiteColor, fontSize: 20)),
+              ),
             ),
           )
         ],
@@ -315,116 +323,101 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   "37 Saloons Found Near You",
                   textScaler: const TextScaler.linear(0.85),
-                  style: AppTextTheme.bold
-                      .copyWith(fontSize: 19, color: ColorConstant.blackColor),
+                  style: AppTextTheme.bold.copyWith(
+                      fontSize: 19, color: ColorConstant.blackColor),
                 ),
-                TextButton(
-                    onPressed: () {},
-                    child: Text(
-                      "VIEW ALL",
-                      style: AppTextTheme.medium.copyWith(
-                          fontSize: 13, color: ColorConstant.grayTextColor),
-                    ))
-              ],
-            ),
-          ),
-          Stack(
-            children: [
-              SizedBox(
-                height: 50,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: Get.width * 0.3,
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                  color: ColorConstant.grayBorderColor,
-                                  width: 1)),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Image.asset(
-                                AssetsConstant.filter,
-                                height: 14,
-                                width: 14,
-                              ),
-                              Text(
-                                "Sort By",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 13),
-                              ),
-                              Image.asset(
-                                AssetsConstant.arrowDown,
-                                height: 10,
-                                width: 10,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          children: List.generate(
-                            5,
-                            (index) => Container(
-                              padding: const EdgeInsets.all(10),
-                              margin: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                    color: ColorConstant.grayBorderColor,
-                                    width: 1),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Nearest",
-                                  style: AppTextTheme.medium.copyWith(
-                                      color: ColorConstant.blackColor,
-                                      fontSize: 13),
-                                ),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                right: 0,
-                child: Container(
-                  padding: EdgeInsets.only(right: 15),
+                const SizedBox(width: 5),
+                Container(
                   height: 50,
                   color: ColorConstant.whiteColor,
                   child: Row(
                     children: [
-                      CupertinoSwitch(
-                        // This bool value toggles the switch.
-                        value: atHome,
-                        activeColor: ColorConstant.primaryColor,
-                        onChanged: (bool? value) {
-                          // This is called when the user toggles the switch.
-                          setState(() {
-                            atHome = value ?? false;
-                          });
-                        },
-                      ),
                       Text(
-                        "at home",
-                        style: AppTextTheme.regular.copyWith(
-                            color: ColorConstant.blackColor, fontSize: 11),
-                      )
+                        "Home Service",
+                        style: AppTextTheme.medium.copyWith(
+                            color: ColorConstant.primaryColor,
+                            fontSize: 13),
+                      ),
+                      SizedBox(
+                        height: 30,
+                        child: CupertinoSwitch(
+                          value: atHome,
+                          activeColor: ColorConstant.primaryColor,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              atHome = value ?? false;
+                            });
+                          },
+                        ),
+                      ),
                     ],
                   ),
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 50,
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  children: [
+                    Container(
+                      width: Get.width * 0.3,
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                              color: ColorConstant.grayBorderColor, width: 1)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Image.asset(
+                            AssetsConstant.filter,
+                            height: 14,
+                            width: 14,
+                          ),
+                          Text(
+                            "Sort By",
+                            style: AppTextTheme.medium.copyWith(
+                                color: ColorConstant.blackColor, fontSize: 13),
+                          ),
+                          Image.asset(
+                            AssetsConstant.arrowDown,
+                            height: 10,
+                            width: 10,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Row(
+                      children: List.generate(
+                        5,
+                        (index) => Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                                color: ColorConstant.grayBorderColor, width: 1),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Nearest",
+                              style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.blackColor,
+                                  fontSize: 13),
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
+              ),
+            ),
           ),
         ],
       ),

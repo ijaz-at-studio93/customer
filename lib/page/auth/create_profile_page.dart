@@ -225,7 +225,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
               ),
               child: TextField(
                 controller: _emailTextEditingController,
-                keyboardType: TextInputType.phone,
+                keyboardType: TextInputType.emailAddress,
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.blackColor, fontSize: 13),
                 decoration: InputDecoration(

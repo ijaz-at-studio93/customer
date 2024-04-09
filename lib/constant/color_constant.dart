@@ -24,4 +24,8 @@ class ColorConstant {
   static const Color editBgProduct = Color(0xffF2F2F2);
   static const Color removeStroke = Color(0xffE63232);
   static const Color removeBgStroke = Color(0xffFFE9E9);
+  static const Color removeBgButton = Color(0xffFFD3D3);
+  static const Color removeBgButtonStroke = Color(0xffFFAAAA);
+  static const Color garyDividerColor = Color(0xffDBDBDB);
+  static const Color dividerRedLightColor = Color(0xffEDE5E5);
 }

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/page/appointment/appointment_booking_page.dart';
 import 'package:sallon_customer/page/stylist/widget/review_and_ratings_widget.dart';
-import 'package:sallon_customer/page/stylist/widget/stylist_basic_info.dart';
+import 'package:sallon_customer/page/stylist/widget/service_offered_page.dart';
 import 'package:sallon_customer/page/stylist/widget/stylist_portfolio_gird_view.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
@@ -34,7 +36,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
             _nameContainColum(),
             _tabBarView(),
             isSelectedTab == 1
-                ? const StylistBasicInfo()
+                ? const ServiceAndOfferedPage()
                 : isSelectedTab == 2
                     ? const StylistPortfolioGridview()
                     : const ReviewAndRating()
@@ -42,18 +44,107 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 10),
-        child: ButtonWidget(
-          onPress: () {
-            Get.to(()=> const AboutStylistPage());
-          },
-          buttonTitleText: "Make a appointment",
+      floatingActionButton: Container(
+        width: Get.width,
+        color: ColorConstant.whiteColor,
+        height: 100,
+        clipBehavior: Clip.none,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                FlutterImageStack(
+                  imageList: _images,
+                  showTotalCount: false,
+                  totalCount: 4,
+                  imageSource: ImageSource.network,
+                  itemRadius: 35,
+                  itemCount: 2,
+                  itemBorderWidth: 3, // Border width around the images
+                ),
+                const SizedBox(width: 10),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "1 Added",
+                          style: AppTextTheme.bold.copyWith(
+                              fontSize: 13,
+                              color: ColorConstant.grayTextColor),
+                        ),
+                        const SizedBox(width: 2),
+                        Image.asset(
+                          AssetsConstant.arrowUpIcon,
+                          height: 8,
+                          width: 11,
+                        )
+                      ],
+                    ),
+                    Text(
+                      "₹4,000",
+                      style: AppTextTheme.bold.copyWith(
+                          fontSize: 19, color: ColorConstant.blackColor),
+                    )
+                  ],
+                ),
+              ],
+            ),
+            GestureDetector(
+              onTap: () {
+                Get.to(()=> const AppointmentBookingPage());
+              },
+              child: Container(
+                height: 45,
+                width: Get.width * 0.4,
+                decoration: BoxDecoration(
+                  color: ColorConstant.primaryColor,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Book Now",
+                      textScaler: const TextScaler.linear(0.85),
+                      style: AppTextTheme.medium.copyWith(
+                          fontSize: 16, color: ColorConstant.whiteColor),
+                    ),
+                    const SizedBox(width: 10),
+                    const Icon(
+                      Icons.arrow_forward,
+                      color: ColorConstant.whiteColor,
+                      size: 20,
+                    )
+                  ],
+                ),
+              ),
+            )
+          ],
         ),
       ),
+      // floatingActionButton: Padding(
+      //   padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 10),
+      //   child: ButtonWidget(
+      //     onPress: () {
+      //
+      //     },
+      //     buttonTitleText: "Make a appointment",
+      //   ),
+      // ),
     );
   }
 
+
+  /*---------  Dummy Image ------*/
+  List<String> _images = [
+    'https://images.unsplash.com/photo-1593642532842-98d0fd5ebc1a?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=2250&q=80',
+    'https://images.unsplash.com/photo-1612594305265-86300a9a5b5b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+  ];
   /*-------------- Image header Widget ------------*/
   _imageHeaderWidget() {
     return Stack(
@@ -237,7 +328,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                 child: Column(
                   children: [
                     Text(
-                      "Basic Info",
+                      "Service Offered",
                       style: isSelectedTab == 1
                           ? AppTextTheme.bold.copyWith(
                               fontSize: 16, color: ColorConstant.primaryColor)

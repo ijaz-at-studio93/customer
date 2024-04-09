@@ -3,6 +3,7 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/project_specific/add_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
 class ServiceOfferListTileWidget extends StatelessWidget {
@@ -46,7 +47,7 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Text(
@@ -63,23 +64,7 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 5),
-              Row(
-                children: [
-                  Text(
-                    "Selected",
-                    style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.primaryColor, fontSize: 14),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    "Edit",
-                    style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.redBgColor, fontSize: 14),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 10),
               Dash(
                 direction: Axis.horizontal,
                 length: Get.width * 0.6,
@@ -120,22 +105,7 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                 bottom: -15,
                 left: 10,
                 right: 10,
-                child: Container(
-                  width: 68,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: ColorConstant.pinkBgColor,
-                    border: Border.all(color: ColorConstant.pinkStrokeColor),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Add",
-                      style: AppTextTheme.medium.copyWith(
-                          fontSize: 13, color: ColorConstant.primaryColor),
-                    ),
-                  ),
-                ),
+                child: AddButtonWidget(onPress: (){}),
               )
             ],
           )

@@ -27,9 +27,10 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
         child: Container(
           width: Get.width,
           decoration: BoxDecoration(
-              color: ColorConstant.whiteColor,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: ColorConstant.strokeColor, width: 1.5)),
+            color: ColorConstant.whiteColor,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: ColorConstant.strokeColor, width: 1.5),
+          ),
           child: Column(
             children: [
               Stack(
@@ -58,7 +59,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         }
                       },
                       child: Obx(
-                            () => Container(
+                        () => Container(
                           width: 38,
                           height: 38,
                           decoration: const BoxDecoration(
@@ -67,14 +68,14 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           child: Center(
                             child: _authController.isFavService
                                 ? const Icon(
-                              CupertinoIcons.heart_fill,
-                              color: Colors.red,
-                            )
+                                    CupertinoIcons.heart_fill,
+                                    color: Colors.red,
+                                  )
                                 : Image.asset(
-                              AssetsConstant.likeBlank,
-                              height: 20,
-                              width: 20,
-                            ),
+                                    AssetsConstant.likeBlank,
+                                    height: 20,
+                                    width: 20,
+                                  ),
                           ),
                         ),
                       ),
@@ -85,7 +86,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     left: 12,
                     child: Container(
                       height: 30,
-                      width: Get.width * 0.39,
+                      width: Get.width * 0.4,
                       decoration: BoxDecoration(
                           color: ColorConstant.topRatedColor,
                           borderRadius: BorderRadius.circular(6)),
@@ -98,7 +99,6 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                       ),
                     ),
                   ),
-
                   Positioned(
                       bottom: 10,
                       left: 15,
@@ -135,12 +135,18 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Lakme Saloon & Spa',
-                          textScaler: TextScaler.linear(0.85),
-                          style: AppTextTheme.bold.copyWith(
-                              fontSize: 19, color: ColorConstant.blackColor),
+                        SizedBox(
+                          width: Get.width * 0.5,
+                          child: Text(
+                            'Lakme Saloon & Spa',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textScaler: const TextScaler.linear(0.85),
+                            style: AppTextTheme.bold.copyWith(
+                                fontSize: 19, color: ColorConstant.blackColor),
+                          ),
                         ),
+                        const SizedBox(height: 5),
                         Row(
                           children: [
                             Text(
@@ -157,6 +163,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 5),
                         Row(
                           children: [
                             Image.asset(
@@ -165,11 +172,16 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                               width: 15,
                             ),
                             const SizedBox(width: 8),
-                            Text(
-                              'First Floor, Bindal Tower, near..',
-                              style: AppTextTheme.medium.copyWith(
-                                  fontSize: 13,
-                                  color: ColorConstant.grayTextColor),
+                            SizedBox(
+                              width: Get.width * 0.5,
+                              child: Text(
+                                'First Floor, Bindal Tower, near..',
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: AppTextTheme.medium.copyWith(
+                                    fontSize: 13,
+                                    color: ColorConstant.grayTextColor),
+                              ),
                             ),
                           ],
                         ),
@@ -210,7 +222,8 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                 dashColor: const Color(0xffCFCFCF),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [

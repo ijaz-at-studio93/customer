@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/project_specific/edit_product_button_widget.dart';
+import 'package:sallon_customer/project_specific/remove_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
 class KnowWhatYouWidget extends StatelessWidget {
@@ -19,8 +21,8 @@ class KnowWhatYouWidget extends StatelessWidget {
               children: [
                 Text(
                   'Facial Spa',
-                  style: AppTextTheme.bold.copyWith(
-                      fontSize: 16, color: ColorConstant.blackColor),
+                  style: AppTextTheme.bold
+                      .copyWith(fontSize: 16, color: ColorConstant.blackColor),
                 ),
                 const SizedBox(height: 10),
                 Text(
@@ -55,8 +57,7 @@ class KnowWhatYouWidget extends StatelessWidget {
                         Text(
                           "50% Off",
                           style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.primaryColor,
-                              fontSize: 13),
+                              color: ColorConstant.primaryColor, fontSize: 13),
                         )
                       ],
                     )
@@ -72,36 +73,9 @@ class KnowWhatYouWidget extends StatelessWidget {
                       fontSize: 13, color: ColorConstant.grayTextColor),
                 ),
                 const SizedBox(height: 10),
-                Container(
-                  height: 39,
-                  width: 110,
-                  decoration: BoxDecoration(
-                      border: Border.all(color: ColorConstant.editProduct),
-                      color: ColorConstant.editBgProduct,
-                      borderRadius: BorderRadius.circular(5)),
-                  child: Center(
-                      child: Text(
-                    'Edit Product',
-                    style: AppTextTheme.medium.copyWith(
-                        fontSize: 13, color: ColorConstant.blackColor),
-                  )),
-                ),
+                EditProductButtonWidget(onTap: () {}),
                 const SizedBox(height: 10),
-                Container(
-                  height: 39,
-                  width: 110,
-                  decoration: BoxDecoration(
-                    color: ColorConstant.removeBgStroke,
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(color: ColorConstant.removeStroke),
-                  ),
-                  child: Center(
-                      child: Text(
-                    'Remove',
-                    style: AppTextTheme.medium.copyWith(
-                        fontSize: 13, color: ColorConstant.removeStroke),
-                  )),
-                )
+                RemoveButtonWidget(onPress: () {})
               ],
             ),
           ],

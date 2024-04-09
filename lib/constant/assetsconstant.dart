@@ -23,8 +23,18 @@ class AssetsConstant {
   static const String eveningSLot = "assets/icon/EveningSLot.png";
   static const String daySlot = "assets/icon/DaySlot.png";
   static const String playIcon = "assets/icon/play_Icon.png";
+  static const String arrowDownListTileIcon =
+      "assets/icon/arrow_down_list_tile.png";
+  static const String arrowUpIcon = "assets/icon/arrow_up_icon.png";
+  static const String sosIcon = "assets/icon/sos.png";
+  static const String editIcon = "assets/icon/edit.png";
 
   /*--------------- Image ------------*/
   static const String offer = "assets/images/offer.png";
 
+  static const String signOut = "assets/images/sign_out.png";
+  static const String reviewRatings = "assets/images/review_ratings.png";
+  static const String myBooking = "assets/images/my_booking.png";
+  static const String faq = "assets/images/faq.png";
+  static const String about = "assets/images/about.png";
 }
