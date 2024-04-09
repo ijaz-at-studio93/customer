@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
@@ -9,7 +10,8 @@ import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+  final bool splashPage;
+  const LoginPage({super.key, required this.splashPage});
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -54,8 +56,7 @@ class _LoginPageState extends State<LoginPage> {
   _headerWidget() {
     return Container(
       width: Get.width,
-      height: Get.height * 0.23,
-      padding: const EdgeInsets.only(top: 50, left: 21, right: 21),
+      padding: const EdgeInsets.only(top: 50, left: 21, right: 21, bottom: 35),
       decoration: const BoxDecoration(color: ColorConstant.primaryColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,31 +64,33 @@ class _LoginPageState extends State<LoginPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              widget.splashPage
+                  ? const SizedBox(width: 34, height: 34)
+                  : InkWell(
+                      onTap: () {
+                        Get.back();
+                      },
+                      child: Container(
+                        height: 34,
+                        width: 34,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: ColorConstant.whiteColor,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.arrow_back_ios_new,
+                            color: ColorConstant.whiteColor,
+                            size: 12,
+                          ),
+                        ),
+                      ),
+                    ),
               InkWell(
                 onTap: () {
-                  Get.back();
-                },
-                child: Container(
-                  height: 34,
-                  width: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: ColorConstant.whiteColor,
-                    ),
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.arrow_back_ios_new,
-                      color: ColorConstant.whiteColor,
-                      size: 12,
-                    ),
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () {
-                  Get.offAll(()=> const BottomNavBarPage());
+                  Get.offAll(() => const BottomNavBarPage());
                 },
                 child: Container(
                   height: 40,
@@ -215,16 +218,16 @@ class _LoginPageState extends State<LoginPage> {
           ],
         ),
         const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  getWhatsappUpdate = !getWhatsappUpdate;
-                });
-              },
-              child: Container(
+        GestureDetector(
+          onTap: () {
+            setState(() {
+              getWhatsappUpdate = !getWhatsappUpdate;
+            });
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
                 height: 17,
                 width: 17,
                 decoration: BoxDecoration(
@@ -246,14 +249,14 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              "Get Update on whatsapp",
-              style: AppTextTheme.medium
-                  .copyWith(color: ColorConstant.primaryColor, fontSize: 14),
-            ),
-          ],
+              const SizedBox(width: 12),
+              Text(
+                "Get Update on whatsapp",
+                style: AppTextTheme.medium
+                    .copyWith(color: ColorConstant.primaryColor, fontSize: 14),
+              ),
+            ],
+          ),
         )
       ],
     );
@@ -265,6 +268,8 @@ class _LoginPageState extends State<LoginPage> {
       showMessage("Please enter mobile Number");
     } else if (_mobileTextEditingController.text.length != 10) {
       showMessage("Please enter 10 digit mobile Number");
+    } else if (!getWhatsappUpdate) {
+      showMessage("Please fill Get update on whatsapp");
     } else {
       Get.to(() => const CreateProfilePage());
     }

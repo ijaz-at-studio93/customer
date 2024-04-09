@@ -53,6 +53,7 @@ dependencies:
   flutter_image_stack: ^0.0.7
   marquee_text: ^2.5.0+1
   image_picker: ^1.0.7
+  page_transition: ^2.1.0
 
 
 

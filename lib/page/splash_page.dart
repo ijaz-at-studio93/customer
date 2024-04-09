@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/page/auth/login_page.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
@@ -45,13 +46,17 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   /*-------------- Route For Welcome Page -----------------*/
+
+
   route() {
-    Navigator.pushAndRemoveUntil<void>(
-      context,
-      MaterialPageRoute<void>(
-        builder: (BuildContext context) => const LoginPage(),
-      ),
-      (Route<dynamic> route) => false,
-    );
+    Navigator.pushAndRemoveUntil(
+        context,
+        PageTransition(
+            child: const LoginPage(splashPage: true,),
+            alignment: Alignment.center,
+            duration: const Duration(milliseconds: 800),
+            // type: PageTransitionType.rightToLeftWithFade
+            type: PageTransitionType.size),
+        (route) => false);
   }
 }
