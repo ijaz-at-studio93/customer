@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
@@ -14,6 +16,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
+  File imagePath = File("");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -103,20 +106,28 @@ class _ProfilePageState extends State<ProfilePage> {
       child: Row(
         children: [
           InkWell(
-            onTap: ()async{
-              FileUtils.openPlatformImagePicker(onSelectImage: (file){
-                print(file);
+            onTap: () async {
+              FileUtils.openPlatformImagePicker(onSelectImage: (file) {
+                setState(() {
+                  imagePath = file;
+                });
               });
-
             },
             child: ClipRRect(
               borderRadius: BorderRadius.circular(100),
-              child: Image.network(
-                "https://plus.unsplash.com/premium_photo-1708271598114-5e6e8892a2ad?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                width: 66,
-                height: 66,
-                fit: BoxFit.cover,
-              ),
+              child: imagePath.path == ""
+                  ? Image.network(
+                      "https://plus.unsplash.com/premium_photo-1708271598114-5e6e8892a2ad?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                      width: 66,
+                      height: 66,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.file(
+                      imagePath,
+                      width: 66,
+                      height: 66,
+                      fit: BoxFit.cover,
+                    ),
             ),
           ),
           const SizedBox(width: 20),

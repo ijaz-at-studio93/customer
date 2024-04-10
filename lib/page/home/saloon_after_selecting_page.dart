@@ -13,6 +13,7 @@ import 'package:sallon_customer/page/home/widget/stylist_list_grid_widget.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
+import '../search/stylist_search_page.dart';
 
 class SaloonAfterSelectingServicesPage extends StatefulWidget {
   const SaloonAfterSelectingServicesPage({super.key});
@@ -245,7 +246,9 @@ class _SaloonAfterSelectingServicesPageState
                 children: [
                   buttonWidget(
                     imageUrl: AssetsConstant.iconSearch,
-                    onPress: () {},
+                    onPress: () {
+                      Get.to(() => const StylistSearchPage());
+                    },
                     h: 24,
                     w: 24,
                   ),

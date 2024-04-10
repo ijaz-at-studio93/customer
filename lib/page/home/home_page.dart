@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
@@ -8,10 +7,12 @@ import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/page/home/saloon_after_selecting_page.dart';
 import 'package:sallon_customer/page/home/widget/menu_dialog_widget.dart';
 import 'package:sallon_customer/page/home/widget/saloon_card_widget.dart';
+import 'package:sallon_customer/page/search/stylist_search_page.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
 import '../profile/profile_page.dart';
+import '../search/area_of_city_search_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -148,32 +149,37 @@ class _HomePageState extends State<HomePage> {
 
   /*--------------- Search Widget ------------*/
   _searchWidget() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      width: Get.width,
-      height: 48,
-      decoration: ShapeDecoration(
-        color: ColorConstant.whiteColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: (){
+        Get.to(()=>const AreaOfCitySearchPage());
+      },
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16),
+        width: Get.width,
+        height: 48,
+        decoration: ShapeDecoration(
+          color: ColorConstant.whiteColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          shadows: const [
+            BoxShadow(
+              color: Color(0x0A000000),
+              blurRadius: 8.20,
+              offset: Offset(1, 1),
+              spreadRadius: 0,
+            )
+          ],
         ),
-        shadows: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 8.20,
-            offset: Offset(1, 1),
-            spreadRadius: 0,
-          )
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.only(left: 10),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Image.asset(
-            AssetsConstant.search,
-            width: 24,
-            height: 24,
+        child: Padding(
+          padding: const EdgeInsets.only(left: 10),
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Image.asset(
+              AssetsConstant.search,
+              width: 24,
+              height: 24,
+            ),
           ),
         ),
       ),

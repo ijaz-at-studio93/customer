@@ -7,6 +7,7 @@ import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/page/appointment/qr_page.dart';
 import 'package:sallon_customer/page/appointment/widget/know_what_you_widget.dart';
 import 'package:sallon_customer/page/appointment/widget/popular_service_widget.dart';
+import 'package:sallon_customer/page/appointment/your_approval_bottom_sheet.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
@@ -234,7 +235,18 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             ),
             GestureDetector(
               onTap: () {
-                Get.to(() => const QRCodePage());
+              /*  Get.to(() => const QRCodePage());*/
+                showModalBottomSheet(
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(32),
+                          topRight: Radius.circular(32),
+                        )),
+                    context: context,
+                    builder: (context) {
+                      return const YourApprovalBottomSheet();
+                    });
               },
               child: Container(
                 height: 45,
