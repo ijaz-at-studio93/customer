@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/edit_product_button_widget.dart';
 import 'package:sallon_customer/project_specific/remove_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+
+import '../../../util/SharedPrefs.dart';
 
 class KnowWhatYouWidget extends StatelessWidget {
   const KnowWhatYouWidget({super.key});
@@ -53,11 +56,13 @@ class KnowWhatYouWidget extends StatelessWidget {
                           AssetsConstant.offerIcon,
                           height: 14,
                           width: 14,
+                          color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                         ),
                         Text(
                           "50% Off",
                           style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.primaryColor, fontSize: 13),
+                              color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)), fontSize: 13),
                         )
                       ],
                     )

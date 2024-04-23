@@ -5,12 +5,14 @@ import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/page/home/widget/customized_sheet_widget.dart';
 import 'package:sallon_customer/page/home/widget/view_cart_widget.dart';
 import 'package:sallon_customer/page/stylist/selecting_artist_bottom_sheet.dart';
 import 'package:sallon_customer/page/home/widget/over_view_list_tile_widget.dart';
 import 'package:sallon_customer/page/home/widget/stylist_list_grid_widget.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
 import '../search/stylist_search_page.dart';
@@ -114,7 +116,8 @@ class _SaloonAfterSelectingServicesPageState
                     height: 45,
                     width: Get.width * 0.4,
                     decoration: BoxDecoration(
-                      color: ColorConstant.primaryColor,
+                      color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Row(
@@ -147,7 +150,8 @@ class _SaloonAfterSelectingServicesPageState
                 width: 130,
                 height: 50,
                 decoration: BoxDecoration(
-                    color: ColorConstant.primaryColor,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
                     borderRadius: BorderRadius.circular(12)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -366,6 +370,8 @@ class _SaloonAfterSelectingServicesPageState
                     AssetsConstant.manWalk,
                     height: 13,
                     width: 13,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
                   ),
                   const SizedBox(width: 5),
                   Text(
@@ -386,6 +392,8 @@ class _SaloonAfterSelectingServicesPageState
                     AssetsConstant.calender,
                     height: 13,
                     width: 13,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
                   ),
                   const SizedBox(width: 5),
                   Text(
@@ -407,6 +415,8 @@ class _SaloonAfterSelectingServicesPageState
                     AssetsConstant.locationNewIcon,
                     height: 13,
                     width: 13,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
                   ),
                   const SizedBox(width: 5),
                   SizedBox(
@@ -435,13 +445,16 @@ class _SaloonAfterSelectingServicesPageState
                       AssetsConstant.locationShare,
                       width: 12,
                       height: 12,
+                      color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
                     ),
                     const SizedBox(width: 10),
                     Text(
                       "Get Direction",
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.medium.copyWith(
-                          fontSize: 12, color: ColorConstant.primaryColor),
+                          fontSize: 12, color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender))),
                     )
                   ],
                 ),
@@ -481,7 +494,8 @@ class _SaloonAfterSelectingServicesPageState
                         "Overview",
                         style: isSelectedTab == 1
                             ? AppTextTheme.bold.copyWith(
-                                fontSize: 16, color: ColorConstant.primaryColor)
+                                fontSize: 16, color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)))
                             : AppTextTheme.medium.copyWith(
                                 fontSize: 16,
                                 color: ColorConstant.grayTextColor),
@@ -492,7 +506,8 @@ class _SaloonAfterSelectingServicesPageState
                         width: Get.width * 0.2,
                         decoration: BoxDecoration(
                             color: isSelectedTab == 1
-                                ? ColorConstant.primaryColor
+                                ? changeTheme(
+                                SharedPrefs.readStringValue(PrefConstants.gender))
                                 : Colors.transparent,
                             borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(12),
@@ -514,7 +529,8 @@ class _SaloonAfterSelectingServicesPageState
                         "Stylist List",
                         style: isSelectedTab == 2
                             ? AppTextTheme.bold.copyWith(
-                                fontSize: 16, color: ColorConstant.primaryColor)
+                                fontSize: 16, color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)))
                             : AppTextTheme.medium.copyWith(
                                 fontSize: 16,
                                 color: ColorConstant.grayTextColor),
@@ -525,7 +541,8 @@ class _SaloonAfterSelectingServicesPageState
                         width: Get.width * 0.2,
                         decoration: BoxDecoration(
                             color: isSelectedTab == 2
-                                ? ColorConstant.primaryColor
+                                ? changeTheme(
+                                SharedPrefs.readStringValue(PrefConstants.gender))
                                 : Colors.transparent,
                             borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(12),
@@ -561,11 +578,13 @@ class _SaloonAfterSelectingServicesPageState
                           color: ColorConstant.blackColor,
                           fontSize: 14),
                       trimLines: 6,
-                      colorClickableText: ColorConstant.primaryColor,
+                      colorClickableText: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
                       trimCollapsedText: 'more',
                       trimExpandedText: 'Show less',
                       moreStyle: AppTextTheme.medium.copyWith(
-                          fontSize: 15, color: ColorConstant.primaryColor),
+                          fontSize: 15, color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender))),
                     ),
                   ),
                   Padding(
@@ -588,13 +607,15 @@ class _SaloonAfterSelectingServicesPageState
                                 Text(
                                   "Home Service",
                                   style: AppTextTheme.bold.copyWith(
-                                      color: ColorConstant.primaryColor,
+                                      color: changeTheme(
+                                          SharedPrefs.readStringValue(PrefConstants.gender)),
                                       fontSize: 13),
                                 ),
                                 CupertinoSwitch(
                                   value: isHomeService,
                                   // Current state of the CupertinoSwitch
-                                  activeColor: ColorConstant.primaryColor,
+                                  activeColor: changeTheme(
+                                      SharedPrefs.readStringValue(PrefConstants.gender)),
                                   onChanged: (value) {
                                     setState(() {
                                       isHomeService =
@@ -686,7 +707,8 @@ class _SaloonAfterSelectingServicesPageState
                         child: Text(
                           "Add More Service",
                           style: AppTextTheme.medium.copyWith(
-                              fontSize: 13, color: ColorConstant.primaryColor),
+                              fontSize: 13, color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender))),
                         ),
                       ),
                     ),
@@ -751,7 +773,8 @@ class _SaloonAfterSelectingServicesPageState
                             "VIEW MORE",
                             style: AppTextTheme.medium.copyWith(
                                 fontSize: 13,
-                                color: ColorConstant.primaryColor),
+                                color: changeTheme(
+                                    SharedPrefs.readStringValue(PrefConstants.gender))),
                           ),
                         ),
                       ),
@@ -776,7 +799,8 @@ class _SaloonAfterSelectingServicesPageState
                             CupertinoSwitch(
                               value: serviceOffered,
                               // Current state of the CupertinoSwitch
-                              activeColor: ColorConstant.primaryColor,
+                              activeColor: changeTheme(
+                                  SharedPrefs.readStringValue(PrefConstants.gender)),
                               onChanged: (value) {
                                 setState(() {
                                   serviceOffered =

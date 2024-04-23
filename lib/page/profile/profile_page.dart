@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../util/pick_image.dart';
 
@@ -145,7 +147,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(68),
                   border:
-                      Border.all(color: ColorConstant.primaryColor, width: 1),
+                      Border.all(color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, width: 1),
                 ),
                 child: Row(
                   children: [
@@ -158,7 +161,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     Text(
                       "Edit Details",
                       style: AppTextTheme.regular.copyWith(
-                          color: ColorConstant.primaryColor, fontSize: 13),
+                          color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 13),
                     )
                   ],
                 ),

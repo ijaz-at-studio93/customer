@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../constant/color_constant.dart';
 import '../../project_specific/button_widget.dart';
@@ -41,6 +43,8 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 35),
                     child: ButtonWidget(
+                      color:   changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                         buttonTitleText: "Continue",
                         onPress: () {
                           _doCreateProfile();
@@ -61,7 +65,8 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
       width: Get.width,
       height: Get.height * 0.23,
       padding: const EdgeInsets.only(top: 45, left: 21, right: 21),
-      decoration: const BoxDecoration(color: ColorConstant.primaryColor),
+      decoration:   BoxDecoration(color: changeTheme(
+          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

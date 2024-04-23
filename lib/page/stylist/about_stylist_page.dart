@@ -3,11 +3,13 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/page/appointment/appointment_booking_page.dart';
 import 'package:sallon_customer/page/stylist/widget/review_and_ratings_widget.dart';
 import 'package:sallon_customer/page/stylist/widget/service_offered_page.dart';
 import 'package:sallon_customer/page/stylist/widget/stylist_portfolio_gird_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../constant/color_constant.dart';
 import '../../project_specific/status_bar_color_appbar.dart';
@@ -76,7 +78,8 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                 height: 45,
                 width: Get.width * 0.4,
                 decoration: BoxDecoration(
-                  color: ColorConstant.primaryColor,
+                  color:    changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -250,9 +253,10 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
               itemCount: 5,
               itemSize: 25.0,
               ignoreGestures: true,
-              itemBuilder: (context, _) => const Icon(
+              itemBuilder: (context, _) =>    Icon(
                 Icons.star,
-                color: ColorConstant.primaryColor,
+                color:  changeTheme(
+                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                 size: 25,
               ),
               onRatingUpdate: (rating) {},
@@ -272,11 +276,13 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
             style: AppTextTheme.medium.copyWith(
                 height: 1.5, color: ColorConstant.grayTextColor, fontSize: 14),
             trimLines: 2,
-            colorClickableText: ColorConstant.primaryColor,
+            colorClickableText:  changeTheme(
+                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
             trimCollapsedText: 'more',
             trimExpandedText: 'Show less',
             moreStyle: AppTextTheme.medium
-                .copyWith(fontSize: 15, color: ColorConstant.primaryColor),
+                .copyWith(fontSize: 15, color:  changeTheme(
+                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor),
           ),
         ),
       ],
@@ -305,7 +311,8 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       "Service Offered",
                       style: isSelectedTab == 1
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color: ColorConstant.primaryColor)
+                              fontSize: 16, color:  changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -315,7 +322,8 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 1
-                              ? ColorConstant.primaryColor
+                              ?  changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -336,7 +344,8 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       "Portfolio",
                       style: isSelectedTab == 2
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color: ColorConstant.primaryColor)
+                              fontSize: 16, color:  changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -346,7 +355,8 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 2
-                              ? ColorConstant.primaryColor
+                              ?  changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -367,7 +377,8 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       "Review & ratings",
                       style: isSelectedTab == 3
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color: ColorConstant.primaryColor)
+                              fontSize: 16, color:  changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -377,7 +388,8 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 3
-                              ? ColorConstant.primaryColor
+                              ? changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),

@@ -5,6 +5,9 @@ import 'package:sallon_customer/page/Insights/Insights_home_page.dart';
 import 'package:sallon_customer/page/home/home_page.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
+import '../constant/variable_constant.dart';
+import '../util/SharedPrefs.dart';
+
 class BottomNavBarPage extends StatefulWidget {
   const BottomNavBarPage({super.key});
 
@@ -31,8 +34,8 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
         unselectedLabelStyle: AppTextTheme.medium
             .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
         selectedLabelStyle: AppTextTheme.medium
-            .copyWith(color: ColorConstant.primaryColor, fontSize: 14),
-        selectedItemColor: ColorConstant.primaryColor,
+            .copyWith(color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)), fontSize: 14),
+        selectedItemColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
         unselectedItemColor: ColorConstant.grayTextColor,
         items: [
           BottomNavigationBarItem(
@@ -41,7 +44,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
               height: 24,
               width: 24,
               color: _selectedIndex == 0
-                  ? ColorConstant.primaryColor
+                  ? changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
                   : ColorConstant.grayTextColor,
             ),
             label: 'Home',
@@ -63,7 +66,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
               height: 24,
               width: 24,
               color: _selectedIndex == 1
-                  ? ColorConstant.primaryColor
+                  ?changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
                   : ColorConstant.grayTextColor,
             ),
             label: 'Bookings',
@@ -74,7 +77,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
               height: 24,
               width: 24,
               color: _selectedIndex == 2
-                  ? ColorConstant.primaryColor
+                  ? changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
                   : ColorConstant.grayTextColor,
             ),
             label: 'Insights',

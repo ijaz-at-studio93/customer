@@ -4,7 +4,9 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 import 'package:ticket_widget/ticket_widget.dart';
 
 import '../bottom_navigation_bar.dart';
@@ -20,7 +22,8 @@ class _QRCodePageState extends State<QRCodePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: ColorConstant.primaryColor,
+      backgroundColor: changeTheme(
+          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

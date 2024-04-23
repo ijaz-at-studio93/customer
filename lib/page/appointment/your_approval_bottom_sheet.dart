@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/page/appointment/qr_page.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../constant/color_constant.dart';
+import '../../constant/variable_constant.dart';
 import '../../project_specific/text_theme.dart';
 
 class YourApprovalBottomSheet extends StatefulWidget {
@@ -37,9 +39,11 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
             height: 71,
             width: Get.width,
             padding: const EdgeInsets.symmetric(horizontal: 20),
-            decoration: const BoxDecoration(
-              color: ColorConstant.primaryColor,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                  ColorConstant.primaryColor,
+              borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(16),
                 topLeft: Radius.circular(16),
               ),
@@ -89,7 +93,8 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
                       Text(
                         "Yes",
                         style: AppTextTheme.medium.copyWith(
-                            fontSize: 13, color: ColorConstant.primaryColor),
+                            fontSize: 13, color:changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
                       ),
                       const SizedBox(width: 10),
                       Container(
@@ -126,7 +131,8 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
                       Text(
                         "No",
                         style: AppTextTheme.medium.copyWith(
-                            fontSize: 13, color: ColorConstant.primaryColor),
+                            fontSize: 13, color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
                       ),
                       const SizedBox(width: 10),
                       Container(
@@ -159,6 +165,8 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: ButtonWidget(
                 buttonTitleText: "Done",
+                color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                 onPress: () {
                   Get.back();
                   Get.to(() => const QRCodePage());

@@ -1,5 +1,7 @@
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:flutter/material.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class ProgressBarView extends StatelessWidget {
   const ProgressBarView({super.key});
@@ -8,8 +10,11 @@ class ProgressBarView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Container(
-        decoration: const BoxDecoration(
-            color: ColorConstant.primaryColor, shape: BoxShape.circle),
+        decoration: BoxDecoration(
+            color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                ColorConstant.primaryColor,
+            shape: BoxShape.circle),
         padding: const EdgeInsets.all(10),
         height: 50,
         width: 50,

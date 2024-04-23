@@ -6,8 +6,10 @@ import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class OtpScreenPage extends StatefulWidget {
   final String mobileNumber;
@@ -48,6 +50,8 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
                         horizontal: 20, vertical: 35),
                     child: ButtonWidget(
                         buttonTitleText: "Continue",
+                        color:   changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                         onPress: () {
                           doOtp();
                         }),
@@ -67,7 +71,8 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
       width: Get.width,
       height: Get.height * 0.23,
       padding: const EdgeInsets.only(top: 45, left: 21, right: 21),
-      decoration: const BoxDecoration(color: ColorConstant.primaryColor),
+      decoration:   BoxDecoration(color: changeTheme(
+          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -138,7 +143,8 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
             enabled: true,
             animationType: AnimationType.fade,
             textStyle: AppTextTheme.bold
-                .copyWith(color: ColorConstant.primaryColor, fontSize: 16),
+                .copyWith(color: changeTheme(
+                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 16),
             animationDuration: const Duration(milliseconds: 300),
             onChanged: (value) {},
             pinTheme: PinTheme(
@@ -146,11 +152,13 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
               borderWidth: 1,
               inactiveFillColor: Colors.transparent,
               borderRadius: BorderRadius.circular(8),
-              selectedColor: ColorConstant.primaryColor,
+              selectedColor: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
               activeFillColor: const Color(0xffE0D3FF),
               selectedFillColor: Colors.transparent,
               inactiveColor: ColorConstant.grayColor,
-              activeColor: ColorConstant.primaryColor,
+              activeColor: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
             ),
             onCompleted: (val) {},
           ),
@@ -175,12 +183,14 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
                       child: Text(
                         "Resend",
                         style: AppTextTheme.bold.copyWith(
-                            fontSize: 16, color: ColorConstant.primaryColor),
+                            fontSize: 16, color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
                       ))
                   : Text(
                       "Retry in 00:${_start.toString()}",
                       style: AppTextTheme.bold.copyWith(
-                          fontSize: 16, color: ColorConstant.primaryColor),
+                          fontSize: 16, color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
                     ),
             ],
           )

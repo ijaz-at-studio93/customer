@@ -4,11 +4,13 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/page/appointment/qr_page.dart';
 import 'package:sallon_customer/page/appointment/widget/know_what_you_widget.dart';
 import 'package:sallon_customer/page/appointment/widget/popular_service_widget.dart';
 import 'package:sallon_customer/page/appointment/your_approval_bottom_sheet.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
   const AppointmentBookingPage({super.key});
@@ -252,7 +254,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                 height: 45,
                 width: Get.width * 0.4,
                 decoration: BoxDecoration(
-                  color: ColorConstant.primaryColor,
+                  color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -312,12 +315,13 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
           dateFormatter: DateFormatter.dayOnly()
           // fullDateDMY(),
           ),
-      dayProps: const EasyDayProps(
+      dayProps:   EasyDayProps(
         dayStructure: DayStructure.dayStrDayNum,
         activeDayStyle: DayStyle(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-            color: Color(0xff8466CF),
+            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            color: changeTheme(
+                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
           ),
         ),
       ),

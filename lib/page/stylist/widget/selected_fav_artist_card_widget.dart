@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../../project_specific/text_theme.dart';
 import '../stylist_saloon_details_page.dart';
@@ -96,13 +98,15 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(56),
                     border: Border.all(
-                      color: ColorConstant.primaryColor,
+                      color:  changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                     )),
                 child: Center(
                   child: Text(
                     "Select Artist",
                     style: AppTextTheme.medium.copyWith(
-                        color: ColorConstant.primaryColor, fontSize: 13),
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 13),
                   ),
                 ),
               ),

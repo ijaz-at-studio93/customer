@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/page/auth/create_profile_page.dart';
 import 'package:sallon_customer/page/bottom_navigation_bar.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class LoginPage extends StatefulWidget {
   final bool splashPage;
@@ -38,6 +40,8 @@ class _LoginPageState extends State<LoginPage> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 35),
                     child: ButtonWidget(
+                        color:   changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                         buttonTitleText: "Continue",
                         onPress: () {
                           _doLogin();
@@ -57,7 +61,8 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       width: Get.width,
       padding: const EdgeInsets.only(top: 50, left: 21, right: 21, bottom: 35),
-      decoration: const BoxDecoration(color: ColorConstant.primaryColor),
+      decoration:   BoxDecoration(color: changeTheme(
+          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -232,11 +237,13 @@ class _LoginPageState extends State<LoginPage> {
                 width: 17,
                 decoration: BoxDecoration(
                   color: getWhatsappUpdate
-                      ? ColorConstant.primaryColor
+                      ? changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(3),
                   border: Border.all(
-                    color: ColorConstant.primaryColor,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                   ),
                 ),
                 child: Center(
@@ -253,7 +260,8 @@ class _LoginPageState extends State<LoginPage> {
               Text(
                 "Get Update on whatsapp",
                 style: AppTextTheme.medium
-                    .copyWith(color: ColorConstant.primaryColor, fontSize: 14),
+                    .copyWith(color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 14),
               ),
             ],
           ),

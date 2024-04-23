@@ -3,8 +3,10 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/add_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class ServiceOfferListTileWidget extends StatelessWidget {
   const ServiceOfferListTileWidget({super.key});
@@ -80,11 +82,13 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                   style: AppTextTheme.medium.copyWith(
                       color: ColorConstant.grayTextColor, fontSize: 14),
                   trimLines: 2,
-                  colorClickableText: ColorConstant.primaryColor,
+                  colorClickableText:  changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                   trimCollapsedText: 'more',
                   trimExpandedText: 'Show less',
                   moreStyle: AppTextTheme.medium.copyWith(
-                      fontSize: 15, color: ColorConstant.primaryColor),
+                      fontSize: 15, color:  changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor),
                 ),
               ),
             ],
@@ -105,7 +109,10 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                 bottom: -15,
                 left: 10,
                 right: 10,
-                child: AddButtonWidget(onPress: (){}),
+                child: AddButtonWidget(onPress: (){},
+                color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                ),
               )
             ],
           )

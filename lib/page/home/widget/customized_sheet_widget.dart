@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import 'custom_list_tile_widget.dart';
 
@@ -157,6 +159,8 @@ class _CustomizedSheetWidgetState extends State<CustomizedSheetWidget> {
                               AssetsConstant.arrowUpIcon,
                               height: 8,
                               width: 11,
+                              color: changeTheme(
+                                  SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                             )
                           ],
                         ),
@@ -175,7 +179,8 @@ class _CustomizedSheetWidgetState extends State<CustomizedSheetWidget> {
                         height: 45,
                         width: Get.width * 0.4,
                         decoration: BoxDecoration(
-                          color: ColorConstant.primaryColor,
+                          color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(

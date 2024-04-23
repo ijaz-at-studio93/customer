@@ -6,6 +6,9 @@ import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/project_specific/remove_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
+
+import '../../../constant/variable_constant.dart';
 
 class ViewCartListTileWidget extends StatefulWidget {
   const ViewCartListTileWidget({super.key});
@@ -73,12 +76,15 @@ class _ViewCartListTileWidgetState extends State<ViewCartListTileWidget> {
                       AssetsConstant.editIcon,
                       height: 10,
                       width: 10,
+                      color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                     ),
                     const SizedBox(width: 5),
                     Text(
                       "Edit Product",
                       style: AppTextTheme.regular.copyWith(
-                          color: ColorConstant.primaryColor, fontSize: 13),
+                          color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 13),
                     )
                   ],
                 ),

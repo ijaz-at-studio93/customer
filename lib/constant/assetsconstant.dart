@@ -29,6 +29,9 @@ class AssetsConstant {
   static const String sosIcon = "assets/icon/sos.png";
   static const String editIcon = "assets/icon/edit.png";
 
+
+
+
   /*--------------- Image ------------*/
   static const String offer = "assets/images/offer.png";
 

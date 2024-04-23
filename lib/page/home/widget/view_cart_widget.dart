@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/page/home/widget/view_cart_list_tile_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../../constant/assetsconstant.dart';
 import '../../appointment/appointment_booking_page.dart';
@@ -111,6 +113,8 @@ class _ViewCartWidgetState extends State<ViewCartWidget> {
                                   AssetsConstant.arrowUpIcon,
                                   height: 8,
                                   width: 11,
+                                  color: changeTheme(
+                                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                                 )
                               ],
                             ),
@@ -133,7 +137,8 @@ class _ViewCartWidgetState extends State<ViewCartWidget> {
                         height: 45,
                         width: Get.width * 0.4,
                         decoration: BoxDecoration(
-                          color: ColorConstant.primaryColor,
+                          color: changeTheme(
+    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(

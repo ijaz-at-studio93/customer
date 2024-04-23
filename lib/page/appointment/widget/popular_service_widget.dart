@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
+
+import '../../../constant/variable_constant.dart';
 
 class PopularServiceWidget extends StatelessWidget {
   const PopularServiceWidget({super.key});
@@ -91,13 +94,15 @@ class PopularServiceWidget extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(6),
                   color: ColorConstant.pinkBgColor,
-                  border: Border.all(color: ColorConstant.pinkStrokeColor),
+                  border: Border.all(color:changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
                 ),
                 child: Center(
                   child: Text(
                     "Add",
                     style: AppTextTheme.medium.copyWith(
-                        fontSize: 13, color: ColorConstant.primaryColor),
+                        fontSize: 13, color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
                   ),
                 ),
               ),

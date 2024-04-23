@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class InsightsDetailPage extends StatefulWidget {
   final String image;
@@ -51,7 +53,8 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
               child: Text(
                 "Posted By Amrit Saloon •28 Feb",
                 style: AppTextTheme.medium
-                    .copyWith(color: ColorConstant.primaryColor, fontSize: 14),
+                    .copyWith(color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 14),
               ),
             ),
             Padding(
@@ -70,11 +73,13 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
                 style: AppTextTheme.medium.copyWith(
                     height: 1.5, color: ColorConstant.blackColor, fontSize: 14),
                 trimLines: 6,
-                colorClickableText: ColorConstant.primaryColor,
+                colorClickableText: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                 trimCollapsedText: 'more',
                 trimExpandedText: 'Show less',
                 moreStyle: AppTextTheme.medium
-                    .copyWith(fontSize: 15, color: ColorConstant.primaryColor),
+                    .copyWith(fontSize: 15, color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
               ),
             ),
           ],

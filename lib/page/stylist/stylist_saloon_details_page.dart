@@ -4,6 +4,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/page/appointment/appointment_booking_page.dart';
 import 'package:sallon_customer/page/stylist/widget/review_and_ratings_widget.dart';
 import 'package:sallon_customer/page/stylist/widget/service_offered_page.dart';
@@ -11,6 +12,7 @@ import 'package:sallon_customer/page/stylist/widget/stylist_portfolio_gird_view.
 import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../constant/assetsconstant.dart';
 import 'about_stylist_page.dart';
@@ -102,7 +104,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                 height: 45,
                 width: Get.width * 0.4,
                 decoration: BoxDecoration(
-                  color: ColorConstant.primaryColor,
+                  color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -291,9 +294,10 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
               itemCount: 5,
               itemSize: 25.0,
               ignoreGestures: true,
-              itemBuilder: (context, _) => const Icon(
+              itemBuilder: (context, _) =>   Icon(
                 Icons.star,
-                color: ColorConstant.primaryColor,
+                color:  changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                 size: 25,
               ),
               onRatingUpdate: (rating) {},
@@ -331,7 +335,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       "Service Offered",
                       style: isSelectedTab == 1
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color: ColorConstant.primaryColor)
+                              fontSize: 16, color:  changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -341,7 +346,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 1
-                              ? ColorConstant.primaryColor
+                              ?  changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -362,7 +368,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       "Portfolio",
                       style: isSelectedTab == 2
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color: ColorConstant.primaryColor)
+                              fontSize: 16, color:  changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -372,7 +379,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 2
-                              ? ColorConstant.primaryColor
+                              ? changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -393,7 +401,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       "Review & ratings",
                       style: isSelectedTab == 3
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color: ColorConstant.primaryColor)
+                              fontSize: 16, color:  changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -403,7 +412,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 3
-                              ? ColorConstant.primaryColor
+                              ?  changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),

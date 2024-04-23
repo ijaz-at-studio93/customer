@@ -5,8 +5,10 @@ import 'package:get/get.dart';
 
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/auth_controller.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class SaloonCardWidget extends StatefulWidget {
   final VoidCallback onPress;
@@ -75,6 +77,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                                     AssetsConstant.likeBlank,
                                     height: 20,
                                     width: 20,
+                                    color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
                                   ),
                           ),
                         ),
@@ -170,6 +173,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                               AssetsConstant.locationNewIcon,
                               height: 15,
                               width: 15,
+                              color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
                             ),
                             const SizedBox(width: 8),
                             SizedBox(
@@ -243,7 +247,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     Text(
                       '50% off',
                       style: AppTextTheme.bold.copyWith(
-                          color: ColorConstant.primaryColor, fontSize: 14),
+                          color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)), fontSize: 14),
                     ),
                   ],
                 ),

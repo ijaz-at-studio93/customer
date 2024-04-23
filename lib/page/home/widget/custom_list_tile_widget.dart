@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../../constant/color_constant.dart';
 
@@ -78,11 +80,13 @@ class CustomListTileWidget extends StatelessWidget {
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
                 trimLines: 2,
-                colorClickableText: ColorConstant.primaryColor,
+                colorClickableText:changeTheme(
+    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
                 trimCollapsedText: 'more',
                 trimExpandedText: 'Show less',
                 moreStyle: AppTextTheme.medium
-                    .copyWith(fontSize: 15, color: ColorConstant.primaryColor),
+                    .copyWith(fontSize: 15, color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
               ),
             ),
           ],

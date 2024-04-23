@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/page/search/widget/location_title_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class AreaOfCitySearchPage extends StatefulWidget {
   const AreaOfCitySearchPage({super.key});
@@ -144,7 +146,8 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
             Text(
               "YOUR CURRENT LOCATION",
               style: AppTextTheme.bold
-                  .copyWith(color: ColorConstant.primaryColor, fontSize: 16),
+                  .copyWith(color:  changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 16),
             )
           ],
         ),

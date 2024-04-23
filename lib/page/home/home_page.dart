@@ -1,16 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
+
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/page/home/saloon_after_selecting_page.dart';
 import 'package:sallon_customer/page/home/widget/menu_dialog_widget.dart';
 import 'package:sallon_customer/page/home/widget/saloon_card_widget.dart';
-import 'package:sallon_customer/page/search/stylist_search_page.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
+import '../../constant/variable_constant.dart';
 import '../profile/profile_page.dart';
 import '../search/area_of_city_search_page.dart';
 
@@ -22,6 +24,13 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  int _selectedGender = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -55,38 +64,135 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: GestureDetector(
-        onTap: () {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return const MenuDialogWidget();
-              });
-        },
-        child: Container(
-          width: 130,
-          height: 50,
-          decoration: BoxDecoration(
-              color: ColorConstant.primaryColor,
-              borderRadius: BorderRadius.circular(12)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Image.asset(
-                AssetsConstant.epMenu,
-                height: 24,
-                width: 24,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                "Menu",
-                style: AppTextTheme.medium
-                    .copyWith(color: ColorConstant.whiteColor),
-              )
-            ],
-          ),
-        ),
-      ),
+      floatingActionButton:
+          SharedPrefs.readBoolValue(PrefConstants.isSelectedGender)
+              ? GestureDetector(
+                  onTap: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return const MenuDialogWidget();
+                        });
+                  },
+                  child: Container(
+                    width: 130,
+                    height: 50,
+                    decoration: BoxDecoration(
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          AssetsConstant.epMenu,
+                          height: 24,
+                          width: 24,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Menu",
+                          style: AppTextTheme.medium
+                              .copyWith(color: ColorConstant.whiteColor),
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              : Container(
+                  width: Get.width * 0.55,
+                  height: 50,
+                  decoration: BoxDecoration(
+                      color: ColorConstant.whiteColor,
+                      borderRadius: BorderRadius.circular(12)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedGender = 0;
+                            SharedPrefs.writeValue(
+                                PrefConstants.isSelectedGender, true);
+                            SharedPrefs.writeValue(PrefConstants.gender, "0");
+                          });
+                        },
+                        child: Container(
+                          height: 50,
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: _selectedGender == 0
+                                ? ColorConstant.primaryColor
+                                : ColorConstant.whiteColor,
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                AssetsConstant.man,
+                                height: 24,
+                                width: 24,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "man",
+                                style: AppTextTheme.medium.copyWith(
+                                    color: _selectedGender == 0
+                                        ? ColorConstant.whiteColor
+                                        : ColorConstant.grayTextColor),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            _selectedGender = 1;
+                            SharedPrefs.writeValue(
+                                PrefConstants.isSelectedGender, true);
+                            SharedPrefs.writeValue(PrefConstants.gender, "1");
+                          });
+                        },
+                        child: Container(
+                          height: 50,
+                          width: 100,
+                          decoration: BoxDecoration(
+                              color: _selectedGender == 1
+                                  ? ColorConstant.primaryColor
+                                  : ColorConstant.whiteColor,
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(12),
+                                bottomRight: Radius.circular(12),
+                              )),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                AssetsConstant.woman,
+                                height: 24,
+                                width: 24,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                "Women",
+                                style: AppTextTheme.medium.copyWith(
+                                    color: _selectedGender == 1
+                                        ? ColorConstant.whiteColor
+                                        : ColorConstant.grayTextColor),
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 
@@ -106,6 +212,8 @@ class _HomePageState extends State<HomePage> {
                 AssetsConstant.location,
                 width: 40,
                 height: 40,
+                color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)),
               ),
               const SizedBox(width: 8),
               Column(
@@ -133,8 +241,10 @@ class _HomePageState extends State<HomePage> {
             child: Container(
               width: 42,
               height: 42,
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: ColorConstant.primaryColor),
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender))),
               child: Center(
                 child: Text("AB",
                     style: AppTextTheme.bold.copyWith(
@@ -150,8 +260,8 @@ class _HomePageState extends State<HomePage> {
   /*--------------- Search Widget ------------*/
   _searchWidget() {
     return GestureDetector(
-      onTap: (){
-        Get.to(()=>const AreaOfCitySearchPage());
+      onTap: () {
+        Get.to(() => const AreaOfCitySearchPage());
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -179,6 +289,8 @@ class _HomePageState extends State<HomePage> {
               AssetsConstant.search,
               width: 24,
               height: 24,
+              color: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender)),
             ),
           ),
         ),
@@ -264,8 +376,12 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(
                 color: ColorConstant.whiteColor,
                 borderRadius: BorderRadius.circular(8),
-                border: const Border(
-                  right: BorderSide(width: 9, color: Color(0xFF8466CF)),
+                border: Border(
+                  right: BorderSide(
+                      width: 9,
+                      color: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender)) ??
+                          Colors.transparent),
                 ),
                 boxShadow: const [
                   BoxShadow(
@@ -329,8 +445,8 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   "37 Saloons Found Near You",
                   textScaler: const TextScaler.linear(0.85),
-                  style: AppTextTheme.bold.copyWith(
-                      fontSize: 19, color: ColorConstant.blackColor),
+                  style: AppTextTheme.bold
+                      .copyWith(fontSize: 19, color: ColorConstant.blackColor),
                 ),
                 const SizedBox(width: 5),
                 Container(
@@ -341,14 +457,16 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         "Home Service",
                         style: AppTextTheme.medium.copyWith(
-                            color: ColorConstant.primaryColor,
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender)),
                             fontSize: 13),
                       ),
                       SizedBox(
                         height: 30,
                         child: CupertinoSwitch(
                           value: atHome,
-                          activeColor: ColorConstant.primaryColor,
+                          activeColor: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender)),
                           onChanged: (bool? value) {
                             setState(() {
                               atHome = value ?? false;

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+
+
 class ColorConstant {
-  static const Color primaryColor = Color(0xFF8466CF);
+  static const Color primaryColor =  Color(0xFF8466CF);
   static const Color blackColor = Color(0xFF222222);
   static const Color whiteColor = Colors.white;
   static const Color borderColor = Color(0xffE5E5E5);
@@ -28,4 +30,11 @@ class ColorConstant {
   static const Color removeBgButtonStroke = Color(0xffFFAAAA);
   static const Color garyDividerColor = Color(0xffDBDBDB);
   static const Color dividerRedLightColor = Color(0xffEDE5E5);
+  static const Color primary2 = Color(0xffCD73B4);
 }
+
+
+
+
+
+

@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/auth_controller.dart';
 import 'package:sallon_customer/page/home/widget/dilaog_menu_list_widget.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class MenuDialogWidget extends StatefulWidget {
   const MenuDialogWidget({super.key});
@@ -59,7 +61,10 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
                     left: 0,
                     right: 0,
                     child:
-                        ButtonWidget(buttonTitleText: "Done", onPress: () {}),
+                        ButtonWidget(buttonTitleText: "Done", onPress: () {},
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                        ),
                   )
                 : Positioned(
                     bottom: -60,
