@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
@@ -104,11 +105,24 @@ class _ViewCartListTileWidgetState extends State<ViewCartListTileWidget> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                "https://cdn.shopify.com/s/files/1/0403/4661/5957/files/5f7b77c13666f8fb7f0dc454c34bde9f_1_480x480.jpg?v=1655612815",
+              child: CachedNetworkImage(
                 width: 108,
                 height: 123,
                 fit: BoxFit.cover,
+                imageUrl:
+                'https://cdn.shopify.com/s/files/1/0403/4661/5957/files/5f7b77c13666f8fb7f0dc454c34bde9f_1_480x480.jpg?v=1655612815',
+                placeholder: (context, url) => const Image(
+                  image: AssetImage(AssetsConstant.placeHolder),
+                  width: 108,
+                  height: 123,
+                  fit: BoxFit.cover,
+                ),
+                errorWidget: (context, url, error) => const Image(
+                  image: AssetImage(AssetsConstant.placeHolder),
+                  width: 108,
+                  height: 123,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             Positioned(

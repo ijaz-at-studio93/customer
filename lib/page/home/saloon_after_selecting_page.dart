@@ -1,16 +1,20 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
+import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/page/home/widget/customized_sheet_widget.dart';
 import 'package:sallon_customer/page/home/widget/view_cart_widget.dart';
 import 'package:sallon_customer/page/stylist/selecting_artist_bottom_sheet.dart';
 import 'package:sallon_customer/page/home/widget/over_view_list_tile_widget.dart';
 import 'package:sallon_customer/page/home/widget/stylist_list_grid_widget.dart';
+import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import '../../constant/color_constant.dart';
@@ -18,7 +22,12 @@ import '../../project_specific/text_theme.dart';
 import '../search/stylist_search_page.dart';
 
 class SaloonAfterSelectingServicesPage extends StatefulWidget {
-  const SaloonAfterSelectingServicesPage({super.key});
+  final String salonId;
+
+  const SaloonAfterSelectingServicesPage({
+    super.key,
+    required this.salonId,
+  });
 
   @override
   State<SaloonAfterSelectingServicesPage> createState() =>
@@ -27,23 +36,39 @@ class SaloonAfterSelectingServicesPage extends StatefulWidget {
 
 class _SaloonAfterSelectingServicesPageState
     extends State<SaloonAfterSelectingServicesPage> {
+  final _homeController = Get.find<HomeController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _homeController.doGetHomeSalonDetails(salonId: widget.salonId);
+      _homeController.doGetSalonDetailsService(salonId: widget.salonId);
+      _homeController.doGetSalonArtiestListData(salonId: widget.salonId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: statusBarTheme(context),
       backgroundColor: ColorConstant.bgColor,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _imageHeaderWidget(),
-            _headerWidget(),
-            const SizedBox(height: 5),
-            _tabBarView(),
-            const SizedBox(height: 110)
-          ],
-        ),
+      body: Obx(
+        () => _homeController.showProgress
+            ? const ProgressBarView()
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _imageHeaderWidget(),
+                    _headerWidget(),
+                    const SizedBox(height: 5),
+                    _tabBarView(),
+                    const SizedBox(height: 110)
+                  ],
+                ),
+              ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      /*floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Stack(
         alignment: Alignment.center,
         clipBehavior: Clip.none,
@@ -142,38 +167,9 @@ class _SaloonAfterSelectingServicesPageState
               ],
             ),
           ),
-          Positioned(
-            top: -70,
-            child: GestureDetector(
-              onTap: () {},
-              child: Container(
-                width: 130,
-                height: 50,
-                decoration: BoxDecoration(
-                    color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),
-                    borderRadius: BorderRadius.circular(12)),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      AssetsConstant.epMenu,
-                      height: 24,
-                      width: 24,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Menu",
-                      style: AppTextTheme.medium
-                          .copyWith(color: ColorConstant.whiteColor),
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
+
         ],
-      ),
+      ),*/
     );
   }
 
@@ -213,11 +209,24 @@ class _SaloonAfterSelectingServicesPageState
   _imageHeaderWidget() {
     return Stack(
       children: [
-        Image.network(
-          'https://images.unsplash.com/photo-1485686531765-ba63b07845a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFrbWUlMjBzYWxvb258ZW58MHx8MHx8fDA%3D',
+        CachedNetworkImage(
           width: Get.width,
           height: Get.height * 0.28,
           fit: BoxFit.fitWidth,
+          imageUrl:
+              "${APIConstants.image}${_homeController.homeSalonDetailsData.data?.image ?? ""}",
+          placeholder: (context, url) => Image(
+            image: const AssetImage(AssetsConstant.placeHolder),
+            width: Get.width,
+            height: Get.height * 0.28,
+            fit: BoxFit.fitWidth,
+          ),
+          errorWidget: (context, url, error) => Image(
+            image: const AssetImage(AssetsConstant.placeHolder),
+            width: Get.width,
+            height: Get.height * 0.28,
+            fit: BoxFit.fitWidth,
+          ),
         ),
         Positioned(
             child: Container(
@@ -341,17 +350,29 @@ class _SaloonAfterSelectingServicesPageState
             width: Get.width * 0.9,
             child: Text(
               maxLines: 1,
-              "The Ultimate Barber Shop By Javed Habi",
+              _homeController.homeSalonDetailsData.data?.name ?? "",
               overflow: TextOverflow.ellipsis,
               style: AppTextTheme.bold
                   .copyWith(fontSize: 19, color: ColorConstant.blackColor),
             ),
           ),
           const SizedBox(height: 5),
-          Text(
-            "Hair Cut •Spa • Waxing • Shaving",
-            style: AppTextTheme.medium
-                .copyWith(color: ColorConstant.grayTextColor, fontSize: 13),
+          Wrap(
+            spacing: 8.0, // gap between adjacent chips
+            runSpacing: 4.0, // gap between lines
+            children: List.generate(
+              _homeController
+                      .homeSalonDetailsData.data?.serviceCategories?.length ??
+                  0,
+              (index) => FilterChip(
+                labelStyle: AppTextTheme.medium
+                    .copyWith(color: ColorConstant.whiteColor, fontSize: 13),
+                label: Text(
+                    "${_homeController.homeSalonDetailsData.data!.serviceCategories?[index].name}"),
+                backgroundColor: ColorConstant.primaryColor,
+                onSelected: (bool value) {},
+              ),
+            ),
           ),
           const SizedBox(height: 20),
           Dash(
@@ -422,7 +443,7 @@ class _SaloonAfterSelectingServicesPageState
                   SizedBox(
                     width: Get.width * 0.5,
                     child: Text(
-                      "First Floor, Bindal Tower, near  ...",
+                      _homeController.homeSalonDetailsData.data?.address ?? "",
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: AppTextTheme.medium.copyWith(
@@ -453,8 +474,9 @@ class _SaloonAfterSelectingServicesPageState
                       "Get Direction",
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.medium.copyWith(
-                          fontSize: 12, color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender))),
+                          fontSize: 12,
+                          color: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender))),
                     )
                   ],
                 ),
@@ -494,8 +516,9 @@ class _SaloonAfterSelectingServicesPageState
                         "Overview",
                         style: isSelectedTab == 1
                             ? AppTextTheme.bold.copyWith(
-                                fontSize: 16, color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)))
+                                fontSize: 16,
+                                color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender)))
                             : AppTextTheme.medium.copyWith(
                                 fontSize: 16,
                                 color: ColorConstant.grayTextColor),
@@ -506,8 +529,8 @@ class _SaloonAfterSelectingServicesPageState
                         width: Get.width * 0.2,
                         decoration: BoxDecoration(
                             color: isSelectedTab == 1
-                                ? changeTheme(
-                                SharedPrefs.readStringValue(PrefConstants.gender))
+                                ? changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender))
                                 : Colors.transparent,
                             borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(12),
@@ -529,8 +552,9 @@ class _SaloonAfterSelectingServicesPageState
                         "Stylist List",
                         style: isSelectedTab == 2
                             ? AppTextTheme.bold.copyWith(
-                                fontSize: 16, color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)))
+                                fontSize: 16,
+                                color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender)))
                             : AppTextTheme.medium.copyWith(
                                 fontSize: 16,
                                 color: ColorConstant.grayTextColor),
@@ -541,8 +565,8 @@ class _SaloonAfterSelectingServicesPageState
                         width: Get.width * 0.2,
                         decoration: BoxDecoration(
                             color: isSelectedTab == 2
-                                ? changeTheme(
-                                SharedPrefs.readStringValue(PrefConstants.gender))
+                                ? changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender))
                                 : Colors.transparent,
                             borderRadius: const BorderRadius.only(
                                 topLeft: Radius.circular(12),
@@ -571,7 +595,8 @@ class _SaloonAfterSelectingServicesPageState
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 20),
                     child: ReadMoreText(
-                      'n publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before the final copy is available.n publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before the final copy ',
+                      _homeController.homeSalonDetailsData.data?.description ??
+                          "",
                       trimMode: TrimMode.Line,
                       style: AppTextTheme.medium.copyWith(
                           height: 1.5,
@@ -583,8 +608,9 @@ class _SaloonAfterSelectingServicesPageState
                       trimCollapsedText: 'more',
                       trimExpandedText: 'Show less',
                       moreStyle: AppTextTheme.medium.copyWith(
-                          fontSize: 15, color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender))),
+                          fontSize: 15,
+                          color: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender))),
                     ),
                   ),
                   Padding(
@@ -608,14 +634,16 @@ class _SaloonAfterSelectingServicesPageState
                                   "Home Service",
                                   style: AppTextTheme.bold.copyWith(
                                       color: changeTheme(
-                                          SharedPrefs.readStringValue(PrefConstants.gender)),
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.gender)),
                                       fontSize: 13),
                                 ),
                                 CupertinoSwitch(
                                   value: isHomeService,
                                   // Current state of the CupertinoSwitch
                                   activeColor: changeTheme(
-                                      SharedPrefs.readStringValue(PrefConstants.gender)),
+                                      SharedPrefs.readStringValue(
+                                          PrefConstants.gender)),
                                   onChanged: (value) {
                                     setState(() {
                                       isHomeService =
@@ -628,37 +656,41 @@ class _SaloonAfterSelectingServicesPageState
                           ],
                         ),
                         const SizedBox(height: 15),
-                        Dash(
-                          direction: Axis.horizontal,
-                          length: Get.width * 0.89,
-                          dashLength: 2,
-                          dashColor: ColorConstant.grayTextColor,
-                        ),
-                        const SizedBox(height: 15),
                       ],
                     ),
                   ),
                   /*--------------------- Title amd List  ---------------*/
                   ListView.builder(
                       shrinkWrap: true,
-                      itemCount: 2,
                       physics: const NeverScrollableScrollPhysics(),
+                      itemCount:
+                          _homeController.salonDetailsListData.data?.length ??
+                              0,
                       itemBuilder: (context, index) {
-                        return Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 20),
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: Text(
-                                "Hair Cut",
+                        return ExpansionTile(
+                          initiallyExpanded: index == 0 ? true : false,
+                          title: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                _homeController.salonDetailsListData
+                                        .data?[index].name ??
+                                    "",
                                 style: AppTextTheme.bold.copyWith(
-                                    fontSize: 20,
-                                    color: ColorConstant.blackColor),
+                                    color: ColorConstant.blackColor,
+                                    fontSize: 19),
                               ),
-                            ),
-                            const SizedBox(height: 20),
+                              const SizedBox(height: 15),
+                              Dash(
+                                direction: Axis.horizontal,
+                                length: Get.width * 0.8,
+                                dashLength: 2,
+                                dashColor: ColorConstant.grayTextColor,
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                          ),
+                          children: [
                             ListView.separated(
                                 separatorBuilder: (context, index) {
                                   return Container(
@@ -670,10 +702,41 @@ class _SaloonAfterSelectingServicesPageState
                                   );
                                 },
                                 shrinkWrap: true,
-                                itemCount: 3,
+                                itemCount: _homeController.salonDetailsListData
+                                        .data?[index].services?.length ??
+                                    0,
                                 physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
+                                itemBuilder: (context, i) {
                                   return OverviewListTileWidget(
+                                    name: _homeController.salonDetailsListData
+                                            .data?[index].services?[i].name ??
+                                        "",
+                                    image:
+                                        "${APIConstants.image}${_homeController.salonDetailsListData.data?[index].services?[i].image ?? ""}",
+                                    gender: _homeController.salonDetailsListData
+                                            .data?[index].services?[i].gender ??
+                                        "",
+                                    price: _homeController.salonDetailsListData
+                                            .data?[index].services?[i].price ??
+                                        0,
+                                    description: _homeController
+                                            .salonDetailsListData
+                                            .data?[index]
+                                            .services?[i]
+                                            .description ??
+                                        "",
+                                    duration: _homeController
+                                            .salonDetailsListData
+                                            .data?[index]
+                                            .services?[i]
+                                            .duration ??
+                                        0,
+                                    homeService: _homeController
+                                            .salonDetailsListData
+                                            .data?[index]
+                                            .services?[i]
+                                            .homeService ??
+                                        false,
                                     onTap: () {
                                       showModalBottomSheet(
                                           isScrollControlled: true,
@@ -689,6 +752,7 @@ class _SaloonAfterSelectingServicesPageState
                                     },
                                   );
                                 }),
+                            const SizedBox(height: 20),
                           ],
                         );
                       }),
@@ -707,8 +771,9 @@ class _SaloonAfterSelectingServicesPageState
                         child: Text(
                           "Add More Service",
                           style: AppTextTheme.medium.copyWith(
-                              fontSize: 13, color: changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender))),
+                              fontSize: 13,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender))),
                         ),
                       ),
                     ),
@@ -729,16 +794,25 @@ class _SaloonAfterSelectingServicesPageState
                     physics: const NeverScrollableScrollPhysics(),
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, // Number of columns
-                      mainAxisSpacing: 12.0, // Spacing between items vertically
-                      crossAxisSpacing:
-                          12.0, // Spacing between items horizontally
+                      crossAxisCount: 2,
+                      // Number of columns
+                      mainAxisSpacing: 12.0,
+                      // Spacing between items vertically
+                      crossAxisSpacing: 12.0,
+                      // Spacing between items horizontally
                       childAspectRatio: 0.80, // Aspect ratio of each item
                     ),
-                    itemCount: 5,
+                    itemCount: _homeController
+                            .getSalonDetailsArtiestData.data?.length ??
+                        0,
                     // Total number of items
                     itemBuilder: (context, index) {
                       return StylistListGridWidget(
+                        image:
+                            "${APIConstants.image}${_homeController.getSalonDetailsArtiestData.data?[index].profileImage}",
+                        name: _homeController
+                                .getSalonDetailsArtiestData.data?[index].name ??
+                            "",
                         onPress: () {},
                       );
                     },
@@ -773,8 +847,8 @@ class _SaloonAfterSelectingServicesPageState
                             "VIEW MORE",
                             style: AppTextTheme.medium.copyWith(
                                 fontSize: 13,
-                                color: changeTheme(
-                                    SharedPrefs.readStringValue(PrefConstants.gender))),
+                                color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender))),
                           ),
                         ),
                       ),
@@ -800,7 +874,8 @@ class _SaloonAfterSelectingServicesPageState
                               value: serviceOffered,
                               // Current state of the CupertinoSwitch
                               activeColor: changeTheme(
-                                  SharedPrefs.readStringValue(PrefConstants.gender)),
+                                  SharedPrefs.readStringValue(
+                                      PrefConstants.gender)),
                               onChanged: (value) {
                                 setState(() {
                                   serviceOffered =
@@ -824,43 +899,32 @@ class _SaloonAfterSelectingServicesPageState
                   ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: 5,
+                      itemCount:
+                          _homeController.salonDetailsListData.data?.length ??
+                              0,
                       itemBuilder: (context, index) {
                         return ExpansionTile(
                           initiallyExpanded: index == 0 ? true : false,
                           title: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 15),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      "Beard",
-                                      style: AppTextTheme.bold.copyWith(
-                                          color: ColorConstant.blackColor,
-                                          fontSize: 19),
-                                    ),
-                                    Image.asset(
-                                      AssetsConstant.arrowDownListTileIcon,
-                                      height: 13,
-                                      width: 13,
-                                    )
-                                  ],
-                                ),
+                              Text(
+                                _homeController.salonDetailsListData
+                                        .data?[index].name ??
+                                    "",
+                                style: AppTextTheme.bold.copyWith(
+                                    color: ColorConstant.blackColor,
+                                    fontSize: 19),
                               ),
+                              const SizedBox(height: 10),
                               Dash(
                                 direction: Axis.horizontal,
-                                length: Get.width * 0.83,
+                                length: Get.width * 0.75,
                                 dashLength: 2,
                                 dashColor: ColorConstant.grayTextColor,
                               ),
-                              const SizedBox(height: 20),
                             ],
                           ),
-                          trailing: const SizedBox(),
                           children: [
                             ListView.separated(
                                 separatorBuilder: (context, index) {
@@ -873,10 +937,41 @@ class _SaloonAfterSelectingServicesPageState
                                   );
                                 },
                                 shrinkWrap: true,
-                                itemCount: 4,
+                                itemCount: _homeController.salonDetailsListData
+                                        .data?[index].services?.length ??
+                                    0,
                                 physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, index) {
+                                itemBuilder: (context, i) {
                                   return OverviewListTileWidget(
+                                    name: _homeController.salonDetailsListData
+                                            .data?[index].services?[i].name ??
+                                        "",
+                                    image:
+                                        "${APIConstants.image}${_homeController.salonDetailsListData.data?[index].services?[i].image ?? ""}",
+                                    gender: _homeController.salonDetailsListData
+                                            .data?[index].services?[i].gender ??
+                                        "",
+                                    price: _homeController.salonDetailsListData
+                                            .data?[index].services?[i].price ??
+                                        0,
+                                    description: _homeController
+                                            .salonDetailsListData
+                                            .data?[index]
+                                            .services?[i]
+                                            .description ??
+                                        "",
+                                    duration: _homeController
+                                            .salonDetailsListData
+                                            .data?[index]
+                                            .services?[i]
+                                            .duration ??
+                                        0,
+                                    homeService: _homeController
+                                            .salonDetailsListData
+                                            .data?[index]
+                                            .services?[i]
+                                            .homeService ??
+                                        false,
                                     onTap: () {
                                       showModalBottomSheet(
                                           isScrollControlled: true,

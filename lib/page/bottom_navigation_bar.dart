@@ -3,6 +3,7 @@ import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/page/Insights/Insights_home_page.dart';
 import 'package:sallon_customer/page/home/home_page.dart';
+import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
 import '../constant/variable_constant.dart';
@@ -20,10 +21,12 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: statusBarTheme(context),
+      backgroundColor: ColorConstant.bgColor,
       body: _selectedIndex == 0
           ? const HomePage()
           : _selectedIndex == 1
-              ? SizedBox()
+              ? const SizedBox()
               : const InsightsHomePage(),
       extendBody: false,
       bottomNavigationBar: BottomNavigationBar(

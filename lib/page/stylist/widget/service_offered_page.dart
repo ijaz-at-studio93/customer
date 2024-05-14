@@ -31,36 +31,21 @@ class _ServiceAndOfferedPageState extends State<ServiceAndOfferedPage> {
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 15),
-                    child: Row(
-                      mainAxisAlignment:
-                      MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Beard",
-                          style: AppTextTheme.bold.copyWith(
-                              color: ColorConstant.blackColor,
-                              fontSize: 19),
-                        ),
-                        Image.asset(
-                          AssetsConstant.arrowDownListTileIcon,
-                          height: 13,
-                          width: 13,
-                        )
-                      ],
-                    ),
+                  Text(
+                    "Beard",
+                    style: AppTextTheme.bold.copyWith(
+                        color: ColorConstant.blackColor,
+                        fontSize: 19),
                   ),
+                  const SizedBox(height: 10),
                   Dash(
                     direction: Axis.horizontal,
-                    length: Get.width * 0.83,
+                    length: Get.width * 0.8,
                     dashLength: 2,
                     dashColor: ColorConstant.grayTextColor,
                   ),
-                  const SizedBox(height: 20),
                 ],
               ),
-              trailing: const SizedBox(),
               children: [
                 ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 10),

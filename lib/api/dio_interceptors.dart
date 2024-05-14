@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart' hide Response;
+import 'package:sallon_customer/project_specific/no_internet_connection.dart';
 
 import '../controller/auth_controller.dart';
 import 'dio_connectivity_request_retrier.dart';
@@ -14,13 +15,12 @@ class RetryOnConnectionChangeInterceptor extends Interceptor {
   RetryOnConnectionChangeInterceptor({required this.requestRetrier});
 
   @override
-  Future onError(DioError err, ErrorInterceptorHandler handler) async {
+  Future onError(DioException err, ErrorInterceptorHandler handler) async {
     if (_shouldRetry(err)) {
       try {
         Get.find<AuthController>().setShowProgress = false;
-
         if (Get.find<AuthController>().isDialogShow) {
-          /*Get.to(() => const NoInternetConnection());*/
+          Get.to(() => const NoInternetConnection());
           /*Get.dialog(
             NoInternetConnectionDialog(callbackPosBtn: () {
               Get.find<AuthController>().setIsDialogShow = true;
@@ -44,6 +44,8 @@ class RetryOnConnectionChangeInterceptor extends Interceptor {
   }
 
   bool _shouldRetry(DioException err) {
-    return err.type == DioExceptionType.unknown && err.error != null && err.error is SocketException;
+    return  err.type == DioExceptionType.connectionError ||
+        err.error != null || 
+        err.error is SocketException;
   }
 }

@@ -80,13 +80,17 @@ class CustomListTileWidget extends StatelessWidget {
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
                 trimLines: 2,
-                colorClickableText:changeTheme(
-    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                colorClickableText: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                    ColorConstant.primaryColor,
                 trimCollapsedText: 'more',
                 trimExpandedText: 'Show less',
-                moreStyle: AppTextTheme.medium
-                    .copyWith(fontSize: 15, color: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+                moreStyle: AppTextTheme.medium.copyWith(
+                  fontSize: 15,
+                  color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
+                ),
               ),
             ),
           ],

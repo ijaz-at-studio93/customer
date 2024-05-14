@@ -29,15 +29,13 @@ class AssetsConstant {
   static const String sosIcon = "assets/icon/sos.png";
   static const String editIcon = "assets/icon/edit.png";
 
-
-
-
   /*--------------- Image ------------*/
   static const String offer = "assets/images/offer.png";
-
   static const String signOut = "assets/images/sign_out.png";
   static const String reviewRatings = "assets/images/review_ratings.png";
   static const String myBooking = "assets/images/my_booking.png";
   static const String faq = "assets/images/faq.png";
   static const String about = "assets/images/about.png";
+  static const String noInterNet = "assets/images/nointernet_connection.png";
+  static const String placeHolder = "assets/images/place_holder.jpg";
 }

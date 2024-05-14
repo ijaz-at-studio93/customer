@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
@@ -38,7 +39,6 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                 : isSelectedTab == 2
                     ? const StylistPortfolioGridview()
                     : const ReviewAndRating(),
-
             const SizedBox(height: 110)
           ],
         ),
@@ -64,22 +64,22 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                 ),
                 Text(
                   "₹4,000",
-                  style: AppTextTheme.bold.copyWith(
-                      fontSize: 19, color: ColorConstant.blackColor),
+                  style: AppTextTheme.bold
+                      .copyWith(fontSize: 19, color: ColorConstant.blackColor),
                 )
               ],
             ),
             GestureDetector(
-              onTap: (){
-
-                Get.to(()=> const AppointmentBookingPage());
+              onTap: () {
+                Get.to(() => const AppointmentBookingPage());
               },
               child: Container(
                 height: 45,
                 width: Get.width * 0.4,
                 decoration: BoxDecoration(
-                  color:    changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                  color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -112,11 +112,23 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Image.network(
-          'https://images.unsplash.com/photo-1485686531765-ba63b07845a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFrbWUlMjBzYWxvb258ZW58MHx8MHx8fDA%3D',
+        CachedNetworkImage(
           width: Get.width,
           height: Get.height * 0.28,
           fit: BoxFit.fitWidth,
+          imageUrl:
+              'https://images.unsplash.com/photo-1485686531765-ba63b07845a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFrbWUlMjBzYWxvb258ZW58MHx8MHx8fDA%3D',
+          placeholder: (context, url) => Image(
+              image: const AssetImage(AssetsConstant.placeHolder),
+              width: Get.width,
+              height: Get.height * 0.28,
+              fit: BoxFit.fitWidth),
+          errorWidget: (context, url, error) => Image(
+            image: const AssetImage(AssetsConstant.placeHolder),
+            width: Get.width,
+            height: Get.height * 0.28,
+            fit: BoxFit.fitWidth,
+          ),
         ),
         Positioned(
             child: Container(
@@ -253,10 +265,11 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
               itemCount: 5,
               itemSize: 25.0,
               ignoreGestures: true,
-              itemBuilder: (context, _) =>    Icon(
+              itemBuilder: (context, _) => Icon(
                 Icons.star,
-                color:  changeTheme(
-                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                    ColorConstant.primaryColor,
                 size: 25,
               ),
               onRatingUpdate: (rating) {},
@@ -276,13 +289,16 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
             style: AppTextTheme.medium.copyWith(
                 height: 1.5, color: ColorConstant.grayTextColor, fontSize: 14),
             trimLines: 2,
-            colorClickableText:  changeTheme(
-                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+            colorClickableText: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                ColorConstant.primaryColor,
             trimCollapsedText: 'more',
             trimExpandedText: 'Show less',
-            moreStyle: AppTextTheme.medium
-                .copyWith(fontSize: 15, color:  changeTheme(
-                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor),
+            moreStyle: AppTextTheme.medium.copyWith(
+                fontSize: 15,
+                color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                    ColorConstant.primaryColor),
           ),
         ),
       ],
@@ -311,8 +327,10 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       "Service Offered",
                       style: isSelectedTab == 1
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color:  changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
+                              fontSize: 16,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -322,8 +340,9 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 1
-                              ?  changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
+                              ? changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -344,8 +363,10 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       "Portfolio",
                       style: isSelectedTab == 2
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color:  changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
+                              fontSize: 16,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -355,8 +376,9 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 2
-                              ?  changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
+                              ? changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -377,8 +399,10 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       "Review & ratings",
                       style: isSelectedTab == 3
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color:  changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
+                              fontSize: 16,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -388,8 +412,9 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 3
-                              ? changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
+                              ? changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),

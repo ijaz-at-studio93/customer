@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-
 import '../constant/api_constant.dart';
 import '../util/SharedPrefs.dart';
 import 'dio_connectivity_request_retrier.dart';
@@ -49,7 +48,7 @@ class DioClient {
           debugPrint("Bearer $token");
           debugPrint('DioClientPrint');
           if (token.isNotEmpty) {
-            req.headers['Authorization'] = 'Bearer $token';
+            req.headers['x-access-token'] = token;
           }
           return handler.next(req);
         }, onResponse:
@@ -58,12 +57,14 @@ class DioClient {
             if (resp.statusCode == 401 || resp.statusCode == 400) {
               /*Get.find<AuthController>().resetApp();*/
             }
-            if (resp.statusCode == 500) {}
+            if (resp.statusCode == 500) {
+
+            }
           } catch (e) {
             return handler.next(resp);
           }
           return handler.next(resp);
-        }, onError: (DioError error, ErrorInterceptorHandler handler) async {
+        }, onError: (DioException error, ErrorInterceptorHandler handler) async {
           return handler.next(error);
         }),
       );

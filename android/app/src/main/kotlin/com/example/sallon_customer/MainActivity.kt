@@ -1,4 +1,4 @@
-package com.example.sallon_customer
+package com.ananta.scout
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
+import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
@@ -25,9 +27,17 @@ class PopularServiceWidget extends StatelessWidget {
             height: 110,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(6),
-              child: Image.network(
-                  'https://images.unsplash.com/photo-1488376739361-ed24c9beb6d0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHBsYXklMjBpY29ufGVufDB8fDB8fHww',
-                  fit: BoxFit.cover),
+              child: CachedNetworkImage(
+                fit: BoxFit.cover,
+                imageUrl:
+                    'https://images.unsplash.com/photo-1488376739361-ed24c9beb6d0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHBsYXklMjBpY29ufGVufDB8fDB8fHww',
+                placeholder: (context, url) => const Image(
+                    image: AssetImage(AssetsConstant.placeHolder),
+                    fit: BoxFit.cover),
+                errorWidget: (context, url, error) => const Image(
+                    image: AssetImage(AssetsConstant.placeHolder),
+                    fit: BoxFit.cover),
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -87,22 +97,27 @@ class PopularServiceWidget extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 10),
-
               Container(
                 width: 100,
                 height: 30,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(6),
                   color: ColorConstant.pinkBgColor,
-                  border: Border.all(color:changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+                  border: Border.all(
+                    color: changeTheme(SharedPrefs.readStringValue(
+                            PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
+                  ),
                 ),
                 child: Center(
                   child: Text(
                     "Add",
                     style: AppTextTheme.medium.copyWith(
-                        fontSize: 13, color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+                      fontSize: 13,
+                      color: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender)) ??
+                          ColorConstant.primaryColor,
+                    ),
                   ),
                 ),
               ),

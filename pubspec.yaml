@@ -54,6 +54,17 @@ dependencies:
   marquee_text: ^2.5.0+1
   image_picker: ^1.0.7
   page_transition: ^2.1.0
+  platform_device_id: ^1.0.1
+  firebase_core: ^2.30.1
+  firebase_messaging: ^14.9.1
+  cached_network_image: ^3.3.1
+  url_launcher: ^6.2.6
+  flutter_local_notifications: ^17.1.1
+  permission_handler: ^11.3.1
+  google_maps_flutter: ^2.6.1
+  geolocator: ^11.0.0
+  geocoding: ^3.0.0
+  pagination_view: ^2.0.0
 
 
 

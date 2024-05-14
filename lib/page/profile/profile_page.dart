@@ -1,14 +1,14 @@
-import 'dart:io';
-
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/controller/auth_controller.dart';
+import 'package:sallon_customer/page/profile/edit_profile_page.dart';
+import 'package:sallon_customer/project_specific/log_out_dialog.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
-
-import '../../util/pick_image.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -18,7 +18,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  File imagePath = File("");
+  final _authController = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,53 +48,61 @@ class _ProfilePageState extends State<ProfilePage> {
             _imageRowWidget(),
             const SizedBox(height: 5),
             const Divider(
-              color: ColorConstant.garyDividerColor,
-              indent: 20,
-              endIndent: 20,
-              thickness: 1,
-            ),
+                color: ColorConstant.garyDividerColor,
+                indent: 20,
+                endIndent: 20,
+                thickness: 1),
             _listTitleWidget(
                 image: AssetsConstant.myBooking,
                 name: "My Bookings",
                 onPress: () {}),
             const Divider(
-              color: ColorConstant.garyDividerColor,
-              indent: 20,
-              endIndent: 20,
-              thickness: 1,
-            ),
+                color: ColorConstant.garyDividerColor,
+                indent: 20,
+                endIndent: 20,
+                thickness: 1),
             _listTitleWidget(
                 image: AssetsConstant.reviewRatings,
                 name: "Review & Ratings",
                 onPress: () {}),
             const Divider(
-              color: ColorConstant.garyDividerColor,
-              indent: 20,
-              endIndent: 20,
-              thickness: 1,
-            ),
+                color: ColorConstant.garyDividerColor,
+                indent: 20,
+                endIndent: 20,
+                thickness: 1),
             _listTitleWidget(
                 image: AssetsConstant.faq,
                 name: "FAQ’s & Support",
                 onPress: () {}),
             const Divider(
-              color: ColorConstant.garyDividerColor,
-              indent: 20,
-              endIndent: 20,
-              thickness: 1,
-            ),
+                color: ColorConstant.garyDividerColor,
+                indent: 20,
+                endIndent: 20,
+                thickness: 1),
             _listTitleWidget(
                 image: AssetsConstant.about, name: "About Us", onPress: () {}),
             const Divider(
-              color: ColorConstant.garyDividerColor,
-              indent: 20,
-              endIndent: 20,
-              thickness: 1,
-            ),
+                color: ColorConstant.garyDividerColor,
+                indent: 20,
+                endIndent: 20,
+                thickness: 1),
             _listTitleWidget(
                 image: AssetsConstant.signOut,
                 name: "Sign Out",
-                onPress: () {}),
+                onPress: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return LogOutDialog(
+                          noPress: () {
+                            Get.back();
+                          },
+                          yesPress: () {
+                            _authController.resetApp();
+                          },
+                        );
+                      });
+                }),
           ],
         ),
       ),
@@ -107,29 +115,27 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Row(
         children: [
-          InkWell(
-            onTap: () async {
-              FileUtils.openPlatformImagePicker(onSelectImage: (file) {
-                setState(() {
-                  imagePath = file;
-                });
-              });
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(100),
-              child: imagePath.path == ""
-                  ? Image.network(
-                      "https://plus.unsplash.com/premium_photo-1708271598114-5e6e8892a2ad?q=80&w=1935&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                      width: 66,
-                      height: 66,
-                      fit: BoxFit.cover,
-                    )
-                  : Image.file(
-                      imagePath,
-                      width: 66,
-                      height: 66,
-                      fit: BoxFit.cover,
-                    ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: CachedNetworkImage(
+              width: 66,
+              height: 66,
+              fit: BoxFit.cover,
+              imageUrl: _authController
+                      .userResponseModel.data?.userData?.profileImage ??
+                  "",
+              placeholder: (context, url) => const Image(
+                image: AssetImage(AssetsConstant.placeHolder),
+                width: 66,
+                height: 66,
+                fit: BoxFit.cover,
+              ),
+              errorWidget: (context, url, error) => const Image(
+                image: AssetImage(AssetsConstant.placeHolder),
+                width: 66,
+                height: 66,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
           const SizedBox(width: 20),
@@ -137,34 +143,47 @@ class _ProfilePageState extends State<ProfilePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Sourabh Kumar",
+                _authController.userResponseModel.data?.userData?.name ?? "",
                 style: AppTextTheme.bold
                     .copyWith(color: ColorConstant.blackColor, fontSize: 20),
               ),
               const SizedBox(height: 5),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(68),
-                  border:
-                      Border.all(color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, width: 1),
-                ),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      AssetsConstant.editIcon,
-                      width: 14,
-                      height: 14,
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      "Edit Details",
-                      style: AppTextTheme.regular.copyWith(
-                          color: changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 13),
-                    )
-                  ],
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => const EditProfilePage());
+                },
+                child: Container(
+                  height: 35,
+                  width: Get.width * 0.3,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(68),
+                    border: Border.all(
+                        color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender)) ??
+                            ColorConstant.primaryColor,
+                        width: 1),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        AssetsConstant.editIcon,
+                        width: 14,
+                        height: 14,
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        "Edit Details",
+                        style: AppTextTheme.regular.copyWith(
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender)) ??
+                                ColorConstant.primaryColor,
+                            fontSize: 13),
+                      )
+                    ],
+                  ),
                 ),
               )
             ],
@@ -182,7 +201,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: GestureDetector(
+      child: InkWell(
         onTap: onPress,
         child: SizedBox(
           height: 50,
@@ -192,6 +211,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 image,
                 width: 24,
                 height: 24,
+                color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)),
               ),
               const SizedBox(width: 15),
               Text(

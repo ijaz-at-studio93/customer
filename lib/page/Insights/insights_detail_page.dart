@@ -1,6 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
+import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
@@ -41,20 +43,34 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Image.network(
-              widget.image,
+            CachedNetworkImage(
               width: Get.width,
               height: Get.height * 0.3,
               fit: BoxFit.cover,
+              imageUrl: widget.image,
+              placeholder: (context, url) => Image(
+                image: const AssetImage(AssetsConstant.placeHolder),
+                width: Get.width,
+                height: Get.height * 0.3,
+                fit: BoxFit.cover,
+              ),
+              errorWidget: (context, url, error) => Image(
+                image: const AssetImage(AssetsConstant.placeHolder),
+                width: Get.width,
+                height: Get.height * 0.3,
+                fit: BoxFit.cover,
+              ),
             ),
             const SizedBox(height: 18),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
                 "Posted By Amrit Saloon •28 Feb",
-                style: AppTextTheme.medium
-                    .copyWith(color: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 14),
+                style: AppTextTheme.medium.copyWith(
+                    color: changeTheme(SharedPrefs.readStringValue(
+                            PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
+                    fontSize: 14),
               ),
             ),
             Padding(
@@ -74,12 +90,16 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
                     height: 1.5, color: ColorConstant.blackColor, fontSize: 14),
                 trimLines: 6,
                 colorClickableText: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                    ColorConstant.primaryColor,
                 trimCollapsedText: 'more',
                 trimExpandedText: 'Show less',
-                moreStyle: AppTextTheme.medium
-                    .copyWith(fontSize: 15, color: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+                moreStyle: AppTextTheme.medium.copyWith(
+                  fontSize: 15,
+                  color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
+                ),
               ),
             ),
           ],

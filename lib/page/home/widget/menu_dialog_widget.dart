@@ -60,11 +60,12 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
                     bottom: -60,
                     left: 0,
                     right: 0,
-                    child:
-                        ButtonWidget(buttonTitleText: "Done", onPress: () {},
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)),
-                        ),
+                    child: ButtonWidget(
+                      buttonTitleText: "Done",
+                      onPress: () {},
+                      color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
+                    ),
                   )
                 : Positioned(
                     bottom: -60,

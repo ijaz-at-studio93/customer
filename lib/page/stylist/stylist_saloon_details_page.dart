@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -9,13 +10,13 @@ import 'package:sallon_customer/page/appointment/appointment_booking_page.dart';
 import 'package:sallon_customer/page/stylist/widget/review_and_ratings_widget.dart';
 import 'package:sallon_customer/page/stylist/widget/service_offered_page.dart';
 import 'package:sallon_customer/page/stylist/widget/stylist_portfolio_gird_view.dart';
-import 'package:sallon_customer/project_specific/button_widget.dart';
+
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../constant/assetsconstant.dart';
-import 'about_stylist_page.dart';
+
 
 class StylistSaloonDetailsPage extends StatefulWidget {
   const StylistSaloonDetailsPage({super.key});
@@ -153,12 +154,26 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
     return Stack(
       clipBehavior: Clip.none,
       children: [
-        Image.network(
-          'https://images.unsplash.com/photo-1485686531765-ba63b07845a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFrbWUlMjBzYWxvb258ZW58MHx8MHx8fDA%3D',
+        CachedNetworkImage(
           width: Get.width,
           height: Get.height * 0.28,
           fit: BoxFit.fitWidth,
+          imageUrl:
+          "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFrbWUlMjBzYWxvb258ZW58MHx8MHx8fDA%3D",
+          placeholder: (context, url) =>   Image(
+            image: const AssetImage(AssetsConstant.placeHolder),
+            width: Get.width,
+            height: Get.height * 0.28,
+            fit: BoxFit.fitWidth,
+          ),
+          errorWidget: (context, url, error) =>   Image(
+            image: const AssetImage(AssetsConstant.placeHolder),
+            width: Get.width,
+            height: Get.height * 0.28,
+            fit: BoxFit.fitWidth,
+          ),
         ),
+
         Positioned(
             child: Container(
           width: Get.width,
@@ -227,11 +242,26 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
             child: Center(
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(100),
-                child: Image.network(
-                  "https://www.iwmbuzz.com/wp-content/uploads/2020/08/neha-kakkar-hairstyle-take-hair-styling-tips-for-curly-hair-for-girls-4.jpg",
-                  height: 100,
+                child: CachedNetworkImage(
                   width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                  imageUrl:
+                  "https://www.iwmbuzz.com/wp-content/uploads/2020/08/neha-kakkar-hairstyle-take-hair-styling-tips-for-curly-hair-for-girls-4.jpg",
+                  placeholder: (context, url) =>   const Image(
+                    image: AssetImage(AssetsConstant.placeHolder),
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
+                  errorWidget: (context, url, error) =>   const Image(
+                    image: AssetImage(AssetsConstant.placeHolder),
+                    width: 100,
+                    height: 100,
+                    fit: BoxFit.cover,
+                  ),
                 ),
+
               ),
             ),
           ),

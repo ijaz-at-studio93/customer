@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -29,11 +30,24 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(4),
-                  child: Image.network(
-                    'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+                  child: CachedNetworkImage(
                     width: Get.width,
                     height: Get.height * 0.25,
                     fit: BoxFit.fitWidth,
+                    imageUrl:
+                        "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                    placeholder: (context, url) => Image(
+                      image: const AssetImage(AssetsConstant.placeHolder),
+                      width: Get.width,
+                      height: Get.height * 0.25,
+                      fit: BoxFit.fitWidth,
+                    ),
+                    errorWidget: (context, url, error) => Image(
+                      image: const AssetImage(AssetsConstant.placeHolder),
+                      width: Get.width,
+                      height: Get.height * 0.25,
+                      fit: BoxFit.fitWidth,
+                    ),
                   ),
                 ),
                 Positioned(
@@ -88,16 +102,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                     ),
                   ),
                 ),
-                Positioned(
-                  left: 0,
-                  right: 0,
-                  top: 80,
-                  child: Image.asset(
-                    AssetsConstant.playIcon,
-                    height: 60,
-                    width: 60,
-                  ),
-                )
+
               ],
             ),
             const SizedBox(height: 20),
@@ -128,11 +133,24 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                   children: [
                     ClipRRect(
                       borderRadius: BorderRadius.circular(100),
-                      child: Image.network(
-                        "https://images.unsplash.com/photo-1546961329-78bef0414d7c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                      child: CachedNetworkImage(
                         height: 17,
                         width: 17,
                         fit: BoxFit.cover,
+                        imageUrl:
+                            "https://images.unsplash.com/photo-1546961329-78bef0414d7c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                        placeholder: (context, url) => const Image(
+                          image: AssetImage(AssetsConstant.placeHolder),
+                          height: 17,
+                          width: 17,
+                          fit: BoxFit.cover,
+                        ),
+                        errorWidget: (context, url, error) => const Image(
+                          image: AssetImage(AssetsConstant.placeHolder),
+                          height: 17,
+                          width: 17,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 4),

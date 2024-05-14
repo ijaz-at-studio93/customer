@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/controller/auth_controller.dart';
+import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../constant/color_constant.dart';
@@ -17,44 +19,52 @@ class CreateProfilePage extends StatefulWidget {
 }
 
 class _CreateProfilePageState extends State<CreateProfilePage> {
+  /*---------------- Controller Define -------------*/
   final _mobileTextEditingController = TextEditingController();
   final _nameTextEditingController = TextEditingController();
   final _emailTextEditingController = TextEditingController();
+  final _authController = Get.find<AuthController>();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstant.whiteColor,
-      body: Column(
-        children: [
-          _headerWidget(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 35),
-                  _columWithNameTextField(),
-                  const SizedBox(height: 30),
-                  _columPhoneWithTextField(),
-                  const SizedBox(height: 30),
-                  _columWithEmailTextField(),
-                  const SizedBox(height: 35),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 35),
-                    child: ButtonWidget(
-                      color:   changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
-                        buttonTitleText: "Continue",
-                        onPress: () {
-                          _doCreateProfile();
-                        }),
-                  )
-                ],
+      body: Obx(
+        () => ProgressContainerView(
+          isProgressRunning: _authController.showProgress,
+          child: Column(
+            children: [
+              _headerWidget(),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 35),
+                      _columWithNameTextField(),
+                      const SizedBox(height: 30),
+                      _columPhoneWithTextField(),
+                      const SizedBox(height: 30),
+                      _columWithEmailTextField(),
+                      const SizedBox(height: 35),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 35),
+                        child: ButtonWidget(
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender)) ??
+                                ColorConstant.primaryColor,
+                            buttonTitleText: "Continue",
+                            onPress: () {
+                              _doCreateProfile();
+                            }),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -65,8 +75,10 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
       width: Get.width,
       height: Get.height * 0.23,
       padding: const EdgeInsets.only(top: 45, left: 21, right: 21),
-      decoration:   BoxDecoration(color: changeTheme(
-          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor),
+      decoration: BoxDecoration(
+          color:
+              changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                  ColorConstant.primaryColor),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -152,7 +164,6 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                     decoration: InputDecoration(
                         contentPadding: const EdgeInsets.only(bottom: 2),
                         border: InputBorder.none,
-
                         hintText: "10 digit mobile number",
                         counterText: "",
                         hintStyle: AppTextTheme.medium.copyWith(
@@ -254,8 +265,17 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
     } else if (_mobileTextEditingController.text.length != 10) {
       showMessage("Please enter 10 digit mobile number");
     } else {
-      Get.to(
-          () => OtpScreenPage(mobileNumber: _mobileTextEditingController.text));
+      _authController.doSignUp(
+          mobileNO: _mobileTextEditingController.text,
+          name: _nameTextEditingController.text,
+          cc: "91",
+          email: _emailTextEditingController.text,
+          callback: () {
+            Get.to(() => OtpScreenPage(
+                  mobileNumber: _mobileTextEditingController.text,
+                  isLogin: false,
+                ));
+          });
     }
   }
 }

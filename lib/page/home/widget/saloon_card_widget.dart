@@ -1,25 +1,32 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
+import 'package:sallon_customer/constant/api_constant.dart';
 
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/controller/auth_controller.dart';
+import 'package:sallon_customer/model/home_salon_list_model.dart';
+
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class SaloonCardWidget extends StatefulWidget {
   final VoidCallback onPress;
-  const SaloonCardWidget({super.key, required this.onPress});
+  final HomeSalonModel homeSalonModel;
+  const SaloonCardWidget({
+    super.key,
+    required this.onPress,
+    required this.homeSalonModel,
+  });
 
   @override
   State<SaloonCardWidget> createState() => _SaloonCardWidgetState();
 }
 
 class _SaloonCardWidgetState extends State<SaloonCardWidget> {
-  final _authController = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -42,11 +49,24 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                       topLeft: Radius.circular(20),
                       topRight: Radius.circular(20),
                     ),
-                    child: Image.network(
-                      'https://images.unsplash.com/photo-1485686531765-ba63b07845a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFrbWUlMjBzYWxvb258ZW58MHx8MHx8fDA%3D',
+                    child: CachedNetworkImage(
                       width: Get.width,
                       height: Get.height * 0.25,
                       fit: BoxFit.fitWidth,
+                      imageUrl:
+                          "${APIConstants.image}${widget.homeSalonModel.image}",
+                      placeholder: (context, url) => Image(
+                        image: const AssetImage(AssetsConstant.placeHolder),
+                        width: Get.width,
+                        height: Get.height * 0.25,
+                        fit: BoxFit.fitWidth,
+                      ),
+                      errorWidget: (context, url, error) => Image(
+                        image: const AssetImage(AssetsConstant.placeHolder),
+                        width: Get.width,
+                        height: Get.height * 0.25,
+                        fit: BoxFit.fitWidth,
+                      ),
                     ),
                   ),
                   Positioned(
@@ -54,54 +74,33 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     right: 10,
                     child: GestureDetector(
                       onTap: () {
-                        if (_authController.isFavService) {
-                          _authController.isFavServiceSelect = false;
-                        } else {
-                          _authController.isFavServiceSelect = true;
-                        }
+                        setState(() {
+                          widget.homeSalonModel.isFav = !(widget.homeSalonModel.isFav ??false);
+                        });
                       },
-                      child: Obx(
-                        () => Container(
-                          width: 38,
-                          height: 38,
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: ColorConstant.blackColor),
-                          child: Center(
-                            child: _authController.isFavService
-                                ? const Icon(
-                                    CupertinoIcons.heart_fill,
-                                    color: Colors.red,
-                                  )
-                                : Image.asset(
-                                    AssetsConstant.likeBlank,
-                                    height: 20,
-                                    width: 20,
-                                    color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-                                  ),
+                      child: Container(
+                        width: 38,
+                        height: 38,
+                        decoration: const BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: ColorConstant.blackColor),
+                        child: Center(
+                          child: widget.homeSalonModel.isFav ?? false
+                              ? const Icon(
+                            CupertinoIcons.heart_fill,
+                            color: Colors.red,
+                          )
+                              : Image.asset(
+                            AssetsConstant.likeBlank,
+                            height: 20,
+                            width: 20,
+                            color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
                           ),
                         ),
                       ),
                     ),
                   ),
-                  Positioned(
-                    top: 10,
-                    left: 12,
-                    child: Container(
-                      height: 30,
-                      width: Get.width * 0.4,
-                      decoration: BoxDecoration(
-                          color: ColorConstant.topRatedColor,
-                          borderRadius: BorderRadius.circular(6)),
-                      child: Center(
-                        child: Text(
-                          "Hair Style •₹200 Onwards",
-                          style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.whiteColor, fontSize: 12),
-                        ),
-                      ),
-                    ),
-                  ),
+
                   Positioned(
                       bottom: 10,
                       left: 15,
@@ -141,7 +140,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         SizedBox(
                           width: Get.width * 0.5,
                           child: Text(
-                            'Lakme Saloon & Spa',
+                            '${widget.homeSalonModel.name}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             textScaler: const TextScaler.linear(0.85),
@@ -168,20 +167,20 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         ),
                         const SizedBox(height: 5),
                         Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Image.asset(
                               AssetsConstant.locationNewIcon,
                               height: 15,
                               width: 15,
-                              color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)),
                             ),
                             const SizedBox(width: 8),
                             SizedBox(
-                              width: Get.width * 0.5,
+                              width: Get.width * 0.75,
                               child: Text(
-                                'First Floor, Bindal Tower, near..',
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 1,
+                                '${widget.homeSalonModel.address}',
                                 style: AppTextTheme.medium.copyWith(
                                     fontSize: 13,
                                     color: ColorConstant.grayTextColor),
@@ -191,67 +190,10 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         ),
                       ],
                     ),
-                    Container(
-                      decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: ColorConstant.greenColor,
-                          borderRadius: BorderRadius.circular(5)),
-                      width: 60,
-                      height: 30,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            '4.8',
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 11, color: ColorConstant.whiteColor),
-                          ),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ),
               const SizedBox(height: 15),
-              Dash(
-                direction: Axis.horizontal,
-                length: Get.width * 0.85,
-                dashLength: 2,
-                dashColor: const Color(0xffCFCFCF),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Text(
-                      '₹200/-',
-                      style: AppTextTheme.bold.copyWith(
-                          fontSize: 16, color: ColorConstant.blackColor),
-                    ),
-                    Text(
-                      '₹400',
-                      style: AppTextTheme.bold.copyWith(
-                          fontSize: 12,
-                          color: ColorConstant.grayTextColor,
-                          decoration: TextDecoration.lineThrough),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      '50% off',
-                      style: AppTextTheme.bold.copyWith(
-                          color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)), fontSize: 14),
-                    ),
-                  ],
-                ),
-              )
             ],
           ),
         ),

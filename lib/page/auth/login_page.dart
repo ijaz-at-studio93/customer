@@ -5,9 +5,13 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/page/auth/create_profile_page.dart';
+import 'package:sallon_customer/controller/auth_controller.dart';
+
+import 'package:sallon_customer/page/auth/otp_screen_page.dart';
 import 'package:sallon_customer/page/bottom_navigation_bar.dart';
+import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
+
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
@@ -20,38 +24,48 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  /*-----------  Define Controller ------------*/
   final _mobileTextEditingController = TextEditingController();
+
+  final _authController = Get.find<AuthController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstant.whiteColor,
-      body: Column(
-        children: [
-          _headerWidget(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 35),
-                  _columWithTextField(),
-                  const SizedBox(height: 35),
-                  _termsCondition(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 35),
-                    child: ButtonWidget(
-                        color:   changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
-                        buttonTitleText: "Continue",
-                        onPress: () {
-                          _doLogin();
-                        }),
-                  )
-                ],
+      body: Obx(
+        () => ProgressContainerView(
+          isProgressRunning: _authController.showProgress,
+          child: Column(
+            children: [
+              _headerWidget(),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 35),
+                      _columWithTextField(),
+                      const SizedBox(height: 35),
+                      _termsCondition(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 35),
+                        child: ButtonWidget(
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender)) ??
+                                ColorConstant.primaryColor,
+                            buttonTitleText: "Continue",
+                            onPress: () {
+                              _doLogin();
+                            }),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -61,8 +75,10 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       width: Get.width,
       padding: const EdgeInsets.only(top: 50, left: 21, right: 21, bottom: 35),
-      decoration:   BoxDecoration(color: changeTheme(
-          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+      decoration: BoxDecoration(
+        color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
+            ColorConstant.primaryColor,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -237,13 +253,15 @@ class _LoginPageState extends State<LoginPage> {
                 width: 17,
                 decoration: BoxDecoration(
                   color: getWhatsappUpdate
-                      ? changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
+                      ? changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender)) ??
+                          ColorConstant.primaryColor
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(3),
                   border: Border.all(
-                    color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                    color: changeTheme(SharedPrefs.readStringValue(
+                            PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
                   ),
                 ),
                 child: Center(
@@ -259,9 +277,11 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(width: 12),
               Text(
                 "Get Update on whatsapp",
-                style: AppTextTheme.medium
-                    .copyWith(color: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 14),
+                style: AppTextTheme.medium.copyWith(
+                    color: changeTheme(SharedPrefs.readStringValue(
+                            PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
+                    fontSize: 14),
               ),
             ],
           ),
@@ -279,7 +299,16 @@ class _LoginPageState extends State<LoginPage> {
     } else if (!getWhatsappUpdate) {
       showMessage("Please fill Get update on whatsapp");
     } else {
-      Get.to(() => const CreateProfilePage());
+      _authController.doCheckMobileNumberRegistration(
+          mobileNo: _mobileTextEditingController.text,
+          countryCode: "91",
+          callback: () {
+            Get.to(() => OtpScreenPage(
+                  mobileNumber: _mobileTextEditingController.text,
+                  isLogin: false,
+                ));
+          });
+      /* Get.to(() => const CreateProfilePage());*/
     }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -26,14 +27,30 @@ class DialogMenuListWidget extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  "https://static.toiimg.com/thumb/msid-108614769/108614769.jpg?width=500&resizemode=4",
-                  height: 80, width: 80, // Horoscope image
+                child: CachedNetworkImage(
+                  height: 80,
+                  width: 80,
+                  // Horoscope image
                   fit: BoxFit.cover,
+                  imageUrl:
+                      'https://static.toiimg.com/thumb/msid-108614769/108614769.jpg?width=500&resizemode=4',
+                  placeholder: (context, url) => const Image(
+                    image: AssetImage(AssetsConstant.placeHolder),
+                    height: 80,
+                    width: 80,
+                    // Horoscope image
+                    fit: BoxFit.cover,
+                  ),
+                  errorWidget: (context, url, error) => const Image(
+                    image: AssetImage(AssetsConstant.placeHolder),
+                    height: 80,
+                    width: 80,
+                    // Horoscope image
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-              const SizedBox(height: 10),
-              // Space between image and text
+              const SizedBox(height: 10), // Space between image and text
               SizedBox(
                 width: Get.width * 0.2,
                 child: Text(
@@ -68,7 +85,7 @@ class DialogMenuListWidget extends StatelessWidget {
                         ),
                       ),
                     )
-                  : SizedBox(),
+                  : const SizedBox(),
             ),
           )
         ],

@@ -1,10 +1,9 @@
-import 'dart:ffi';
-
-import 'package:flutter/cupertino.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
+import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/add_button_widget.dart';
@@ -12,9 +11,24 @@ import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class OverviewListTileWidget extends StatelessWidget {
-
+  final String name;
+  final String description;
+  final String image;
+  final int price;
+  final int duration;
+  final String gender;
+  final bool homeService;
   final VoidCallback onTap;
-  const OverviewListTileWidget({super.key, required this.onTap});
+  const OverviewListTileWidget(
+      {super.key,
+      required this.onTap,
+      required this.name,
+      required this.description,
+      required this.image,
+      required this.price,
+      required this.duration,
+      required this.gender,
+      required this.homeService});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +45,7 @@ class OverviewListTileWidget extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.6,
                   child: Text(
-                    "Manicure & pedicure",
+                    name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textScaler: const TextScaler.linear(0.85),
@@ -42,14 +56,14 @@ class OverviewListTileWidget extends StatelessWidget {
                 const SizedBox(height: 5),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.star,
-                      color: ColorConstant.grayColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 5),
                     Text(
-                      "4.8 (76 Reviews)",
+                      "Gender • ",
+                      textScaler: const TextScaler.linear(0.85),
+                      style: AppTextTheme.bold.copyWith(
+                          color: ColorConstant.blackColor, fontSize: 16),
+                    ),
+                    Text(
+                      gender,
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.medium.copyWith(
                           color: ColorConstant.grayColor, fontSize: 16),
@@ -60,20 +74,35 @@ class OverviewListTileWidget extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      "₹399 • ",
+                      "₹$price • ",
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.bold.copyWith(
                           color: ColorConstant.blackColor, fontSize: 16),
                     ),
                     Text(
-                      "35 min",
+                      "$duration min",
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.medium.copyWith(
                           color: ColorConstant.grayColor, fontSize: 16),
                     ),
                   ],
                 ),
-                const SizedBox(height: 13),
+                const SizedBox(height: 5),
+                homeService
+                    ? Row(
+                        children: [
+                          const Icon(Icons.home, size: 15),
+                          const SizedBox(width: 5),
+                          Text(
+                            "Is service available",
+                            textScaler: const TextScaler.linear(0.85),
+                            style: AppTextTheme.medium.copyWith(
+                                color: ColorConstant.grayColor, fontSize: 16),
+                          ),
+                        ],
+                      )
+                    : const SizedBox(),
+                const SizedBox(height: 5),
                 Dash(
                   direction: Axis.horizontal,
                   length: Get.width * 0.6,
@@ -84,18 +113,20 @@ class OverviewListTileWidget extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.5,
                   child: ReadMoreText(
-                    'Short Description of the Hair cut ideas of something cut ideas of something.',
+                    description,
                     trimMode: TrimMode.Line,
                     style: AppTextTheme.medium.copyWith(
                         color: ColorConstant.grayTextColor, fontSize: 14),
                     trimLines: 2,
-                    colorClickableText:   changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)),
+                    colorClickableText: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
                     trimCollapsedText: 'more',
                     trimExpandedText: 'Show less',
                     moreStyle: AppTextTheme.medium.copyWith(
-                        fontSize: 15, color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),),
+                      fontSize: 15,
+                      color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
+                    ),
                   ),
                 ),
               ],
@@ -105,20 +136,34 @@ class OverviewListTileWidget extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    "https://cdn.shopify.com/s/files/1/0403/4661/5957/files/5f7b77c13666f8fb7f0dc454c34bde9f_1_480x480.jpg?v=1655612815",
+                  child: CachedNetworkImage(
                     width: 108,
                     height: 123,
                     fit: BoxFit.cover,
+                    imageUrl: image,
+                    placeholder: (context, url) => const Image(
+                      image: AssetImage(AssetsConstant.placeHolder),
+                      width: 108,
+                      height: 123,
+                      fit: BoxFit.cover,
+                    ),
+                    errorWidget: (context, url, error) => const Image(
+                      image: AssetImage(AssetsConstant.placeHolder),
+                      width: 108,
+                      height: 123,
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 Positioned(
                   bottom: -18,
                   left: 8,
                   right: 8,
-                  child: AddButtonWidget(onPress: (){},
-                  color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                  child: AddButtonWidget(
+                    onPress: () {},
+                    color: changeTheme(SharedPrefs.readStringValue(
+                            PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
                   ),
                 )
               ],

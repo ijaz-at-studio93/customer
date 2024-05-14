@@ -14,7 +14,6 @@ class SharedPrefs {
   }
 
 
-
   static bool readBoolValue(String key) {
     return GetStorage().read(key) ?? false;
   }
@@ -31,9 +30,9 @@ class SharedPrefs {
 
 class PrefConstants {
   static const String token = "token";
-
   // static const String accessToken = "accessToken";
   static const String fcmToken = 'FCMToken';
+  static const String deviceId = 'DeviceId';
   static const String isUserLogin = "isLogin";
   static const String userModel = "userModel";
   static const String isFirstTime = 'isFirstTime';
@@ -42,5 +41,4 @@ class PrefConstants {
   static const String userId = "userId";
   static const String isSelectedGender = "isSelectedGender";
   static const String gender = "gender";
-
 }

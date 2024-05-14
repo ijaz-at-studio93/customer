@@ -15,6 +15,10 @@ class AreaOfCitySearchPage extends StatefulWidget {
 }
 
 class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
+
+  /*------------- Controller -------------*/
+  final  _searchTextEditingController  =  TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,6 +114,15 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                 SizedBox(
                   width: Get.width * 0.8,
                   child: TextField(
+                    controller: _searchTextEditingController,
+                    textInputAction: TextInputAction.search,
+                    onEditingComplete: (){
+                     if(_searchTextEditingController.text.isNotEmpty){
+                       FocusManager.instance.primaryFocus?.unfocus();
+                     }else{
+                       FocusManager.instance.primaryFocus?.unfocus();
+                     }
+                    },
                     style: AppTextTheme.medium.copyWith(
                         color: ColorConstant.blackColor, fontSize: 14),
                     decoration: InputDecoration(

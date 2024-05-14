@@ -7,24 +7,29 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/controller/auth_controller.dart';
+import 'package:sallon_customer/page/bottom_navigation_bar.dart';
+import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class OtpScreenPage extends StatefulWidget {
+  final bool isLogin;
   final String mobileNumber;
-  const OtpScreenPage({super.key, required this.mobileNumber});
+  const OtpScreenPage(
+      {super.key, required this.mobileNumber, required this.isLogin});
 
   @override
   State<OtpScreenPage> createState() => _OtpScreenPageState();
 }
 
 class _OtpScreenPageState extends State<OtpScreenPage> {
+  /*---------------- Controller Define -------------*/
   final _otpTextEditingController = TextEditingController();
-
   int _start = 60;
-
   bool isResendOTp = false;
+  final _authController = Get.find<AuthController>();
 
   @override
   void initState() {
@@ -36,31 +41,37 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstant.whiteColor,
-      body: Column(
-        children: [
-          _headerWidget(),
-          Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  const SizedBox(height: 35),
-                  _otpCodeField(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 35),
-                    child: ButtonWidget(
-                        buttonTitleText: "Continue",
-                        color:   changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
-                        onPress: () {
-                          doOtp();
-                        }),
-                  )
-                ],
+      body: Obx(
+        () => ProgressContainerView(
+          isProgressRunning: _authController.showProgress,
+          child: Column(
+            children: [
+              _headerWidget(),
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 35),
+                      _otpCodeField(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 35),
+                        child: ButtonWidget(
+                            buttonTitleText: "Continue",
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender)) ??
+                                ColorConstant.primaryColor,
+                            onPress: () {
+                              doOtp();
+                            }),
+                      )
+                    ],
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -71,8 +82,10 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
       width: Get.width,
       height: Get.height * 0.23,
       padding: const EdgeInsets.only(top: 45, left: 21, right: 21),
-      decoration:   BoxDecoration(color: changeTheme(
-          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+      decoration: BoxDecoration(
+        color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
+            ColorConstant.primaryColor,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -142,9 +155,11 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
             enableActiveFill: true,
             enabled: true,
             animationType: AnimationType.fade,
-            textStyle: AppTextTheme.bold
-                .copyWith(color: changeTheme(
-                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor, fontSize: 16),
+            textStyle: AppTextTheme.bold.copyWith(
+                color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                    ColorConstant.primaryColor,
+                fontSize: 16),
             animationDuration: const Duration(milliseconds: 300),
             onChanged: (value) {},
             pinTheme: PinTheme(
@@ -153,12 +168,14 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
               inactiveFillColor: Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               selectedColor: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                  ColorConstant.primaryColor,
               activeFillColor: const Color(0xffE0D3FF),
               selectedFillColor: Colors.transparent,
               inactiveColor: ColorConstant.grayColor,
               activeColor: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                  ColorConstant.primaryColor,
             ),
             onCompleted: (val) {},
           ),
@@ -174,6 +191,8 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
               isResendOTp
                   ? TextButton(
                       onPressed: () {
+                        _authController.doResendOTP(
+                            mobileNo: widget.mobileNumber, cc: "91");
                         setState(() {
                           _start = 60;
                           isResendOTp = false;
@@ -183,14 +202,20 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
                       child: Text(
                         "Resend",
                         style: AppTextTheme.bold.copyWith(
-                            fontSize: 16, color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+                          fontSize: 16,
+                          color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)) ??
+                              ColorConstant.primaryColor,
+                        ),
                       ))
                   : Text(
                       "Retry in 00:${_start.toString()}",
                       style: AppTextTheme.bold.copyWith(
-                          fontSize: 16, color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+                        fontSize: 16,
+                        color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender)) ??
+                            ColorConstant.primaryColor,
+                      ),
                     ),
             ],
           )
@@ -220,6 +245,15 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
       showMessage("Please enter OTP");
     } else if (_otpTextEditingController.text.length != 6) {
       showMessage("Please enter 6 digit OTP");
-    } else {}
+    } else {
+      _authController.doLogin(
+          mobile: widget.mobileNumber,
+          cc: "91",
+          verificationCode: _otpTextEditingController.text,
+          callback: () {
+            Get.to(()=> const BottomNavBarPage());
+          });
+
+    }
   }
 }
