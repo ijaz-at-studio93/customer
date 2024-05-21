@@ -1,29 +1,30 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/page/home/widget/customized_sheet_widget.dart';
-import 'package:sallon_customer/page/home/widget/view_cart_widget.dart';
-import 'package:sallon_customer/page/stylist/selecting_artist_bottom_sheet.dart';
 import 'package:sallon_customer/page/home/widget/over_view_list_tile_widget.dart';
 import 'package:sallon_customer/page/home/widget/stylist_list_grid_widget.dart';
-import 'package:sallon_customer/project_specific/progressbar_view.dart';
+import 'package:sallon_customer/page/stylist/selecting_artist_bottom_sheet.dart';
+import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
+import 'package:sallon_customer/project_specific/remove_and_add_service_dialog.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
+import 'package:sallon_customer/util/NoItemsWidget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
+import '../appointment/appointment_booking_page.dart';
 import '../search/stylist_search_page.dart';
 
 class SaloonAfterSelectingServicesPage extends StatefulWidget {
   final String salonId;
-
   const SaloonAfterSelectingServicesPage({
     super.key,
     required this.salonId,
@@ -38,6 +39,8 @@ class _SaloonAfterSelectingServicesPageState
     extends State<SaloonAfterSelectingServicesPage> {
   final _homeController = Get.find<HomeController>();
 
+  bool loading = false;
+  final box = GetStorage();
   @override
   void initState() {
     super.initState();
@@ -48,128 +51,187 @@ class _SaloonAfterSelectingServicesPageState
     });
   }
 
+  String serviceId = "";
+  String artiestId = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: statusBarTheme(context),
       backgroundColor: ColorConstant.bgColor,
       body: Obx(
-        () => _homeController.showProgress
-            ? const ProgressBarView()
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _imageHeaderWidget(),
-                    _headerWidget(),
-                    const SizedBox(height: 5),
-                    _tabBarView(),
-                    const SizedBox(height: 110)
-                  ],
-                ),
-              ),
+        () => ProgressContainerView(
+          isProgressRunning: _homeController.showProgress,
+          child: ListView(
+            children: [
+              _imageHeaderWidget(),
+              _headerWidget(),
+              const SizedBox(height: 5),
+              _tabBarView(),
+              const SizedBox(height: 110)
+            ],
+          ),
+        ),
       ),
-      /*floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Stack(
-        alignment: Alignment.center,
-        clipBehavior: Clip.none,
-        children: [
-          Container(
-            width: Get.width,
-            color: ColorConstant.whiteColor,
-            height: 100,
-            clipBehavior: Clip.none,
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: serviceId == ""
+          ? const SizedBox()
+          : Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
               children: [
-                Row(
-                  children: [
-                    FlutterImageStack(
-                      imageList: _images,
-                      showTotalCount: false,
-                      totalCount: 4,
-                      imageSource: ImageSource.network,
-                      itemRadius: 35,
-                      itemCount: 2,
-                      itemBorderWidth: 3, // Border width around the images
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(
-                              "1 Added",
-                              style: AppTextTheme.bold.copyWith(
-                                  fontSize: 13,
-                                  color: ColorConstant.grayTextColor),
-                            ),
-                            const SizedBox(width: 2),
-                            Image.asset(
-                              AssetsConstant.arrowUpIcon,
-                              height: 8,
-                              width: 11,
-                            )
-                          ],
-                        ),
-                        Text(
-                          "₹4,000",
-                          style: AppTextTheme.bold.copyWith(
-                              fontSize: 19, color: ColorConstant.blackColor),
-                        )
-                      ],
-                    ),
-                  ],
-                ),
-                GestureDetector(
-                  onTap: () {
-                    showModalBottomSheet(
-                        isScrollControlled: true,
-                        shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(32),
-                          topRight: Radius.circular(32),
-                        )),
-                        context: context,
-                        builder: (context) {
-                          return const ViewCartWidget();
-                        });
-                  },
-                  child: Container(
-                    height: 45,
-                    width: Get.width * 0.4,
-                    decoration: BoxDecoration(
-                      color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          "Select Stylist",
-                          textScaler: const TextScaler.linear(0.85),
-                          style: AppTextTheme.medium.copyWith(
-                              fontSize: 16, color: ColorConstant.whiteColor),
-                        ),
-                        const SizedBox(width: 10),
-                        const Icon(
-                          Icons.arrow_forward,
-                          color: ColorConstant.whiteColor,
-                          size: 20,
-                        )
-                      ],
-                    ),
+                Container(
+                  width: Get.width,
+                  height: 100,
+                  decoration: const BoxDecoration(
+                    color: ColorConstant.whiteColor,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0x1E000000),
+                        blurRadius: 8,
+                        offset: Offset(-2, -2),
+                        spreadRadius: 0,
+                      )
+                    ],
                   ),
-                )
+                  clipBehavior: Clip.none,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          FlutterImageStack(
+                            imageList: _images,
+                            showTotalCount: false,
+                            totalCount: 4,
+                            imageSource: ImageSource.network,
+                            itemRadius: 35,
+                            itemCount: 2,
+                            itemBorderWidth:
+                                3, // Border width around the images
+                          ),
+                          const SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: () {
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(32),
+                                    topRight: Radius.circular(32),
+                                  )),
+                                  context: context,
+                                  builder: (context) {
+                                    return const CustomizedSheetWidget();
+                                  });
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      "1 Added",
+                                      style: AppTextTheme.bold.copyWith(
+                                          fontSize: 13,
+                                          color: ColorConstant.grayTextColor),
+                                    ),
+                                    const SizedBox(width: 2),
+                                    Image.asset(
+                                      AssetsConstant.arrowUpIcon,
+                                      height: 8,
+                                      width: 11,
+                                    )
+                                  ],
+                                ),
+                                Text(
+                                  "₹4,000",
+                                  style: AppTextTheme.bold.copyWith(
+                                      fontSize: 19,
+                                      color: ColorConstant.blackColor),
+                                )
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          if (serviceId != "" && artiestId != "") {
+                            Get.to(() => AppointmentBookingPage(
+                                  serviceId: serviceId,
+                                  salonId: widget.salonId,
+                                  artiestId: artiestId,
+                                ));
+                          } else {
+                            showModalBottomSheet(
+                                isScrollControlled: true,
+                                isDismissible: false,
+                                enableDrag: false,
+                                shape: const RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(32),
+                                  topRight: Radius.circular(32),
+                                )),
+                                context: context,
+                                builder: (context) {
+                                  return SelectingArtistBottomSheetWidget(
+                                    serviceId: serviceId,
+                                    callback: () {
+                                      artiestId = box.read('artiestId');
+                                    },
+                                  );
+                                });
+                          }
+
+                          /*showModalBottomSheet(
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(32),
+                              topRight: Radius.circular(32),
+                            )),
+                            context: context,
+                            builder: (context) {
+                              return const ViewCartWidget(
+                              );
+                            });*/
+                        },
+                        child: Container(
+                          height: 45,
+                          width: Get.width * 0.4,
+                          decoration: BoxDecoration(
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Select Stylist",
+                                textScaler: const TextScaler.linear(0.85),
+                                style: AppTextTheme.medium.copyWith(
+                                    fontSize: 16,
+                                    color: ColorConstant.whiteColor),
+                              ),
+                              const SizedBox(width: 10),
+                              const Icon(
+                                Icons.arrow_forward,
+                                color: ColorConstant.whiteColor,
+                                size: 20,
+                              )
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
               ],
             ),
-          ),
-
-        ],
-      ),*/
     );
   }
 
@@ -453,14 +515,15 @@ class _SaloonAfterSelectingServicesPageState
                 ],
               ),
               Container(
-                padding: const EdgeInsets.all(11),
-                height: 35,
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10),
                   color: ColorConstant.pinkBgColor,
                   border: Border.all(color: ColorConstant.pinkStrokeColor),
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Image.asset(
                       AssetsConstant.locationShare,
@@ -579,10 +642,7 @@ class _SaloonAfterSelectingServicesPageState
             ),
           ),
           Container(
-            height: 1,
-            width: Get.width,
-            color: const Color(0xffADADAD),
-          ),
+              height: 1, width: Get.width, color: const Color(0xffADADAD)),
 
           /*------------------  OverView  and  Stylist Widget -----------------*/
           if (isSelectedTab == 1)
@@ -613,181 +673,172 @@ class _SaloonAfterSelectingServicesPageState
                               PrefConstants.gender))),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Selected Categories",
-                              style: AppTextTheme.bold.copyWith(
-                                color: ColorConstant.blackColor,
-                                fontSize: 19,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                Text(
-                                  "Home Service",
-                                  style: AppTextTheme.bold.copyWith(
-                                      color: changeTheme(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.gender)),
-                                      fontSize: 13),
-                                ),
-                                CupertinoSwitch(
-                                  value: isHomeService,
-                                  // Current state of the CupertinoSwitch
-                                  activeColor: changeTheme(
-                                      SharedPrefs.readStringValue(
-                                          PrefConstants.gender)),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      isHomeService =
-                                          value; // Update the CupertinoSwitch state
-                                    });
-                                  },
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 15),
-                      ],
-                    ),
-                  ),
                   /*--------------------- Title amd List  ---------------*/
-                  ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount:
-                          _homeController.salonDetailsListData.data?.length ??
+                  _homeController.salonDetailsListData.data?.isEmpty ?? false
+                      ? _homeController.showProgress
+                          ? const SizedBox()
+                          : const NoItemsWidget(
+                              text: "This Salon No Provide Any Service",
+                            )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _homeController
+                                  .salonDetailsListData.data?.length ??
                               0,
-                      itemBuilder: (context, index) {
-                        return ExpansionTile(
-                          initiallyExpanded: index == 0 ? true : false,
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _homeController.salonDetailsListData
-                                        .data?[index].name ??
-                                    "",
-                                style: AppTextTheme.bold.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 19),
+                          itemBuilder: (context, index) {
+                            return ExpansionTile(
+                              initiallyExpanded: index == 0 ? true : false,
+                              title: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    _homeController.salonDetailsListData
+                                            .data?[index].name ??
+                                        "",
+                                    style: AppTextTheme.bold.copyWith(
+                                        color: ColorConstant.blackColor,
+                                        fontSize: 19),
+                                  ),
+                                  const SizedBox(height: 15),
+                                  Dash(
+                                    direction: Axis.horizontal,
+                                    length: Get.width * 0.75,
+                                    dashLength: 2,
+                                    dashColor: ColorConstant.grayTextColor,
+                                  ),
+                                  const SizedBox(height: 20),
+                                ],
                               ),
-                              const SizedBox(height: 15),
-                              Dash(
-                                direction: Axis.horizontal,
-                                length: Get.width * 0.8,
-                                dashLength: 2,
-                                dashColor: ColorConstant.grayTextColor,
-                              ),
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                          children: [
-                            ListView.separated(
-                                separatorBuilder: (context, index) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(
-                                        top: 20, bottom: 20),
-                                    height: 1,
-                                    width: Get.width,
-                                    color: ColorConstant.dividerColor,
-                                  );
-                                },
-                                shrinkWrap: true,
-                                itemCount: _homeController.salonDetailsListData
-                                        .data?[index].services?.length ??
-                                    0,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, i) {
-                                  return OverviewListTileWidget(
-                                    name: _homeController.salonDetailsListData
-                                            .data?[index].services?[i].name ??
-                                        "",
-                                    image:
-                                        "${APIConstants.image}${_homeController.salonDetailsListData.data?[index].services?[i].image ?? ""}",
-                                    gender: _homeController.salonDetailsListData
-                                            .data?[index].services?[i].gender ??
-                                        "",
-                                    price: _homeController.salonDetailsListData
-                                            .data?[index].services?[i].price ??
-                                        0,
-                                    description: _homeController
-                                            .salonDetailsListData
-                                            .data?[index]
-                                            .services?[i]
-                                            .description ??
-                                        "",
-                                    duration: _homeController
-                                            .salonDetailsListData
-                                            .data?[index]
-                                            .services?[i]
-                                            .duration ??
-                                        0,
-                                    homeService: _homeController
-                                            .salonDetailsListData
-                                            .data?[index]
-                                            .services?[i]
-                                            .homeService ??
-                                        false,
-                                    onTap: () {
-                                      showModalBottomSheet(
-                                          isScrollControlled: true,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(32),
-                                            topRight: Radius.circular(32),
-                                          )),
-                                          context: context,
-                                          builder: (context) {
-                                            return const CustomizedSheetWidget();
-                                          });
+                              children: [
+                                ListView.separated(
+                                    separatorBuilder: (context, index) {
+                                      return Container(
+                                        margin: const EdgeInsets.only(
+                                            top: 20, bottom: 20),
+                                        height: 1,
+                                        width: Get.width,
+                                        color: ColorConstant.dividerColor,
+                                      );
                                     },
-                                  );
-                                }),
-                            const SizedBox(height: 20),
-                          ],
-                        );
-                      }),
-                  const SizedBox(height: 25),
-                  Center(
-                    child: Container(
-                      width: Get.width * 0.4,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color: ColorConstant.pinkBgColor,
-                        border:
-                            Border.all(color: ColorConstant.pinkStrokeColor),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Add More Service",
-                          style: AppTextTheme.medium.copyWith(
-                              fontSize: 13,
-                              color: changeTheme(SharedPrefs.readStringValue(
-                                  PrefConstants.gender))),
-                        ),
-                      ),
-                    ),
-                  ),
+                                    shrinkWrap: true,
+                                    itemCount: _homeController
+                                            .salonDetailsListData
+                                            .data?[index]
+                                            .services
+                                            ?.length ??
+                                        0,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemBuilder: (context, i) {
+                                      return OverviewListTileWidget(
+                                        servicesList: _homeController
+                                            .salonDetailsListData
+                                            .data![index]
+                                            .services![i],
+                                        isSelect: _homeController
+                                                .salonDetailsListData
+                                                .data?[index]
+                                                .services?[i]
+                                                .isSelect ??
+                                            false,
+                                        addButtonTap: () {
+                                          setState(() {
+                                            if (serviceId != "") {
+                                              if (_homeController
+                                                      .salonDetailsListData
+                                                      .data?[index]
+                                                      .services?[i]
+                                                      .isSelect ??
+                                                  false) {
+                                                _homeController
+                                                    .salonDetailsListData
+                                                    .data?[index]
+                                                    .services?[i]
+                                                    .isSelect = !(_homeController
+                                                        .salonDetailsListData
+                                                        .data?[index]
+                                                        .services?[i]
+                                                        .isSelect ??
+                                                    false);
+                                                serviceId = "";
+                                                artiestId = "";
+                                              } else {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return RemoveAndAddServiceDialog(
+                                                          noPress: () {
+                                                        Get.back();
+                                                      }, yesPress: () {
+                                                        setState(() {
+                                                          _homeController
+                                                              .doGetHomeSalonDetails(
+                                                                  salonId: widget
+                                                                      .salonId);
+                                                          _homeController
+                                                              .doGetSalonDetailsService(
+                                                                  salonId: widget
+                                                                      .salonId);
+                                                          _homeController
+                                                              .doGetSalonArtiestListData(
+                                                                  salonId: widget
+                                                                      .salonId);
+                                                          Navigator.pop(
+                                                              context);
+                                                          serviceId = "";
+                                                          artiestId = "";
+                                                        });
+                                                      });
+                                                    });
+                                              }
+                                            } else {
+                                              _homeController
+                                                  .salonDetailsListData
+                                                  .data?[index]
+                                                  .services?[i]
+                                                  .isSelect = !(_homeController
+                                                      .salonDetailsListData
+                                                      .data?[index]
+                                                      .services?[i]
+                                                      .isSelect ??
+                                                  false);
+
+                                              if (_homeController
+                                                      .salonDetailsListData
+                                                      .data?[index]
+                                                      .services?[i]
+                                                      .isSelect ??
+                                                  false) {
+                                                serviceId = _homeController
+                                                        .salonDetailsListData
+                                                        .data?[index]
+                                                        .services?[i]
+                                                        .id ??
+                                                    "";
+                                              } else {
+                                                serviceId = "";
+                                                artiestId = "";
+                                              }
+                                            }
+                                          });
+                                        },
+                                        onTap: () {},
+                                      );
+                                    }),
+                                const SizedBox(height: 20),
+                              ],
+                            );
+                          }),
                 ],
               ),
             )
           else
-            Container(
-              color: ColorConstant.whiteColor,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  GridView.builder(
+            _homeController.getSalonDetailsArtiestData.data?.isEmpty ?? false
+                ? const NoItemsWidget(
+                    text: "No Stylist Available",
+                  )
+                : GridView.builder(
                     shrinkWrap: true,
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16, vertical: 15),
@@ -795,206 +846,22 @@ class _SaloonAfterSelectingServicesPageState
                     gridDelegate:
                         const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      // Number of columns
                       mainAxisSpacing: 12.0,
-                      // Spacing between items vertically
                       crossAxisSpacing: 12.0,
-                      // Spacing between items horizontally
-                      childAspectRatio: 0.80, // Aspect ratio of each item
+                      childAspectRatio: 0.62, // Aspect ratio of each item
                     ),
                     itemCount: _homeController
                             .getSalonDetailsArtiestData.data?.length ??
                         0,
-                    // Total number of items
                     itemBuilder: (context, index) {
                       return StylistListGridWidget(
-                        image:
-                            "${APIConstants.image}${_homeController.getSalonDetailsArtiestData.data?[index].profileImage}",
-                        name: _homeController
-                                .getSalonDetailsArtiestData.data?[index].name ??
-                            "",
+                        isView: false,
+                        salonArtiestListModel: _homeController
+                            .getSalonDetailsArtiestData.data![index],
                         onPress: () {},
                       );
                     },
                   ),
-                  const SizedBox(height: 20),
-                  Center(
-                    child: InkWell(
-                      onTap: () {
-                        showModalBottomSheet(
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(32),
-                              topRight: Radius.circular(32),
-                            )),
-                            context: context,
-                            builder: (context) {
-                              return const SelectingArtistBottomSheetWidget();
-                            });
-                      },
-                      child: Container(
-                        width: Get.width * 0.4,
-                        height: 36,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          color: ColorConstant.pinkBgColor,
-                          border:
-                              Border.all(color: ColorConstant.pinkStrokeColor),
-                        ),
-                        child: Center(
-                          child: Text(
-                            "VIEW MORE",
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 13,
-                                color: changeTheme(SharedPrefs.readStringValue(
-                                    PrefConstants.gender))),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Services Offered",
-                              style: AppTextTheme.bold.copyWith(
-                                color: ColorConstant.blackColor,
-                                fontSize: 20,
-                              ),
-                            ),
-                            CupertinoSwitch(
-                              value: serviceOffered,
-                              // Current state of the CupertinoSwitch
-                              activeColor: changeTheme(
-                                  SharedPrefs.readStringValue(
-                                      PrefConstants.gender)),
-                              onChanged: (value) {
-                                setState(() {
-                                  serviceOffered =
-                                      value; // Update the CupertinoSwitch state
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
-                        Dash(
-                          direction: Axis.horizontal,
-                          length: Get.width * 0.89,
-                          dashLength: 2,
-                          dashColor: ColorConstant.grayTextColor,
-                        ),
-                      ],
-                    ),
-                  ),
-                  /*-------------- ExpansionTile Widget ------------*/
-                  ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount:
-                          _homeController.salonDetailsListData.data?.length ??
-                              0,
-                      itemBuilder: (context, index) {
-                        return ExpansionTile(
-                          initiallyExpanded: index == 0 ? true : false,
-                          title: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                _homeController.salonDetailsListData
-                                        .data?[index].name ??
-                                    "",
-                                style: AppTextTheme.bold.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 19),
-                              ),
-                              const SizedBox(height: 10),
-                              Dash(
-                                direction: Axis.horizontal,
-                                length: Get.width * 0.75,
-                                dashLength: 2,
-                                dashColor: ColorConstant.grayTextColor,
-                              ),
-                            ],
-                          ),
-                          children: [
-                            ListView.separated(
-                                separatorBuilder: (context, index) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(
-                                        top: 20, bottom: 20),
-                                    height: 1,
-                                    width: Get.width,
-                                    color: ColorConstant.dividerColor,
-                                  );
-                                },
-                                shrinkWrap: true,
-                                itemCount: _homeController.salonDetailsListData
-                                        .data?[index].services?.length ??
-                                    0,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemBuilder: (context, i) {
-                                  return OverviewListTileWidget(
-                                    name: _homeController.salonDetailsListData
-                                            .data?[index].services?[i].name ??
-                                        "",
-                                    image:
-                                        "${APIConstants.image}${_homeController.salonDetailsListData.data?[index].services?[i].image ?? ""}",
-                                    gender: _homeController.salonDetailsListData
-                                            .data?[index].services?[i].gender ??
-                                        "",
-                                    price: _homeController.salonDetailsListData
-                                            .data?[index].services?[i].price ??
-                                        0,
-                                    description: _homeController
-                                            .salonDetailsListData
-                                            .data?[index]
-                                            .services?[i]
-                                            .description ??
-                                        "",
-                                    duration: _homeController
-                                            .salonDetailsListData
-                                            .data?[index]
-                                            .services?[i]
-                                            .duration ??
-                                        0,
-                                    homeService: _homeController
-                                            .salonDetailsListData
-                                            .data?[index]
-                                            .services?[i]
-                                            .homeService ??
-                                        false,
-                                    onTap: () {
-                                      showModalBottomSheet(
-                                          isScrollControlled: true,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(32),
-                                            topRight: Radius.circular(32),
-                                          )),
-                                          context: context,
-                                          builder: (context) {
-                                            return const CustomizedSheetWidget();
-                                          });
-                                    },
-                                  );
-                                }),
-                            const SizedBox(height: 20),
-                          ],
-                        );
-                      }),
-                  const SizedBox(height: 25),
-                ],
-              ),
-            ),
           const SizedBox(height: 20)
         ],
       ),

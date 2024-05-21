@@ -17,7 +17,6 @@ import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../constant/assetsconstant.dart';
 
-
 class StylistSaloonDetailsPage extends StatefulWidget {
   const StylistSaloonDetailsPage({super.key});
 
@@ -49,7 +48,17 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
         width: Get.width,
-        color: ColorConstant.whiteColor,
+        decoration: const BoxDecoration(
+          color: ColorConstant.whiteColor,
+          boxShadow: [
+            BoxShadow(
+              color: Color(0x1E000000),
+              blurRadius: 8,
+              offset: Offset(-2, -2),
+              spreadRadius: 0,
+            ),
+          ],
+        ),
         height: 100,
         clipBehavior: Clip.none,
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -77,8 +86,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                         Text(
                           "1 Added",
                           style: AppTextTheme.bold.copyWith(
-                              fontSize: 13,
-                              color: ColorConstant.grayTextColor),
+                              fontSize: 13, color: ColorConstant.grayTextColor),
                         ),
                         const SizedBox(width: 2),
                         Image.asset(
@@ -99,14 +107,15 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
             ),
             GestureDetector(
               onTap: () {
-                Get.to(()=> const AppointmentBookingPage());
+                /*Get.to(() => const AppointmentBookingPage());*/
               },
               child: Container(
                 height: 45,
                 width: Get.width * 0.4,
                 decoration: BoxDecoration(
                   color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
@@ -143,12 +152,12 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
     );
   }
 
-
   /*---------  Dummy Image ------*/
   List<String> _images = [
     'https://images.unsplash.com/photo-1593642532842-98d0fd5ebc1a?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=2250&q=80',
     'https://images.unsplash.com/photo-1612594305265-86300a9a5b5b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
   ];
+
   /*-------------- Image header Widget ------------*/
   _imageHeaderWidget() {
     return Stack(
@@ -159,21 +168,20 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
           height: Get.height * 0.28,
           fit: BoxFit.fitWidth,
           imageUrl:
-          "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFrbWUlMjBzYWxvb258ZW58MHx8MHx8fDA%3D",
-          placeholder: (context, url) =>   Image(
+              "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFrbWUlMjBzYWxvb258ZW58MHx8MHx8fDA%3D",
+          placeholder: (context, url) => Image(
             image: const AssetImage(AssetsConstant.placeHolder),
             width: Get.width,
             height: Get.height * 0.28,
             fit: BoxFit.fitWidth,
           ),
-          errorWidget: (context, url, error) =>   Image(
+          errorWidget: (context, url, error) => Image(
             image: const AssetImage(AssetsConstant.placeHolder),
             width: Get.width,
             height: Get.height * 0.28,
             fit: BoxFit.fitWidth,
           ),
         ),
-
         Positioned(
             child: Container(
           width: Get.width,
@@ -247,21 +255,20 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                   height: 100,
                   fit: BoxFit.cover,
                   imageUrl:
-                  "https://www.iwmbuzz.com/wp-content/uploads/2020/08/neha-kakkar-hairstyle-take-hair-styling-tips-for-curly-hair-for-girls-4.jpg",
-                  placeholder: (context, url) =>   const Image(
+                      "https://www.iwmbuzz.com/wp-content/uploads/2020/08/neha-kakkar-hairstyle-take-hair-styling-tips-for-curly-hair-for-girls-4.jpg",
+                  placeholder: (context, url) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
                     width: 100,
                     height: 100,
                     fit: BoxFit.cover,
                   ),
-                  errorWidget: (context, url, error) =>   const Image(
+                  errorWidget: (context, url, error) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
                     width: 100,
                     height: 100,
                     fit: BoxFit.cover,
                   ),
                 ),
-
               ),
             ),
           ),
@@ -324,10 +331,11 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
               itemCount: 5,
               itemSize: 25.0,
               ignoreGestures: true,
-              itemBuilder: (context, _) =>   Icon(
+              itemBuilder: (context, _) => Icon(
                 Icons.star,
-                color:  changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                    ColorConstant.primaryColor,
                 size: 25,
               ),
               onRatingUpdate: (rating) {},
@@ -365,8 +373,10 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       "Service Offered",
                       style: isSelectedTab == 1
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color:  changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
+                              fontSize: 16,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -376,8 +386,9 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 1
-                              ?  changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
+                              ? changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -398,8 +409,10 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       "Portfolio",
                       style: isSelectedTab == 2
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color:  changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
+                              fontSize: 16,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -409,8 +422,9 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 2
-                              ? changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
+                              ? changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),
@@ -431,8 +445,10 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       "Review & ratings",
                       style: isSelectedTab == 3
                           ? AppTextTheme.bold.copyWith(
-                              fontSize: 16, color:  changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor)
+                              fontSize: 16,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor)
                           : AppTextTheme.medium.copyWith(
                               fontSize: 16, color: ColorConstant.grayTextColor),
                     ),
@@ -442,8 +458,9 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                       width: Get.width * 0.2,
                       decoration: BoxDecoration(
                           color: isSelectedTab == 3
-                              ?  changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor
+                              ? changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor
                               : Colors.transparent,
                           borderRadius: const BorderRadius.only(
                               topLeft: Radius.circular(12),

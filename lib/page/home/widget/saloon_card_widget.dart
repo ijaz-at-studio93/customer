@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dash/flutter_dash.dart';
+
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
 
@@ -149,7 +149,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           ),
                         ),
                         const SizedBox(height: 5),
-                        Row(
+                        if (widget.homeSalonModel.homeService ?? false) Row(
                           children: [
                             Text(
                               "25 Min",
@@ -164,7 +164,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                                   fontSize: 13),
                             ),
                           ],
-                        ),
+                        ) else  const SizedBox(),
                         const SizedBox(height: 5),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,

@@ -17,8 +17,8 @@ class _StylistPortfolioGridviewState extends State<StylistPortfolioGridview> {
   Widget build(BuildContext context) {
     return Container(
       color: ColorConstant.whiteColor,
-      height: Get.height,
       child: GridView.builder(
+        shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
         itemCount: 6,

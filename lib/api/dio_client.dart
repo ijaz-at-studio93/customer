@@ -45,7 +45,7 @@ class DioClient {
         InterceptorsWrapper(onRequest:
             (RequestOptions req, RequestInterceptorHandler handler) async {
           String token = SharedPrefs.readStringValue(PrefConstants.token);
-          debugPrint("Bearer $token");
+          debugPrint("x-access-token $token");
           debugPrint('DioClientPrint');
           if (token.isNotEmpty) {
             req.headers['x-access-token'] = token;
@@ -57,14 +57,15 @@ class DioClient {
             if (resp.statusCode == 401 || resp.statusCode == 400) {
               /*Get.find<AuthController>().resetApp();*/
             }
-            if (resp.statusCode == 500) {
-
+            if (resp.statusCode == 500 || resp.statusCode == 502) {
+              showMessage("Internal Server Error Bad Gateway");
             }
           } catch (e) {
             return handler.next(resp);
           }
           return handler.next(resp);
-        }, onError: (DioException error, ErrorInterceptorHandler handler) async {
+        }, onError:
+            (DioException error, ErrorInterceptorHandler handler) async {
           return handler.next(error);
         }),
       );

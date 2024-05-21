@@ -1,10 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:get/get.dart';
+import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/controller/home_controller.dart';
+import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import 'package:ticket_widget/ticket_widget.dart';
@@ -13,15 +17,27 @@ import 'package:url_launcher/url_launcher.dart';
 import '../bottom_navigation_bar.dart';
 
 class QRCodePage extends StatefulWidget {
-  const QRCodePage({super.key});
+  final String appointmentId;
+  const QRCodePage({super.key, required this.appointmentId});
 
   @override
   State<QRCodePage> createState() => _QRCodePageState();
 }
 
 class _QRCodePageState extends State<QRCodePage> {
-    bool _canPopNow = true;
+  bool _canPopNow = true;
   DateTime? _currentBackPressTime;
+
+  final _homeController = Get.find<HomeController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _homeController.doCreateQrCode(appointmentId: widget.appointmentId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -41,7 +57,11 @@ class _QRCodePageState extends State<QRCodePage> {
             const SizedBox(height: 67),
             InkWell(
               onTap: () {
-                Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const BottomNavBarPage()), (route) => false);
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const BottomNavBarPage()),
+                    (route) => false);
               },
               child: const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15),
@@ -51,182 +71,232 @@ class _QRCodePageState extends State<QRCodePage> {
                 ),
               ),
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      CachedNetworkImage(
-                        height: Get.height * 0.26,
-                        width: Get.height,
-                        fit: BoxFit.cover,
-                        imageUrl:
-                            "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-                        placeholder: (context, url) => Image(
-                          image: const AssetImage(AssetsConstant.placeHolder),
-                          height: Get.height * 0.26,
-                          width: Get.height,
-                          fit: BoxFit.cover,
-                        ),
-                        errorWidget: (context, url, error) => Image(
-                          image: const AssetImage(AssetsConstant.placeHolder),
-                          height: Get.height * 0.26,
-                          width: Get.height,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      Positioned(
-                        top: Get.height * 0.18,
-                        right: 0,
-                        left: 0,
-                        child: TicketWidget(
-                          isCornerRounded: true,
-                          padding: const EdgeInsets.all(23),
-                          width: Get.width,
-                          height: Get.height * 0.64,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+            Obx(
+              () =>  Expanded(
+                      child:_homeController.showProgress
+                          ? const ProgressBarView()
+                          : SingleChildScrollView(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 15),
+                          child: Stack(
+                            clipBehavior: Clip.none,
                             children: [
-                              Text(
-                                "Amrit Saloon And Spa",
-                                style: AppTextTheme.bold.copyWith(
-                                    fontSize: 16,
-                                    color: ColorConstant.blackColor),
-                              ),
-                              const SizedBox(height: 15),
-                              Container(
-                                width: Get.width * 0.8,
-                                height: 1,
-                                decoration: const BoxDecoration(
-                                    color: ColorConstant.divider2Color),
-                              ),
-                              const SizedBox(height: 15),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Date",
-                                        style: AppTextTheme.medium.copyWith(
-                                            color: ColorConstant.grayTextColor,
-                                            fontSize: 13),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        "Fri, 15 May 2023",
-                                        style: AppTextTheme.medium.copyWith(
-                                            color: ColorConstant.blackColor,
-                                            fontSize: 13),
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Time Slot",
-                                        style: AppTextTheme.medium.copyWith(
-                                            color: ColorConstant.grayTextColor,
-                                            fontSize: 13),
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        "10:00-10:00 AM",
-                                        style: AppTextTheme.medium.copyWith(
-                                            color: ColorConstant.blackColor,
-                                            fontSize: 13),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 15),
-                              Container(
-                                width: Get.width * 0.8,
-                                height: 1,
-                                decoration: const BoxDecoration(
-                                    color: ColorConstant.divider2Color),
-                              ),
-                              const SizedBox(height: 15),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Address",
-                                    style: AppTextTheme.medium.copyWith(
-                                        color: ColorConstant.grayTextColor,
-                                        fontSize: 13),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  Text(
-                                    "Ring Road No. 1, near RAIPURA, C.G, Changurabhata, Raipur, Chhattisgarh 492007",
-                                    style: AppTextTheme.medium.copyWith(
-                                        color: ColorConstant.blackColor,
-                                        fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 15),
-                              Container(
-                                width: Get.width * 0.8,
-                                height: 1,
-                                decoration: const BoxDecoration(
-                                    color: ColorConstant.divider2Color),
-                              ),
-                              const SizedBox(height: 10),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Stylist Name",
-                                    style: AppTextTheme.medium.copyWith(
-                                        color: ColorConstant.grayTextColor,
-                                        fontSize: 13),
-                                  ),
-                                  const SizedBox(height: 5),
-                                  Text(
-                                    "Ajay Chandrakar",
-                                    style: AppTextTheme.medium.copyWith(
-                                        color: ColorConstant.blackColor,
-                                        fontSize: 13),
-                                  ),
-                                ],
-                              ),
-                              Center(
-                                child: QrImageView(
-                                  data: 'WELCOME-SALON',
-                                  version: QrVersions.auto,
-                                  size: 200.0,
+                              CachedNetworkImage(
+                                height: Get.height * 0.26,
+                                width: Get.height,
+                                fit: BoxFit.cover,
+                                imageUrl:
+                                    "${APIConstants.image} ${_homeController.getUserBookingQrCodeModel.data?.salon?.image ?? ""}",
+                                placeholder: (context, url) => Image(
+                                  image: const AssetImage(
+                                      AssetsConstant.placeHolder),
+                                  height: Get.height * 0.26,
+                                  width: Get.height,
+                                  fit: BoxFit.cover,
+                                ),
+                                errorWidget: (context, url, error) => Image(
+                                  image: const AssetImage(
+                                      AssetsConstant.placeHolder),
+                                  height: Get.height * 0.26,
+                                  width: Get.height,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
-                              const SizedBox(height: 15),
-                              Center(
-                                child: Text(
-                                  "AU86286HH",
-                                  style: AppTextTheme.medium.copyWith(
-                                      fontSize: 13,
-                                      color: ColorConstant.blackColor),
+                              Positioned(
+                                top: Get.height * 0.18,
+                                right: 0,
+                                left: 0,
+                                child: TicketWidget(
+                                  isCornerRounded: true,
+                                  padding: const EdgeInsets.all(23),
+                                  width: Get.width,
+                                  height: Get.height * 0.64,
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _homeController
+                                                .getUserBookingQrCodeModel
+                                                .data
+                                                ?.service
+                                                ?.name ??
+                                            "",
+                                        style: AppTextTheme.bold.copyWith(
+                                            fontSize: 16,
+                                            color: ColorConstant.blackColor),
+                                      ),
+                                      const SizedBox(height: 15),
+                                      Container(
+                                        width: Get.width * 0.8,
+                                        height: 1,
+                                        decoration: const BoxDecoration(
+                                            color: ColorConstant.divider2Color),
+                                      ),
+                                      const SizedBox(height: 15),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Date",
+                                                style: AppTextTheme.medium
+                                                    .copyWith(
+                                                        color: ColorConstant
+                                                            .grayTextColor,
+                                                        fontSize: 13),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Text(
+                                                convertFinalDate(
+                                                    date: _homeController
+                                                            .getUserBookingQrCodeModel
+                                                            .data
+                                                            ?.finalizedAt ??
+                                                        ''),
+                                                style: AppTextTheme.medium
+                                                    .copyWith(
+                                                        color: ColorConstant
+                                                            .blackColor,
+                                                        fontSize: 13),
+                                              ),
+                                            ],
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Time Slot",
+                                                style: AppTextTheme.medium
+                                                    .copyWith(
+                                                        color: ColorConstant
+                                                            .grayTextColor,
+                                                        fontSize: 13),
+                                              ),
+                                              const SizedBox(height: 10),
+                                              Text(
+                                                "${convertDate(date: _homeController.getUserBookingQrCodeModel.data?.startsAt ?? "")} - ${convertDate(date: _homeController.getUserBookingQrCodeModel.data?.endsAt ?? "")}",
+                                                style: AppTextTheme.medium
+                                                    .copyWith(
+                                                        color: ColorConstant
+                                                            .blackColor,
+                                                        fontSize: 13),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 15),
+                                      Container(
+                                        width: Get.width * 0.8,
+                                        height: 1,
+                                        decoration: const BoxDecoration(
+                                            color: ColorConstant.divider2Color),
+                                      ),
+                                      const SizedBox(height: 15),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Address",
+                                            style: AppTextTheme.medium.copyWith(
+                                                color:
+                                                    ColorConstant.grayTextColor,
+                                                fontSize: 13),
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            _homeController
+                                                    .getUserBookingQrCodeModel
+                                                    .data
+                                                    ?.salon
+                                                    ?.address ??
+                                                "",
+                                            style: AppTextTheme.medium.copyWith(
+                                                color: ColorConstant.blackColor,
+                                                fontSize: 13),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 15),
+                                      Container(
+                                        width: Get.width * 0.8,
+                                        height: 1,
+                                        decoration: const BoxDecoration(
+                                            color: ColorConstant.divider2Color),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Stylist Name",
+                                            style: AppTextTheme.medium.copyWith(
+                                                color:
+                                                    ColorConstant.grayTextColor,
+                                                fontSize: 13),
+                                          ),
+                                          const SizedBox(height: 5),
+                                          Text(
+                                            _homeController
+                                                    .getUserBookingQrCodeModel
+                                                    .data
+                                                    ?.artist
+                                                    ?.name ??
+                                                '',
+                                            style: AppTextTheme.medium.copyWith(
+                                                color: ColorConstant.blackColor,
+                                                fontSize: 13),
+                                          ),
+                                        ],
+                                      ),
+                                      Center(
+                                        child: QrImageView(
+                                          data: _homeController
+                                                  .getUserBookingQrCodeModel
+                                                  .data
+                                                  ?.completionToken ??
+                                              "",
+                                          version: QrVersions.auto,
+                                          size: 200.0,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 15),
+                                      Center(
+                                        child: Text(
+                                          _homeController
+                                                  .getUserBookingQrCodeModel
+                                                  .data
+                                                  ?.completionToken ??
+                                              "",
+                                          style: AppTextTheme.medium.copyWith(
+                                              fontSize: 13,
+                                              color: ColorConstant.blackColor),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
-                              )
+                              ),
                             ],
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
+                    ),
             ),
           ],
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () async{
-            _launchPhone("9998936810");
+          onPressed: () async {
+            _launchPhone(_homeController.getUserBookingQrCodeModel.data?.salon?.mobile ?? "");
           },
           backgroundColor: ColorConstant.removeStroke,
           child: Image.asset(
@@ -240,14 +310,31 @@ class _QRCodePageState extends State<QRCodePage> {
   }
 
   /*-------------- Call Function -----------*/
-    _launchPhone(String phoneNumber) async {
-      String url = 'tel:$phoneNumber';
-      if (await canLaunch(url)) {
-        await launch(url);
-      } else {
-        throw 'Could not launch $url';
-      }
+  _launchPhone(String phoneNumber) async {
+    String url = 'tel:$phoneNumber';
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
     }
+  }
+
+  /*---------------- convertTime ------------*/
+  String convertDate({required String date}) {
+    String dateTimeString = date;
+    DateTime dateTime = DateTime.parse(dateTimeString);
+    String formattedTime = DateFormat('hh:mm a').format(dateTime);
+    return formattedTime;
+  }
+
+  /*--------------  convert Final  Date -----------*/
+  String convertFinalDate({required String date}) {
+    String dateTimeString = date;
+    DateTime dateTime = DateTime.parse(dateTimeString);
+    String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+    String formattedTime = DateFormat('hh:mm a').format(dateTime);
+    return "$formattedDate $formattedTime";
+  }
 
   void tapBackAgainToCloseApp() {
     DateTime now = DateTime.now();
@@ -260,10 +347,14 @@ class _QRCodePageState extends State<QRCodePage> {
       });
       Future.delayed(
         const Duration(seconds: 3),
-            () {
+        () {
           setState(() {
             _canPopNow = false;
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=> const BottomNavBarPage()), (route) => false);
+            Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const BottomNavBarPage()),
+                (route) => false);
             _currentBackPressTime = null;
           });
         },

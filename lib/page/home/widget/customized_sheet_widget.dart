@@ -135,7 +135,17 @@ class _CustomizedSheetWidgetState extends State<CustomizedSheetWidget> {
               ),
               Container(
                 width: Get.width,
-                color: ColorConstant.whiteColor,
+                decoration: const BoxDecoration(
+                  color: ColorConstant.whiteColor,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Color(0x1E000000),
+                      blurRadius: 8,
+                      offset: Offset(-2, -2),
+                      spreadRadius: 0,
+                    ),
+                  ],
+                ),
                 height: 100,
                 clipBehavior: Clip.none,
                 padding: const EdgeInsets.symmetric(horizontal: 24),

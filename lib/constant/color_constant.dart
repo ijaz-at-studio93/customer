@@ -24,6 +24,7 @@ class ColorConstant {
   static const Color selectTimeSlotBorder = Color(0xffEEEEEE);
   static const Color editProduct = Color(0xffE2E2E2);
   static const Color editBgProduct = Color(0xffF2F2F2);
+  static const Color  idColor = Color(0xffADADAD);
   static const Color removeStroke = Color(0xffE63232);
   static const Color removeBgStroke = Color(0xffFFE9E9);
   static const Color removeBgButton = Color(0xffFFD3D3);

@@ -11,6 +11,7 @@ class HomeSalonModel {
   String? createdAt;
   String? updatedAt;
   int? distance;
+  bool? homeService;
   bool? isFav;
 
   HomeSalonModel(
@@ -26,6 +27,7 @@ class HomeSalonModel {
       this.createdAt,
       this.updatedAt,
       this.distance,
+      this.homeService,
       this.isFav});
 
   HomeSalonModel.fromJson(Map<String, dynamic> json) {
@@ -43,6 +45,7 @@ class HomeSalonModel {
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     distance = json['distance'];
+    homeService = json['homeService'];
   }
 
   Map<String, dynamic> toJson() {
@@ -61,6 +64,7 @@ class HomeSalonModel {
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
     data['distance'] = distance;
+    data['homeService'] = homeService;
     return data;
   }
 }

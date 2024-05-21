@@ -5,6 +5,7 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
@@ -16,6 +17,7 @@ import 'package:sallon_customer/page/home/saloon_after_selecting_page.dart';
 import 'package:sallon_customer/page/home/widget/menu_dialog_widget.dart';
 import 'package:sallon_customer/page/home/widget/saloon_card_widget.dart';
 import 'package:sallon_customer/page/location/google_map.dart';
+import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
@@ -32,16 +34,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  /*------------  Controller ----------------------*/
+  /*-------------------  Controller ----------------------*/
   int _selectedGender = 0;
   final _authController = Get.find<AuthController>();
   final _homeController = Get.find<HomeController>();
 
+  ScrollController scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      getCurrentLatLng();
+    getCurrentLatLng();
+    scrollController.addListener(() {
+      if (_homeController.lat != 0.0 && _homeController.lng != 0.0) {
+        if (scrollController.position.pixels ==
+            scrollController.position.maxScrollExtent) {
+          _homeController.fetchPosts();
+        }
+      }
     });
   }
 
@@ -51,41 +61,61 @@ class _HomePageState extends State<HomePage> {
       appBar: statusBarTheme(context),
       backgroundColor: ColorConstant.bgColor,
       body: Obx(
-        () => _homeController.showProgress
-            ? const ProgressBarView()
-            : SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _headerWidget(),
-                    const SizedBox(height: 10),
-                    _searchWidget(),
-                    const SizedBox(height: 10),
-                    _ourService(),
-                    const SizedBox(height: 15),
-                    _offer(),
-                    const SizedBox(height: 10),
-                    _saloonsFoundNear(),
-                    ListView.builder(
-                        padding: EdgeInsets.zero,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _homeController.homeSalonList.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index) {
-                          return SaloonCardWidget(
-                            homeSalonModel:
-                                _homeController.homeSalonList[index],
-                            onPress: () {
-                              Get.to(() => SaloonAfterSelectingServicesPage(
-                                    salonId: _homeController
-                                            .homeSalonList[index].id ??
-                                        "",
-                                  ));
-                            },
-                          );
-                        }),
-                  ],
-                ),
-              ),
+        () => ProgressContainerView(
+          isProgressRunning: _homeController.showProgress,
+          child: ListView(
+            controller: scrollController,
+            shrinkWrap: true,
+            children: [
+              _headerWidget(),
+              const SizedBox(height: 10),
+              _searchWidget(),
+              const SizedBox(height: 10),
+              _ourService(),
+              const SizedBox(height: 15),
+              _offer(),
+              const SizedBox(height: 10),
+              _saloonsFoundNear(),
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: _homeController.salonList.length +
+                    (_homeController.isLoading.value ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index == _homeController.salonList.length) {
+                    return const ProgressBarView();
+                  }
+                  return SaloonCardWidget(
+                    homeSalonModel: _homeController.salonList[index],
+                    onPress: () {
+                      Get.to(
+                        () => SaloonAfterSelectingServicesPage(
+                          salonId: _homeController.salonList[index].id ?? "",
+                        ),
+                      );
+                    },
+                  );
+                },
+              )
+              /*ListView.builder(
+                  padding: EdgeInsets.zero,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: _homeController.homeSalonList.length,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) {
+                    return SaloonCardWidget(
+                      homeSalonModel: _homeController.homeSalonList[index],
+                      onPress: () {
+                        Get.to(() => SaloonAfterSelectingServicesPage(
+                              salonId:
+                                  _homeController.homeSalonList[index].id ?? "",
+                            ));
+                      },
+                    );
+                  })*/
+            ],
+          ),
+        ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Container(
@@ -236,17 +266,20 @@ class _HomePageState extends State<HomePage> {
                           color: ColorConstant.blackColor, fontSize: 20),
                     ),
                     const SizedBox(height: 3),
-                    SizedBox(
-                      width: Get.width * 0.6,
-                      child: FittedBox(
-                        child: Text(
-                          _authController.userCurrentLocation,
-                          maxLines: 1,
-                          style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.grayColor, fontSize: 13),
-                        ),
-                      ),
-                    ),
+                    _homeController.showProgress
+                        ? const SizedBox()
+                        : SizedBox(
+                            width: Get.width * 0.6,
+                            child: FittedBox(
+                              child: Text(
+                                _authController.userCurrentLocation,
+                                maxLines: 1,
+                                style: AppTextTheme.medium.copyWith(
+                                    color: ColorConstant.grayColor,
+                                    fontSize: 13),
+                              ),
+                            ),
+                          ),
                   ],
                 ),
               ],
@@ -283,6 +316,7 @@ class _HomePageState extends State<HomePage> {
   _searchWidget() {
     return GestureDetector(
       onTap: () {
+
         Get.to(() => const AreaOfCitySearchPage());
       },
       child: Container(
@@ -408,7 +442,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /*------------  Offer ----------*/
+  /*--------------------  Offer -------------------*/
   _offer() {
     return SizedBox(
       height: 100,
@@ -478,7 +512,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /*------------ Saloons Found Near ----------- */
-  bool atHome = true;
+  bool atHome = false;
   _saloonsFoundNear() {
     return Container(
       color: ColorConstant.whiteColor,
@@ -490,7 +524,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "37 Saloons Found Near You",
+                  "${_homeController.salonList.length} Saloons Found Near You",
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.bold
                       .copyWith(fontSize: 19, color: ColorConstant.blackColor),
@@ -600,7 +634,6 @@ class _HomePageState extends State<HomePage> {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission;
     if (!serviceEnabled) {
-      Get.back();
       await Permission.location.request();
       showMessage("Location services are disabled.");
       return Future.error('Location services are disabled.');
@@ -609,14 +642,13 @@ class _HomePageState extends State<HomePage> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        Get.back();
         await Permission.location.request();
         showMessage("Location permissions are denied");
         return Future.error('Location permissions are denied');
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      Get.back();
+      openAppSettings();
       showMessage(
           "Location permissions are permanently denied, we cannot request permissions.");
       return Future.error(
@@ -626,12 +658,23 @@ class _HomePageState extends State<HomePage> {
     List<Placemark> placemarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
 
+    _homeController.lat = position.latitude;
+    _homeController.lng = position.longitude;
+
     Placemark place = placemarks[0];
     _authController.userCity = "${place.locality}";
     _authController.userCurrentLocation =
         "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
-    _homeController.doGetHomeCategory();
-    _homeController.doGetHomeSalonList(
-        offset: 1, size: 10, lat: position.latitude, lng: position.longitude);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _homeController.doGetHomeCategory();
+      _homeController.fetchPosts();
+      // _homeController.doGetHomeSalonList(
+      //     offset: 1, size: 10, lat: position.latitude, lng: position.longitude);
+    });
   }
+
+
+
+
+
 }

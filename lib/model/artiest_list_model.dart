@@ -1,19 +1,18 @@
-class SalonDetailsArtiestModel {
+class ArtistListModel {
   int? statusCode;
   bool? success;
-  List<SalonArtiestListModel>? data;
+  List<Artiest>? data;
   String? message;
 
-  SalonDetailsArtiestModel(
-      {this.statusCode, this.success, this.data, this.message});
+  ArtistListModel({this.statusCode, this.success, this.data, this.message});
 
-  SalonDetailsArtiestModel.fromJson(Map<String, dynamic> json) {
+  ArtistListModel.fromJson(Map<String, dynamic> json) {
     statusCode = json['statusCode'];
     success = json['success'];
     if (json['data'] != null) {
-      data = <SalonArtiestListModel>[];
+      data = <Artiest>[];
       json['data'].forEach((v) {
-        data!.add(SalonArtiestListModel.fromJson(v));
+        data!.add(Artiest.fromJson(v));
       });
     }
     message = json['message'];
@@ -31,7 +30,7 @@ class SalonDetailsArtiestModel {
   }
 }
 
-class  SalonArtiestListModel {
+class Artiest {
   String? id;
   String? name;
   String? dob;
@@ -39,9 +38,10 @@ class  SalonArtiestListModel {
   int? experience;
   bool? homeService;
   String? gender;
-  bool? isSelected;
+  String? artistServiceableGender;
+  bool? isSelectArtist;
 
-  SalonArtiestListModel(
+  Artiest(
       {this.id,
       this.name,
       this.dob,
@@ -49,9 +49,10 @@ class  SalonArtiestListModel {
       this.experience,
       this.homeService,
       this.gender,
-      this.isSelected});
+      this.artistServiceableGender,
+      this.isSelectArtist});
 
-  SalonArtiestListModel.fromJson(Map<String, dynamic> json) {
+  Artiest.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
     dob = json['dob'];
@@ -59,6 +60,7 @@ class  SalonArtiestListModel {
     experience = json['experience'];
     homeService = json['homeService'];
     gender = json['gender'];
+    artistServiceableGender = json['artistServiceableGender'];
   }
 
   Map<String, dynamic> toJson() {
@@ -70,6 +72,7 @@ class  SalonArtiestListModel {
     data['experience'] = experience;
     data['homeService'] = homeService;
     data['gender'] = gender;
+    data['artistServiceableGender'] = artistServiceableGender;
     return data;
   }
 }

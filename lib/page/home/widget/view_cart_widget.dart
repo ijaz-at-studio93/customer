@@ -131,7 +131,7 @@ class _ViewCartWidgetState extends State<ViewCartWidget> {
                     GestureDetector(
                       onTap: () {
                         Navigator.pop(context);
-                        Get.to(()=> const AppointmentBookingPage());
+                     /*   Get.to(()=> const AppointmentBookingPage());*/
                       },
                       child: Container(
                         height: 45,

@@ -29,7 +29,7 @@ class AssetsConstant {
   static const String sosIcon = "assets/icon/sos.png";
   static const String editIcon = "assets/icon/edit.png";
 
-  /*--------------- Image ------------*/
+  /*--------------- Image -------------------*/
   static const String offer = "assets/images/offer.png";
   static const String signOut = "assets/images/sign_out.png";
   static const String reviewRatings = "assets/images/review_ratings.png";

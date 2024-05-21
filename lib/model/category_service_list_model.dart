@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class CategoryServicesListModel {
   int? statusCode;
   bool? success;
@@ -72,16 +74,19 @@ class Services {
   int? duration;
   String? gender;
   bool? homeService;
+  bool? isSelect;
 
-  Services(
-      {this.id,
-      this.name,
-      this.description,
-      this.image,
-      this.price,
-      this.duration,
-      this.gender,
-      this.homeService});
+  Services({
+    this.id,
+    this.name,
+    this.description,
+    this.image,
+    this.price,
+    this.duration,
+    this.gender,
+    this.homeService,
+    this.isSelect,
+  });
 
   Services.fromJson(Map<String, dynamic> json) {
     id = json['id'];

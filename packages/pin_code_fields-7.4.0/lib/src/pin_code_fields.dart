@@ -639,7 +639,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
             ),
           ],
         );
-      } else
+      } else {
         return Center(
           child: FadeTransition(
             opacity: _cursorAnimation,
@@ -652,6 +652,7 @@ class _PinCodeTextFieldState extends State<PinCodeTextField>
             ),
           ),
         );
+      }
     }
     return _renderPinField(
       index: index,

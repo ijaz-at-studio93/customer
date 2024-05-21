@@ -8,6 +8,7 @@ import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/page/appointment/appointment_booking_page.dart';
 import 'package:sallon_customer/page/stylist/widget/review_and_ratings_widget.dart';
 import 'package:sallon_customer/page/stylist/widget/service_offered_page.dart';
+import 'package:sallon_customer/page/stylist/widget/stylist_basic_info.dart';
 import 'package:sallon_customer/page/stylist/widget/stylist_portfolio_gird_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
@@ -27,7 +28,7 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: statusBarTheme(context),
-      backgroundColor: ColorConstant.bgColor,
+      backgroundColor: ColorConstant.whiteColor,
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -35,75 +36,15 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
             _nameContainColum(),
             _tabBarView(),
             isSelectedTab == 1
-                ? const ServiceAndOfferedPage()
+                ? const StylistBasicInfo()
                 : isSelectedTab == 2
                     ? const StylistPortfolioGridview()
                     : const ReviewAndRating(),
-            const SizedBox(height: 110)
+
           ],
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        width: Get.width,
-        color: ColorConstant.whiteColor,
-        height: 90,
-        clipBehavior: Clip.none,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "1 Add On",
-                  style: AppTextTheme.bold.copyWith(
-                      fontSize: 13, color: ColorConstant.grayTextColor),
-                ),
-                Text(
-                  "₹4,000",
-                  style: AppTextTheme.bold
-                      .copyWith(fontSize: 19, color: ColorConstant.blackColor),
-                )
-              ],
-            ),
-            GestureDetector(
-              onTap: () {
-                Get.to(() => const AppointmentBookingPage());
-              },
-              child: Container(
-                height: 45,
-                width: Get.width * 0.4,
-                decoration: BoxDecoration(
-                  color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
-                      ColorConstant.primaryColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Book Appointment",
-                      textScaler: const TextScaler.linear(0.85),
-                      style: AppTextTheme.medium.copyWith(
-                          fontSize: 16, color: ColorConstant.whiteColor),
-                    ),
-                    const SizedBox(width: 10),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: ColorConstant.whiteColor,
-                      size: 20,
-                    )
-                  ],
-                ),
-              ),
-            )
-          ],
-        ),
-      ),
+
     );
   }
 
@@ -324,7 +265,7 @@ class _AboutStylistPageState extends State<AboutStylistPage> {
                 child: Column(
                   children: [
                     Text(
-                      "Service Offered",
+                      "Basic Info",
                       style: isSelectedTab == 1
                           ? AppTextTheme.bold.copyWith(
                               fontSize: 16,

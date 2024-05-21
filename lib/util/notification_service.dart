@@ -5,10 +5,15 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:just_audio/just_audio.dart';
 
+final player = AudioPlayer();
 /*background notification handler*/
-Future<dynamic> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+Future<dynamic> firebaseMessagingBackgroundHandler(
+    RemoteMessage message) async {
   await Firebase.initializeApp();
+  await player.setAsset('assets/notification_sound.mp3');
+  player.play();
   if (kDebugMode) {
     print('Message: ${message.data}');
   }
@@ -17,7 +22,8 @@ Future<dynamic> firebaseMessagingBackgroundHandler(RemoteMessage message) async 
 }
 
 /*Handle the clicked notification.*/
-Future<void> handleNotification(Map<String, dynamic> data, {bool delay = false}) async {
+Future<void> handleNotification(Map<String, dynamic> data,
+    {bool delay = false}) async {
   switch (data['push_type']) {
     /*  case '5':
       Get.to(() => const ReferAndEarnPage(isNotificationClick: true));
@@ -45,10 +51,13 @@ class PushNotificationService {
 
     SchedulerBinding.instance.addPostFrameCallback(
       (_) async {
-        await FirebaseMessaging.instance.getInitialMessage().then((RemoteMessage? message) {
+        await FirebaseMessaging.instance
+            .getInitialMessage()
+            .then((RemoteMessage? message) {
           // this.message = message?.data;
           if (message?.data.isNotEmpty ?? false) {
-            Future.delayed(const Duration(milliseconds: 900)).then((value) => handleNotification(message!.data));
+            Future.delayed(const Duration(milliseconds: 900))
+                .then((value) => handleNotification(message!.data));
           }
         });
       },
@@ -74,17 +83,23 @@ class PushNotificationService {
 
   registerNotificationListeners() async {
     AndroidNotificationChannel channel = androidNotificationChannel();
-      final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+    final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+        FlutterLocalNotificationsPlugin();
     await flutterLocalNotificationsPlugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
-    var androidSettings = const AndroidInitializationSettings('@mipmap/notification_icon');
+    var androidSettings = const AndroidInitializationSettings(
+      '@mipmap/notification_icon',
+    );
     var iOSSettings = const DarwinInitializationSettings(
       requestSoundPermission: false,
       requestAlertPermission: false,
     );
-    var initSettings = InitializationSettings(android: androidSettings, iOS: iOSSettings);
-    flutterLocalNotificationsPlugin.initialize(initSettings, onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
+    var initSettings =
+        InitializationSettings(android: androidSettings, iOS: iOSSettings);
+    flutterLocalNotificationsPlugin.initialize(initSettings,
+        onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
     FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
     FirebaseMessaging.onMessage.listen((RemoteMessage? message) {
@@ -105,6 +120,7 @@ class PushNotificationService {
                   channel.name,
                   channelDescription: channel.description,
                   icon: android?.smallIcon,
+                  /* sound:   const RawResourceAndroidNotificationSound("assets/notification_sound.mp3")*/
                   playSound: true,
                 ),
               ),
@@ -122,14 +138,16 @@ class PushNotificationService {
         importance: Importance.max,
       );
 
-  Future onDidReceiveNotificationResponse(NotificationResponse? notificationResponse) async {
+  Future onDidReceiveNotificationResponse(
+      NotificationResponse? notificationResponse) async {
     if (message != null) {
       handleNotification(message);
     }
   }
 
   /* Handle the clicked notification.*/
-  Future<void> handleNotification(Map<String, dynamic> data, {bool delay = false}) async {
+  Future<void> handleNotification(Map<String, dynamic> data,
+      {bool delay = false}) async {
     message = data;
     switch (message['push_type']) {
       /* case '5':

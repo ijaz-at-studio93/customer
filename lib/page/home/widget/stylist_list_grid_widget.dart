@@ -3,24 +3,36 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/model/salon_details_artiest.dart';
+import 'package:sallon_customer/page/stylist/about_stylist_page.dart';
+import 'package:sallon_customer/project_specific/remove_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
-
+import '../../../constant/api_constant.dart';
+import '../../../constant/variable_constant.dart';
+import '../../../util/SharedPrefs.dart';
 import '../../stylist/stylist_saloon_details_page.dart';
 
-class StylistListGridWidget extends StatelessWidget {
+class StylistListGridWidget extends StatefulWidget {
   final VoidCallback onPress;
-  final String image;
-  final String name;
-  const StylistListGridWidget(
-      {super.key,
-      required this.onPress,
-      required this.image,
-      required this.name});
+  final bool isView;
+  final SalonArtiestListModel salonArtiestListModel;
 
+  const StylistListGridWidget({
+    super.key,
+    required this.onPress,
+    required this.salonArtiestListModel,
+    required this.isView,
+  });
+
+  @override
+  State<StylistListGridWidget> createState() => _StylistListGridWidgetState();
+}
+
+class _StylistListGridWidgetState extends State<StylistListGridWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onPress,
+      onTap: widget.onPress,
       child: Container(
         decoration: ShapeDecoration(
           shape: RoundedRectangleBorder(
@@ -41,7 +53,8 @@ class StylistListGridWidget extends StatelessWidget {
                     width: Get.width,
                     height: 135,
                     fit: BoxFit.cover,
-                    imageUrl: image,
+                    imageUrl:
+                        "${APIConstants.image}${widget.salonArtiestListModel.profileImage}",
                     placeholder: (context, url) => Image(
                       image: const AssetImage(AssetsConstant.placeHolder),
                       width: Get.width,
@@ -77,12 +90,12 @@ class StylistListGridWidget extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    name,
+                    widget.salonArtiestListModel.name ?? "",
                     textScaler: const TextScaler.linear(0.85),
                     style: AppTextTheme.bold.copyWith(
                         color: ColorConstant.blackColor, fontSize: 15),
@@ -105,9 +118,51 @@ class StylistListGridWidget extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 10),
+            !widget.isView
+                ? const SizedBox()
+                : GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        widget.salonArtiestListModel.isSelected =
+                            !(widget.salonArtiestListModel.isSelected ?? false);
+                      });
+                    },
+                    child: widget.salonArtiestListModel.isSelected ?? false
+                        ? RemoveButtonWidget(onPress: () {
+                            setState(() {
+                              widget.salonArtiestListModel.isSelected = false;
+                            });
+                          })
+                        : Container(
+                            height: 39,
+                            width: 110,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(56),
+                                border: Border.all(
+                                  color: changeTheme(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.gender)) ??
+                                      ColorConstant.primaryColor,
+                                )),
+                            child: Center(
+                              child: Text(
+                                "Select Artist",
+                                style: AppTextTheme.medium.copyWith(
+                                    color: changeTheme(
+                                            SharedPrefs.readStringValue(
+                                                PrefConstants.gender)) ??
+                                        ColorConstant.primaryColor,
+                                    fontSize: 13),
+                              ),
+                            ),
+                          ),
+                  ),
+            !widget.isView ? const SizedBox(height: 39) : const SizedBox(),
             TextButton(
               onPressed: () {
-                Get.to(() => const StylistSaloonDetailsPage());
+      /*          Get.to(() => const StylistSaloonDetailsPage());*/
+                Get.to(() => const AboutStylistPage());
               },
               child: Text(
                 "View Profile",

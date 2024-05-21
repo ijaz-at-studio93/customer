@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
@@ -20,7 +22,7 @@ class EasyDateTimeLine extends StatefulWidget {
     this.onDateChange,
     this.itemBuilder,
     this.activeColor,
-    this.locale = "en_US",
+    this.locale = "en_US", this.onMonthChange,
   });
 
   /// Represents the initial date for the timeline widget.
@@ -63,6 +65,9 @@ class EasyDateTimeLine extends StatefulWidget {
 
   final ItemBuilderCallBack? itemBuilder;
 
+  final OnMonthChangeCallBack? onMonthChange;
+
+
   /// A `String` that represents the locale code to use for formatting the dates in the timeline.
   final String locale;
 
@@ -93,6 +98,11 @@ class _EasyDateTimeLineState extends State<EasyDateTimeLine> {
     _focusedDateListener.value = date;
     widget.onDateChange?.call(date);
   }
+
+
+
+
+
 
   @override
   void dispose() {
@@ -188,6 +198,7 @@ class _EasyDateTimeLineState extends State<EasyDateTimeLine> {
     setState(() {
       _initialDay = 1;
       _easyMonth = month!;
+      widget.onMonthChange?.call(month);
     });
   }
 

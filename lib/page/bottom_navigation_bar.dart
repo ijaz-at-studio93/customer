@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/page/Insights/Insights_home_page.dart';
+import 'package:sallon_customer/page/booking/booking_home_page.dart';
 import 'package:sallon_customer/page/home/home_page.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
@@ -18,80 +20,113 @@ class BottomNavBarPage extends StatefulWidget {
 
 class _BottomNavBarPageState extends State<BottomNavBarPage> {
   int _selectedIndex = 0;
+  bool _canPopNow = false;
+  DateTime? _currentBackPressTime;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: statusBarTheme(context),
-      backgroundColor: ColorConstant.bgColor,
-      body: _selectedIndex == 0
-          ? const HomePage()
-          : _selectedIndex == 1
-              ? const SizedBox()
-              : const InsightsHomePage(),
-      extendBody: false,
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        showUnselectedLabels: true,
-        showSelectedLabels: true,
-        unselectedLabelStyle: AppTextTheme.medium
-            .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
-        selectedLabelStyle: AppTextTheme.medium
-            .copyWith(color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)), fontSize: 14),
-        selectedItemColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-        unselectedItemColor: ColorConstant.grayTextColor,
-        items: [
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              AssetsConstant.home,
-              height: 24,
-              width: 24,
-              color: _selectedIndex == 0
-                  ? changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
-                  : ColorConstant.grayTextColor,
+    return PopScope(
+      canPop: _canPopNow,
+      onPopInvoked: (bool didPop) {
+        if (!didPop) {
+          tapBackAgainToCloseApp();
+        }
+      },
+      child: Scaffold(
+        appBar: statusBarTheme(context),
+        backgroundColor: ColorConstant.bgColor,
+        body: _selectedIndex == 0
+            ? const HomePage()
+            : _selectedIndex == 1
+                ? const BookingHomePage()
+                : const InsightsHomePage(),
+        extendBody: false,
+        bottomNavigationBar: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _selectedIndex,
+          showUnselectedLabels: true,
+          showSelectedLabels: true,
+          unselectedLabelStyle: AppTextTheme.medium
+              .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
+          selectedLabelStyle: AppTextTheme.medium
+              .copyWith(color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)), fontSize: 14),
+          selectedItemColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+          unselectedItemColor: ColorConstant.grayTextColor,
+          items: [
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                AssetsConstant.home,
+                height: 24,
+                width: 24,
+                color: _selectedIndex == 0
+                    ? changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
+                    : ColorConstant.grayTextColor,
+              ),
+              label: 'Home',
             ),
-            label: 'Home',
-          ),
-          /* BottomNavigationBarItem(
-            icon: Image.asset(
-              AssetsConstant.home,
-              height: 35,
-              width: 35,
-              color: _selectedIndex == 1
-                  ? ColorConstant.primaryColor
-                  : ColorConstant.grayTextColor,
+            /* BottomNavigationBarItem(
+              icon: Image.asset(
+                AssetsConstant.home,
+                height: 35,
+                width: 35,
+                color: _selectedIndex == 1
+                    ? ColorConstant.primaryColor
+                    : ColorConstant.grayTextColor,
+              ),
+              label: 'Explore',
+            ),*/
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                AssetsConstant.bookings,
+                height: 24,
+                width: 24,
+                color: _selectedIndex == 1
+                    ?changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
+                    : ColorConstant.grayTextColor,
+              ),
+              label: 'Bookings',
             ),
-            label: 'Explore',
-          ),*/
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              AssetsConstant.bookings,
-              height: 24,
-              width: 24,
-              color: _selectedIndex == 1
-                  ?changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
-                  : ColorConstant.grayTextColor,
+            BottomNavigationBarItem(
+              icon: Image.asset(
+                AssetsConstant.insights,
+                height: 24,
+                width: 24,
+                color: _selectedIndex == 2
+                    ? changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
+                    : ColorConstant.grayTextColor,
+              ),
+              label: 'Insights',
             ),
-            label: 'Bookings',
-          ),
-          BottomNavigationBarItem(
-            icon: Image.asset(
-              AssetsConstant.insights,
-              height: 24,
-              width: 24,
-              color: _selectedIndex == 2
-                  ? changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
-                  : ColorConstant.grayTextColor,
-            ),
-            label: 'Insights',
-          ),
-        ],
-        onTap: (val) {
-          setState(() {
-            _selectedIndex = val;
-          });
-        },
+          ],
+          onTap: (val) {
+            setState(() {
+              _selectedIndex = val;
+            });
+          },
+        ),
       ),
     );
   }
+
+  /*---------------  TapBack Button ----------------*/
+  void tapBackAgainToCloseApp() {
+    DateTime now = DateTime.now();
+    if (_currentBackPressTime == null ||
+        now.difference(_currentBackPressTime!) > const Duration(seconds: 3)) {
+      _currentBackPressTime = now;
+      showMessage("Tap back again to close the app");
+      setState(() {
+        _canPopNow = true; // Temporarily let user exit app on the next back tap
+      });
+      Future.delayed(
+        const Duration(seconds: 3),
+            () {
+          setState(() {
+            _canPopNow = false;
+            _currentBackPressTime = null;
+          });
+        },
+      );
+    }
+  }
+
 }

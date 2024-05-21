@@ -73,7 +73,7 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
             ignoreGestures: true,
             itemBuilder: (context, _) => const Icon(
               Icons.star,
-              color:  ColorConstant.primaryColor,
+              color: ColorConstant.primaryColor,
               size: 25,
             ),
             onRatingUpdate: (rating) {},

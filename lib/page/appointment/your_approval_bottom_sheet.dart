@@ -10,7 +10,8 @@ import '../../constant/variable_constant.dart';
 import '../../project_specific/text_theme.dart';
 
 class YourApprovalBottomSheet extends StatefulWidget {
-  const YourApprovalBottomSheet({super.key});
+  final  VoidCallback tapDone;
+  const YourApprovalBottomSheet({super.key, required this.tapDone});
 
   @override
   State<YourApprovalBottomSheet> createState() =>
@@ -167,10 +168,7 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
                 buttonTitleText: "Done",
                 color: changeTheme(
                     SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
-                onPress: () {
-                  Get.back();
-                  Get.to(() => const QRCodePage());
-                }),
+                onPress: widget.tapDone),
           ),
         ],
       ),

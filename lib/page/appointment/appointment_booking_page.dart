@@ -2,24 +2,62 @@ import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
+import 'package:intl/intl.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
-
+import 'package:sallon_customer/controller/home_controller.dart';
+import 'package:sallon_customer/page/appointment/qr_page.dart';
 import 'package:sallon_customer/page/appointment/widget/know_what_you_widget.dart';
 import 'package:sallon_customer/page/appointment/widget/popular_service_widget.dart';
 import 'package:sallon_customer/page/appointment/your_approval_bottom_sheet.dart';
+import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
+import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
-  const AppointmentBookingPage({super.key});
+  final String salonId;
+  final String serviceId;
+  final String artiestId;
+  const AppointmentBookingPage(
+      {super.key,
+      required this.salonId,
+      required this.serviceId,
+      required this.artiestId});
 
   @override
   State<AppointmentBookingPage> createState() => _AppointmentBookingPageState();
 }
 
 class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
+  final _homeController = Get.find<HomeController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      DateTime date = DateTime.now();
+      String formatDate = DateFormat("yyyy-MM-dd").format(date);
+      selectDate = formatDate;
+      _homeController.doGetUnAvailableDatesListData(
+          salonId: widget.salonId,
+          serviceId: widget.serviceId,
+          artiestId: widget.artiestId,
+          date: formatDate,
+          callback: () {
+            _homeController.doGetAvailabilitiesTimeSlot(
+              salonId: widget.salonId,
+              serviceId: widget.serviceId,
+              artiestId: widget.artiestId,
+              date: formatDate,
+            );
+          });
+    });
+  }
+
+  int selectedIndex = 0;
+  String selectTime = '';
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,261 +80,349 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(
-                height: 200,
-                width: Get.width,
-                child: _customBackgroundExample()),
-            /*----------- Popular Service By Your Artist ---------------*/
-            Container(
-              width: Get.width,
-              color: ColorConstant.whiteColor,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Popular Service By Your Artist",
-                    style: AppTextTheme.bold.copyWith(
-                        fontSize: 16, color: ColorConstant.blackColor),
-                  ),
-                  const SizedBox(height: 15),
-                  Dash(
-                    direction: Axis.horizontal,
-                    length: Get.width * 0.88,
-                    dashLength: 2,
-                    dashColor: const Color(0xffCFCFCF),
-                  ),
-                  const SizedBox(height: 15),
-                  SizedBox(
-                    height: 150,
-                    child: ListView.builder(
-                        padding: EdgeInsets.zero,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: 5,
-                        itemBuilder: (context, index) {
-                          return const PopularServiceWidget();
-                        }),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 2),
-            /*-------------- Select Time Slot  ---------------*/
-            Container(
-              color: ColorConstant.whiteColor,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Select Time Slot",
-                    style: AppTextTheme.bold.copyWith(
-                        fontSize: 16, color: ColorConstant.blackColor),
-                  ),
-                  const SizedBox(height: 15),
-                  Dash(
-                    direction: Axis.horizontal,
-                    length: Get.width * 0.88,
-                    dashLength: 2,
-                    dashColor: const Color(0xffCFCFCF),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Image.asset(
-                        AssetsConstant.daySlot,
-                        height: 24,
-                        width: 24,
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        "Day Slot",
-                        style: AppTextTheme.medium
-                            .copyWith(color: ColorConstant.grayTextColor),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height: 50,
+      body: Obx(
+        () => ProgressContainerView(
+          isProgressRunning: _homeController.showBookingProgress,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                SizedBox(
+                    height: 200,
                     width: Get.width,
-                    child: ListView.builder(
-                        itemCount: 5,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, i) {
-                          return _timeSlotContainerWidget(
-                              timeSlot: "10:00 - 10:00 AM");
-                        }),
-                  ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Image.asset(
-                        AssetsConstant.eveningSLot,
-                        height: 24,
-                        width: 24,
+                    child: _customBackgroundExample()),
+                /*----------- Popular Service By Your Artist ---------------*/
+                _homeController.showProgress
+                    ? Column(
+                        children: [
+                          SizedBox(height: Get.height * 0.23),
+                          const ProgressBarView(),
+                        ],
+                      )
+                    : Column(
+                        children: [
+                          Container(
+                            width: Get.width,
+                            color: ColorConstant.whiteColor,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Popular Service By Your Artist",
+                                  style: AppTextTheme.bold.copyWith(
+                                      fontSize: 16,
+                                      color: ColorConstant.blackColor),
+                                ),
+                                const SizedBox(height: 15),
+                                Dash(
+                                  direction: Axis.horizontal,
+                                  length: Get.width * 0.88,
+                                  dashLength: 2,
+                                  dashColor: const Color(0xffCFCFCF),
+                                ),
+                                const SizedBox(height: 15),
+                                SizedBox(
+                                  height: 150,
+                                  child: ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: 5,
+                                      itemBuilder: (context, index) {
+                                        return const PopularServiceWidget();
+                                      }),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          /*-------------- Select Time Slot  ---------------*/
+                          Container(
+                            color: ColorConstant.whiteColor,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Select Time Slot",
+                                  style: AppTextTheme.bold.copyWith(
+                                      fontSize: 16,
+                                      color: ColorConstant.blackColor),
+                                ),
+                                const SizedBox(height: 15),
+                                Dash(
+                                  direction: Axis.horizontal,
+                                  length: Get.width * 0.88,
+                                  dashLength: 2,
+                                  dashColor: const Color(0xffCFCFCF),
+                                ),
+                                const SizedBox(height: 10),
+                                SizedBox(
+                                  height: 50,
+                                  width: Get.width,
+                                  child: ListView.builder(
+                                      itemCount: _homeController
+                                              .getAvailabilitiesTimeSlotModelData
+                                              .data
+                                              ?.length ??
+                                          0,
+                                      shrinkWrap: true,
+                                      scrollDirection: Axis.horizontal,
+                                      itemBuilder: (context, i) {
+                                        return _timeSlotContainerWidget(
+                                            isSelected: selectedIndex == i,
+                                            onPress: () {
+                                              setState(() {
+                                                selectedIndex = i;
+                                                selectTime = _homeController
+                                                        .getAvailabilitiesTimeSlotModelData
+                                                        .data?[i]
+                                                        .time ??
+                                                    "";
+                                              });
+                                            },
+                                            timeSlot: convertTimesToAmPmString(
+                                                _homeController
+                                                        .getAvailabilitiesTimeSlotModelData
+                                                        .data?[i]
+                                                        .time ??
+                                                    ""));
+                                      }),
+                                ),
+                                const SizedBox(height: 18),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          /*------------ Know What You are paying For ------------*/
+                          Container(
+                            width: Get.width,
+                            color: ColorConstant.whiteColor,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "Know What You are paying For",
+                                  style: AppTextTheme.bold.copyWith(
+                                      fontSize: 16,
+                                      color: ColorConstant.blackColor),
+                                ),
+                                const SizedBox(height: 15),
+                                Dash(
+                                  direction: Axis.horizontal,
+                                  length: Get.width * 0.88,
+                                  dashLength: 2,
+                                  dashColor: const Color(0xffCFCFCF),
+                                ),
+                                const SizedBox(height: 10),
+                                ListView.separated(
+                                    separatorBuilder: (context, index) {
+                                      return const Divider(
+                                        height: 24,
+                                        color: Color(0xffE0E0E0),
+                                        thickness: 1.5,
+                                      );
+                                    },
+                                    shrinkWrap: true,
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
+                                    itemCount: 3,
+                                    itemBuilder: (context, index) {
+                                      return const KnowWhatYouWidget();
+                                    }),
+                                const SizedBox(height: 100),
+                              ],
+                            ),
+                          )
+                        ],
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        "Evening SLot",
-                        style: AppTextTheme.medium
-                            .copyWith(color: ColorConstant.grayTextColor),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height: 50,
-                    width: Get.width,
-                    child: ListView.builder(
-                        itemCount: 5,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, i) {
-                          return _timeSlotContainerWidget(
-                              timeSlot: "10:00 - 10:00 AM");
-                        }),
-                  ),
-                  const SizedBox(height: 18),
-                ],
-              ),
+              ],
             ),
-            const SizedBox(height: 2),
-            /*------------ Know What You are paying For ------------*/
-            Container(
-              width: Get.width,
-              color: ColorConstant.whiteColor,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Know What You are paying For",
-                    style: AppTextTheme.bold.copyWith(
-                        fontSize: 16, color: ColorConstant.blackColor),
-                  ),
-                  const SizedBox(height: 15),
-                  Dash(
-                    direction: Axis.horizontal,
-                    length: Get.width * 0.88,
-                    dashLength: 2,
-                    dashColor: const Color(0xffCFCFCF),
-                  ),
-                  const SizedBox(height: 10),
-                  ListView.separated(
-                      separatorBuilder: (context, index) {
-                        return const Divider(
-                          height: 24,
-                          color: Color(0xffE0E0E0),
-                          thickness: 1.5,
-                        );
-                      },
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: 3,
-                      itemBuilder: (context, index) {
-                        return const KnowWhatYouWidget();
-                      }),
-                  const SizedBox(height: 100),
-                ],
-              ),
-            )
-          ],
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        width: Get.width,
-        color: ColorConstant.whiteColor,
-        height: 100,
-        clipBehavior: Clip.none,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "1 Add On",
-                  style: AppTextTheme.bold.copyWith(
-                      fontSize: 13, color: ColorConstant.grayTextColor),
-                ),
-                Text(
-                  "₹4,000",
-                  style: AppTextTheme.bold
-                      .copyWith(fontSize: 19, color: ColorConstant.blackColor),
-                )
-              ],
-            ),
-            GestureDetector(
-              onTap: () {
-              /*  Get.to(() => const QRCodePage());*/
-                showModalBottomSheet(
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(32),
-                          topRight: Radius.circular(32),
-                        )),
-                    context: context,
-                    builder: (context) {
-                      return const YourApprovalBottomSheet();
-                    });
-              },
-              child: Container(
-                height: 45,
-                width: Get.width * 0.4,
-                decoration: BoxDecoration(
-                  color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Pay & Book",
-                      textScaler: const TextScaler.linear(0.85),
-                      style: AppTextTheme.medium.copyWith(
-                          fontSize: 16, color: ColorConstant.whiteColor),
-                    ),
-                    const SizedBox(width: 10),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: ColorConstant.whiteColor,
-                      size: 20,
-                    )
-                  ],
-                ),
+      floatingActionButton: _homeController.showProgress
+          ? const SizedBox()
+          : Container(
+              width: Get.width,
+              height: 100,
+              decoration: const BoxDecoration(
+                color: ColorConstant.whiteColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Color(0x1E000000),
+                    blurRadius: 8,
+                    offset: Offset(-2, -2),
+                    spreadRadius: 0,
+                  )
+                ],
               ),
-            )
-          ],
-        ),
-      ),
+              clipBehavior: Clip.none,
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "1 Add On",
+                        style: AppTextTheme.bold.copyWith(
+                            fontSize: 13, color: ColorConstant.grayTextColor),
+                      ),
+                      Text(
+                        "₹4,000",
+                        style: AppTextTheme.bold.copyWith(
+                            fontSize: 19, color: ColorConstant.blackColor),
+                      )
+                    ],
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      if (selectTime == "") {
+                        selectTime = _homeController
+                                .getAvailabilitiesTimeSlotModelData
+                                .data?[0]
+                                .time ??
+                            "";
+                        String inputDateTime = "$selectDate$selectTime";
+                        String correctedDateTime =
+                            '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+                        DateTime dateTime = DateTime.parse(correctedDateTime);
+                        String isoDateTime = dateTime.toIso8601String();
+
+                        _homeController.doCreateBooking(
+                            salonId: widget.salonId,
+                            serviceId: widget.serviceId,
+                            salonArtistId: widget.artiestId,
+                            startAt: isoDateTime,
+                            callback: () {
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(32),
+                                    topRight: Radius.circular(32),
+                                  )),
+                                  context: context,
+                                  builder: (context) {
+                                    return YourApprovalBottomSheet(
+                                      tapDone: () {
+                                        Get.back();
+                                        Get.to(() => QRCodePage(
+                                            appointmentId: _homeController
+                                                    .getCreateBookingAppointmentModel
+                                                    .data
+                                                    ?.id ??
+                                                ""));
+                                      },
+                                    );
+                                  });
+                            });
+                      } else {
+                        String inputDateTime = "$selectDate$selectTime";
+                        String correctedDateTime =
+                            '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+                        DateTime dateTime = DateTime.parse(correctedDateTime);
+                        String isoDateTime = dateTime.toIso8601String();
+                        _homeController.doCreateBooking(
+                            salonId: widget.salonId,
+                            serviceId: widget.serviceId,
+                            salonArtistId: widget.artiestId,
+                            startAt: isoDateTime,
+                            callback: () {
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(32),
+                                    topRight: Radius.circular(32),
+                                  )),
+                                  context: context,
+                                  builder: (context) {
+                                    return YourApprovalBottomSheet(
+                                      tapDone: () {
+                                        Get.back();
+                                        Get.to(() => QRCodePage(
+                                            appointmentId: _homeController
+                                                    .getCreateBookingAppointmentModel
+                                                    .data
+                                                    ?.id ??
+                                                ""));
+                                      },
+                                    );
+                                  });
+                            });
+                      }
+                    },
+                    child: Container(
+                      height: 45,
+                      width: Get.width * 0.4,
+                      decoration: BoxDecoration(
+                        color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender)) ??
+                            ColorConstant.primaryColor,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "Pay & Book",
+                            textScaler: const TextScaler.linear(0.85),
+                            style: AppTextTheme.medium.copyWith(
+                                fontSize: 16, color: ColorConstant.whiteColor),
+                          ),
+                          const SizedBox(width: 10),
+                          const Icon(
+                            Icons.arrow_forward,
+                            color: ColorConstant.whiteColor,
+                            size: 20,
+                          )
+                        ],
+                      ),
+                    ),
+                  )
+                ],
+              ),
+            ),
     );
   }
 
+  String selectDate = "";
+
   /*------------  Time Slot ------*/
-  _timeSlotContainerWidget({required String timeSlot}) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      margin: const EdgeInsets.only(right: 12),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: ColorConstant.grayBorderColor, width: 1),
-      ),
-      child: Center(
-        child: Text(
-          timeSlot,
-          style: AppTextTheme.medium
-              .copyWith(color: ColorConstant.blackColor, fontSize: 12),
+  _timeSlotContainerWidget(
+      {required String timeSlot,
+      required bool isSelected,
+      required VoidCallback onPress}) {
+    return InkWell(
+      onTap: onPress,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        margin: const EdgeInsets.only(right: 12),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? ColorConstant.primaryColor
+              : ColorConstant.whiteColor,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: ColorConstant.grayBorderColor, width: 1),
+        ),
+        child: Center(
+          child: Text(
+            timeSlot,
+            style: AppTextTheme.bold.copyWith(
+                color: isSelected
+                    ? ColorConstant.whiteColor
+                    : ColorConstant.blackColor,
+                fontSize: 13),
+          ),
         ),
       ),
     );
@@ -304,27 +430,86 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
   /*---------------  Date Calender Time ------------*/
   EasyDateTimeLine _customBackgroundExample() {
+    final List<Map<String, String>> unavailableDates = [];
+
+    for (int i = 0;
+        i <
+            (_homeController.getUnAvailableDatesListData.data?.unavailableDates
+                    ?.length ??
+                0);
+        i++) {
+      unavailableDates.add({
+        "date": _homeController
+                .getUnAvailableDatesListData.data?.unavailableDates?[i].date ??
+            ""
+      });
+    }
+
+    List<DateTime> dateTimeList = unavailableDates.map((dateMap) {
+      return DateTime.parse(dateMap["date"]!);
+    }).toList();
+
     return EasyDateTimeLine(
-      initialDate: DateTime.now(),
+      onMonthChange: (val) {
+        String inputString = val.toString();
+        RegExp regExp = RegExp(r'\d+');
+        Iterable<RegExpMatch> matches = regExp.allMatches(inputString);
+        String result = matches.map((match) => match.group(0)).join('');
+        String year = DateFormat("yyyy").format(DateTime.now());
+        String finalDate =
+            "$year-${result.length == 1 ? '0$result' : result}-01";
+        print(finalDate);
+        selectDate = finalDate;
+        _homeController.doGetUnAvailableDatesListData(
+            salonId: widget.salonId,
+            serviceId: widget.serviceId,
+            artiestId: widget.artiestId,
+            date: finalDate,
+            callback: () {
+              _homeController.doGetAvailabilitiesTimeSlot(
+                salonId: widget.salonId,
+                serviceId: widget.serviceId,
+                artiestId: widget.artiestId,
+                date: finalDate,
+              );
+            });
+      },
+      initialDate:
+          selectDate == "" ? DateTime.now() : DateTime.parse(selectDate),
       onDateChange: (selectedDate) {
         //`selectedDate` the new date selected.
-        print(selectedDate);
+        String formatDate = DateFormat("yyyy-MM-dd").format(selectedDate);
+        selectDate = formatDate;
+        _homeController.doGetAvailabilitiesTimeSlot(
+          salonId: widget.salonId,
+          serviceId: widget.serviceId,
+          artiestId: widget.artiestId,
+          date: formatDate,
+        );
       },
       headerProps: const EasyHeaderProps(
+          showSelectedDate: true,
           monthPickerType: MonthPickerType.switcher,
-          dateFormatter: DateFormatter.dayOnly()
-          // fullDateDMY(),
-          ),
-      dayProps:   EasyDayProps(
+          dateFormatter: DateFormatter.dayOnly()),
+      disabledDates: dateTimeList,
+      dayProps: EasyDayProps(
         dayStructure: DayStructure.dayStrDayNum,
         activeDayStyle: DayStyle(
           decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(8)),
             color: changeTheme(
-                SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
+                    SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                ColorConstant.primaryColor,
           ),
         ),
       ),
     );
+  }
+
+  /*-------------- convert AM PM Date Time --------------------*/
+  String convertTimesToAmPmString(String timeSlot) {
+    DateTime time = DateFormat("HH:mm").parse(timeSlot);
+    String convertTimeSlot = DateFormat("hh:mm a").format(time);
+    return convertTimeSlot;
   }
 }

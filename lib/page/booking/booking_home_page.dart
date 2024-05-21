@@ -1,0 +1,139 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/controller/home_controller.dart';
+import 'package:sallon_customer/page/appointment/qr_page.dart';
+import 'package:sallon_customer/page/booking/widget/pending_card_widget.dart';
+import 'package:sallon_customer/project_specific/progressbar_view.dart';
+import 'package:sallon_customer/project_specific/text_theme.dart';
+
+import '../../util/NoItemsWidget.dart';
+
+class BookingHomePage extends StatefulWidget {
+  const BookingHomePage({super.key});
+
+  @override
+  State<BookingHomePage> createState() => _BookingHomePageState();
+}
+
+class _BookingHomePageState extends State<BookingHomePage> {
+  final _homeController = Get.find<HomeController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _homeController.doGetCurrentBookingListData();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: ColorConstant.whiteColor,
+      appBar: AppBar(
+        elevation: 0.0,
+        backgroundColor: ColorConstant.whiteColor,
+        leading: const SizedBox(),
+        centerTitle: true,
+        title: Text(
+          "Bookings",
+          style: AppTextTheme.bold
+              .copyWith(color: ColorConstant.blackColor, fontSize: 19),
+        ),
+      ),
+      body: Column(
+        children: [
+          _bookingOverView(),
+          Obx(
+            () => _homeController.showProgress
+                ? const ProgressBarView()
+                : Expanded(
+                    child: bookingOverView == "0"
+                        ? _homeController
+                                    .getCurrentBookingListModel.data?.isEmpty ??
+                                false
+                            ? const NoItemsWidget(
+                                text: "No Any Pending Booking",
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: _homeController
+                                        .getCurrentBookingListModel
+                                        .data
+                                        ?.length ??
+                                    0,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 5),
+                                    child: PendingCardWidget(
+                                      onPress: () {
+                                        Get.to(() => QRCodePage(
+                                            appointmentId: _homeController
+                                                    .getCurrentBookingListModel
+                                                    .data?[index]
+                                                    .appointmentId ??
+                                                ""));
+                                      },
+                                      bookingData: _homeController
+                                          .getCurrentBookingListModel
+                                          .data![index],
+                                    ),
+                                  );
+                                })
+                        : const SizedBox()),
+          )
+        ],
+      ),
+    );
+  }
+
+  /*----------- Tab Bar variable  ----------- */
+  String? bookingOverView = "0";
+
+  /*------------------- Switch Tab Stylist & Salon -------------------*/
+  _bookingOverView() {
+    return Container(
+      height: 81,
+      color: ColorConstant.whiteColor,
+      width: Get.width,
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: CupertinoSlidingSegmentedControl(
+          backgroundColor: ColorConstant.grayBorderColor,
+          padding: const EdgeInsets.all(6),
+          groupValue: bookingOverView,
+          thumbColor: ColorConstant.whiteColor,
+          children: {
+            "0": SizedBox(
+              width: Get.width,
+              height: Get.height * 0.05,
+              child: Center(
+                child: Text(
+                  "Pending",
+                  style: bookingOverView == "0"
+                      ? AppTextTheme.bold.copyWith(
+                          fontSize: 14, color: ColorConstant.blackColor)
+                      : AppTextTheme.medium.copyWith(
+                          fontSize: 13, color: ColorConstant.grayTextColor),
+                ),
+              ),
+            ),
+            "1": Text(
+              "Completed",
+              style: bookingOverView == "1"
+                  ? AppTextTheme.bold
+                      .copyWith(fontSize: 14, color: ColorConstant.blackColor)
+                  : AppTextTheme.medium.copyWith(
+                      fontSize: 13, color: ColorConstant.grayTextColor),
+            ),
+          },
+          onValueChanged: (dynamic value) {
+            setState(() {
+              bookingOverView = value;
+            });
+          }),
+    );
+  }
+}
