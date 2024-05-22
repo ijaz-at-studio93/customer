@@ -82,7 +82,7 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
               children: [
                 Text(
                   artiest.name ?? "",
-                  textScaler: const TextScaler.linear(0.85),
+                  textScaler: const TextScaler.linear(0.70),
                   style: AppTextTheme.bold
                       .copyWith(color: ColorConstant.blackColor, fontSize: 15),
                 ),

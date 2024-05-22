@@ -24,7 +24,7 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Get.height * 0.32,
+      height: Get.height * 0.4,
       width: Get.width,
       decoration: const BoxDecoration(
         color: ColorConstant.whiteColor,

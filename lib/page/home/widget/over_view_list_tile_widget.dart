@@ -30,7 +30,7 @@ class OverviewListTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: InkWell(
         onTap: onTap,
         child: Row(
@@ -40,7 +40,7 @@ class OverviewListTileWidget extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  width: Get.width * 0.6,
+                  width: Get.width * 0.5,
                   child: Text(
                     servicesList.name ?? "",
                     maxLines: 1,
@@ -102,7 +102,7 @@ class OverviewListTileWidget extends StatelessWidget {
                 const SizedBox(height: 5),
                 Dash(
                   direction: Axis.horizontal,
-                  length: Get.width * 0.6,
+                  length: Get.width * 0.5,
                   dashLength: 2,
                   dashColor: ColorConstant.grayTextColor,
                 ),

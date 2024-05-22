@@ -7,7 +7,6 @@ import 'package:sallon_customer/page/appointment/qr_page.dart';
 import 'package:sallon_customer/page/booking/widget/pending_card_widget.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
-
 import '../../util/NoItemsWidget.dart';
 
 class BookingHomePage extends StatefulWidget {
@@ -47,10 +46,10 @@ class _BookingHomePageState extends State<BookingHomePage> {
         children: [
           _bookingOverView(),
           Obx(
-            () => _homeController.showProgress
-                ? const ProgressBarView()
-                : Expanded(
-                    child: bookingOverView == "0"
+            () =>  Expanded(
+                    child: _homeController.showProgress
+                        ? const ProgressBarView()
+                        : bookingOverView == "0"
                         ? _homeController
                                     .getCurrentBookingListModel.data?.isEmpty ??
                                 false

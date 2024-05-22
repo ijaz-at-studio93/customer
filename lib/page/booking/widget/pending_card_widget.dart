@@ -4,12 +4,10 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:sallon_customer/model/current_booking_list_model.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
-
 import '../../../constant/color_constant.dart';
 
 class PendingCardWidget extends StatefulWidget {
   final BookingData bookingData;
-
   final VoidCallback onPress;
   const PendingCardWidget(
       {super.key, required this.onPress, required this.bookingData});

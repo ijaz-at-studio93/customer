@@ -5,7 +5,6 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
@@ -316,7 +315,6 @@ class _HomePageState extends State<HomePage> {
   _searchWidget() {
     return GestureDetector(
       onTap: () {
-
         Get.to(() => const AreaOfCitySearchPage());
       },
       child: Container(
@@ -525,7 +523,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text(
                   "${_homeController.salonList.length} Saloons Found Near You",
-                  textScaler: const TextScaler.linear(0.85),
+                  textScaler: const TextScaler.linear(0.70),
                   style: AppTextTheme.bold
                       .copyWith(fontSize: 19, color: ColorConstant.blackColor),
                 ),
@@ -672,9 +670,4 @@ class _HomePageState extends State<HomePage> {
       //     offset: 1, size: 10, lat: position.latitude, lng: position.longitude);
     });
   }
-
-
-
-
-
 }

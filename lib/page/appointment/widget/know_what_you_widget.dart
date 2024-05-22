@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
+import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
@@ -86,9 +87,9 @@ class KnowWhatYouWidget extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 10),
-        const Dash(
+         Dash(
             direction: Axis.horizontal,
-            length: 351,
+            length: Get.width*0.85,
             dashLength: 3,
             dashColor: Colors.grey),
         const SizedBox(height: 10),
