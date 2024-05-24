@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "286621436633",
-    "project_id": "saloncustomer-ab2ac",
-    "storage_bucket": "saloncustomer-ab2ac.appspot.com"
+    "project_number": "9001451192",
+    "project_id": "salon-534a7",
+    "storage_bucket": "salon-534a7.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:286621436633:android:4d9a9b11a477d8cc5c0cc8",
+        "mobilesdk_app_id": "1:9001451192:android:b378fec7894f8aea70fe4d",
         "android_client_info": {
           "package_name": "com.ananta.scout"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA6psSwlqzUZgkQj5nOAlX71IdFrMXj_bo"
+          "current_key": "AIzaSyCGQSFK-wIwU452TaX8jtvmAR5yD-mQlPU"
         }
       ],
       "services": {
