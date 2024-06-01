@@ -29,7 +29,7 @@ class _SelectingArtistBottomSheetWidgetState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _homeController.doGetArtiestListData(serviceId: widget.serviceId);
+      _homeController.doGetArtiestListData();
     });
   }
 

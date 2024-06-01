@@ -27,50 +27,66 @@ class CreateBookingAppointmentModel {
 }
 
 class Data {
+  int? orderAmount;
+  String? createdAt;
+  String? updatedAt;
   String? id;
-  String? startsAt;
-  String? endsAt;
-  String? status;
-  String? salonId;
-  String? finalizedAt;
-  String? salonServiceId;
-  String? salonArtistId;
+  String? deletedAt;
   String? completionToken;
+  String? orderStatus;
+  String? paymentStatus;
+  String? salonAppointmentId;
+  String? salonId;
+  String? userId;
+  String? finalizedAt;
+  String? idx;
 
   Data(
-      {this.id,
-      this.startsAt,
-      this.endsAt,
-      this.status,
-      this.salonId,
-      this.finalizedAt,
-      this.salonServiceId,
-      this.salonArtistId,
-      this.completionToken});
+      {this.orderAmount,
+        this.createdAt,
+        this.updatedAt,
+        this.id,
+        this.deletedAt,
+        this.completionToken,
+        this.orderStatus,
+        this.paymentStatus,
+        this.salonAppointmentId,
+        this.salonId,
+        this.userId,
+        this.finalizedAt,
+        this.idx});
 
   Data.fromJson(Map<String, dynamic> json) {
+    orderAmount = json['orderAmount'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
     id = json['id'];
-    startsAt = json['startsAt'];
-    endsAt = json['endsAt'];
-    status = json['status'];
-    salonId = json['salonId'];
-    finalizedAt = json['finalizedAt'];
-    salonServiceId = json['salonServiceId'];
-    salonArtistId = json['salonArtistId'];
+    deletedAt = json['deletedAt'];
     completionToken = json['completionToken'];
+    orderStatus = json['orderStatus'];
+    paymentStatus = json['paymentStatus'];
+    salonAppointmentId = json['salonAppointmentId'];
+    salonId = json['salonId'];
+    userId = json['userId'];
+    finalizedAt = json['finalizedAt'];
+    idx = json['idx'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['orderAmount'] = orderAmount;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
     data['id'] = id;
-    data['startsAt'] = startsAt;
-    data['endsAt'] = endsAt;
-    data['status'] = status;
-    data['salonId'] = salonId;
-    data['finalizedAt'] = finalizedAt;
-    data['salonServiceId'] = salonServiceId;
-    data['salonArtistId'] = salonArtistId;
+    data['deletedAt'] = deletedAt;
     data['completionToken'] = completionToken;
+    data['orderStatus'] = orderStatus;
+    data['paymentStatus'] = paymentStatus;
+    data['salonAppointmentId'] = salonAppointmentId;
+    data['salonId'] = salonId;
+    data['userId'] = userId;
+    data['finalizedAt'] = finalizedAt;
+    data['idx'] = idx;
     return data;
   }
 }

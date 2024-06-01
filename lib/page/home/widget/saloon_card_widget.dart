@@ -1,25 +1,25 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
-
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/model/home_salon_list_model.dart';
-
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class SaloonCardWidget extends StatefulWidget {
   final VoidCallback onPress;
-  final HomeSalonModel homeSalonModel;
+  final HomeSalonDataList homeSalonModel;
+  final bool isFav;
   const SaloonCardWidget({
     super.key,
     required this.onPress,
     required this.homeSalonModel,
+    required this.isFav,
   });
 
   @override
@@ -27,6 +27,7 @@ class SaloonCardWidget extends StatefulWidget {
 }
 
 class _SaloonCardWidgetState extends State<SaloonCardWidget> {
+  final _homeController = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -75,7 +76,18 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
-                          widget.homeSalonModel.isFav = !(widget.homeSalonModel.isFav ??false);
+                          widget.homeSalonModel.isFavourite =
+                              !(widget.homeSalonModel.isFavourite ?? false);
+                          if (widget.homeSalonModel.isFavourite ?? false) {
+                            _homeController.doAddFavouriteSalon(
+                                salonId: widget.homeSalonModel.id ?? "");
+                          } else {
+                            _homeController.doRemoveFavouriteSalon(
+                                callback: () {
+                                  _homeController.doGetFavouriteSalon();
+                                },
+                                salonId: widget.homeSalonModel.id ?? "");
+                          }
                         });
                       },
                       child: Container(
@@ -85,22 +97,23 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                             shape: BoxShape.circle,
                             color: ColorConstant.blackColor),
                         child: Center(
-                          child: widget.homeSalonModel.isFav ?? false
+                          child: widget.homeSalonModel.isFavourite ?? false
                               ? const Icon(
-                            CupertinoIcons.heart_fill,
-                            color: Colors.red,
-                          )
+                                  CupertinoIcons.heart_fill,
+                                  color: Colors.red,
+                                )
                               : Image.asset(
-                            AssetsConstant.likeBlank,
-                            height: 20,
-                            width: 20,
-                            color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-                          ),
+                                  AssetsConstant.likeBlank,
+                                  height: 20,
+                                  width: 20,
+                                  color: changeTheme(
+                                      SharedPrefs.readStringValue(
+                                          PrefConstants.gender)),
+                                ),
                         ),
                       ),
                     ),
                   ),
-
                   Positioned(
                       bottom: 10,
                       left: 15,
@@ -114,7 +127,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           ),
                           const SizedBox(width: 3),
                           Text(
-                            '4.8',
+                            widget.homeSalonModel.rating.toString(),
                             style: AppTextTheme.medium.copyWith(
                                 fontSize: 11, color: ColorConstant.yellowColor),
                           ),
@@ -149,22 +162,24 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           ),
                         ),
                         const SizedBox(height: 5),
-                        if (widget.homeSalonModel.homeService ?? false) Row(
-                          children: [
-                            Text(
-                              "25 Min",
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.grayTextColor,
-                                  fontSize: 13),
-                            ),
-                            Text(
-                              " • Available for Home",
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.grayTextColor,
-                                  fontSize: 13),
-                            ),
-                          ],
-                        ) else  const SizedBox(),
+                        if (widget.homeSalonModel.homeService ?? false)
+                          Row(
+                            children: [
+                              Icon(Icons.home,
+                                  size: 20,
+                                  color: changeTheme(
+                                      SharedPrefs.readStringValue(
+                                          PrefConstants.gender))),
+                              Text(
+                                " • Available for Home",
+                                style: AppTextTheme.medium.copyWith(
+                                    color: ColorConstant.grayTextColor,
+                                    fontSize: 13),
+                              ),
+                            ],
+                          )
+                        else
+                          const SizedBox(),
                         const SizedBox(height: 5),
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,

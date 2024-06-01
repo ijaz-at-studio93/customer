@@ -6,12 +6,14 @@ import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/auth_controller.dart';
 import 'package:sallon_customer/page/profile/edit_profile_page.dart';
+import 'package:sallon_customer/page/profile/favourite_salon_page.dart';
 import 'package:sallon_customer/project_specific/log_out_dialog.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final VoidCallback callback;
+  const ProfilePage({super.key, required this.callback});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -21,89 +23,104 @@ class _ProfilePageState extends State<ProfilePage> {
   final _authController = Get.find<AuthController>();
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorConstant.bgColor,
-      appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: ColorConstant.whiteColor,
-        leading: IconButton(
-          onPressed: () {
-            Get.back();
-          },
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: ColorConstant.blackColor,
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (didPop) {
+        widget.callback.call();
+      },
+      child: Scaffold(
+        backgroundColor: ColorConstant.bgColor,
+        appBar: AppBar(
+          elevation: 0.0,
+          backgroundColor: ColorConstant.whiteColor,
+          leading: IconButton(
+            onPressed: () {
+              Get.back();
+              widget.callback.call();
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: ColorConstant.blackColor,
+            ),
+          ),
+          centerTitle: true,
+          title: Text(
+            "My Details",
+            style: AppTextTheme.bold
+                .copyWith(color: ColorConstant.blackColor, fontSize: 19),
           ),
         ),
-        centerTitle: true,
-        title: Text(
-          "My Details",
-          style: AppTextTheme.bold
-              .copyWith(color: ColorConstant.blackColor, fontSize: 19),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _imageRowWidget(),
-            const SizedBox(height: 5),
-            const Divider(
-                color: ColorConstant.garyDividerColor,
-                indent: 20,
-                endIndent: 20,
-                thickness: 1),
-            _listTitleWidget(
-                image: AssetsConstant.myBooking,
-                name: "My Bookings",
-                onPress: () {}),
-            const Divider(
-                color: ColorConstant.garyDividerColor,
-                indent: 20,
-                endIndent: 20,
-                thickness: 1),
-            _listTitleWidget(
-                image: AssetsConstant.reviewRatings,
-                name: "Review & Ratings",
-                onPress: () {}),
-            const Divider(
-                color: ColorConstant.garyDividerColor,
-                indent: 20,
-                endIndent: 20,
-                thickness: 1),
-            _listTitleWidget(
-                image: AssetsConstant.faq,
-                name: "FAQ’s & Support",
-                onPress: () {}),
-            const Divider(
-                color: ColorConstant.garyDividerColor,
-                indent: 20,
-                endIndent: 20,
-                thickness: 1),
-            _listTitleWidget(
-                image: AssetsConstant.about, name: "About Us", onPress: () {}),
-            const Divider(
-                color: ColorConstant.garyDividerColor,
-                indent: 20,
-                endIndent: 20,
-                thickness: 1),
-            _listTitleWidget(
-                image: AssetsConstant.signOut,
-                name: "Sign Out",
-                onPress: () {
-                  showDialog(
-                      context: context,
-                      builder: (context) {
-                        return LogOutDialog(
-                          noPress: () {
-                            Get.back();
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              _imageRowWidget(),
+              const SizedBox(height: 5),
+              const Divider(
+                  color: ColorConstant.garyDividerColor,
+                  indent: 20,
+                  endIndent: 20,
+                  thickness: 1),
+              _listTitleWidget(
+                  image: AssetsConstant.likeBlank,
+                  name: "Favourite Salon",
+                  onPress: () {
+                    Get.to(() => FavouriteSalonPage(
+                          callback: () {
+                            widget.callback.call();
                           },
-                          yesPress: () {
-                            _authController.resetApp();
-                          },
-                        );
-                      });
-                }),
-          ],
+                        ));
+                  }),
+              const Divider(
+                  color: ColorConstant.garyDividerColor,
+                  indent: 20,
+                  endIndent: 20,
+                  thickness: 1),
+              _listTitleWidget(
+                  image: AssetsConstant.reviewRatings,
+                  name: "Review & Ratings",
+                  onPress: () {}),
+              const Divider(
+                  color: ColorConstant.garyDividerColor,
+                  indent: 20,
+                  endIndent: 20,
+                  thickness: 1),
+              _listTitleWidget(
+                  image: AssetsConstant.faq,
+                  name: "FAQ’s & Support",
+                  onPress: () {}),
+              const Divider(
+                  color: ColorConstant.garyDividerColor,
+                  indent: 20,
+                  endIndent: 20,
+                  thickness: 1),
+              _listTitleWidget(
+                  image: AssetsConstant.about,
+                  name: "About Us",
+                  onPress: () {}),
+              const Divider(
+                  color: ColorConstant.garyDividerColor,
+                  indent: 20,
+                  endIndent: 20,
+                  thickness: 1),
+              _listTitleWidget(
+                  image: AssetsConstant.signOut,
+                  name: "Sign Out",
+                  onPress: () {
+                    showDialog(
+                        context: context,
+                        builder: (context) {
+                          return LogOutDialog(
+                            noPress: () {
+                              Get.back();
+                            },
+                            yesPress: () {
+                              _authController.resetApp();
+                            },
+                          );
+                        });
+                  }),
+            ],
+          ),
         ),
       ),
     );

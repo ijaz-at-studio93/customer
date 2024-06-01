@@ -1,9 +1,13 @@
 import 'dart:ui';
+import 'package:flutter/animation.dart';
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/api/home_api.dart';
 import 'package:sallon_customer/model/artiest_list_model.dart';
 import 'package:sallon_customer/model/availabilities_time_sloat_model.dart';
+import 'package:sallon_customer/model/booking_history_list_model.dart';
+import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
 import 'package:sallon_customer/model/category_service_list_model.dart';
 import 'package:sallon_customer/model/create_booking_appoiment_model.dart';
 import 'package:sallon_customer/model/current_booking_list_model.dart';
@@ -13,11 +17,16 @@ import 'package:sallon_customer/model/salon_details_artiest.dart';
 import 'package:sallon_customer/model/salon_details_model.dart';
 import 'package:sallon_customer/model/un_available_dates_model.dart';
 import 'package:sallon_customer/model/user_booking_qr_code_model.dart';
+import 'package:sallon_customer/util/logger.dart';
 
 class HomeController extends GetxController {
   final Rx<bool> _showProgress = false.obs;
   bool get showProgress => _showProgress.value;
   set setShowProgress(val) => _showProgress.value = val;
+
+  final Rx<bool> _showAddProgress = false.obs;
+  bool get gteShowAddProgress => _showAddProgress.value;
+  set setShowAddProgress(val) => _showAddProgress.value = val;
 
   /*----------------- Show Booking Progress ------------*/
   final Rx<bool> _showBookingProgress = false.obs;
@@ -47,9 +56,25 @@ class HomeController extends GetxController {
   set setSalonDetailsListData(val) => _salonDetailsListData.value = val;
 
   /*-----------------  Home Salon List Widget Get -------------------*/
+  final Rx<HomeSalonModel> _homeSalonList =
+      HomeSalonModel().obs;
+  HomeSalonModel get getHomeSalonList =>
+      _homeSalonList.value;
+  set setHomeSalonList(val) => _homeSalonList.value = val;
 
-  final RxList<HomeSalonModel> _homeSalonList = <HomeSalonModel>[].obs;
-  List<HomeSalonModel> get homeSalonList => _homeSalonList;
+
+
+  final Rx<HomeSalonModel> _favSalonList =
+      HomeSalonModel().obs;
+  HomeSalonModel get getFavSalonList =>
+      _homeSalonList.value;
+  set setFavSalonList(val) => _favSalonList.value = val;
+
+
+
+
+
+
 
   /*--------------------- Salon artiest -------------*/
   final Rx<SalonDetailsArtiestModel> _salonDetailsArtiestData =
@@ -100,6 +125,13 @@ class HomeController extends GetxController {
       _currentBookingListModel.value;
   set setCurrentBookingListModel(val) => _currentBookingListModel.value = val;
 
+  /*-------------------  Booking History List Model --------------------*/
+  final Rx<BookingHistoryListModel> _bookingHistoryListModel =
+      BookingHistoryListModel().obs;
+  BookingHistoryListModel get getBookingHistoryListModel =>
+      _bookingHistoryListModel.value;
+  set setBookingHistoryListModel(val) => _bookingHistoryListModel.value = val;
+
   /*---------------- getHomeCategory ----------*/
   doGetHomeCategory() async {
     try {
@@ -112,10 +144,17 @@ class HomeController extends GetxController {
     }
   }
 
-  double lat = 0.0;
+  /*>>>>>>>>>>>>>>>>>>>>>>>>>>  CART PART <<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+  /*---------------- Add Cart -------------------*/
+  final Rx<ServiceAddCartModel> _serviceAddCartModel =
+      ServiceAddCartModel().obs;
+  ServiceAddCartModel get getServiceAddCartModel => _serviceAddCartModel.value;
+  set setServiceAddCartModel(val) => _serviceAddCartModel.value = val;
+
+/*  double lat = 0.0;
   double lng = 0.0;
 
-  /* ------------------------ Pagination For List ------------------------ */
+  */ /* ------------------------ Pagination For List ------------------------ */ /*
   var salonList = <HomeSalonModel>[].obs;
   var isLoading = false.obs;
   var page = 1.obs;
@@ -142,7 +181,7 @@ class HomeController extends GetxController {
     } finally {
       isLoading.value = false;
     }
-  }
+  }*/
 
   /* ------------------------ Pagination End ------------------------ */
 
@@ -154,6 +193,7 @@ class HomeController extends GetxController {
           await HomeAPI.getSalonDetail(salonId: salonId);
     } catch (e) {
       showError(e);
+      logger.d("DO Get Artiest List Data ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
@@ -167,12 +207,13 @@ class HomeController extends GetxController {
           await HomeAPI.getSalonDetailsCategoryServiceList(salonId: salonId);
     } catch (e) {
       showError(e);
+      logger.d("DO Get Artiest List Data ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
   }
 
-  /*------------------------- Do Get Home Salon List -------------*/ /*
+  /*------------------------- Do Get Home Salon List -------------*/
   doGetHomeSalonList(
       {required int offset,
       required int size,
@@ -184,10 +225,11 @@ class HomeController extends GetxController {
           offset: offset, size: size, lat: lat, lng: lng);
     } catch (e) {
       showError(e);
+      logger.d("Do Get Home Salon List  ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
-  }*/
+  }
 
   /*--------------- Do Get Salon Artiest ---------------*/
 
@@ -198,18 +240,20 @@ class HomeController extends GetxController {
           await HomeAPI.salonDetailsArtiest(salonId: salonId);
     } catch (e) {
       showError(e);
+      logger.d("Do Get Salon Artiest ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
   }
 
   /*------------------------------ DO Get Artiest List Data ------------------------------*/
-  doGetArtiestListData({required String serviceId}) async {
+  doGetArtiestListData() async {
     try {
       _showProgress.value = true;
-      _artiestListData.value = await HomeAPI.getArtiest(serviceId: serviceId);
+      _artiestListData.value = await HomeAPI.getArtiest();
     } catch (e) {
       showError(e);
+      logger.d("DO Get Artiest List Data ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
@@ -217,25 +261,21 @@ class HomeController extends GetxController {
 
   /*------------------------ get UnAvailableDatesListData --------------------*/
   doGetUnAvailableDatesListData({
-    required String salonId,
-    required String serviceId,
     required String artiestId,
     required String date,
     required VoidCallback callback,
   }) async {
     try {
       _showProgress.value = true;
-      _unAvailableDatesListData.value = await HomeAPI.getUnAvailableDates(
-          salonId: salonId,
-          serviceId: serviceId,
-          artiestId: artiestId,
-          date: date);
+      _unAvailableDatesListData.value =
+          await HomeAPI.getUnAvailableDates(artiestId: artiestId, date: date);
 
       if (_unAvailableDatesListData.value.data?.isMonthAvailable ?? false) {
         callback.call();
       }
     } catch (e) {
       showError(e);
+      logger.d("UnAvailableDatesListData ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
@@ -243,20 +283,15 @@ class HomeController extends GetxController {
 
   /*------------------------------ Get availabilities Time  Slot ------------------------------*/
   doGetAvailabilitiesTimeSlot(
-      {required String salonId,
-      required String serviceId,
-      required String artiestId,
-      required String date}) async {
+      {required String artiestId, required String date}) async {
     try {
       _showProgress.value = true;
       _availabilitiesTimeSlotModelData.value =
           await HomeAPI.getAvailabilitiesTimeSlot(
-              salonId: salonId,
-              serviceId: serviceId,
-              artiestId: artiestId,
-              date: date);
+              artiestId: artiestId, date: date);
     } catch (e) {
       showError(e);
+      logger.d("availabilities Time  Slot ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
@@ -264,8 +299,6 @@ class HomeController extends GetxController {
 
   /*----------------------- Create Booking  ForCustomer -----------------*/
   doCreateBooking({
-    required String salonId,
-    required String serviceId,
     required String salonArtistId,
     required String startAt,
     required VoidCallback callback,
@@ -273,10 +306,7 @@ class HomeController extends GetxController {
     try {
       _showBookingProgress.value = true;
       _createBookingAppointmentModel.value = await HomeAPI.userCreateBooking(
-          salonId: salonId,
-          serviceId: serviceId,
-          salonArtistId: salonArtistId,
-          startAt: startAt);
+          salonArtistId: salonArtistId, startAt: startAt);
       if (_createBookingAppointmentModel
               .value.data?.completionToken?.isNotEmpty ??
           false) {
@@ -284,6 +314,7 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
+      logger.d("Create Booking  ForCustomer ${e.toString()}");
     } finally {
       _showBookingProgress.value = false;
     }
@@ -297,6 +328,7 @@ class HomeController extends GetxController {
           await HomeAPI.userBookingQrCodeDetails(appointmentId: appointmentId);
     } catch (e) {
       showError(e);
+      logger.d("QR Code Model ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
@@ -307,6 +339,196 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _currentBookingListModel.value = await HomeAPI.currentBookingList();
+    } catch (e) {
+      showError(e);
+      logger.d("Current Booking List  Data ${e.toString()}");
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*-----------------  Add  Favourite Salon ---------------*/
+  doAddFavouriteSalon({required String salonId}) async {
+    try {
+      _showAddProgress.value = true;
+      bool result = await HomeAPI.addFavouriteSalon(salonId: salonId);
+      print(result);
+    } catch (e) {
+      showError(e);
+      logger.d("Favourite Salon ${e.toString()}");
+    } finally {
+      _showAddProgress.value = false;
+    }
+  }
+
+  /*-----------------  remove  Favourite Salon ---------------*/
+  doRemoveFavouriteSalon(
+      {required String salonId, required VoidCallback callback}) async {
+    try {
+      _showAddProgress.value = true;
+      bool result = await HomeAPI.removeFavouriteSalon(salonId: salonId);
+      if (result) {
+        callback.call();
+      }
+      print(result);
+    } catch (e) {
+      showError(e);
+      logger.d("Remove  Favourite Salon  ${e.toString()}");
+    } finally {
+      _showAddProgress.value = false;
+    }
+  }
+
+  /*----------------  Fav Salon List -------------------*/
+  doGetFavouriteSalon() async {
+    try {
+      _showAddProgress.value = false;
+      _favSalonList.value = await HomeAPI.getFavouriteSalon();
+    } catch (e) {
+      showError(e);
+      logger.d("Fav Salon List  ${e.toString()}");
+    } finally {
+      _showAddProgress.value = false;
+    }
+  }
+
+  /*>>>>>>>>>>>>>>>>>>>  CART <<<<<<<<<<<<<<<<<<<<<<<*/
+  /*------------------------ Add Cart ----------------*/
+  doAddCart(
+      {required String salonServiceId, required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      _serviceAddCartModel.value =
+          await HomeAPI.serviceAddCart(salonServiceId: salonServiceId);
+      if (_serviceAddCartModel.value.success ?? false) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+      logger.d("Add Cart  ${e.toString()}");
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*-------------------  Remove Cart ------------------*/
+  doRemoveCart(
+      {required String salonServiceId, required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      bool result =
+          await HomeAPI.serviceRemoveAddCart(salonServiceId: salonServiceId);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+      logger.d("Remove Cart  ${e.toString()}");
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*---------------- Get Cart ---------------*/
+  doGetCart() async {
+    try {
+      _showProgress.value = true;
+      _serviceAddCartModel.value = await HomeAPI.getUserCart();
+    } catch (e) {
+      showError(e);
+      logger.d(" Get Cart ${e.toString()}");
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*---------- Clear Cart --------------*/
+  doClearCart({required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.removeCart();
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+      logger.d("Clear Cart  ${e.toString()}");
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*----------------- Add Cart in  Product ------------------*/
+
+  doAddProductCart(
+      {required String productId, required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      _serviceAddCartModel.value =
+          await HomeAPI.addProductCart(productId: productId);
+      if (_serviceAddCartModel.value.success ?? false) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+      logger.d("Add Cart  ${e.toString()}");
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*----------------- Remove Cart in  Product ------------------*/
+  doRemoveProductCart(
+      {required String productId, required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.removeProductCart(productId: productId);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+      logger.d("Add Cart  ${e.toString()}");
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Cart Part End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+
+  /*----------------------------- Do Get Booking History Data List ---------------------*/
+  doGetBookingHistory() async {
+    try {
+      _showProgress.value = true;
+      _bookingHistoryListModel.value = await HomeAPI.bookingHistory();
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*----------------------------  Upload PortFolio --------------------*/
+  doUploadPortFolio(
+      {required String appointmentId, required bool isUpload}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.portFolioUpload(
+          appointmentId: appointmentId, isUpload: isUpload);
+      if (result) {
+        showMessage("Portfolio Request Sent Successfully");
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*--------------------------  Artiest Portfolio -----------------*/
+  doGetArtiestPortfolio() async {
+    try {
+      _showProgress.value = true;
     } catch (e) {
       showError(e);
     } finally {

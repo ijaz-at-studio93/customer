@@ -13,7 +13,6 @@ import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import 'package:ticket_widget/ticket_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 import '../bottom_navigation_bar.dart';
 
 class QRCodePage extends StatefulWidget {
@@ -27,7 +26,6 @@ class QRCodePage extends StatefulWidget {
 class _QRCodePageState extends State<QRCodePage> {
   bool _canPopNow = true;
   DateTime? _currentBackPressTime;
-
   final _homeController = Get.find<HomeController>();
 
   @override
@@ -35,6 +33,9 @@ class _QRCodePageState extends State<QRCodePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doCreateQrCode(appointmentId: widget.appointmentId);
+      _homeController.doClearCart(callback: () {
+        _homeController.doGetCart();
+      });
     });
   }
 
@@ -54,236 +55,235 @@ class _QRCodePageState extends State<QRCodePage> {
         appBar: AppBar(
           backgroundColor: ColorConstant.primaryColor,
           elevation: 0.0,
-          leading: IconButton(onPressed: (){
-            Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const BottomNavBarPage()),
+          leading: IconButton(
+              onPressed: () {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const BottomNavBarPage()),
                     (route) => false);
-          }, icon: const Icon(Icons.arrow_back)),
+              },
+              icon: const Icon(Icons.arrow_back)),
         ),
-        body:  Obx(()=>
-        _homeController.showProgress
-            ? const ProgressBarView()
-            : SingleChildScrollView(
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: CachedNetworkImage(
-                    height: Get.height * 0.26,
-                    width: Get.height,
-                    fit: BoxFit.cover,
-                    imageUrl:
-                    "${APIConstants.image} ${_homeController.getUserBookingQrCodeModel.data?.salon?.image ?? ""}",
-                    placeholder: (context, url) => Image(
-                      image: const AssetImage(
-                          AssetsConstant.placeHolder),
-                      height: Get.height * 0.26,
-                      width: Get.height,
-                      fit: BoxFit.cover,
-                    ),
-                    errorWidget: (context, url, error) => Image(
-                      image: const AssetImage(
-                          AssetsConstant.placeHolder),
-                      height: Get.height * 0.26,
-                      width: Get.height,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: Get.height * 0.18,
-                  right: 15,
-                  left: 15,
-                  child: TicketWidget(
-                    isCornerRounded: true,
-                    padding: const EdgeInsets.all(23),
-                    width: Get.width,
-                    height: Get.height,
-                    child: Column(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _homeController
-                              .getUserBookingQrCodeModel
-                              .data
-                              ?.service
-                              ?.name ??
-                              "",
-                          style: AppTextTheme.bold.copyWith(
-                              fontSize: 16,
-                              color: ColorConstant.blackColor),
+        body: Obx(
+          () => _homeController.showProgress
+              ? const ProgressBarView()
+              : SingleChildScrollView(
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15),
+                        child: CachedNetworkImage(
+                          height: Get.height * 0.26,
+                          width: Get.height,
+                          fit: BoxFit.cover,
+                          imageUrl:
+                              "${APIConstants.image} ${_homeController.getUserBookingQrCodeModel.data?.salon?.image ?? ""}",
+                          placeholder: (context, url) => Image(
+                            image: const AssetImage(AssetsConstant.placeHolder),
+                            height: Get.height * 0.26,
+                            width: Get.height,
+                            fit: BoxFit.cover,
+                          ),
+                          errorWidget: (context, url, error) => Image(
+                            image: const AssetImage(AssetsConstant.placeHolder),
+                            height: Get.height * 0.26,
+                            width: Get.height,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                        const SizedBox(height: 15),
-                        Container(
-                          width: Get.width * 0.8,
-                          height: 1,
-                          decoration: const BoxDecoration(
-                              color: ColorConstant.divider2Color),
-                        ),
-                        const SizedBox(height: 15),
-                        Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
-                          children: [
-                            Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Date",
-                                  style: AppTextTheme.medium
-                                      .copyWith(
-                                      color: ColorConstant
-                                          .grayTextColor,
-                                      fontSize: 13),
+                      ),
+                      Positioned(
+                        top: Get.height * 0.18,
+                        right: 15,
+                        left: 15,
+                        child: TicketWidget(
+                          isCornerRounded: true,
+                          padding: const EdgeInsets.all(23),
+                          width: Get.width,
+                          height: Get.height * 0.63,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Wrap(
+                                spacing: 8.0, // gap between adjacent chips
+                                runSpacing: 4.0, // gap between lines
+                                children: List.generate(
+                                  _homeController.getUserBookingQrCodeModel.data
+                                          ?.items?.length ??
+                                      0,
+                                  (index) => _homeController
+                                              .getUserBookingQrCodeModel
+                                              .data
+                                              ?.items?[index]
+                                              .isService ??
+                                          false
+                                      ? FilterChip(
+                                          labelStyle: AppTextTheme.medium
+                                              .copyWith(
+                                                  color:
+                                                      ColorConstant.whiteColor,
+                                                  fontSize: 13),
+                                          label: Text(_homeController
+                                                  .getUserBookingQrCodeModel
+                                                  .data
+                                                  ?.items?[index]
+                                                  .service
+                                                  ?.name ??
+                                              ""),
+                                          backgroundColor:
+                                              ColorConstant.primaryColor,
+                                          onSelected: (bool value) {},
+                                        )
+                                      : const SizedBox(),
                                 ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  convertFinalDate(
-                                      date: _homeController
+                              ),
+                              const SizedBox(height: 15),
+                              Container(
+                                width: Get.width * 0.8,
+                                height: 1,
+                                decoration: const BoxDecoration(
+                                    color: ColorConstant.divider2Color),
+                              ),
+                              const SizedBox(height: 15),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Date",
+                                        style: AppTextTheme.medium.copyWith(
+                                            color: ColorConstant.grayTextColor,
+                                            fontSize: 13),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      _homeController.getUserBookingQrCodeModel
+                                                  .data?.finalizedAt ==
+                                              null
+                                          ? const SizedBox()
+                                          : Text(
+                                              convertFinalDate(
+                                                  date: _homeController
+                                                          .getUserBookingQrCodeModel
+                                                          .data
+                                                          ?.finalizedAt ??
+                                                      ''),
+                                              style: AppTextTheme.medium
+                                                  .copyWith(
+                                                      color: ColorConstant
+                                                          .blackColor,
+                                                      fontSize: 13),
+                                            ),
+                                    ],
+                                  ),
+                                  Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Time Slot",
+                                        style: AppTextTheme.medium.copyWith(
+                                            color: ColorConstant.grayTextColor,
+                                            fontSize: 13),
+                                      ),
+                                      const SizedBox(height: 10),
+                                      _homeController.getUserBookingQrCodeModel
+                                                      .data?.startsAt ==
+                                                  null &&
+                                              _homeController
+                                                      .getUserBookingQrCodeModel
+                                                      .data
+                                                      ?.endsAt ==
+                                                  null
+                                          ? const SizedBox()
+                                          : Text(
+                                              "${convertDate(date: _homeController.getUserBookingQrCodeModel.data?.startsAt ?? "")} - ${convertDate(date: _homeController.getUserBookingQrCodeModel.data?.endsAt ?? "")}",
+                                              style: AppTextTheme.medium
+                                                  .copyWith(
+                                                      color: ColorConstant
+                                                          .blackColor,
+                                                      fontSize: 13),
+                                            ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              Container(
+                                width: Get.width * 0.8,
+                                height: 1,
+                                decoration: const BoxDecoration(
+                                    color: ColorConstant.divider2Color),
+                              ),
+                              const SizedBox(height: 15),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "Address",
+                                    style: AppTextTheme.medium.copyWith(
+                                        color: ColorConstant.grayTextColor,
+                                        fontSize: 13),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  Text(
+                                    _homeController.getUserBookingQrCodeModel
+                                            .data?.salon?.address ??
+                                        "",
+                                    style: AppTextTheme.medium.copyWith(
+                                        color: ColorConstant.blackColor,
+                                        fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 15),
+                              Container(
+                                width: Get.width * 0.8,
+                                height: 1,
+                                decoration: const BoxDecoration(
+                                    color: ColorConstant.divider2Color),
+                              ),
+                              const SizedBox(height: 10),
+                              Center(
+                                child: QrImageView(
+                                  data: _homeController
                                           .getUserBookingQrCodeModel
                                           .data
-                                          ?.finalizedAt ??
-                                          ''),
-                                  style: AppTextTheme.medium
-                                      .copyWith(
-                                      color: ColorConstant
-                                          .blackColor,
-                                      fontSize: 13),
+                                          ?.completionToken ??
+                                      "",
+                                  version: QrVersions.auto,
+                                  size: 200.0,
                                 ),
-                              ],
-                            ),
-                            Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  "Time Slot",
-                                  style: AppTextTheme.medium
-                                      .copyWith(
-                                      color: ColorConstant
-                                          .grayTextColor,
-                                      fontSize: 13),
+                              ),
+                              const SizedBox(height: 15),
+                              Center(
+                                child: Text(
+                                  _homeController.getUserBookingQrCodeModel.data
+                                          ?.completionToken ??
+                                      "",
+                                  style: AppTextTheme.medium.copyWith(
+                                      fontSize: 13,
+                                      color: ColorConstant.blackColor),
                                 ),
-                                const SizedBox(height: 10),
-                                Text(
-                                  "${convertDate(date: _homeController.getUserBookingQrCodeModel.data?.startsAt ?? "")} - ${convertDate(date: _homeController.getUserBookingQrCodeModel.data?.endsAt ?? "")}",
-                                  style: AppTextTheme.medium
-                                      .copyWith(
-                                      color: ColorConstant
-                                          .blackColor,
-                                      fontSize: 13),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
-                        Container(
-                          width: Get.width * 0.8,
-                          height: 1,
-                          decoration: const BoxDecoration(
-                              color: ColorConstant.divider2Color),
-                        ),
-                        const SizedBox(height: 15),
-                        Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Address",
-                              style: AppTextTheme.medium.copyWith(
-                                  color:
-                                  ColorConstant.grayTextColor,
-                                  fontSize: 13),
-                            ),
-                            const SizedBox(height: 10),
-                            Text(
-                              _homeController
-                                  .getUserBookingQrCodeModel
-                                  .data
-                                  ?.salon
-                                  ?.address ??
-                                  "",
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.blackColor,
-                                  fontSize: 13),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
-                        Container(
-                          width: Get.width * 0.8,
-                          height: 1,
-                          decoration: const BoxDecoration(
-                              color: ColorConstant.divider2Color),
-                        ),
-                        const SizedBox(height: 10),
-                        Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Stylist Name",
-                              style: AppTextTheme.medium.copyWith(
-                                  color:
-                                  ColorConstant.grayTextColor,
-                                  fontSize: 13),
-                            ),
-                            const SizedBox(height: 5),
-                            Text(
-                              _homeController
-                                  .getUserBookingQrCodeModel
-                                  .data
-                                  ?.artist
-                                  ?.name ??
-                                  '',
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.blackColor,
-                                  fontSize: 13),
-                            ),
-                          ],
-                        ),
-                        Center(
-                          child: QrImageView(
-                            data: _homeController
-                                .getUserBookingQrCodeModel
-                                .data
-                                ?.completionToken ??
-                                "",
-                            version: QrVersions.auto,
-                            size: 200.0,
+                              )
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 15),
-                        Center(
-                          child: Text(
-                            _homeController
-                                .getUserBookingQrCodeModel
-                                .data
-                                ?.completionToken ??
-                                "",
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 13,
-                                color: ColorConstant.blackColor),
-                          ),
-                        )
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ),
-
-              ],
-            ),
-          ),
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            _launchPhone(_homeController.getUserBookingQrCodeModel.data?.salon?.mobile ?? "");
+            _launchPhone(
+                _homeController.getUserBookingQrCodeModel.data?.salon?.mobile ??
+                    "");
           },
           backgroundColor: ColorConstant.removeStroke,
           child: Image.asset(

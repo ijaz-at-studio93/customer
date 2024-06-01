@@ -2,21 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sallon_customer/model/current_booking_list_model.dart';
+import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
-import '../../../constant/color_constant.dart';
 
-class PendingCardWidget extends StatefulWidget {
-  final BookingData bookingData;
+import '../../../model/booking_history_list_model.dart';
+
+class CompleteAndRejectWidget extends StatefulWidget {
+  final HistoryList historyList;
   final VoidCallback onPress;
-  const PendingCardWidget(
-      {super.key, required this.onPress, required this.bookingData});
+  const CompleteAndRejectWidget({super.key, required this.historyList, required this.onPress});
 
   @override
-  State<PendingCardWidget> createState() => _PendingCardWidgetState();
+  State<CompleteAndRejectWidget> createState() =>
+      _CompleteAndRejectWidgetState();
 }
 
-class _PendingCardWidgetState extends State<PendingCardWidget> {
+class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -44,7 +45,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                 ],
               ),
               Text(
-                "${convertDate(date: widget.bookingData.startsAt ?? "")}- ${convertDate(date: widget.bookingData.endsAt ?? "")}",
+                "${convertDate(date: widget.historyList.startsAt ?? "")}- ${convertDate(date: widget.historyList.endsAt ?? "")}",
                 style: AppTextTheme.regular
                     .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
               )
@@ -67,10 +68,33 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                "₹${widget.bookingData.orderAmount}/-",
+                "₹${widget.historyList.orderAmount}/-",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Text(
+                "Order Status : ",
+                style: AppTextTheme.medium
+                    .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                widget.historyList.orderStatus == "salon_artist_rejected"
+                    ? "Rejected"
+                    : widget.historyList.orderStatus ?? "",
+                textScaler: const TextScaler.linear(0.85),
+                style: AppTextTheme.bold.copyWith(
+                    fontSize: 16,
+                    color: widget.historyList.orderStatus ==
+                            "salon_artist_rejected"
+                        ? ColorConstant.redBgColor
+                        : ColorConstant.primaryColor),
               ),
             ],
           ),
@@ -84,7 +108,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                widget.bookingData.salon?.name ?? "",
+                widget.historyList.salon?.name ?? "",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
@@ -101,7 +125,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                widget.bookingData.appointment?.artist?.name ?? "",
+                widget.historyList.appointment?.artist?.name ?? "",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
@@ -109,24 +133,26 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
             ],
           ),
           const SizedBox(height: 20),
-          GestureDetector(
-            onTap: widget.onPress,
-            child: Container(
-              height: 50,
-              width: Get.width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: const Color(0xffEAEAEA),
-              ),
-              child: Center(
-                child: Text(
-                  "VIEW",
-                  style: AppTextTheme.bold
-                      .copyWith(color: ColorConstant.blackColor, fontSize: 16),
-                ),
-              ),
-            ),
-          )
+          widget.historyList.orderStatus == "salon_artist_rejected"
+              ? const SizedBox()
+              : GestureDetector(
+                  onTap: widget.onPress,
+                  child: Container(
+                    height: 50,
+                    width: Get.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xffEAEAEA),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "VIEW",
+                        style: AppTextTheme.bold.copyWith(
+                            color: ColorConstant.blackColor, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                )
         ],
       ),
     );

@@ -44,14 +44,14 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getCurrentLatLng();
-    scrollController.addListener(() {
+    /* scrollController.addListener(() {
       if (_homeController.lat != 0.0 && _homeController.lng != 0.0) {
         if (scrollController.position.pixels ==
             scrollController.position.maxScrollExtent) {
           _homeController.fetchPosts();
         }
       }
-    });
+    });*/
   }
 
   @override
@@ -75,7 +75,7 @@ class _HomePageState extends State<HomePage> {
               _offer(),
               const SizedBox(height: 10),
               _saloonsFoundNear(),
-              ListView.builder(
+              /*   ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: _homeController.salonList.length +
@@ -85,6 +85,7 @@ class _HomePageState extends State<HomePage> {
                     return const ProgressBarView();
                   }
                   return SaloonCardWidget(
+                    isFav: false,
                     homeSalonModel: _homeController.salonList[index],
                     onPress: () {
                       Get.to(
@@ -95,23 +96,27 @@ class _HomePageState extends State<HomePage> {
                     },
                   );
                 },
-              )
-              /*ListView.builder(
+              )*/
+              ListView.builder(
                   padding: EdgeInsets.zero,
                   physics: const NeverScrollableScrollPhysics(),
-                  itemCount: _homeController.homeSalonList.length,
+                  itemCount:
+                      _homeController.getHomeSalonList.data?.rows?.length ?? 0,
                   shrinkWrap: true,
                   itemBuilder: (context, index) {
                     return SaloonCardWidget(
-                      homeSalonModel: _homeController.homeSalonList[index],
+                      homeSalonModel:
+                          _homeController.getHomeSalonList.data!.rows![index],
                       onPress: () {
                         Get.to(() => SaloonAfterSelectingServicesPage(
-                              salonId:
-                                  _homeController.homeSalonList[index].id ?? "",
+                              salonId: _homeController
+                                      .getHomeSalonList.data?.rows?[index].id ??
+                                  "",
                             ));
                       },
+                      isFav: false,
                     );
-                  })*/
+                  })
             ],
           ),
         ),
@@ -286,7 +291,11 @@ class _HomePageState extends State<HomePage> {
           ),
           GestureDetector(
             onTap: () {
-              Get.to(() => const ProfilePage());
+              Get.to(() => ProfilePage(
+                    callback: () {
+                      getCurrentLatLng();
+                    },
+                  ));
             },
             child: Container(
               width: 42,
@@ -522,7 +531,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${_homeController.salonList.length} Saloons Found Near You",
+                  "${_homeController.homeCategoryListResponseModel.data?.length} Saloons Found Near You",
                   textScaler: const TextScaler.linear(0.70),
                   style: AppTextTheme.bold
                       .copyWith(fontSize: 19, color: ColorConstant.blackColor),
@@ -656,18 +665,18 @@ class _HomePageState extends State<HomePage> {
     List<Placemark> placemarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
 
-    _homeController.lat = position.latitude;
+    /*_homeController.lat = position.latitude;
     _homeController.lng = position.longitude;
-
+*/
     Placemark place = placemarks[0];
     _authController.userCity = "${place.locality}";
     _authController.userCurrentLocation =
         "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doGetHomeCategory();
-      _homeController.fetchPosts();
-      // _homeController.doGetHomeSalonList(
-      //     offset: 1, size: 10, lat: position.latitude, lng: position.longitude);
+      /*_homeController.fetchPosts();*/
+      _homeController.doGetHomeSalonList(
+          offset: 1, size: 50, lat: position.latitude, lng: position.longitude);
     });
   }
 }

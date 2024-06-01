@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_image_stack/flutter_image_stack.dart';
@@ -48,6 +49,7 @@ class _SaloonAfterSelectingServicesPageState
       _homeController.doGetHomeSalonDetails(salonId: widget.salonId);
       _homeController.doGetSalonDetailsService(salonId: widget.salonId);
       _homeController.doGetSalonArtiestListData(salonId: widget.salonId);
+      _homeController.doGetCart();
     });
   }
 
@@ -74,48 +76,108 @@ class _SaloonAfterSelectingServicesPageState
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: serviceId == ""
-          ? const SizedBox()
-          : Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
-              children: [
-                Container(
-                  width: Get.width,
-                  height: 100,
-                  decoration: const BoxDecoration(
-                    color: ColorConstant.whiteColor,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Color(0x1E000000),
-                        blurRadius: 8,
-                        offset: Offset(-2, -2),
-                        spreadRadius: 0,
-                      )
-                    ],
-                  ),
-                  clipBehavior: Clip.none,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          FlutterImageStack(
-                            imageList: _images,
-                            showTotalCount: false,
-                            totalCount: 4,
-                            imageSource: ImageSource.network,
-                            itemRadius: 35,
-                            itemCount: 2,
-                            itemBorderWidth:
-                                3, // Border width around the images
-                          ),
-                          const SizedBox(width: 10),
-                          GestureDetector(
-                            onTap: () {
+      floatingActionButton: Obx(
+        () => _homeController.getServiceAddCartModel.data?.items?.isEmpty ??
+                false ||
+                    _homeController.getServiceAddCartModel.data?.items ==
+                        null ??
+                false
+            ? const SizedBox()
+            : Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: Get.width,
+                    height: 100,
+                    decoration: const BoxDecoration(
+                      color: ColorConstant.whiteColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0x1E000000),
+                          blurRadius: 8,
+                          offset: Offset(-2, -2),
+                          spreadRadius: 0,
+                        )
+                      ],
+                    ),
+                    clipBehavior: Clip.none,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            FlutterImageStack(
+                              imageList: _images,
+                              showTotalCount: false,
+                              totalCount: 4,
+                              imageSource: ImageSource.network,
+                              itemRadius: 35,
+                              itemCount: 2,
+                              itemBorderWidth:
+                                  3, // Border width around the images
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(32),
+                                      topRight: Radius.circular(32),
+                                    )),
+                                    context: context,
+                                    builder: (context) {
+                                      return   CustomizedSheetWidget(
+                                        serviceAddCartModel: _homeController.getServiceAddCartModel,
+                                      );
+                                    });
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "${_homeController.getServiceAddCartModel.data?.items?.length} Added",
+                                        style: AppTextTheme.bold.copyWith(
+                                            fontSize: 13,
+                                            color: ColorConstant.grayTextColor),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Image.asset(
+                                        AssetsConstant.arrowUpIcon,
+                                        height: 8,
+                                        width: 11,
+                                      )
+                                    ],
+                                  ),
+                                  Text(
+                                    "₹${_homeController.getServiceAddCartModel.data?.price ?? ""}",
+                                    style: AppTextTheme.bold.copyWith(
+                                        fontSize: 19,
+                                        color: ColorConstant.blackColor),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            if (artiestId != "") {
+                              Get.to(() => AppointmentBookingPage(
+
+                                    artiestId: artiestId,
+                                  ));
+                            } else {
                               showModalBottomSheet(
                                   isScrollControlled: true,
+                                  isDismissible: false,
+                                  enableDrag: false,
                                   shape: const RoundedRectangleBorder(
                                       borderRadius: BorderRadius.only(
                                     topLeft: Radius.circular(32),
@@ -123,70 +185,16 @@ class _SaloonAfterSelectingServicesPageState
                                   )),
                                   context: context,
                                   builder: (context) {
-                                    return const CustomizedSheetWidget();
+                                    return SelectingArtistBottomSheetWidget(
+                                      serviceId: serviceId,
+                                      callback: () {
+                                        artiestId = box.read('artiestId');
+                                      },
+                                    );
                                   });
-                            },
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      "1 Added",
-                                      style: AppTextTheme.bold.copyWith(
-                                          fontSize: 13,
-                                          color: ColorConstant.grayTextColor),
-                                    ),
-                                    const SizedBox(width: 2),
-                                    Image.asset(
-                                      AssetsConstant.arrowUpIcon,
-                                      height: 8,
-                                      width: 11,
-                                    )
-                                  ],
-                                ),
-                                Text(
-                                  "₹4,000",
-                                  style: AppTextTheme.bold.copyWith(
-                                      fontSize: 19,
-                                      color: ColorConstant.blackColor),
-                                )
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          if (serviceId != "" && artiestId != "") {
-                            Get.to(() => AppointmentBookingPage(
-                                  serviceId: serviceId,
-                                  salonId: widget.salonId,
-                                  artiestId: artiestId,
-                                ));
-                          } else {
-                            showModalBottomSheet(
-                                isScrollControlled: true,
-                                isDismissible: false,
-                                enableDrag: false,
-                                shape: const RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(32),
-                                  topRight: Radius.circular(32),
-                                )),
-                                context: context,
-                                builder: (context) {
-                                  return SelectingArtistBottomSheetWidget(
-                                    serviceId: serviceId,
-                                    callback: () {
-                                      artiestId = box.read('artiestId');
-                                    },
-                                  );
-                                });
-                          }
+                            }
 
-                          /*showModalBottomSheet(
+                            /*showModalBottomSheet(
                             isScrollControlled: true,
                             shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.only(
@@ -198,46 +206,69 @@ class _SaloonAfterSelectingServicesPageState
                               return const ViewCartWidget(
                               );
                             });*/
-                        },
-                        child: Container(
-                          height: 45,
-                          width: Get.width * 0.4,
-                          decoration: BoxDecoration(
-                            color: changeTheme(SharedPrefs.readStringValue(
-                                PrefConstants.gender)),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Select Stylist",
-                                textScaler: const TextScaler.linear(0.85),
-                                style: AppTextTheme.medium.copyWith(
-                                    fontSize: 16,
-                                    color: ColorConstant.whiteColor),
-                              ),
-                              const SizedBox(width: 10),
-                              const Icon(
-                                Icons.arrow_forward,
-                                color: ColorConstant.whiteColor,
-                                size: 20,
-                              )
-                            ],
+                          },
+                          child: Container(
+                            height: 45,
+                            width: Get.width * 0.4,
+                            decoration: BoxDecoration(
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Select Stylist",
+                                  textScaler: const TextScaler.linear(0.85),
+                                  style: AppTextTheme.medium.copyWith(
+                                      fontSize: 16,
+                                      color: ColorConstant.whiteColor),
+                                ),
+                                const SizedBox(width: 10),
+                                const Icon(
+                                  Icons.arrow_forward,
+                                  color: ColorConstant.whiteColor,
+                                  size: 20,
+                                )
+                              ],
+                            ),
                           ),
                         ),
-                      )
-                    ],
+                        IconButton(
+                          onPressed: () {
+                            _homeController.doClearCart(callback: () {
+                              _homeController.doGetHomeSalonDetails(
+                                  salonId: widget.salonId);
+                              _homeController.doGetSalonDetailsService(
+                                  salonId: widget.salonId);
+                              _homeController.doGetSalonArtiestListData(
+                                  salonId: widget.salonId);
+                              _homeController.doGetCart();
+                            });
+                          },
+                          icon: const Icon(
+                            CupertinoIcons.xmark_circle_fill,
+                            color: ColorConstant.primaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
+                ],
+              ),
+      ),
     );
   }
 
   /*---------  Dummy Image ------*/
   List<String> _images = [
     'https://images.unsplash.com/photo-1593642532842-98d0fd5ebc1a?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=2250&q=80',
+    'https://images.unsplash.com/photo-1612594305265-86300a9a5b5b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1612594305265-86300a9a5b5b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1612594305265-86300a9a5b5b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1612594305265-86300a9a5b5b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
+    'https://images.unsplash.com/photo-1612594305265-86300a9a5b5b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
     'https://images.unsplash.com/photo-1612594305265-86300a9a5b5b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
   ];
 
@@ -744,6 +775,48 @@ class _SaloonAfterSelectingServicesPageState
                                             false,
                                         addButtonTap: () {
                                           setState(() {
+                                            _homeController
+                                                .salonDetailsListData
+                                                .data?[index]
+                                                .services?[i]
+                                                .isSelect = !(_homeController
+                                                    .salonDetailsListData
+                                                    .data?[index]
+                                                    .services?[i]
+                                                    .isSelect ??
+                                                false);
+
+                                            if (_homeController
+                                                    .salonDetailsListData
+                                                    .data?[index]
+                                                    .services?[i]
+                                                    .isSelect ??
+                                                false) {
+                                              _homeController.doAddCart(
+                                                  salonServiceId: _homeController
+                                                          .salonDetailsListData
+                                                          .data?[index]
+                                                          .services?[i]
+                                                          .id ??
+                                                      "",
+                                                  callback: () {
+                                                    _homeController.doGetCart();
+                                                  });
+                                            } else {
+                                              _homeController.doRemoveCart(
+                                                  salonServiceId: _homeController
+                                                          .salonDetailsListData
+                                                          .data?[index]
+                                                          .services?[i]
+                                                          .id ??
+                                                      "",
+                                                  callback: () {
+                                                    _homeController.doGetCart();
+                                                  });
+                                            }
+                                          });
+
+                                          /*setState(() {
                                             if (serviceId != "") {
                                               if (_homeController
                                                       .salonDetailsListData
@@ -821,7 +894,7 @@ class _SaloonAfterSelectingServicesPageState
                                                 artiestId = "";
                                               }
                                             }
-                                          });
+                                          });*/
                                         },
                                         onTap: () {},
                                       );

@@ -14,7 +14,7 @@ import 'package:sallon_customer/project_specific/remove_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
-class OverviewListTileWidget extends StatelessWidget {
+class OverviewListTileWidget extends StatefulWidget {
   final Services servicesList ;
 
   final VoidCallback onTap;
@@ -28,11 +28,16 @@ class OverviewListTileWidget extends StatelessWidget {
       required this.servicesList});
 
   @override
+  State<OverviewListTileWidget> createState() => _OverviewListTileWidgetState();
+}
+
+class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: InkWell(
-        onTap: onTap,
+        onTap: widget.onTap,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -42,7 +47,7 @@ class OverviewListTileWidget extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.5,
                   child: Text(
-                    servicesList.name ?? "",
+                    widget.servicesList.name ?? "",
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     textScaler: const TextScaler.linear(0.85),
@@ -60,7 +65,7 @@ class OverviewListTileWidget extends StatelessWidget {
                           color: ColorConstant.blackColor, fontSize: 16),
                     ),
                     Text(
-                      servicesList.gender ?? "",
+                      widget.servicesList.gender ?? "",
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.medium.copyWith(
                           color: ColorConstant.grayColor, fontSize: 16),
@@ -71,13 +76,13 @@ class OverviewListTileWidget extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      "₹${servicesList.price} • ",
+                      "₹${widget.servicesList.price} • ",
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.bold.copyWith(
                           color: ColorConstant.blackColor, fontSize: 16),
                     ),
                     Text(
-                      "${servicesList.duration} min",
+                      "${widget.servicesList.duration} min",
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.medium.copyWith(
                           color: ColorConstant.grayColor, fontSize: 16),
@@ -85,7 +90,7 @@ class OverviewListTileWidget extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 5),
-                servicesList.homeService ?? false
+                widget.servicesList.homeService ?? false
                     ? Row(
                         children: [
                           const Icon(Icons.home, size: 15),
@@ -110,7 +115,7 @@ class OverviewListTileWidget extends StatelessWidget {
                 SizedBox(
                   width: Get.width * 0.5,
                   child: ReadMoreText(
-                    servicesList.description ?? "",
+                    widget.servicesList.description ?? "",
                     trimMode: TrimMode.Line,
                     style: AppTextTheme.medium.copyWith(
                         color: ColorConstant.grayTextColor, fontSize: 14),
@@ -132,14 +137,14 @@ class OverviewListTileWidget extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 GestureDetector(
-                  onTap: addButtonTap,
+                  onTap: widget.addButtonTap,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: CachedNetworkImage(
                       width: 123,
                       height: 123,
                       fit: BoxFit.cover,
-                      imageUrl: "${APIConstants.image}${servicesList.image ?? " "}",
+                      imageUrl: "${APIConstants.image}${widget.servicesList.image ?? " "}",
                       placeholder: (context, url) => const Image(
                         image: AssetImage(AssetsConstant.placeHolder),
                         width: 108,
@@ -159,10 +164,10 @@ class OverviewListTileWidget extends StatelessWidget {
                   bottom: -18,
                   left: 8,
                   right: 8,
-                  child: isSelect
-                      ? RemoveButtonWidget(onPress: addButtonTap)
+                  child: widget.isSelect
+                      ? RemoveButtonWidget(onPress: widget.addButtonTap)
                       : AddButtonWidget(
-                          onPress: addButtonTap,
+                          onPress: widget.addButtonTap,
                           color: changeTheme(SharedPrefs.readStringValue(
                                   PrefConstants.gender)) ??
                               ColorConstant.primaryColor,

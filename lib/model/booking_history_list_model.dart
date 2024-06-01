@@ -1,16 +1,21 @@
-class UserBookingQrCodeModel {
+class BookingHistoryListModel {
   int? statusCode;
   bool? success;
-  Data? data;
+  List<HistoryList>? data;
   String? message;
 
-  UserBookingQrCodeModel(
+  BookingHistoryListModel(
       {this.statusCode, this.success, this.data, this.message});
 
-  UserBookingQrCodeModel.fromJson(Map<String, dynamic> json) {
+  BookingHistoryListModel.fromJson(Map<String, dynamic> json) {
     statusCode = json['statusCode'];
     success = json['success'];
-    data = json['data'] != null ? Data.fromJson(json['data']) : null;
+    if (json['data'] != null) {
+      data = <HistoryList>[];
+      json['data'].forEach((v) {
+        data!.add(HistoryList.fromJson(v));
+      });
+    }
     message = json['message'];
   }
 
@@ -19,47 +24,52 @@ class UserBookingQrCodeModel {
     data['statusCode'] = statusCode;
     data['success'] = success;
     if (this.data != null) {
-      data['data'] = this.data!.toJson();
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
     }
     data['message'] = message;
     return data;
   }
 }
 
-class Data {
+class HistoryList {
   int? orderAmount;
   String? bookingId;
+  String? idx;
   String? finalizedAt;
   String? appointmentId;
   String? orderStatus;
-  String? completionToken;
   String? startsAt;
   String? endsAt;
   Salon? salon;
+  Appointment? appointment;
   List<Items>? items;
 
-  Data(
+  HistoryList(
       {this.orderAmount,
-        this.bookingId,
-        this.finalizedAt,
-        this.appointmentId,
-        this.orderStatus,
-        this.completionToken,
-        this.startsAt,
-        this.endsAt,
-        this.salon,
-        this.items});
+      this.bookingId,
+      this.idx,
+      this.finalizedAt,
+      this.appointmentId,
+      this.orderStatus,
+      this.startsAt,
+      this.endsAt,
+      this.salon,
+      this.appointment,
+      this.items});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  HistoryList.fromJson(Map<String, dynamic> json) {
     orderAmount = json['orderAmount'];
     bookingId = json['bookingId'];
+    idx = json['idx'];
     finalizedAt = json['finalizedAt'];
     appointmentId = json['appointmentId'];
     orderStatus = json['orderStatus'];
-    completionToken = json['completionToken'];
     startsAt = json['startsAt'];
     endsAt = json['endsAt'];
     salon = json['salon'] != null ? Salon.fromJson(json['salon']) : null;
+    appointment = json['appointment'] != null
+        ? Appointment.fromJson(json['appointment'])
+        : null;
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
@@ -72,14 +82,17 @@ class Data {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['orderAmount'] = orderAmount;
     data['bookingId'] = bookingId;
+    data['idx'] = idx;
     data['finalizedAt'] = finalizedAt;
     data['appointmentId'] = appointmentId;
     data['orderStatus'] = orderStatus;
-    data['completionToken'] = completionToken;
     data['startsAt'] = startsAt;
     data['endsAt'] = endsAt;
     if (salon != null) {
       data['salon'] = salon!.toJson();
+    }
+    if (appointment != null) {
+      data['appointment'] = appointment!.toJson();
     }
     if (items != null) {
       data['items'] = items!.map((v) => v.toJson()).toList();
@@ -91,40 +104,39 @@ class Data {
 class Salon {
   String? id;
   String? name;
-  String? address;
-  String? countryCode;
-  String? mobile;
-  String? email;
-  String? image;
 
-  Salon(
-      {this.id,
-        this.name,
-        this.address,
-        this.countryCode,
-        this.mobile,
-        this.email,
-        this.image});
+  Salon({this.id, this.name});
 
   Salon.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
-    address = json['address'];
-    countryCode = json['countryCode'];
-    mobile = json['mobile'];
-    email = json['email'];
-    image = json['image'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['name'] = name;
-    data['address'] = address;
-    data['countryCode'] = countryCode;
-    data['mobile'] = mobile;
-    data['email'] = email;
-    data['image'] = image;
+    return data;
+  }
+}
+
+class Appointment {
+  String? id;
+  Salon? artist;
+
+  Appointment({this.id, this.artist});
+
+  Appointment.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    artist = json['artist'] != null ? Salon.fromJson(json['artist']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['id'] = id;
+    if (artist != null) {
+      data['artist'] = artist!.toJson();
+    }
     return data;
   }
 }
@@ -133,7 +145,7 @@ class Items {
   String? id;
   bool? isService;
   Service? service;
-  Product? product;
+  Service? product;
 
   Items({this.id, this.isService, this.service, this.product});
 
@@ -141,9 +153,9 @@ class Items {
     id = json['id'];
     isService = json['isService'];
     service =
-    json['service'] != null ? Service.fromJson(json['service']) : null;
+        json['service'] != null ? Service.fromJson(json['service']) : null;
     product =
-    json['product'] != null ? Product.fromJson(json['product']) : null;
+        json['product'] != null ? Service.fromJson(json['product']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -164,73 +176,13 @@ class Service {
   int? price;
   String? id;
   String? name;
-  int? duration;
-  String? image;
-  List<Categories>? categories;
 
-  Service(
-      {this.price,
-        this.id,
-        this.name,
-        this.duration,
-        this.image,
-        this.categories});
+  Service({this.price, this.id, this.name});
 
   Service.fromJson(Map<String, dynamic> json) {
     price = json['price'];
     id = json['id'];
     name = json['name'];
-    duration = json['duration'];
-    image = json['image'];
-    if (json['categories'] != null) {
-      categories = <Categories>[];
-      json['categories'].forEach((v) {
-        categories!.add(Categories.fromJson(v));
-      });
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['price'] = price;
-    data['id'] = id;
-    data['name'] = name;
-    data['duration'] = duration;
-    data['image'] = image;
-    if (categories != null) {
-      data['categories'] = categories!.map((v) => v.toJson()).toList();
-    }
-    return data;
-  }
-}
-
-class Categories {
-  String? name;
-
-  Categories({this.name});
-
-  Categories.fromJson(Map<String, dynamic> json) {
-    name = json['name'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['name'] = name;
-    return data;
-  }
-}
-
-class Product {
-  int? price;
-  String? id;
-  String? name;
-
-  Product({this.price, this.id, this.name});
-
-  Product.fromJson(Map<String, dynamic> json) {
-    price = json['price'];
-    id = json['id'];
-    name = json['name'];
   }
 
   Map<String, dynamic> toJson() {
@@ -241,4 +193,3 @@ class Product {
     return data;
   }
 }
-

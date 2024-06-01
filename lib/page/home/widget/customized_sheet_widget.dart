@@ -3,19 +3,27 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/controller/home_controller.dart';
+import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
+import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/NoItemsWidget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:sallon_customer/util/logger.dart';
 
 import 'custom_list_tile_widget.dart';
 
 class CustomizedSheetWidget extends StatefulWidget {
-  const CustomizedSheetWidget({super.key});
+  final ServiceAddCartModel serviceAddCartModel;
+  const CustomizedSheetWidget({super.key, required this.serviceAddCartModel});
 
   @override
   State<CustomizedSheetWidget> createState() => _CustomizedSheetWidgetState();
 }
 
 class _CustomizedSheetWidgetState extends State<CustomizedSheetWidget> {
+  final _homeController = Get.find<HomeController>();
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -31,192 +39,212 @@ class _CustomizedSheetWidgetState extends State<CustomizedSheetWidget> {
               topLeft: Radius.circular(16),
             ),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: Get.width * 0.6,
-                      child: Text(
-                        "Manicure & pedicure",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textScaler: const TextScaler.linear(0.85),
-                        style: AppTextTheme.bold.copyWith(
-                            color: ColorConstant.blackColor, fontSize: 17),
-                      ),
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        const Icon(
-                          Icons.star,
-                          color: ColorConstant.grayColor,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          "4.8 (76 Reviews)",
-                          textScaler: const TextScaler.linear(0.85),
-                          style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.grayColor, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    Row(
-                      children: [
-                        Text(
-                          "₹399 • ",
-                          textScaler: const TextScaler.linear(0.85),
-                          style: AppTextTheme.bold.copyWith(
-                              color: ColorConstant.blackColor, fontSize: 16),
-                        ),
-                        Text(
-                          "35 min",
-                          textScaler: const TextScaler.linear(0.85),
-                          style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.grayColor, fontSize: 16),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                  ],
-                ),
-              ),
-              Container(
-                height: 1,
-                width: Get.width,
-                color: ColorConstant.dividerRedLightColor,
-              ),
-              Container(
-                width: Get.width * 0.3,
-                margin:
-                    const EdgeInsets.symmetric(horizontal: 21, vertical: 10),
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: ColorConstant.greenColor,
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Center(
-                  child: Text(
-                    "RECOMMENDED",
-                    style: AppTextTheme.medium.copyWith(
-                        fontSize: 10, color: ColorConstant.whiteColor),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: ListView.separated(
-                  separatorBuilder: (context, index) {
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 15,top: 15),
-                      height: 1,
-                      width: Get.width,
-                      color: ColorConstant.dividerColor,
-                    );
-                  },
-                  shrinkWrap: true,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-                  itemCount: 5,
-                  itemBuilder: (context, index) {
-                    return const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 15),
-                      child: CustomListTileWidget(),
-                    );
-                  },
-                ),
-              ),
-              Container(
-                width: Get.width,
-                decoration: const BoxDecoration(
-                  color: ColorConstant.whiteColor,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x1E000000),
-                      blurRadius: 8,
-                      offset: Offset(-2, -2),
-                      spreadRadius: 0,
-                    ),
-                  ],
-                ),
-                height: 100,
-                clipBehavior: Clip.none,
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
+          child: Obx(
+            () => ProgressContainerView(
+              isProgressRunning: _homeController.showProgress,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 15),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        SizedBox(
+                          width: Get.width * 0.6,
+                          child: Text(
+                            "Manicure & pedicure",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textScaler: const TextScaler.linear(0.85),
+                            style: AppTextTheme.bold.copyWith(
+                                color: ColorConstant.blackColor, fontSize: 17),
+                          ),
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.star,
+                              color: ColorConstant.grayColor,
+                              size: 20,
+                            ),
+                            const SizedBox(width: 5),
+                            Text(
+                              "4.8 (76 Reviews)",
+                              textScaler: const TextScaler.linear(0.85),
+                              style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.grayColor, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
                         Row(
                           children: [
                             Text(
-                              "1 Added",
+                              "₹399 • ",
+                              textScaler: const TextScaler.linear(0.85),
                               style: AppTextTheme.bold.copyWith(
-                                  fontSize: 13,
-                                  color: ColorConstant.grayTextColor),
+                                  color: ColorConstant.blackColor,
+                                  fontSize: 16),
                             ),
-                            const SizedBox(width: 2),
-                            Image.asset(
-                              AssetsConstant.arrowUpIcon,
-                              height: 8,
-                              width: 11,
-                              color: changeTheme(
-                                  SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
-                            )
-                          ],
-                        ),
-                        Text(
-                          "₹4,000",
-                          style: AppTextTheme.bold.copyWith(
-                              fontSize: 19, color: ColorConstant.blackColor),
-                        )
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                         Get.back();
-                      },
-                      child: Container(
-                        height: 45,
-                        width: Get.width * 0.4,
-                        decoration: BoxDecoration(
-                          color: changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
                             Text(
-                              "Continue",
+                              "35 min",
                               textScaler: const TextScaler.linear(0.85),
                               style: AppTextTheme.medium.copyWith(
-                                  fontSize: 16, color: ColorConstant.whiteColor),
+                                  color: ColorConstant.grayColor, fontSize: 16),
                             ),
-                            const SizedBox(width: 10),
-                            const Icon(
-                              Icons.arrow_forward,
-                              color: ColorConstant.whiteColor,
-                              size: 20,
-                            )
                           ],
                         ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    height: 1,
+                    width: Get.width,
+                    color: ColorConstant.dividerRedLightColor,
+                  ),
+                  Container(
+                    width: Get.width * 0.3,
+                    margin: const EdgeInsets.symmetric(
+                        horizontal: 21, vertical: 10),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: ColorConstant.greenColor,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "RECOMMENDED",
+                        style: AppTextTheme.medium.copyWith(
+                            fontSize: 10, color: ColorConstant.whiteColor),
                       ),
-                    )
-                  ],
-                ),
+                    ),
+                  ),
+                  Expanded(
+                    child: widget.serviceAddCartModel.data
+                                ?.servicesAvailableProductList?.isEmpty ??
+                            false
+                        ? const NoItemsWidget(text: "No Any Product Found")
+                        : ListView.separated(
+                            separatorBuilder: (context, index) {
+                              return Container(
+                                margin:
+                                    const EdgeInsets.only(bottom: 15, top: 15),
+                                height: 1,
+                                width: Get.width,
+                                color: ColorConstant.dividerColor,
+                              );
+                            },
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 15),
+                            itemCount: widget.serviceAddCartModel.data
+                                    ?.servicesAvailableProductList?.length ??
+                                0,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 15),
+                                child: CustomListTileWidget(
+                                  nameProduct: widget
+                                          .serviceAddCartModel
+                                          .data
+                                          ?.servicesAvailableProductList?[index]
+                                          .name ??
+                                      "",
+                                  productDescription: widget
+                                          .serviceAddCartModel
+                                          .data
+                                          ?.servicesAvailableProductList?[index]
+                                          .description ??
+                                      "",
+                                  productImage: widget
+                                          .serviceAddCartModel
+                                          .data
+                                          ?.servicesAvailableProductList?[index]
+                                          .image ??
+                                      "",
+                                  price: widget
+                                          .serviceAddCartModel
+                                          .data
+                                          ?.servicesAvailableProductList?[index]
+                                          .price
+                                          .toString() ??
+                                      "",
+                                  isAdd: () {
+                                    /* logger.d("Is Add");
+                                    setState(() {
+                                      widget
+                                          .serviceAddCartModel
+                                          .data
+                                          ?.servicesAvailableProductList?[index]
+                                          .isAdded = !(widget
+                                              .serviceAddCartModel
+                                              .data
+                                              ?.servicesAvailableProductList?[
+                                                  index]
+                                              .isAdded ??
+                                          false);
+                                    });*/
+                                    _homeController.doAddProductCart(
+                                        productId: widget
+                                                .serviceAddCartModel
+                                                .data
+                                                ?.servicesAvailableProductList?[
+                                                    index]
+                                                .id ??
+                                            "",
+                                        callback: () {
+                                          setState(() {
+                                            widget
+                                                .serviceAddCartModel
+                                                .data
+                                                ?.servicesAvailableProductList?[
+                                                    index]
+                                                .isAdded = true;
+                                          });
+                                          _homeController.doGetCart();
+                                        });
+                                  },
+                                  isRemove: () {
+                                    logger.d("Is Remove");
+                                    _homeController.doRemoveProductCart(
+                                        productId: widget
+                                                .serviceAddCartModel
+                                                .data
+                                                ?.servicesAvailableProductList?[
+                                                    index]
+                                                .id ??
+                                            "",
+                                        callback: () {
+                                          setState(() {
+                                            widget
+                                                .serviceAddCartModel
+                                                .data
+                                                ?.servicesAvailableProductList?[
+                                                    index]
+                                                .isAdded = false;
+                                          });
+                                          _homeController.doGetCart();
+                                        });
+                                  },
+                                  isAdded: widget
+                                          .serviceAddCartModel
+                                          .data
+                                          ?.servicesAvailableProductList?[index]
+                                          .isAdded ??
+                                      false,
+                                ),
+                              );
+                            },
+                          ),
+                  ),
+                ],
               ),
-
-            ],
+            ),
           ),
         ),
         Positioned(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import 'package:sallon_customer/controller/auth_controller.dart';
 import '../constant/api_constant.dart';
 import '../util/SharedPrefs.dart';
 import 'dio_connectivity_request_retrier.dart';
@@ -59,6 +60,7 @@ class DioClient {
             }
             if (resp.statusCode == 500 || resp.statusCode == 502) {
               showMessage("Internal Server Error Bad Gateway");
+              Get.find<AuthController>().resetApp();
             }
           } catch (e) {
             return handler.next(resp);

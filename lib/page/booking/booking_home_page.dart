@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/page/appointment/qr_page.dart';
+import 'package:sallon_customer/page/booking/widget/complate_booking_details_view.dart';
+import 'package:sallon_customer/page/booking/widget/complete_reject_widget.dart';
 import 'package:sallon_customer/page/booking/widget/pending_card_widget.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
@@ -46,10 +48,10 @@ class _BookingHomePageState extends State<BookingHomePage> {
         children: [
           _bookingOverView(),
           Obx(
-            () =>  Expanded(
-                    child: _homeController.showProgress
-                        ? const ProgressBarView()
-                        : bookingOverView == "0"
+            () => Expanded(
+                child: _homeController.showProgress
+                    ? const ProgressBarView()
+                    : bookingOverView == "0"
                         ? _homeController
                                     .getCurrentBookingListModel.data?.isEmpty ??
                                 false
@@ -82,7 +84,38 @@ class _BookingHomePageState extends State<BookingHomePage> {
                                     ),
                                   );
                                 })
-                        : const SizedBox()),
+                        : _homeController
+                                    .getBookingHistoryListModel.data?.isEmpty ??
+                                false
+                            ? const NoItemsWidget(
+                                text: "No Any Pending Booking",
+                              )
+                            : ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: _homeController
+                                        .getBookingHistoryListModel
+                                        .data
+                                        ?.length ??
+                                    0,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 5),
+                                    child: CompleteAndRejectWidget(
+                                      historyList: _homeController
+                                          .getBookingHistoryListModel
+                                          .data![index],
+                                      onPress: () {
+                                        Get.to(() => CompleteBookingDetailsView(
+                                            appointmentId:_homeController
+                                                .getBookingHistoryListModel
+                                                .data?[index]
+                                                .appointmentId ??
+                                                ""));
+                                      },
+                                    ),
+                                  );
+                                })),
           )
         ],
       ),
@@ -100,7 +133,7 @@ class _BookingHomePageState extends State<BookingHomePage> {
       width: Get.width,
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: CupertinoSlidingSegmentedControl(
-          backgroundColor: ColorConstant.grayBorderColor,
+          backgroundColor: ColorConstant.primaryColor,
           padding: const EdgeInsets.all(6),
           groupValue: bookingOverView,
           thumbColor: ColorConstant.whiteColor,
@@ -115,7 +148,7 @@ class _BookingHomePageState extends State<BookingHomePage> {
                       ? AppTextTheme.bold.copyWith(
                           fontSize: 14, color: ColorConstant.blackColor)
                       : AppTextTheme.medium.copyWith(
-                          fontSize: 13, color: ColorConstant.grayTextColor),
+                          fontSize: 13, color: ColorConstant.whiteColor),
                 ),
               ),
             ),
@@ -124,14 +157,21 @@ class _BookingHomePageState extends State<BookingHomePage> {
               style: bookingOverView == "1"
                   ? AppTextTheme.bold
                       .copyWith(fontSize: 14, color: ColorConstant.blackColor)
-                  : AppTextTheme.medium.copyWith(
-                      fontSize: 13, color: ColorConstant.grayTextColor),
+                  : AppTextTheme.medium
+                      .copyWith(fontSize: 13, color: ColorConstant.whiteColor),
             ),
           },
           onValueChanged: (dynamic value) {
-            setState(() {
-              bookingOverView = value;
-            });
+            bookingOverView = value;
+            if (bookingOverView == "0") {
+              setState(() {
+                _homeController.doGetCurrentBookingListData();
+              });
+            } else {
+              setState(() {
+                _homeController.doGetBookingHistory();
+              });
+            }
           }),
     );
   }

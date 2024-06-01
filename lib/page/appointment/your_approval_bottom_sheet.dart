@@ -4,14 +4,14 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/page/appointment/qr_page.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
-
 import '../../constant/color_constant.dart';
 import '../../constant/variable_constant.dart';
+import '../../controller/home_controller.dart';
 import '../../project_specific/text_theme.dart';
 
 class YourApprovalBottomSheet extends StatefulWidget {
-  final  VoidCallback tapDone;
-  const YourApprovalBottomSheet({super.key, required this.tapDone});
+  final String salonAppointmentId;
+  const YourApprovalBottomSheet({super.key, required this.salonAppointmentId});
 
   @override
   State<YourApprovalBottomSheet> createState() =>
@@ -20,11 +20,11 @@ class YourApprovalBottomSheet extends StatefulWidget {
 
 class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
   int yourApproval = 1;
-
+  final _homeController = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Get.height * 0.4,
+      height: Get.height * 0.32,
       width: Get.width,
       decoration: const BoxDecoration(
         color: ColorConstant.whiteColor,
@@ -94,8 +94,11 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
                       Text(
                         "Yes",
                         style: AppTextTheme.medium.copyWith(
-                            fontSize: 13, color:changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+                          fontSize: 13,
+                          color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)) ??
+                              ColorConstant.primaryColor,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Container(
@@ -132,8 +135,11 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
                       Text(
                         "No",
                         style: AppTextTheme.medium.copyWith(
-                            fontSize: 13, color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,),
+                          fontSize: 13,
+                          color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)) ??
+                              ColorConstant.primaryColor,
+                        ),
                       ),
                       const SizedBox(width: 10),
                       Container(
@@ -167,8 +173,16 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
             child: ButtonWidget(
                 buttonTitleText: "Done",
                 color: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
-                onPress: widget.tapDone),
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                    ColorConstant.primaryColor,
+                onPress: () {
+                  Get.back();
+                  _homeController.doUploadPortFolio(
+                      appointmentId: widget.salonAppointmentId,
+                      isUpload: yourApproval == 1 ? true : false);
+                  Get.to(() =>
+                      QRCodePage(appointmentId: widget.salonAppointmentId));
+                }),
           ),
         ],
       ),

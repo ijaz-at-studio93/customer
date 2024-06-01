@@ -1,8 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:sallon_customer/api/dio_client.dart';
+import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
@@ -14,16 +17,11 @@ import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
+import '../../constant/assetsconstant.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
-  final String salonId;
-  final String serviceId;
   final String artiestId;
-  const AppointmentBookingPage(
-      {super.key,
-      required this.salonId,
-      required this.serviceId,
-      required this.artiestId});
+  const AppointmentBookingPage({super.key, required this.artiestId});
 
   @override
   State<AppointmentBookingPage> createState() => _AppointmentBookingPageState();
@@ -40,14 +38,11 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       String formatDate = DateFormat("yyyy-MM-dd").format(date);
       selectDate = formatDate;
       _homeController.doGetUnAvailableDatesListData(
-          salonId: widget.salonId,
-          serviceId: widget.serviceId,
           artiestId: widget.artiestId,
           date: formatDate,
           callback: () {
+            _homeController.doGetCart();
             _homeController.doGetAvailabilitiesTimeSlot(
-              salonId: widget.salonId,
-              serviceId: widget.serviceId,
               artiestId: widget.artiestId,
               date: formatDate,
             );
@@ -230,9 +225,45 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                     shrinkWrap: true,
                                     physics:
                                         const NeverScrollableScrollPhysics(),
-                                    itemCount: 3,
+                                    itemCount: _homeController
+                                            .getServiceAddCartModel
+                                            .data
+                                            ?.items
+                                            ?.length ??
+                                        0,
                                     itemBuilder: (context, index) {
-                                      return const KnowWhatYouWidget();
+                                      return KnowWhatYouWidget(
+                                        removeProduct: () {
+                                          _homeController.doRemoveProductCart(
+                                              productId: _homeController
+                                                      .getServiceAddCartModel
+                                                      .data
+                                                      ?.items?[index]
+                                                      .product
+                                                      ?.id ??
+                                                  "",
+                                              callback: () {
+                                                _homeController.doGetCart();
+                                              });
+                                        },
+                                        removeBtn: () {
+                                          _homeController.doRemoveCart(
+                                              salonServiceId: _homeController
+                                                      .getServiceAddCartModel
+                                                      .data
+                                                      ?.items?[index]
+                                                      .service
+                                                      ?.id ??
+                                                  "",
+                                              callback: () {
+                                                _homeController.doGetCart();
+                                              });
+                                        },
+                                        items: _homeController
+                                            .getServiceAddCartModel
+                                            .data!
+                                            .items![index],
+                                      );
                                     }),
                                 const SizedBox(height: 100),
                               ],
@@ -248,150 +279,318 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: _homeController.showProgress
           ? const SizedBox()
-          : Container(
-              width: Get.width,
-              height: 100,
-              decoration: const BoxDecoration(
-                color: ColorConstant.whiteColor,
-                boxShadow: [
-                  BoxShadow(
-                    color: Color(0x1E000000),
-                    blurRadius: 8,
-                    offset: Offset(-2, -2),
-                    spreadRadius: 0,
-                  )
-                ],
-              ),
-              clipBehavior: Clip.none,
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "1 Add On",
-                        style: AppTextTheme.bold.copyWith(
-                            fontSize: 13, color: ColorConstant.grayTextColor),
-                      ),
-                      Text(
-                        "₹4,000",
-                        style: AppTextTheme.bold.copyWith(
-                            fontSize: 19, color: ColorConstant.blackColor),
+          : _homeController.getServiceAddCartModel.data?.items?.isEmpty ?? false
+              ? const SizedBox()
+              : Container(
+                  width: Get.width,
+                  height: 100,
+                  decoration: const BoxDecoration(
+                    color: ColorConstant.whiteColor,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Color(0x1E000000),
+                        blurRadius: 8,
+                        offset: Offset(-2, -2),
+                        spreadRadius: 0,
                       )
                     ],
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      if (selectTime == "") {
-                        selectTime = _homeController
-                                .getAvailabilitiesTimeSlotModelData
-                                .data?[0]
-                                .time ??
-                            "";
-                        String inputDateTime = "$selectDate$selectTime";
-                        String correctedDateTime =
-                            '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
-                        DateTime dateTime = DateTime.parse(correctedDateTime);
-                        String isoDateTime = dateTime.toIso8601String();
-
-                        _homeController.doCreateBooking(
-                            salonId: widget.salonId,
-                            serviceId: widget.serviceId,
-                            salonArtistId: widget.artiestId,
-                            startAt: isoDateTime,
-                            callback: () {
-                              showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(32),
-                                    topRight: Radius.circular(32),
-                                  )),
-                                  context: context,
-                                  builder: (context) {
-                                    return YourApprovalBottomSheet(
-                                      tapDone: () {
-                                        Get.back();
-                                        Get.to(() => QRCodePage(
-                                            appointmentId: _homeController
-                                                    .getCreateBookingAppointmentModel
-                                                    .data
-                                                    ?.id ??
-                                                ""));
-                                      },
-                                    );
-                                  });
-                            });
-                      } else {
-                        String inputDateTime = "$selectDate$selectTime";
-                        String correctedDateTime =
-                            '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
-                        DateTime dateTime = DateTime.parse(correctedDateTime);
-                        String isoDateTime = dateTime.toIso8601String();
-                        _homeController.doCreateBooking(
-                            salonId: widget.salonId,
-                            serviceId: widget.serviceId,
-                            salonArtistId: widget.artiestId,
-                            startAt: isoDateTime,
-                            callback: () {
-                              showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(32),
-                                    topRight: Radius.circular(32),
-                                  )),
-                                  context: context,
-                                  builder: (context) {
-                                    return YourApprovalBottomSheet(
-                                      tapDone: () {
-                                        Get.back();
-                                        Get.to(() => QRCodePage(
-                                            appointmentId: _homeController
-                                                    .getCreateBookingAppointmentModel
-                                                    .data
-                                                    ?.id ??
-                                                ""));
-                                      },
-                                    );
-                                  });
-                            });
-                      }
-                    },
-                    child: Container(
-                      height: 45,
-                      width: Get.width * 0.4,
-                      decoration: BoxDecoration(
-                        color: changeTheme(SharedPrefs.readStringValue(
-                                PrefConstants.gender)) ??
-                            ColorConstant.primaryColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
+                  clipBehavior: Clip.none,
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      _homeController.getServiceAddCartModel.data?.previewImages
+                                  ?.isEmpty ??
+                              false
+                          ? const SizedBox()
+                          : Row(
+                              children: [
+                                _homeController.getServiceAddCartModel.data
+                                            ?.previewImages?.length ==
+                                        1
+                                    ? Row(
+                                        children: [
+                                          for (int i = 0; i < 1; i++)
+                                            Align(
+                                              widthFactor: 0.8,
+                                              child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(100),
+                                                child: CachedNetworkImage(
+                                                  fit: BoxFit.cover,
+                                                  width: 30,
+                                                  height: 30,
+                                                  imageUrl:
+                                                      "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
+                                                  placeholder: (context, url) =>
+                                                      const Image(
+                                                    image: AssetImage(
+                                                        AssetsConstant
+                                                            .placeHolder),
+                                                    fit: BoxFit.cover,
+                                                    width: 30,
+                                                    height: 30,
+                                                  ),
+                                                  errorWidget:
+                                                      (context, url, error) =>
+                                                          const Image(
+                                                    image: AssetImage(
+                                                        AssetsConstant
+                                                            .placeHolder),
+                                                    fit: BoxFit.cover,
+                                                    width: 30,
+                                                    height: 30,
+                                                  ),
+                                                ),
+                                              ),
+                                            )
+                                        ],
+                                      )
+                                    : _homeController.getServiceAddCartModel
+                                                .data?.previewImages?.length ==
+                                            2
+                                        ? Row(
+                                            children: [
+                                              for (int i = 0; i < 2; i++)
+                                                Align(
+                                                  widthFactor: 0.8,
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            100),
+                                                    child: CachedNetworkImage(
+                                                      fit: BoxFit.cover,
+                                                      width: 30,
+                                                      height: 30,
+                                                      imageUrl:
+                                                          "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
+                                                      placeholder:
+                                                          (context, url) =>
+                                                              const Image(
+                                                        image: AssetImage(
+                                                            AssetsConstant
+                                                                .placeHolder),
+                                                        fit: BoxFit.cover,
+                                                        width: 30,
+                                                        height: 30,
+                                                      ),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          const Image(
+                                                        image: AssetImage(
+                                                            AssetsConstant
+                                                                .placeHolder),
+                                                        fit: BoxFit.cover,
+                                                        width: 30,
+                                                        height: 30,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                )
+                                            ],
+                                          )
+                                        : Row(
+                                            children: [
+                                              for (int i = 0; i < 2; i++)
+                                                Align(
+                                                  widthFactor: 0.7,
+                                                  child: ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            100),
+                                                    child: CachedNetworkImage(
+                                                      fit: BoxFit.cover,
+                                                      width: 35,
+                                                      height: 35,
+                                                      imageUrl:
+                                                          "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
+                                                      placeholder:
+                                                          (context, url) =>
+                                                              const Image(
+                                                        image: AssetImage(
+                                                            AssetsConstant
+                                                                .placeHolder),
+                                                        fit: BoxFit.cover,
+                                                        width: 35,
+                                                        height: 35,
+                                                      ),
+                                                      errorWidget: (context,
+                                                              url, error) =>
+                                                          const Image(
+                                                        image: AssetImage(
+                                                            AssetsConstant
+                                                                .placeHolder),
+                                                        fit: BoxFit.cover,
+                                                        width: 35,
+                                                        height: 35,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              const SizedBox(width: 10),
+                                              Container(
+                                                width: 33,
+                                                height: 33,
+                                                decoration: const BoxDecoration(
+                                                    color: ColorConstant
+                                                        .primaryColor,
+                                                    shape: BoxShape.circle),
+                                                child: Center(
+                                                  child: Text(
+                                                    _homeController
+                                                            .getServiceAddCartModel
+                                                            .data
+                                                            ?.previewImages
+                                                            ?.length
+                                                            .toString() ??
+                                                        "",
+                                                    style: AppTextTheme.medium
+                                                        .copyWith(
+                                                      color: ColorConstant
+                                                          .whiteColor,
+                                                    ),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                              ],
+                            ),
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Pay & Book",
-                            textScaler: const TextScaler.linear(0.85),
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 16, color: ColorConstant.whiteColor),
+                            "${_homeController.getServiceAddCartModel.data?.items?.length} Add On",
+                            style: AppTextTheme.bold.copyWith(
+                                fontSize: 13,
+                                color: ColorConstant.grayTextColor),
                           ),
-                          const SizedBox(width: 10),
-                          const Icon(
-                            Icons.arrow_forward,
-                            color: ColorConstant.whiteColor,
-                            size: 20,
+                          Text(
+                            "₹${_homeController.getServiceAddCartModel.data?.price ?? ""}",
+                            style: AppTextTheme.bold.copyWith(
+                                fontSize: 19, color: ColorConstant.blackColor),
                           )
                         ],
                       ),
-                    ),
-                  )
-                ],
-              ),
-            ),
+                      GestureDetector(
+                        onTap: () {
+                          if (_homeController.getServiceAddCartModel.data?.items
+                                  ?.isEmpty ??
+                              false) {
+                            showMessage("Cart Service Not Found");
+                          } else {
+                            if (_homeController
+                                    .getAvailabilitiesTimeSlotModelData
+                                    .data
+                                    ?.isEmpty ??
+                                false) {
+                              showMessage(
+                                  "This Date No Available Any Slot Please Select Next Date");
+                            } else {
+                              if (selectTime == "") {
+                                selectTime = _homeController
+                                        .getAvailabilitiesTimeSlotModelData
+                                        .data?[0]
+                                        .time ??
+                                    "";
+                                String inputDateTime = "$selectDate$selectTime";
+                                String correctedDateTime =
+                                    '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+                                DateTime dateTime =
+                                    DateTime.parse(correctedDateTime);
+                                String isoDateTime = dateTime.toIso8601String();
+
+                                _homeController.doCreateBooking(
+                                    salonArtistId: widget.artiestId,
+                                    startAt: isoDateTime,
+                                    callback: () {
+                                      showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(32),
+                                            topRight: Radius.circular(32),
+                                          )),
+                                          context: context,
+                                          builder: (context) {
+                                            return YourApprovalBottomSheet(
+                                              salonAppointmentId:  _homeController
+                                                  .getCreateBookingAppointmentModel
+                                                  .data
+                                                  ?.salonAppointmentId ??
+                                                  "",
+
+                                            );
+                                          });
+                                    });
+                              } else {
+                                String inputDateTime = "$selectDate$selectTime";
+                                String correctedDateTime =
+                                    '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+                                DateTime dateTime =
+                                    DateTime.parse(correctedDateTime);
+                                String isoDateTime = dateTime.toIso8601String();
+                                _homeController.doCreateBooking(
+                                    salonArtistId: widget.artiestId,
+                                    startAt: isoDateTime,
+                                    callback: () {
+                                      showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(32),
+                                            topRight: Radius.circular(32),
+                                          )),
+                                          context: context,
+                                          builder: (context) {
+                                            return     YourApprovalBottomSheet(
+                                              salonAppointmentId:  _homeController
+                                                  .getCreateBookingAppointmentModel
+                                                  .data
+                                                  ?.salonAppointmentId ??
+                                                  "",
+
+                                            );
+                                          });
+                                    });
+                              }
+                            }
+                          }
+                        },
+                        child: Container(
+                          height: 45,
+                          width: Get.width * 0.35,
+                          decoration: BoxDecoration(
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender)) ??
+                                ColorConstant.primaryColor,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Pay & Book",
+                                textScaler: const TextScaler.linear(0.85),
+                                style: AppTextTheme.medium.copyWith(
+                                    fontSize: 16,
+                                    color: ColorConstant.whiteColor),
+                              ),
+                              const SizedBox(width: 10),
+                              const Icon(
+                                Icons.arrow_forward,
+                                color: ColorConstant.whiteColor,
+                                size: 20,
+                              )
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
     );
   }
 
@@ -461,14 +660,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         print(finalDate);
         selectDate = finalDate;
         _homeController.doGetUnAvailableDatesListData(
-            salonId: widget.salonId,
-            serviceId: widget.serviceId,
             artiestId: widget.artiestId,
             date: finalDate,
             callback: () {
               _homeController.doGetAvailabilitiesTimeSlot(
-                salonId: widget.salonId,
-                serviceId: widget.serviceId,
                 artiestId: widget.artiestId,
                 date: finalDate,
               );
@@ -481,8 +676,6 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         String formatDate = DateFormat("yyyy-MM-dd").format(selectedDate);
         selectDate = formatDate;
         _homeController.doGetAvailabilitiesTimeSlot(
-          salonId: widget.salonId,
-          serviceId: widget.serviceId,
           artiestId: widget.artiestId,
           date: formatDate,
         );

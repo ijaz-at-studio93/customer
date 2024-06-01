@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
+import 'package:readmore/readmore.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
 import 'package:sallon_customer/project_specific/edit_product_button_widget.dart';
 import 'package:sallon_customer/project_specific/remove_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
@@ -11,111 +13,147 @@ import 'package:sallon_customer/project_specific/text_theme.dart';
 import '../../../util/SharedPrefs.dart';
 
 class KnowWhatYouWidget extends StatelessWidget {
-  const KnowWhatYouWidget({super.key});
+  final Items items;
+  final VoidCallback removeBtn;
+  final VoidCallback removeProduct;
+  const KnowWhatYouWidget(
+      {super.key,
+      required this.items,
+      required this.removeBtn,
+      required this.removeProduct});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Facial Spa',
-                  style: AppTextTheme.bold
-                      .copyWith(fontSize: 16, color: ColorConstant.blackColor),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Lakme Cream + Head Facial..',
-                  style: AppTextTheme.medium.copyWith(
-                      fontSize: 13, color: ColorConstant.grayTextColor),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    Text(
-                      '₹399',
-                      style: AppTextTheme.bold.copyWith(
-                          fontSize: 16, color: ColorConstant.blackColor),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '₹3199',
-                      style: AppTextTheme.bold.copyWith(
-                          fontSize: 16,
-                          color: ColorConstant.grayTextColor,
-                          decoration: TextDecoration.lineThrough),
-                    ),
-                    const SizedBox(width: 20),
-                    Row(
-                      children: [
-                        Image.asset(
-                          AssetsConstant.offerIcon,
-                          height: 14,
-                          width: 14,
-                          color: changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)) ?? ColorConstant.primaryColor,
-                        ),
-                        Text(
-                          "50% Off",
-                          style: AppTextTheme.medium.copyWith(
-                              color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)), fontSize: 13),
-                        )
-                      ],
-                    )
-                  ],
-                )
-              ],
-            ),
-            Column(
-              children: [
-                Text(
-                  '38 Min',
-                  style: AppTextTheme.medium.copyWith(
-                      fontSize: 13, color: ColorConstant.grayTextColor),
-                ),
-                const SizedBox(height: 10),
-                EditProductButtonWidget(onTap: () {}),
-                const SizedBox(height: 10),
-                RemoveButtonWidget(onPress: () {})
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-         Dash(
-            direction: Axis.horizontal,
-            length: Get.width*0.85,
-            dashLength: 3,
-            dashColor: Colors.grey),
-        const SizedBox(height: 10),
-        Row(
-          children: [
-            Text(
-              'Service Cost : 300',
+    if (items.isService ?? false) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Service",
+            style: AppTextTheme.bold
+                .copyWith(fontSize: 16, color: ColorConstant.primaryColor),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    items.service?.name ?? "",
+                    style: AppTextTheme.bold.copyWith(
+                        fontSize: 16, color: ColorConstant.blackColor),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Lakme Cream + Head Facial..',
+                    style: AppTextTheme.medium.copyWith(
+                        fontSize: 13, color: ColorConstant.grayTextColor),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        '₹${items.service?.price}',
+                        style: AppTextTheme.bold.copyWith(
+                            fontSize: 16, color: ColorConstant.blackColor),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  )
+                ],
+              ),
+              Column(
+                children: [
+                  Text(
+                    '${items.service?.duration} Min',
+                    style: AppTextTheme.medium.copyWith(
+                        fontSize: 13, color: ColorConstant.grayTextColor),
+                  ),
+                  const SizedBox(height: 10),
+                  /* EditProductButtonWidget(onTap: () {}),
+                const SizedBox(height: 10),*/
+                  RemoveButtonWidget(onPress: removeBtn)
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Dash(
+              direction: Axis.horizontal,
+              length: Get.width * 0.85,
+              dashLength: 3,
+              dashColor: Colors.grey),
+          const SizedBox(height: 10),
+          SizedBox(
+            width: Get.width,
+            child: ReadMoreText(
+              items.service?.description ?? "",
+              trimMode: TrimMode.Line,
               style: AppTextTheme.medium
-                  .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
+                  .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
+              trimLines: 2,
+              colorClickableText: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                  ColorConstant.primaryColor,
+              trimCollapsedText: 'more',
+              trimExpandedText: 'Show less',
+              moreStyle: AppTextTheme.medium.copyWith(
+                  fontSize: 15,
+                  color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      ColorConstant.primaryColor),
             ),
-            const SizedBox(width: 9),
-            Container(
-              height: 4,
-              width: 4,
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle, color: Colors.grey),
-            ),
-            const SizedBox(width: 9),
-            Text(
-              'Product Cost : 400',
-              style: AppTextTheme.medium
-                  .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
-            ),
-          ],
-        ),
-      ],
-    );
+          ),
+        ],
+      );
+    } else {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Product",
+            style: AppTextTheme.bold
+                .copyWith(fontSize: 16, color: ColorConstant.primaryColor),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    items.product?.name ?? "",
+                    style: AppTextTheme.bold.copyWith(
+                        fontSize: 16, color: ColorConstant.blackColor),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Lakme Cream + Head Facial..',
+                    style: AppTextTheme.medium.copyWith(
+                        fontSize: 13, color: ColorConstant.grayTextColor),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        '₹${items.product?.price}',
+                        style: AppTextTheme.bold.copyWith(
+                            fontSize: 16, color: ColorConstant.blackColor),
+                      ),
+                      const SizedBox(width: 8),
+                    ],
+                  )
+                ],
+              ),
+              RemoveButtonWidget(onPress: removeProduct)
+            ],
+          ),
+          const SizedBox(height: 10),
+        ],
+      );
+    }
   }
 }
