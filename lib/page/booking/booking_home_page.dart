@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/page/appointment/qr_page.dart';
-import 'package:sallon_customer/page/booking/widget/complate_booking_details_view.dart';
+import 'package:sallon_customer/page/booking/complate_booking_details_view.dart';
 import 'package:sallon_customer/page/booking/widget/complete_reject_widget.dart';
 import 'package:sallon_customer/page/booking/widget/pending_card_widget.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
@@ -107,11 +107,12 @@ class _BookingHomePageState extends State<BookingHomePage> {
                                           .data![index],
                                       onPress: () {
                                         Get.to(() => CompleteBookingDetailsView(
-                                            appointmentId:_homeController
-                                                .getBookingHistoryListModel
-                                                .data?[index]
-                                                .appointmentId ??
-                                                ""));
+                                              appointmentId: _homeController
+                                                      .getBookingHistoryListModel
+                                                      .data?[index]
+                                                      .appointmentId ??
+                                                  "",
+                                            ));
                                       },
                                     ),
                                   );

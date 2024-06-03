@@ -83,9 +83,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                                 salonId: widget.homeSalonModel.id ?? "");
                           } else {
                             _homeController.doRemoveFavouriteSalon(
-                                callback: () {
-                                  _homeController.doGetFavouriteSalon();
-                                },
+                                callback: () {},
                                 salonId: widget.homeSalonModel.id ?? "");
                           }
                         });

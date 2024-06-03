@@ -5,8 +5,10 @@ import 'package:sallon_customer/model/booking_history_list_model.dart';
 import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
 import 'package:sallon_customer/model/category_service_list_model.dart';
 import 'package:sallon_customer/model/create_booking_appoiment_model.dart';
+import 'package:sallon_customer/model/favourite_salon_list_data_model.dart';
 import 'package:sallon_customer/model/home_category_list_model.dart';
 import 'package:sallon_customer/model/home_salon_list_model.dart';
+import 'package:sallon_customer/model/review_list_data_model.dart';
 import 'package:sallon_customer/model/salon_details_artiest.dart';
 import 'package:sallon_customer/model/salon_details_model.dart';
 import 'package:sallon_customer/model/un_available_dates_model.dart';
@@ -185,10 +187,10 @@ class HomeAPI {
   }
 
   /*----------------  Get Favourite  Salon ------------------*/
-  static Future<HomeSalonModel> getFavouriteSalon() async {
+  static Future<FavouriteSalonModel> getFavouriteSalon() async {
     final response = await DioClient.client.get("user/salon/favourite/");
     if (response.isSuccess) {
-      return  HomeSalonModel.fromJson(response.data);
+      return FavouriteSalonModel.fromJson(response.data);
     } else {
       throw response.data;
     }
@@ -280,6 +282,75 @@ class HomeAPI {
     final response = await DioClient.client.put(
         "user/booking/appointments/$appointmentId/allow-portfolio-upload",
         data: {"allowPortfolioUpload": isUpload});
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*------------------------ Review List Data API  --------------------*/
+  static Future<ReviewListModel> reviewListDataGet(
+      {required String appointmentId}) async {
+    final response =
+        await DioClient.client.get("user/booking/$appointmentId/review");
+    if (response.isSuccess) {
+      return ReviewListModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*----------------- Appointment Service Review ------------------ */
+  static Future<bool> addAppointmentServiceReview(
+      {required String appointmentId,
+      required double rate,
+      required String salonServiceId,
+      required String review}) async {
+    final response = await DioClient.client
+        .put("user/booking/$appointmentId/review", data: {
+      "rating": rate,
+      "salonServiceId": salonServiceId,
+      "review": review
+    });
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+/*----------------- Appointment product Review ------------------ */
+  static Future<bool> addAppointmentProductReview(
+      {required String appointmentId,
+      required double rate,
+      required String salonProductId,
+      required String review}) async {
+    final response = await DioClient.client
+        .put("user/booking/$appointmentId/review", data: {
+      "rating": rate,
+      "salonProductId": salonProductId,
+      "review": review
+    });
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+/*----------------- Appointment Artiest Review ------------------ */
+  static Future<bool> addAppointmentArtiestReview(
+      {required String appointmentId,
+      required double rate,
+      required String salonArtistId,
+      required String review}) async {
+    final response = await DioClient.client
+        .put("user/booking/$appointmentId/review", data: {
+      "rating": rate,
+      "salonArtistId": salonArtistId,
+      "review": review
+    });
     if (response.isSuccess) {
       return true;
     } else {

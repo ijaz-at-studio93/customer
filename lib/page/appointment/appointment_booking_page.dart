@@ -9,7 +9,6 @@ import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/appointment/qr_page.dart';
 import 'package:sallon_customer/page/appointment/widget/know_what_you_widget.dart';
 import 'package:sallon_customer/page/appointment/widget/popular_service_widget.dart';
 import 'package:sallon_customer/page/appointment/your_approval_bottom_sheet.dart';

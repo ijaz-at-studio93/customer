@@ -109,9 +109,11 @@ class _HomePageState extends State<HomePage> {
                           _homeController.getHomeSalonList.data!.rows![index],
                       onPress: () {
                         Get.to(() => SaloonAfterSelectingServicesPage(
-                              salonId: _homeController
-                                      .getHomeSalonList.data?.rows?[index].id ??
-                                  "",
+                              homeSalonModel: _homeController
+                                  .getHomeSalonList.data!.rows![index],
+                          callback: (){
+                            getCurrentLatLng();
+                          },
                             ));
                       },
                       isFav: false,

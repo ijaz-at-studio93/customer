@@ -4,6 +4,7 @@ import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/page/home/saloon_after_selecting_page.dart';
 import 'package:sallon_customer/page/home/widget/saloon_card_widget.dart';
+import 'package:sallon_customer/page/profile/fav_salon_card_widget.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/NoItemsWidget.dart';
@@ -36,7 +37,7 @@ class _FavouriteSalonPageState extends State<FavouriteSalonPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          elevation: 0.0,
+          elevation: 1.0,
           backgroundColor: ColorConstant.whiteColor,
           leading: IconButton(
             onPressed: () {
@@ -58,28 +59,17 @@ class _FavouriteSalonPageState extends State<FavouriteSalonPage> {
         body: Obx(
           () => _homeController.gteShowAddProgress
               ? const ProgressBarView()
-              : _homeController.getFavSalonList.data?.rows?.isEmpty ?? false
+              : _homeController.getFavSalonList.data?.isEmpty ?? false
                   ? const NoItemsWidget(
                       text: "No Any Found Favourite Salon",
                     )
                   : ListView.builder(
                       shrinkWrap: true,
-                      itemCount:
-                          _homeController.getFavSalonList.data?.rows?.length,
+                      itemCount: _homeController.getFavSalonList.data?.length,
                       itemBuilder: (context, index) {
-                        return SaloonCardWidget(
-                          isFav: true,
-                          homeSalonModel: _homeController
-                              .getFavSalonList.data!.rows![index],
-                          onPress: () {
-                            Get.to(
-                              () => SaloonAfterSelectingServicesPage(
-                                salonId: _homeController.getFavSalonList.data
-                                        ?.rows?[index].id ??
-                                    "",
-                              ),
-                            );
-                          },
+                        return FavSalonCardWidget(
+                          favSalon:
+                              _homeController.getFavSalonList.data![index],
                         );
                       },
                     ),

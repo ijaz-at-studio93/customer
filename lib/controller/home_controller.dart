@@ -11,8 +11,10 @@ import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
 import 'package:sallon_customer/model/category_service_list_model.dart';
 import 'package:sallon_customer/model/create_booking_appoiment_model.dart';
 import 'package:sallon_customer/model/current_booking_list_model.dart';
+import 'package:sallon_customer/model/favourite_salon_list_data_model.dart';
 import 'package:sallon_customer/model/home_category_list_model.dart';
 import 'package:sallon_customer/model/home_salon_list_model.dart';
+import 'package:sallon_customer/model/review_list_data_model.dart';
 import 'package:sallon_customer/model/salon_details_artiest.dart';
 import 'package:sallon_customer/model/salon_details_model.dart';
 import 'package:sallon_customer/model/un_available_dates_model.dart';
@@ -56,25 +58,15 @@ class HomeController extends GetxController {
   set setSalonDetailsListData(val) => _salonDetailsListData.value = val;
 
   /*-----------------  Home Salon List Widget Get -------------------*/
-  final Rx<HomeSalonModel> _homeSalonList =
-      HomeSalonModel().obs;
-  HomeSalonModel get getHomeSalonList =>
-      _homeSalonList.value;
+  final Rx<HomeSalonModel> _homeSalonList = HomeSalonModel().obs;
+  HomeSalonModel get getHomeSalonList => _homeSalonList.value;
   set setHomeSalonList(val) => _homeSalonList.value = val;
 
+/*--------------------  Fav Salon  List  Model  Data Get  -------------------*/
 
-
-  final Rx<HomeSalonModel> _favSalonList =
-      HomeSalonModel().obs;
-  HomeSalonModel get getFavSalonList =>
-      _homeSalonList.value;
+  final Rx<FavouriteSalonModel> _favSalonList = FavouriteSalonModel().obs;
+  FavouriteSalonModel get getFavSalonList => _favSalonList.value;
   set setFavSalonList(val) => _favSalonList.value = val;
-
-
-
-
-
-
 
   /*--------------------- Salon artiest -------------*/
   final Rx<SalonDetailsArtiestModel> _salonDetailsArtiestData =
@@ -131,6 +123,12 @@ class HomeController extends GetxController {
   BookingHistoryListModel get getBookingHistoryListModel =>
       _bookingHistoryListModel.value;
   set setBookingHistoryListModel(val) => _bookingHistoryListModel.value = val;
+
+  /*------------------- Review Data List API Get Model ----------------*/
+
+  final Rx<ReviewListModel> _reviewDataListModel = ReviewListModel().obs;
+  ReviewListModel get getReviewDataListModel => _reviewDataListModel.value;
+  set setReviewDataListModel(val) => _reviewDataListModel.value = val;
 
   /*---------------- getHomeCategory ----------*/
   doGetHomeCategory() async {
@@ -225,14 +223,13 @@ class HomeController extends GetxController {
           offset: offset, size: size, lat: lat, lng: lng);
     } catch (e) {
       showError(e);
-      logger.d("Do Get Home Salon List  ${e.toString()}");
+      logger.d("Do Get Home Salon List ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
   }
 
   /*--------------- Do Get Salon Artiest ---------------*/
-
   doGetSalonArtiestListData({required String salonId}) async {
     try {
       _showProgress.value = true;
@@ -533,6 +530,96 @@ class HomeController extends GetxController {
       showError(e);
     } finally {
       _showProgress.value = false;
+    }
+  }
+
+  /*---------------------  Get Review Data List Model ----------------*/
+  doGetReviewDataList({required String appointmentId}) async {
+    try {
+      _showProgress.value = true;
+      _reviewDataListModel.value =
+          await HomeAPI.reviewListDataGet(appointmentId: appointmentId);
+    } catch (e) {
+      showError(e);
+      logger.d(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*>>>>>>>>>>>>>>>>>>>>>> Add Review <<<<<<<<<<<<<<<<<<<<<<<*/
+  /*============= Service ================*/
+  doAddServiceReview({
+    required String appointmentId,
+    required double rate,
+    required String salonServiceId,
+    required String review,
+    required VoidCallback callback,
+  }) async {
+    try {
+      _showAddProgress.value = true;
+      bool result = await HomeAPI.addAppointmentServiceReview(
+          appointmentId: appointmentId,
+          rate: rate,
+          salonServiceId: salonServiceId,
+          review: review);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showAddProgress.value = false;
+    }
+  }
+
+  /*================ Product ==================*/
+  doAddProductReview({
+    required String appointmentId,
+    required double rate,
+    required String salonProductId,
+    required String review,
+    required VoidCallback callback,
+  }) async {
+    try {
+      _showAddProgress.value = true;
+      bool result = await HomeAPI.addAppointmentProductReview(
+          appointmentId: appointmentId,
+          rate: rate,
+          salonProductId: salonProductId,
+          review: review);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showAddProgress.value = false;
+    }
+  }
+
+/*================ Artiest ==================*/
+  doAddArtiestReview({
+    required String appointmentId,
+    required double rate,
+    required String salonArtistId,
+    required String review,
+    required VoidCallback callback,
+  }) async {
+    try {
+      _showAddProgress.value = true;
+      bool result = await HomeAPI.addAppointmentArtiestReview(
+          appointmentId: appointmentId,
+          rate: rate,
+          salonArtistId: salonArtistId,
+          review: review);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showAddProgress.value = false;
     }
   }
 }
