@@ -2,14 +2,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/auth_controller.dart';
+import 'package:sallon_customer/model/blog_data_model.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
 class InsightsCardWidget extends StatefulWidget {
   final VoidCallback onPress;
-  const InsightsCardWidget({super.key, required this.onPress});
+  final BlogData blogData;
+  const InsightsCardWidget(
+      {super.key, required this.onPress, required this.blogData});
 
   @override
   State<InsightsCardWidget> createState() => _InsightsCardWidgetState();
@@ -34,8 +38,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                     width: Get.width,
                     height: Get.height * 0.25,
                     fit: BoxFit.fitWidth,
-                    imageUrl:
-                        "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                    imageUrl: "${APIConstants.image}${widget.blogData.image}",
                     placeholder: (context, url) => Image(
                       image: const AssetImage(AssetsConstant.placeHolder),
                       width: Get.width,
@@ -55,11 +58,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                   right: 10,
                   child: GestureDetector(
                     onTap: () {
-                      if (_authController.isInsightsFav) {
-                        _authController.isInsightsFavSelect = false;
-                      } else {
-                        _authController.isInsightsFavSelect = true;
-                      }
+
                     },
                     child: Obx(
                       () => Container(
@@ -84,30 +83,11 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 10,
-                  left: 12,
-                  child: Container(
-                    height: 30,
-                    width: Get.width * 0.25,
-                    decoration: BoxDecoration(
-                        color: ColorConstant.topRatedColor,
-                        borderRadius: BorderRadius.circular(6)),
-                    child: Center(
-                      child: Text(
-                        "By Nykaa Saloon",
-                        style: AppTextTheme.medium.copyWith(
-                            color: ColorConstant.whiteColor, fontSize: 11),
-                      ),
-                    ),
-                  ),
-                ),
-
               ],
             ),
             const SizedBox(height: 20),
             Text(
-              'SML Isuzu Ltd. (SMLI) is a trusted and reliable',
+              widget.blogData.title ?? "",
               style: AppTextTheme.medium
                   .copyWith(color: ColorConstant.blackColor, fontSize: 16),
             ),
@@ -138,7 +118,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                         width: 17,
                         fit: BoxFit.cover,
                         imageUrl:
-                            "https://images.unsplash.com/photo-1546961329-78bef0414d7c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+                            "${APIConstants.image}${widget.blogData.artist?.profileImage ?? ""}",
                         placeholder: (context, url) => const Image(
                           image: AssetImage(AssetsConstant.placeHolder),
                           height: 17,
@@ -155,7 +135,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      "By Harshit Mehta",
+                      widget.blogData.artist?.name ?? "",
                       style: AppTextTheme.medium.copyWith(
                           color: ColorConstant.grayTextColor, fontSize: 11),
                     ),

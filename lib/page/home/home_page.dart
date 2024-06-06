@@ -111,9 +111,9 @@ class _HomePageState extends State<HomePage> {
                         Get.to(() => SaloonAfterSelectingServicesPage(
                               homeSalonModel: _homeController
                                   .getHomeSalonList.data!.rows![index],
-                          callback: (){
-                            getCurrentLatLng();
-                          },
+                              callback: () {
+                                getCurrentLatLng();
+                              },
                             ));
                       },
                       isFav: false,
@@ -664,19 +664,15 @@ class _HomePageState extends State<HomePage> {
           'Location permissions are permanently denied, we cannot request permissions.');
     }
     Position position = await Geolocator.getCurrentPosition();
-    List<Placemark> placemarks =
+    List<Placemark> placeMarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
 
-    /*_homeController.lat = position.latitude;
-    _homeController.lng = position.longitude;
-*/
-    Placemark place = placemarks[0];
+    Placemark place = placeMarks[0];
     _authController.userCity = "${place.locality}";
     _authController.userCurrentLocation =
         "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doGetHomeCategory();
-      /*_homeController.fetchPosts();*/
       _homeController.doGetHomeSalonList(
           offset: 1, size: 50, lat: position.latitude, lng: position.longitude);
     });

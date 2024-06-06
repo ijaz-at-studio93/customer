@@ -18,6 +18,7 @@ class CustomListTileWidget extends StatelessWidget {
   final String productDescription;
   final String productImage;
   final String price;
+  final String rate;
   final VoidCallback isAdd;
   final VoidCallback isRemove;
   final bool isAdded;
@@ -29,7 +30,8 @@ class CustomListTileWidget extends StatelessWidget {
       required this.price,
       required this.isAdd,
       required this.isRemove,
-      required this.isAdded});
+      required this.isAdded,
+      required this.rate});
 
   @override
   Widget build(BuildContext context) {
@@ -55,12 +57,12 @@ class CustomListTileWidget extends StatelessWidget {
               children: [
                 const Icon(
                   Icons.star,
-                  color: ColorConstant.grayColor,
+                  color: ColorConstant.primaryColor,
                   size: 20,
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  "4.8 (76 Reviews)",
+                  rate,
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.medium
                       .copyWith(color: ColorConstant.grayColor, fontSize: 16),
@@ -69,12 +71,11 @@ class CustomListTileWidget extends StatelessWidget {
             ),
             const SizedBox(height: 5),
             Text(
-              "₹$price • ",
+              "₹$price",
               textScaler: const TextScaler.linear(0.85),
               style: AppTextTheme.bold
                   .copyWith(color: ColorConstant.blackColor, fontSize: 16),
             ),
-
             const SizedBox(height: 13),
             Dash(
               direction: Axis.horizontal,
@@ -110,7 +111,7 @@ class CustomListTileWidget extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             GestureDetector(
-              onTap: isAdded ? isRemove : isAdd ,
+              onTap: isAdded ? isRemove : isAdd,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: CachedNetworkImage(

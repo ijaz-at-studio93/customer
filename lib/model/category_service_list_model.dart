@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 class CategoryServicesListModel {
   int? statusCode;
   bool? success;
@@ -70,6 +68,7 @@ class Services {
   String? name;
   String? description;
   String? image;
+  double ? rating;
   int? price;
   int? duration;
   String? gender;
@@ -81,6 +80,7 @@ class Services {
     this.name,
     this.description,
     this.image,
+    this.rating,
     this.price,
     this.duration,
     this.gender,
@@ -93,6 +93,7 @@ class Services {
     name = json['name'];
     description = json['description'];
     image = json['image'];
+    rating = double.parse(json['rating'].toString());
     price = json['price'];
     duration = json['duration'];
     gender = json['gender'];
@@ -105,6 +106,7 @@ class Services {
     data['name'] = name;
     data['description'] = description;
     data['image'] = image;
+    data['rating'] = rating;
     data['price'] = price;
     data['duration'] = duration;
     data['gender'] = gender;

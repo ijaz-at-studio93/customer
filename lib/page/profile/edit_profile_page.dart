@@ -1,15 +1,19 @@
+import 'dart:async';
 import 'dart:io';
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
+import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/auth_controller.dart';
+import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/pick_image.dart';
+import 'package:sallon_customer/util/simple_text_field.dart';
 
 class EditProfilePage extends StatefulWidget {
   const EditProfilePage({super.key});
@@ -24,6 +28,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final _mobileTextEditingController = TextEditingController();
   final _nameTextEditingController = TextEditingController();
   final _emailTextEditingController = TextEditingController();
+  final _verificationCode = TextEditingController();
   final _authController = Get.find<AuthController>();
 
   @override
@@ -60,70 +65,144 @@ class _EditProfilePageState extends State<EditProfilePage> {
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const SizedBox(height: 30),
-            InkWell(
-              onTap: () async {
-                FileUtils.openPlatformImagePicker(onSelectImage: (file) {
-                  setState(() {
-                    imagePath = file;
-                  });
-                });
-              },
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(100),
-                child: imagePath.path == ""
-                    ? CachedNetworkImage(
-                        width: 66,
-                        height: 66,
-                        fit: BoxFit.cover,
-                        imageUrl: _authController.userResponseModel.data
-                                ?.userData?.profileImage ??
-                            "",
-                        placeholder: (context, url) => const Image(
-                          image: AssetImage(AssetsConstant.placeHolder),
-                          width: 66,
-                          height: 66,
-                          fit: BoxFit.cover,
-                        ),
-                        errorWidget: (context, url, error) => const Image(
-                          image: AssetImage(AssetsConstant.placeHolder),
-                          width: 66,
-                          height: 66,
-                          fit: BoxFit.cover,
-                        ),
-                      )
-                    : Image.file(
-                        imagePath,
-                        width: 66,
-                        height: 66,
-                        fit: BoxFit.cover,
+      body: Obx(
+        () => ProgressContainerView(
+          isProgressRunning: _authController.showProgress,
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                const SizedBox(height: 30),
+                InkWell(
+                  onTap: () async {
+                    FileUtils.openPlatformImagePicker(onSelectImage: (file) {
+                      setState(() {
+                        imagePath = file;
+                      });
+                    });
+                  },
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(100),
+                        child: imagePath.path == ""
+                            ? CachedNetworkImage(
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                                imageUrl: "${APIConstants.image}${_authController.userResponseModel.data?.userData?.profileImage ?? ""}",
+                                placeholder: (context, url) => const Image(
+                                  image: AssetImage(AssetsConstant.placeHolder),
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Image(
+                                  image: AssetImage(AssetsConstant.placeHolder),
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : Image.file(
+                                imagePath,
+                                width: 100,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
                       ),
-              ),
+                      const Positioned(
+                          bottom: 10,
+                          right: 2,
+                          child: Icon(
+                            CupertinoIcons.pencil_circle_fill,
+                            color: ColorConstant.primaryColor,
+                          ))
+                    ],
+                  ),
+                ),
+                _columWithNameTextField(),
+                const SizedBox(height: 30),
+                _columPhoneWithTextField(),
+                isVerifyOtp
+                    ? Column(
+                        children: [
+                          SimpleTextFieldWidget(
+                              onChanged: (val) {
+                                if (val.length == 6) {
+                                  _authController.doVerifyOtp(
+                                      mobileNO:
+                                          _mobileTextEditingController.text,
+                                      cc: "91",
+                                      verificationCode: val);
+                                }
+                              },
+                              textEditingController: _verificationCode,
+                              hintText: "",
+                              textInputType: TextInputType.number,
+                              textInputAction: TextInputAction.done,
+                              title: "Enter OTP"),
+                          Padding(
+                            padding: const EdgeInsets.only(right: 20, top: 15),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                isResendOTp
+                                    ? TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            _start = 60;
+                                            isResendOTp = false;
+                                            startTimer();
+                                            _authController.doSendOTP(
+                                                mobileNo:
+                                                    _mobileTextEditingController
+                                                        .text,
+                                                cc: "91");
+                                            _verificationCode.clear();
+                                          });
+                                        },
+                                        child: Text(
+                                          "Resend",
+                                          style: AppTextTheme.bold.copyWith(
+                                              fontSize: 16,
+                                              color: ColorConstant.redBgColor),
+                                        ))
+                                    : Text(
+                                        "Retry in 00:${_start.toString()}",
+                                        style: AppTextTheme.bold.copyWith(
+                                            fontSize: 16,
+                                            color: ColorConstant.redBgColor),
+                                      ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    : const SizedBox(),
+                const SizedBox(height: 30),
+                _columWithEmailTextField(),
+                const SizedBox(height: 35),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25),
+                  child: ButtonWidget(
+                      buttonTitleText: "Edit Details",
+                      onPress: () {
+                        _doEditProfile();
+                      }),
+                )
+              ],
             ),
-            _columWithNameTextField(),
-            const SizedBox(height: 30),
-            _columPhoneWithTextField(),
-            const SizedBox(height: 30),
-            _columWithEmailTextField(),
-            const SizedBox(height: 35),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: ButtonWidget(
-                  buttonTitleText: "Edit Details",
-                  onPress: () {
-                    _doEditProfile();
-                  }),
-            )
-          ],
+          ),
         ),
       ),
     );
   }
 
   /*--------------   Phone Number TextField -----------*/
+  bool isOtpEnable = false;
+  bool isVerifyOtp = false;
   _columPhoneWithTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -157,9 +236,21 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ),
                 const SizedBox(width: 12),
                 SizedBox(
-                  width: Get.width * 0.72,
+                  width: Get.width * 0.56,
                   child: TextField(
                     controller: _mobileTextEditingController,
+                    onChanged: (val) {
+                      setState(() {
+                        if (_authController
+                                    .userResponseModel.data?.userData?.mobile !=
+                                _mobileTextEditingController.text &&
+                            _mobileTextEditingController.text.length == 10) {
+                          isOtpEnable = true;
+                        } else {
+                          isOtpEnable = false;
+                        }
+                      });
+                    },
                     keyboardType: TextInputType.phone,
                     style: AppTextTheme.medium.copyWith(
                         color: ColorConstant.blackColor, fontSize: 13),
@@ -172,7 +263,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         hintStyle: AppTextTheme.medium.copyWith(
                             color: ColorConstant.grayColor, fontSize: 13)),
                   ),
-                )
+                ),
+                isOtpEnable
+                    ? TextButton(
+                        onPressed: () {
+                          _authController.doSendOTP(
+                              mobileNo: _mobileTextEditingController.text,
+                              cc: "91");
+                          isVerifyOtp = true;
+                          _start = 60;
+                          startTimer();
+                        },
+                        child: Text(
+                          "GET OTP",
+                          style: AppTextTheme.medium.copyWith(
+                              fontSize: 14, color: ColorConstant.primaryColor),
+                        ))
+                    : const SizedBox(),
               ],
             ),
           )
@@ -259,16 +366,79 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  /*------------  Do  Create Profile ----*/
+  /*-------------------  Do  Create Profile ----------------*/
   _doEditProfile() {
     if (_nameTextEditingController.text.isEmpty) {
       showMessage("Please enter your name");
+      return;
     } else if (_mobileTextEditingController.text.isEmpty) {
       showMessage("Please enter mobile number");
+      return;
     } else if (_mobileTextEditingController.text.length != 10) {
       showMessage("Please enter 10 digit mobile number");
+      return;
+    } else if (_authController.userResponseModel.data?.userData?.mobile !=
+        _mobileTextEditingController.text) {
+      if (_verificationCode.text.isEmpty) {
+        showMessage("Please enter Otp");
+        return;
+      } else if (_verificationCode.text.length != 6) {
+        showMessage("Please enter 6 Digit");
+        return;
+      }else{
+        _authController.doEditProfile(
+            name: _nameTextEditingController.text,
+            email: _emailTextEditingController.text,
+            mobile: _authController.userResponseModel.data?.userData?.mobile !=
+                _mobileTextEditingController.text
+                ? _mobileTextEditingController.text
+                : "",
+            cc: "91",
+            verificationCode: _verificationCode.text,
+            image: imagePath,
+            callback: () {
+              Navigator.pop(context);
+              setState(() {
+                _authController.initUserData();
+              });
+            });
+      }
     } else {
-      Get.back();
+      _authController.doEditProfile(
+          name: _nameTextEditingController.text,
+          email: _emailTextEditingController.text,
+          mobile: _authController.userResponseModel.data?.userData?.mobile !=
+              _mobileTextEditingController.text
+              ? _mobileTextEditingController.text
+              : "",
+          cc: "91",
+          verificationCode: _verificationCode.text,
+          image: imagePath,
+          callback: () {
+          Navigator.pop(context);
+            setState(() {
+              _authController.initUserData();
+            });
+          });
     }
+  }
+
+  int _start = 60;
+
+  bool isResendOTp = false;
+
+  /*--------------  Start Timer --------------*/
+  startTimer() {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_start == 0) {
+        setState(() {
+          isResendOTp = true;
+        });
+      } else {
+        setState(() {
+          _start--;
+        });
+      }
+    });
   }
 }

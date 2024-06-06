@@ -1,12 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/auth_controller.dart';
 import 'package:sallon_customer/page/profile/edit_profile_page.dart';
 import 'package:sallon_customer/page/profile/favourite_salon_page.dart';
+import 'package:sallon_customer/page/profile/review_rating_page.dart';
 import 'package:sallon_customer/project_specific/log_out_dialog.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
@@ -78,7 +80,9 @@ class _ProfilePageState extends State<ProfilePage> {
               _listTitleWidget(
                   image: AssetsConstant.reviewRatings,
                   name: "Review & Ratings",
-                  onPress: () {}),
+                  onPress: () {
+                    Get.to(() => const ReviewAndRatingPage());
+                  }),
               const Divider(
                   color: ColorConstant.garyDividerColor,
                   indent: 20,
@@ -138,9 +142,8 @@ class _ProfilePageState extends State<ProfilePage> {
               width: 66,
               height: 66,
               fit: BoxFit.cover,
-              imageUrl: _authController
-                      .userResponseModel.data?.userData?.profileImage ??
-                  "",
+              imageUrl:
+                  "${APIConstants.image}${_authController.userResponseModel.data?.userData?.profileImage ?? ""}",
               placeholder: (context, url) => const Image(
                 image: AssetImage(AssetsConstant.placeHolder),
                 width: 66,

@@ -51,7 +51,7 @@ class Data {
       });
     }
     price = json['price'];
-    if(json['previewImages'] !=  null){
+    if (json['previewImages'] != null) {
       previewImages = json['previewImages'].cast<String>();
     }
     if (json['servicesAvailableProductList'] != null) {
@@ -113,7 +113,7 @@ class Items {
 
 class Service {
   int? price;
-  int? rating;
+  double? rating;
   String? id;
   String? createdAt;
   String? updatedAt;
@@ -147,7 +147,7 @@ class Service {
 
   Service.fromJson(Map<String, dynamic> json) {
     price = json['price'];
-    rating = json['rating'];
+    rating = double.parse(json['rating'].toString());
     id = json['id'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
@@ -255,6 +255,8 @@ class ServicesAvailableProductList {
   String? description;
   String? image;
   int? price;
+  int? reviewCount;
+  double? rating;
   bool? isAdded;
   int? count;
 
@@ -268,6 +270,8 @@ class ServicesAvailableProductList {
       this.description,
       this.image,
       this.price,
+      this.reviewCount,
+      this.rating,
       this.isAdded,
       this.count});
 
@@ -281,6 +285,8 @@ class ServicesAvailableProductList {
     description = json['description'];
     image = json['image'];
     price = json['price'];
+    reviewCount = json['reviewCount'];
+    rating = double.parse(json['rating'].toString());
     isAdded = json['isAdded'];
     count = json['count'];
   }
@@ -296,6 +302,8 @@ class ServicesAvailableProductList {
     data['description'] = description;
     data['image'] = image;
     data['price'] = price;
+    data['reviewCount'] = reviewCount;
+    data['rating'] = rating;
     data['isAdded'] = isAdded;
     data['count'] = count;
     return data;

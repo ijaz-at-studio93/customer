@@ -10,7 +10,10 @@ import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class InsightsDetailPage extends StatefulWidget {
   final String image;
-  const InsightsDetailPage({super.key, required this.image});
+  final String  title;
+  final String  subTitle;
+  final String  body;
+  const InsightsDetailPage({super.key, required this.image, required this.title, required this.subTitle, required this.body});
 
   @override
   State<InsightsDetailPage> createState() => _InsightsDetailPageState();
@@ -65,7 +68,7 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                "Posted By Amrit Saloon •28 Feb",
+                widget.title,
                 style: AppTextTheme.medium.copyWith(
                     color: changeTheme(SharedPrefs.readStringValue(
                             PrefConstants.gender)) ??
@@ -76,7 +79,7 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
               child: Text(
-                "SML Isuzu Ltd. (SMLI) is a trusted and reliable",
+                widget.subTitle,
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.blackColor, fontSize: 16),
               ),
@@ -84,7 +87,7 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: ReadMoreText(
-                'n publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before the final copy is available.n publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before the final copy n publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before the final copy is available.n publishing and graphic design, Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content. Lorem ipsum may be used as a placeholder before the final copy ',
+                widget.body,
                 trimMode: TrimMode.Line,
                 style: AppTextTheme.medium.copyWith(
                     height: 1.5, color: ColorConstant.blackColor, fontSize: 14),

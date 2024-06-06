@@ -5,7 +5,9 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/api/home_api.dart';
 import 'package:sallon_customer/model/artiest_list_model.dart';
+import 'package:sallon_customer/model/artiest_portfolio_model.dart';
 import 'package:sallon_customer/model/availabilities_time_sloat_model.dart';
+import 'package:sallon_customer/model/blog_data_model.dart';
 import 'package:sallon_customer/model/booking_history_list_model.dart';
 import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
 import 'package:sallon_customer/model/category_service_list_model.dart';
@@ -15,6 +17,7 @@ import 'package:sallon_customer/model/favourite_salon_list_data_model.dart';
 import 'package:sallon_customer/model/home_category_list_model.dart';
 import 'package:sallon_customer/model/home_salon_list_model.dart';
 import 'package:sallon_customer/model/review_list_data_model.dart';
+import 'package:sallon_customer/model/review_rating_data_model.dart';
 import 'package:sallon_customer/model/salon_details_artiest.dart';
 import 'package:sallon_customer/model/salon_details_model.dart';
 import 'package:sallon_customer/model/un_available_dates_model.dart';
@@ -22,6 +25,7 @@ import 'package:sallon_customer/model/user_booking_qr_code_model.dart';
 import 'package:sallon_customer/util/logger.dart';
 
 class HomeController extends GetxController {
+  /*>>>>>>>>>>>>>>>>>>>> Loader <<<<<<<<<<<<<<<<<<<<<*/
   final Rx<bool> _showProgress = false.obs;
   bool get showProgress => _showProgress.value;
   set setShowProgress(val) => _showProgress.value = val;
@@ -43,14 +47,12 @@ class HomeController extends GetxController {
   set setCategory(val) => _homeCategoryListModel.value = val;
 
   /*------------------ Store Salon Details  Data ------------*/
-
   final Rx<HomeSalonDetailsModel> _homeSalonDetailsData =
       HomeSalonDetailsModel().obs;
   HomeSalonDetailsModel get homeSalonDetailsData => _homeSalonDetailsData.value;
   set setSalonDetails(val) => _homeCategoryListModel.value = val;
 
-  /*----------------------  Store Data Salon Details Service  Data-----------------*/
-
+  /*----------------------  Store Data Salon Details Service Data -----------------*/
   final Rx<CategoryServicesListModel> _salonDetailsListData =
       CategoryServicesListModel().obs;
   CategoryServicesListModel get salonDetailsListData =>
@@ -62,8 +64,7 @@ class HomeController extends GetxController {
   HomeSalonModel get getHomeSalonList => _homeSalonList.value;
   set setHomeSalonList(val) => _homeSalonList.value = val;
 
-/*--------------------  Fav Salon  List  Model  Data Get  -------------------*/
-
+/*--------------------  Fav Salon  List  Model  Data Get -------------------*/
   final Rx<FavouriteSalonModel> _favSalonList = FavouriteSalonModel().obs;
   FavouriteSalonModel get getFavSalonList => _favSalonList.value;
   set setFavSalonList(val) => _favSalonList.value = val;
@@ -125,10 +126,33 @@ class HomeController extends GetxController {
   set setBookingHistoryListModel(val) => _bookingHistoryListModel.value = val;
 
   /*------------------- Review Data List API Get Model ----------------*/
-
   final Rx<ReviewListModel> _reviewDataListModel = ReviewListModel().obs;
   ReviewListModel get getReviewDataListModel => _reviewDataListModel.value;
   set setReviewDataListModel(val) => _reviewDataListModel.value = val;
+
+  /*------------------- ArtiestPortfolio --------------------*/
+  final Rx<ArtiestPortfolio> _artiestDetailsModel = ArtiestPortfolio().obs;
+  ArtiestPortfolio get getArtiestDetailsModel => _artiestDetailsModel.value;
+  set setArtiestDetailsModel(val) => _artiestDetailsModel.value = val;
+
+  /*>>>>>>>>>>>>>>>>>>>>>>>>>> CART PART <<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+  /*---------------- Add Cart -------------------*/
+  final Rx<ServiceAddCartModel> _serviceAddCartModel =
+      ServiceAddCartModel().obs;
+  ServiceAddCartModel get getServiceAddCartModel => _serviceAddCartModel.value;
+  set setServiceAddCartModel(val) => _serviceAddCartModel.value = val;
+
+  /*--------------------  BlogDataModel  -----------------*/
+  final Rx<BlogDataModel> _blogDataModel = BlogDataModel().obs;
+  BlogDataModel get getBlogDataModel => _blogDataModel.value;
+  set setBlogDataModel(val) => _blogDataModel.value = val;
+
+  /*--------------------  Rating  & Review Model  -----------------*/
+  final Rx<ReviewRatingUserModel> _reviewRatingUserModel =
+      ReviewRatingUserModel().obs;
+  ReviewRatingUserModel get getReviewRatingUserModel =>
+      _reviewRatingUserModel.value;
+  set setReviewRatingUserModel(val) => _reviewRatingUserModel.value = val;
 
   /*---------------- getHomeCategory ----------*/
   doGetHomeCategory() async {
@@ -141,13 +165,6 @@ class HomeController extends GetxController {
       _showProgress.value = false;
     }
   }
-
-  /*>>>>>>>>>>>>>>>>>>>>>>>>>>  CART PART <<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
-  /*---------------- Add Cart -------------------*/
-  final Rx<ServiceAddCartModel> _serviceAddCartModel =
-      ServiceAddCartModel().obs;
-  ServiceAddCartModel get getServiceAddCartModel => _serviceAddCartModel.value;
-  set setServiceAddCartModel(val) => _serviceAddCartModel.value = val;
 
 /*  double lat = 0.0;
   double lng = 0.0;
@@ -367,7 +384,6 @@ class HomeController extends GetxController {
       if (result) {
         callback.call();
       }
-      print(result);
     } catch (e) {
       showError(e);
       logger.d("Remove  Favourite Salon  ${e.toString()}");
@@ -522,17 +538,6 @@ class HomeController extends GetxController {
     }
   }
 
-  /*--------------------------  Artiest Portfolio -----------------*/
-  doGetArtiestPortfolio() async {
-    try {
-      _showProgress.value = true;
-    } catch (e) {
-      showError(e);
-    } finally {
-      _showProgress.value = false;
-    }
-  }
-
   /*---------------------  Get Review Data List Model ----------------*/
   doGetReviewDataList({required String appointmentId}) async {
     try {
@@ -620,6 +625,45 @@ class HomeController extends GetxController {
       showError(e);
     } finally {
       _showAddProgress.value = false;
+    }
+  }
+
+  /*--------------------------  Artiest Portfolio -----------------*/
+  doGetArtiestPortfolio({required String artistId}) async {
+    try {
+      _showProgress.value = true;
+      _artiestDetailsModel.value =
+          await HomeAPI.getArtiestPortfolio(artistId: artistId);
+    } catch (e) {
+      showError(e);
+      logger.d(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*---------------- Get Blog Data ----------------*/
+  doGetBlogData() async {
+    try {
+      _showProgress.value = true;
+      _blogDataModel.value = await HomeAPI.getBlogData();
+    } catch (e) {
+      showError(e);
+      logger.d(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*------------------ Get Review Rating -----------------*/
+  doReviewRating() async {
+    try {
+      _showProgress.value = true;
+      _reviewRatingUserModel.value = await HomeAPI.getReviewRating();
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
     }
   }
 }

@@ -1,6 +1,8 @@
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/model/artiest_list_model.dart';
+import 'package:sallon_customer/model/artiest_portfolio_model.dart';
 import 'package:sallon_customer/model/availabilities_time_sloat_model.dart';
+import 'package:sallon_customer/model/blog_data_model.dart';
 import 'package:sallon_customer/model/booking_history_list_model.dart';
 import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
 import 'package:sallon_customer/model/category_service_list_model.dart';
@@ -9,6 +11,7 @@ import 'package:sallon_customer/model/favourite_salon_list_data_model.dart';
 import 'package:sallon_customer/model/home_category_list_model.dart';
 import 'package:sallon_customer/model/home_salon_list_model.dart';
 import 'package:sallon_customer/model/review_list_data_model.dart';
+import 'package:sallon_customer/model/review_rating_data_model.dart';
 import 'package:sallon_customer/model/salon_details_artiest.dart';
 import 'package:sallon_customer/model/salon_details_model.dart';
 import 'package:sallon_customer/model/un_available_dates_model.dart';
@@ -353,6 +356,39 @@ class HomeAPI {
     });
     if (response.isSuccess) {
       return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*------------- Get ArtiestPortfolio ----------------------------*/
+  static Future<ArtiestPortfolio> getArtiestPortfolio(
+      {required String artistId}) async {
+    final response =
+        await DioClient.client.get("user/salon/artist/$artistId/portfolio");
+
+    if (response.isSuccess) {
+      return ArtiestPortfolio.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*------------------  Get Blog Data ---------------*/
+  static Future<BlogDataModel> getBlogData() async {
+    final response = await DioClient.client.get("user/blog/list");
+    if (response.isSuccess) {
+      return BlogDataModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*------------------- Review & Rating ------------------*/
+  static Future<ReviewRatingUserModel> getReviewRating() async {
+    final response = await DioClient.client.get("user/review/list");
+    if (response.isSuccess) {
+      return ReviewRatingUserModel.fromJson(response.data);
     } else {
       throw response.data;
     }

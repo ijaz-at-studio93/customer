@@ -31,6 +31,7 @@ class ArtistListModel {
 }
 
 class Artiest {
+  double? rating;
   String? id;
   String? name;
   String? dob;
@@ -38,21 +39,23 @@ class Artiest {
   int? experience;
   bool? homeService;
   String? gender;
-  String? artistServiceableGender;
+  int? reviewCount;
   bool? isSelectArtist;
 
   Artiest(
-      {this.id,
+      {this.rating,
+      this.id,
       this.name,
       this.dob,
       this.profileImage,
       this.experience,
       this.homeService,
       this.gender,
-      this.artistServiceableGender,
+      this.reviewCount,
       this.isSelectArtist});
 
   Artiest.fromJson(Map<String, dynamic> json) {
+    rating = double.parse(json['rating'].toString());
     id = json['id'];
     name = json['name'];
     dob = json['dob'];
@@ -60,11 +63,12 @@ class Artiest {
     experience = json['experience'];
     homeService = json['homeService'];
     gender = json['gender'];
-    artistServiceableGender = json['artistServiceableGender'];
+    reviewCount = json['reviewCount'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['rating'] = rating;
     data['id'] = id;
     data['name'] = name;
     data['dob'] = dob;
@@ -72,7 +76,7 @@ class Artiest {
     data['experience'] = experience;
     data['homeService'] = homeService;
     data['gender'] = gender;
-    data['artistServiceableGender'] = artistServiceableGender;
+    data['reviewCount'] = reviewCount;
     return data;
   }
 }

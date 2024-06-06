@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/page/stylist/widget/selected_fav_artist_card_widget.dart';
@@ -84,17 +85,8 @@ class _SelectingArtistBottomSheetWidgetState
                     color: ColorConstant.blackColor,
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {
-                    Get.back();
-                    widget.callback.call();
-                  },
-                  child: Text(
-                    "Done",
-                    style: AppTextTheme.medium.copyWith(
-                        fontSize: 14, color: ColorConstant.whiteColor),
-                  ),
-                ),
+                const SizedBox(),
+                const SizedBox(),
               ],
             ),
           ),
@@ -138,7 +130,6 @@ class _SelectingArtistBottomSheetWidgetState
                                           .data![index]
                                           .isSelectArtist ??
                                       false);
-
                                   if (_homeController.getArtiestListData
                                           .data![index].isSelectArtist ??
                                       false) {
@@ -148,6 +139,8 @@ class _SelectingArtistBottomSheetWidgetState
                                             .id ??
                                         "";
                                     box.write("artiestId", artiestId);
+                                    widget.callback.call();
+                                    Get.back();
                                   } else {
                                     artiestId = "";
                                     box.remove("artiestId");

@@ -15,8 +15,7 @@ import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class OverviewListTileWidget extends StatefulWidget {
-  final Services servicesList ;
-
+  final Services servicesList;
   final VoidCallback onTap;
   final VoidCallback addButtonTap;
   final bool isSelect;
@@ -90,6 +89,21 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                   ],
                 ),
                 const SizedBox(height: 5),
+                Row(
+                  children: [
+                    const Icon(
+                      Icons.star,
+                      size: 15,
+                    ),
+                    Text(
+                      "${widget.servicesList.rating}",
+                      textScaler: const TextScaler.linear(0.85),
+                      style: AppTextTheme.medium.copyWith(
+                          color: ColorConstant.grayColor, fontSize: 16),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
                 widget.servicesList.homeService ?? false
                     ? Row(
                         children: [
@@ -144,7 +158,8 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                       width: 123,
                       height: 123,
                       fit: BoxFit.cover,
-                      imageUrl: "${APIConstants.image}${widget.servicesList.image ?? " "}",
+                      imageUrl:
+                          "${APIConstants.image}${widget.servicesList.image ?? " "}",
                       placeholder: (context, url) => const Image(
                         image: AssetImage(AssetsConstant.placeHolder),
                         width: 108,

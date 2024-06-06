@@ -123,7 +123,7 @@ class HomeSalonDataList {
         : null;
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
-    rating =  json['rating'] == 0 ? double.parse(json['rating'].toString()) : json['rating'] ;
+    rating =    double.parse(json['rating'].toString());
     reviewCount = json['reviewCount'];
     distance = json['distance'];
     homeService = json['homeService'];

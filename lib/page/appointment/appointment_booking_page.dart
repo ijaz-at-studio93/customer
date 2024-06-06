@@ -515,12 +515,11 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                           context: context,
                                           builder: (context) {
                                             return YourApprovalBottomSheet(
-                                              salonAppointmentId:  _homeController
-                                                  .getCreateBookingAppointmentModel
-                                                  .data
-                                                  ?.salonAppointmentId ??
+                                              salonAppointmentId: _homeController
+                                                      .getCreateBookingAppointmentModel
+                                                      .data
+                                                      ?.salonAppointmentId ??
                                                   "",
-
                                             );
                                           });
                                     });
@@ -544,13 +543,12 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                           )),
                                           context: context,
                                           builder: (context) {
-                                            return     YourApprovalBottomSheet(
-                                              salonAppointmentId:  _homeController
-                                                  .getCreateBookingAppointmentModel
-                                                  .data
-                                                  ?.salonAppointmentId ??
+                                            return YourApprovalBottomSheet(
+                                              salonAppointmentId: _homeController
+                                                      .getCreateBookingAppointmentModel
+                                                      .data
+                                                      ?.salonAppointmentId ??
                                                   "",
-
                                             );
                                           });
                                     });

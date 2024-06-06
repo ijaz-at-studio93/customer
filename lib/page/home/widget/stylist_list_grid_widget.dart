@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/model/salon_details_artiest.dart';
-import 'package:sallon_customer/page/stylist/about_stylist_page.dart';
 import 'package:sallon_customer/project_specific/remove_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import '../../../constant/api_constant.dart';
@@ -161,8 +160,10 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
             !widget.isView ? const SizedBox(height: 39) : const SizedBox(),
             TextButton(
               onPressed: () {
-      /*          Get.to(() => const StylistSaloonDetailsPage());*/
-                Get.to(() => const AboutStylistPage());
+                Get.to(() => StylistSaloonDetailsPage(
+                      artiestId: widget.salonArtiestListModel.id ?? "",
+                    ));
+                /*Get.to(() => const AboutStylistPage());*/
               },
               child: Text(
                 "View Profile",

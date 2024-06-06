@@ -6,6 +6,7 @@ import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/model/artiest_list_model.dart';
+
 import 'package:sallon_customer/project_specific/remove_button_widget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
@@ -95,7 +96,7 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
                     ),
                     const SizedBox(width: 3),
                     Text(
-                      '4.8',
+                      "${artiest.rating}",
                       style: AppTextTheme.medium.copyWith(
                           fontSize: 11, color: ColorConstant.yellowColor),
                     ),
@@ -108,7 +109,7 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
           GestureDetector(
             onTap: onPress,
             child: artiest.isSelectArtist ?? false
-                ? RemoveButtonWidget(onPress:onPress)
+                ? RemoveButtonWidget(onPress: onPress)
                 : Container(
                     height: 39,
                     width: 158,
@@ -133,8 +134,9 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
-              Get.back();
-              Get.to(() => const StylistSaloonDetailsPage());
+              Get.to(() => StylistSaloonDetailsPage(
+                    artiestId: artiest.id ?? "",
+                  ));
             },
             child: Text(
               "View Profile",

@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
 import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/NoItemsWidget.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
 import 'package:sallon_customer/util/logger.dart';
-
 import 'custom_list_tile_widget.dart';
 
 class CustomizedSheetWidget extends StatefulWidget {
@@ -45,67 +42,6 @@ class _CustomizedSheetWidgetState extends State<CustomizedSheetWidget> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: Get.width * 0.6,
-                          child: Text(
-                            "Manicure & pedicure",
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textScaler: const TextScaler.linear(0.85),
-                            style: AppTextTheme.bold.copyWith(
-                                color: ColorConstant.blackColor, fontSize: 17),
-                          ),
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.star,
-                              color: ColorConstant.grayColor,
-                              size: 20,
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              "4.8 (76 Reviews)",
-                              textScaler: const TextScaler.linear(0.85),
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.grayColor, fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Text(
-                              "₹399 • ",
-                              textScaler: const TextScaler.linear(0.85),
-                              style: AppTextTheme.bold.copyWith(
-                                  color: ColorConstant.blackColor,
-                                  fontSize: 16),
-                            ),
-                            Text(
-                              "35 min",
-                              textScaler: const TextScaler.linear(0.85),
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.grayColor, fontSize: 16),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 10),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    height: 1,
-                    width: Get.width,
-                    color: ColorConstant.dividerRedLightColor,
-                  ),
                   Container(
                     width: Get.width * 0.3,
                     margin: const EdgeInsets.symmetric(
@@ -149,6 +85,8 @@ class _CustomizedSheetWidgetState extends State<CustomizedSheetWidget> {
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 15),
                                 child: CustomListTileWidget(
+                                  rate:
+                                      "${widget.serviceAddCartModel.data?.servicesAvailableProductList?[index].rating}",
                                   nameProduct: widget
                                           .serviceAddCartModel
                                           .data

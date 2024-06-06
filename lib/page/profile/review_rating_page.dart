@@ -3,28 +3,52 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/model/artiest_portfolio_model.dart';
+import 'package:sallon_customer/controller/home_controller.dart';
+import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/NoItemsWidget.dart';
 
-class ReviewAndRating extends StatefulWidget {
-  final ArtiestPortfolio artiestPortfolio;
-  const ReviewAndRating({super.key, required this.artiestPortfolio});
+class ReviewAndRatingPage extends StatefulWidget {
+  const ReviewAndRatingPage({super.key});
 
   @override
-  State<ReviewAndRating> createState() => _ReviewAndRatingState();
+  State<ReviewAndRatingPage> createState() => _ReviewAndRatingPageState();
 }
 
-class _ReviewAndRatingState extends State<ReviewAndRating> {
+class _ReviewAndRatingPageState extends State<ReviewAndRatingPage> {
+  final _homeController = Get.find<HomeController>();
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _homeController.doReviewRating();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: ColorConstant.whiteColor,
-      padding: const EdgeInsets.symmetric(vertical: 30),
-      child: widget.artiestPortfolio.data?.reviews?.isEmpty ?? false
-          ? const NoItemsWidget(
-              text: "No Review Rating Found",
-            )
+    return Scaffold(
+      backgroundColor: ColorConstant.bgColor,
+      appBar: AppBar(
+        elevation: 0.0,
+        backgroundColor: ColorConstant.whiteColor,
+        leading: IconButton(
+          onPressed: () {
+            Get.back();
+          },
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: ColorConstant.blackColor,
+          ),
+        ),
+        centerTitle: true,
+        title: Text(
+          "Review Rating",
+          style: AppTextTheme.bold
+              .copyWith(color: ColorConstant.blackColor, fontSize: 19),
+        ),
+      ),
+      body: Obx(() => _homeController.showProgress
+          ? const ProgressBarView()
           : ListView.separated(
               padding: const EdgeInsets.symmetric(vertical: 5),
               separatorBuilder: (context, index) {
@@ -37,20 +61,21 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
                 );
               },
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.artiestPortfolio.data?.reviews?.length ?? 0,
+              itemCount: _homeController
+                      .getReviewRatingUserModel.data?.artists?.length ??
+                  0,
               itemBuilder: (context, index) {
                 return _listTileWidget(
-                    rate:
-                        widget.artiestPortfolio.data?.reviews?[index].rating ??
-                            0.0,
-                    title:
-                        widget.artiestPortfolio.data?.reviews?[index].review ??
-                            "",
-                    userName: widget.artiestPortfolio.data?.reviews?[index].user
-                            ?.name ??
+                    rate: _homeController.getReviewRatingUserModel.data
+                            ?.artists?[index].rating ??
+                        0.0,
+                    title: _homeController.getReviewRatingUserModel.data
+                            ?.artists?[index].review ??
+                        "",
+                    userName: _homeController.getReviewRatingUserModel.data
+                            ?.artists?[index].artist?.name ??
                         "");
-              }),
+              })),
     );
   }
 

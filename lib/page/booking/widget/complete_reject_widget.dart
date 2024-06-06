@@ -26,6 +26,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
           borderRadius: BorderRadius.circular(7),
           color: const Color(0xffF7F7F7)),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -133,6 +134,26 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
             ],
           ),
           const SizedBox(height: 20),
+          Text(
+            "Item",
+            style: AppTextTheme.medium
+                .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
+          ),
+          Wrap(
+            spacing: 8.0, // gap between adjacent chips
+            runSpacing: 4.0, // gap between lines
+            children: List.generate(
+              widget.historyList.items?.length ?? 0,
+                  (index) =>   widget.historyList.items?[index].isService  ??  false ?  FilterChip(
+                labelStyle: AppTextTheme.medium
+                    .copyWith(color: ColorConstant.whiteColor, fontSize: 13),
+                label:   Text(widget.historyList.items?[index].service?.name ?? "")  ,
+                backgroundColor: ColorConstant.primaryColor,
+                onSelected: (bool value) {},
+              ) :  const SizedBox(),
+            ),
+          ),
+          const SizedBox(height: 10),
           widget.historyList.orderStatus == "salon_artist_rejected"
               ? const SizedBox()
               : GestureDetector(

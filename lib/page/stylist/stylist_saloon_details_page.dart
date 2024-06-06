@@ -4,12 +4,15 @@ import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import 'package:get/get.dart';
+import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/page/appointment/appointment_booking_page.dart';
 import 'package:sallon_customer/page/stylist/widget/review_and_ratings_widget.dart';
 import 'package:sallon_customer/page/stylist/widget/service_offered_page.dart';
 import 'package:sallon_customer/page/stylist/widget/stylist_portfolio_gird_view.dart';
+import 'package:sallon_customer/project_specific/progressbar_view.dart';
 
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
@@ -18,7 +21,8 @@ import 'package:sallon_customer/util/SharedPrefs.dart';
 import '../../constant/assetsconstant.dart';
 
 class StylistSaloonDetailsPage extends StatefulWidget {
-  const StylistSaloonDetailsPage({super.key});
+  final String artiestId;
+  const StylistSaloonDetailsPage({super.key, required this.artiestId});
 
   @override
   State<StylistSaloonDetailsPage> createState() =>
@@ -26,137 +30,50 @@ class StylistSaloonDetailsPage extends StatefulWidget {
 }
 
 class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
+  final _homeController = Get.find<HomeController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _homeController.doGetArtiestPortfolio(artistId: widget.artiestId);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: statusBarTheme(context),
       backgroundColor: ColorConstant.bgColor,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _imageHeaderWidget(),
-            _nameContainColum(),
-            _tabBarView(),
-            isSelectedTab == 1
-                ? const ServiceAndOfferedPage()
-                : isSelectedTab == 2
-                    ? const StylistPortfolioGridview()
-                    : const ReviewAndRating()
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: Container(
-        width: Get.width,
-        decoration: const BoxDecoration(
-          color: ColorConstant.whiteColor,
-          boxShadow: [
-            BoxShadow(
-              color: Color(0x1E000000),
-              blurRadius: 8,
-              offset: Offset(-2, -2),
-              spreadRadius: 0,
-            ),
-          ],
-        ),
-        height: 100,
-        clipBehavior: Clip.none,
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                FlutterImageStack(
-                  imageList: _images,
-                  showTotalCount: false,
-                  totalCount: 4,
-                  imageSource: ImageSource.network,
-                  itemRadius: 35,
-                  itemCount: 2,
-                  itemBorderWidth: 3, // Border width around the images
-                ),
-                const SizedBox(width: 10),
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+      body: Obx(
+        () => _homeController.showProgress
+            ? const ProgressBarView()
+            : SingleChildScrollView(
+                child: Column(
                   children: [
-                    Row(
-                      children: [
-                        Text(
-                          "1 Added",
-                          style: AppTextTheme.bold.copyWith(
-                              fontSize: 13, color: ColorConstant.grayTextColor),
-                        ),
-                        const SizedBox(width: 2),
-                        Image.asset(
-                          AssetsConstant.arrowUpIcon,
-                          height: 8,
-                          width: 11,
-                        )
-                      ],
-                    ),
-                    Text(
-                      "₹4,000",
-                      style: AppTextTheme.bold.copyWith(
-                          fontSize: 19, color: ColorConstant.blackColor),
-                    )
-                  ],
-                ),
-              ],
-            ),
-            GestureDetector(
-              onTap: () {
-                /*Get.to(() => const AppointmentBookingPage());*/
-              },
-              child: Container(
-                height: 45,
-                width: Get.width * 0.4,
-                decoration: BoxDecoration(
-                  color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
-                      ColorConstant.primaryColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      "Book Now",
-                      textScaler: const TextScaler.linear(0.85),
-                      style: AppTextTheme.medium.copyWith(
-                          fontSize: 16, color: ColorConstant.whiteColor),
-                    ),
-                    const SizedBox(width: 10),
-                    const Icon(
-                      Icons.arrow_forward,
-                      color: ColorConstant.whiteColor,
-                      size: 20,
-                    )
+                    _imageHeaderWidget(),
+                    _nameContainColum(),
+                    _tabBarView(),
+                    isSelectedTab == 1
+                        ? ServiceAndOfferedPage(
+                            artiestPortfolio:
+                                _homeController.getArtiestDetailsModel,
+                          )
+                        : isSelectedTab == 2
+                            ? StylistPortfolioGridview(
+                                artiestPortfolio:
+                                    _homeController.getArtiestDetailsModel,
+                              )
+                            : ReviewAndRating(
+                                artiestPortfolio:
+                                    _homeController.getArtiestDetailsModel,
+                              )
                   ],
                 ),
               ),
-            )
-          ],
-        ),
       ),
-      // floatingActionButton: Padding(
-      //   padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 10),
-      //   child: ButtonWidget(
-      //     onPress: () {
-      //
-      //     },
-      //     buttonTitleText: "Make a appointment",
-      //   ),
-      // ),
     );
   }
-
-  /*---------  Dummy Image ------*/
-  List<String> _images = [
-    'https://images.unsplash.com/photo-1593642532842-98d0fd5ebc1a?ixid=MXwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=2250&q=80',
-    'https://images.unsplash.com/photo-1612594305265-86300a9a5b5b?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=1000&q=80',
-  ];
 
   /*-------------- Image header Widget ------------*/
   _imageHeaderWidget() {
@@ -168,7 +85,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
           height: Get.height * 0.28,
           fit: BoxFit.fitWidth,
           imageUrl:
-              "https://images.unsplash.com/photo-1485686531765-ba63b07845a7?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8bGFrbWUlMjBzYWxvb258ZW58MHx8MHx8fDA%3D",
+              "${APIConstants.image}${_homeController.getArtiestDetailsModel.data?.salon?.image ?? ""}",
           placeholder: (context, url) => Image(
             image: const AssetImage(AssetsConstant.placeHolder),
             width: Get.width,
@@ -255,7 +172,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                   height: 100,
                   fit: BoxFit.cover,
                   imageUrl:
-                      "https://www.iwmbuzz.com/wp-content/uploads/2020/08/neha-kakkar-hairstyle-take-hair-styling-tips-for-curly-hair-for-girls-4.jpg",
+                      "${APIConstants.image}${_homeController.getArtiestDetailsModel.data?.profileImage ?? ""}",
                   placeholder: (context, url) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
                     width: 100,
@@ -309,22 +226,17 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
       children: [
         SizedBox(height: Get.height * 0.07),
         Text(
-          "Neha Kakkar",
+          _homeController.getArtiestDetailsModel.data?.name ?? "",
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
-        ),
-        const SizedBox(height: 5),
-        Text(
-          "Barber at RedBox Hair Saloon",
-          style: AppTextTheme.medium
-              .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
         ),
         const SizedBox(height: 5),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             RatingBar.builder(
-              initialRating: 3.5,
+              initialRating:
+                  _homeController.getArtiestDetailsModel.data?.rating ?? 0.0,
               minRating: 1,
               direction: Axis.horizontal,
               allowHalfRating: true,
@@ -341,7 +253,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
               onRatingUpdate: (rating) {},
             ),
             Text(
-              "(125 Reviews)",
+              "(${_homeController.getArtiestDetailsModel.data?.reviewCount ?? 0} Reviews)",
               style: AppTextTheme.medium
                   .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
             ),

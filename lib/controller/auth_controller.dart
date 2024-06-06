@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/auth_api.dart';
 import 'package:sallon_customer/api/dio_client.dart';
+import 'package:sallon_customer/model/otp_verify_model.dart';
 import 'package:sallon_customer/model/user_response_model.dart';
 import 'package:sallon_customer/page/auth/login_page.dart';
 
@@ -50,6 +52,13 @@ class AuthController extends GetxController {
   final Rx<String> _userCity = "".obs;
   String get userCity => _userCity.value;
   set userCity(city) => _userCity.value = city;
+
+  /*------ Store OTP Model Data ------*/
+  final Rx<OtpVerifyModel> _otpVerifyModelResponseModel = OtpVerifyModel().obs;
+  OtpVerifyModel get otpVerifyModelResponseModel =>
+      _otpVerifyModelResponseModel.value;
+  set setOtpVerifyModelResponseModel(val) =>
+      _otpVerifyModelResponseModel.value = val;
 
   /*------------ Do check Mobile Number registration--------*/
   doCheckMobileNumberRegistration(
@@ -157,6 +166,74 @@ class AuthController extends GetxController {
       }
     } catch (e) {
       debugPrint(e.toString());
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*==========================  Verification Code =================*/
+  doVerifyOtp(
+      {required String mobileNO,
+      required String cc,
+      required String verificationCode}) async {
+    try {
+      _showProgress.value = true;
+      _otpVerifyModelResponseModel.value = await AuthAPI.otpVerify(
+          mobileNo: mobileNO, cc: cc, verificationCode: verificationCode);
+      if (_otpVerifyModelResponseModel.value.data?.isVerificationCodeValid ??
+          false) {
+        showMessage(_otpVerifyModelResponseModel.value.message ?? "");
+      } else {
+        showMessage(_otpVerifyModelResponseModel.value.message ?? "");
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*================ Send OTP  Code ===============*/
+  doSendOTP({required String mobileNo, required String cc}) async {
+    try {
+      _showProgress.value = true;
+      bool result =
+          await AuthAPI.sendVerificationCode(mobileNo: mobileNo, cc: cc);
+      if (!result) {
+        showMessage("Verification Code Send Success");
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*---------------- Edit Profile----------------*/
+
+  doEditProfile(
+      {required String name,
+      required String email,
+      required String mobile,
+      required String cc,
+      required String verificationCode,
+      required File image,
+      required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      _userResponseModel.value = await AuthAPI.editProFile(
+          name: name,
+          email: email,
+          mobile: mobile,
+          cc: cc,
+          verificationCode: verificationCode,
+          image: image);
+      await userDataStoreToSharedPrefs(_userResponseModel.value);
+      if (_userResponseModel.value.data?.id != null) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
     } finally {
       _showProgress.value = false;
     }

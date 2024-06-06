@@ -37,7 +37,7 @@ class _RemoveAndAddServiceDialogState extends State<RemoveAndAddServiceDialog> {
             ),
             const SizedBox(height: 10),
             Text(
-              "Please Remove Previous Select Service",
+              "Are You Sure You Want a Clear Your Cart",
               style: AppTextTheme.medium
                   .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
             ),

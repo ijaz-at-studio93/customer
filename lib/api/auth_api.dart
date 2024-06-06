@@ -1,6 +1,10 @@
+import 'dart:io';
+import 'package:mime/mime.dart';
+import 'package:dio/dio.dart';
 import 'package:sallon_customer/model/user_response_model.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
-
+import 'package:http_parser/http_parser.dart';
+import '../model/otp_verify_model.dart';
 import 'dio_client.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 
@@ -88,9 +92,81 @@ class AuthAPI {
     }
   }
 
+  /*================= Send Verification Code ================*/
+  static Future<bool> sendVerificationCode(
+      {required String mobileNo, required String cc}) async {
+    final response = await DioClient.client.post(
+      "auth/user/send/verification-code",
+      data: {
+        "mobile": mobileNo,
+        "countryCode": cc,
+      },
+    );
+    if (response.statusCode == 200 || response.statusCode == 203) {
+      return response.data['data']['isRegistered'];
+    } else {
+      throw response.data;
+    }
+  }
 
+  /*=================  Verify OTP ================*/
+  static Future<OtpVerifyModel> otpVerify(
+      {required String mobileNo,
+      required String cc,
+      required String verificationCode}) async {
+    final response = await DioClient.client
+        .post("auth/user/verify/verification-code", data: {
+      "mobile": mobileNo,
+      "countryCode": cc,
+      "verificationCode": verificationCode
+    });
 
+    if (response.isSuccess) {
+      return OtpVerifyModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
 
+  /*--------------- Edit Profile --------------*/
+  /*--------------- Verify OTP ------------*/
+  static Future<UserResponseModel> editProFile(
+      {required String name,
+      required String email,
+      required String mobile,
+      required String cc,
+      required String verificationCode,
+      required File image}) async {
+    final formData = FormData.fromMap({
+      "name": name,
+      "email": email,
+    });
+
+    if (mobile != "") {
+      formData.fields.add(MapEntry('mobile', mobile));
+      formData.fields.add(MapEntry('countryCode', cc));
+      formData.fields.add(MapEntry('verificationCode', verificationCode));
+    }
+
+    if (image.path.isNotEmpty) {
+      final mimeTypeData =
+          lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
+      final multipartFile = await MultipartFile.fromFile(image.path,
+          contentType: MediaType(mimeTypeData![0], mimeTypeData[1]));
+      formData.files.add(MapEntry('image', multipartFile));
+    }
+
+    final response =
+        await DioClient.client.patch('user/profile', data: formData);
+    if (response.statusCode == 200) {
+      return UserResponseModel.fromJson(response.data);
+    } else if (response.statusCode == 400) {
+      showMessage(response.data['message']);
+      return response.data;
+    } else {
+      return response.data;
+    }
+  }
 
 /*---------------  Login ---------------------*/
 // String? fcmToken = await FirebaseMessaging.instance.getToken();
