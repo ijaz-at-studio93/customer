@@ -17,6 +17,7 @@ import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import '../../constant/assetsconstant.dart';
+import '../profile/add_address_page.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
   final String artiestId;
@@ -33,6 +34,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      userServiceAddressIdSelect = "";
       DateTime date = DateTime.now();
       String formatDate = DateFormat("yyyy-MM-dd").format(date);
       selectDate = formatDate;
@@ -501,28 +503,76 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                     DateTime.parse(correctedDateTime);
                                 String isoDateTime = dateTime.toIso8601String();
 
-                                _homeController.doCreateBooking(
-                                    salonArtistId: widget.artiestId,
-                                    startAt: isoDateTime,
-                                    callback: () {
-                                      showModalBottomSheet(
-                                          isScrollControlled: true,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(32),
-                                            topRight: Radius.circular(32),
-                                          )),
-                                          context: context,
-                                          builder: (context) {
-                                            return YourApprovalBottomSheet(
-                                              salonAppointmentId: _homeController
-                                                      .getCreateBookingAppointmentModel
-                                                      .data
-                                                      ?.salonAppointmentId ??
-                                                  "",
-                                            );
-                                          });
-                                    });
+                                if (_homeController.getServiceAddCartModel.data
+                                        ?.isHomeService ??
+                                    false) {
+                                  if (userServiceAddressIdSelect == "") {
+                                    Get.to(() => const AddAddressPage(
+                                          isSelect: true,
+                                        ));
+                                  } else {
+                                    _homeController.doCreateBooking(
+                                        userAddressId:
+                                            userServiceAddressIdSelect,
+                                        isHomeService: _homeController
+                                                .getServiceAddCartModel
+                                                .data
+                                                ?.isHomeService ??
+                                            false,
+                                        salonArtistId: widget.artiestId,
+                                        startAt: isoDateTime,
+                                        callback: () {
+                                          showModalBottomSheet(
+                                              isScrollControlled: true,
+                                              shape:
+                                                  const RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                topLeft: Radius.circular(32),
+                                                topRight: Radius.circular(32),
+                                              )),
+                                              context: context,
+                                              builder: (context) {
+                                                return YourApprovalBottomSheet(
+                                                  salonAppointmentId: _homeController
+                                                          .getCreateBookingAppointmentModel
+                                                          .data
+                                                          ?.salonAppointmentId ??
+                                                      "",
+                                                );
+                                              });
+                                        });
+                                  }
+                                } else {
+                                  _homeController.doCreateBooking(
+                                      userAddressId: "",
+                                      isHomeService: _homeController
+                                              .getServiceAddCartModel
+                                              .data
+                                              ?.isHomeService ??
+                                          false,
+                                      salonArtistId: widget.artiestId,
+                                      startAt: isoDateTime,
+                                      callback: () {
+                                        showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(32),
+                                              topRight: Radius.circular(32),
+                                            )),
+                                            context: context,
+                                            builder: (context) {
+                                              return YourApprovalBottomSheet(
+                                                salonAppointmentId: _homeController
+                                                        .getCreateBookingAppointmentModel
+                                                        .data
+                                                        ?.salonAppointmentId ??
+                                                    "",
+                                              );
+                                            });
+                                      });
+                                }
                               } else {
                                 String inputDateTime = "$selectDate$selectTime";
                                 String correctedDateTime =
@@ -530,28 +580,77 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                 DateTime dateTime =
                                     DateTime.parse(correctedDateTime);
                                 String isoDateTime = dateTime.toIso8601String();
-                                _homeController.doCreateBooking(
-                                    salonArtistId: widget.artiestId,
-                                    startAt: isoDateTime,
-                                    callback: () {
-                                      showModalBottomSheet(
-                                          isScrollControlled: true,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(32),
-                                            topRight: Radius.circular(32),
-                                          )),
-                                          context: context,
-                                          builder: (context) {
-                                            return YourApprovalBottomSheet(
-                                              salonAppointmentId: _homeController
-                                                      .getCreateBookingAppointmentModel
-                                                      .data
-                                                      ?.salonAppointmentId ??
-                                                  "",
-                                            );
-                                          });
-                                    });
+
+                                if (_homeController.getServiceAddCartModel.data
+                                        ?.isHomeService ??
+                                    false) {
+                                  if (userServiceAddressIdSelect == "") {
+                                    Get.to(() => const AddAddressPage(
+                                          isSelect: true,
+                                        ));
+                                  } else {
+                                    _homeController.doCreateBooking(
+                                        userAddressId:
+                                            userServiceAddressIdSelect,
+                                        isHomeService: _homeController
+                                                .getServiceAddCartModel
+                                                .data
+                                                ?.isHomeService ??
+                                            false,
+                                        salonArtistId: widget.artiestId,
+                                        startAt: isoDateTime,
+                                        callback: () {
+                                          showModalBottomSheet(
+                                              isScrollControlled: true,
+                                              shape:
+                                                  const RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.only(
+                                                topLeft: Radius.circular(32),
+                                                topRight: Radius.circular(32),
+                                              )),
+                                              context: context,
+                                              builder: (context) {
+                                                return YourApprovalBottomSheet(
+                                                  salonAppointmentId: _homeController
+                                                          .getCreateBookingAppointmentModel
+                                                          .data
+                                                          ?.salonAppointmentId ??
+                                                      "",
+                                                );
+                                              });
+                                        });
+                                  }
+                                } else {
+                                  _homeController.doCreateBooking(
+                                      userAddressId: "",
+                                      isHomeService: _homeController
+                                              .getServiceAddCartModel
+                                              .data
+                                              ?.isHomeService ??
+                                          false,
+                                      salonArtistId: widget.artiestId,
+                                      startAt: isoDateTime,
+                                      callback: () {
+                                        showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(32),
+                                              topRight: Radius.circular(32),
+                                            )),
+                                            context: context,
+                                            builder: (context) {
+                                              return YourApprovalBottomSheet(
+                                                salonAppointmentId: _homeController
+                                                        .getCreateBookingAppointmentModel
+                                                        .data
+                                                        ?.salonAppointmentId ??
+                                                    "",
+                                              );
+                                            });
+                                      });
+                                }
                               }
                             }
                           }

@@ -23,6 +23,7 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
   final List<Marker> _marker = <Marker>[];
 
   final _authController = Get.find<AuthController>();
+  final _locationAddress = TextEditingController();
 
   @override
   void initState() {
@@ -52,6 +53,9 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
+        actions: [
+
+        ],
       ),
       body: GoogleMap(
         myLocationButtonEnabled: false,
@@ -66,8 +70,8 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
           _moveToInitialPosition();
         },
         onTap: (latLng) async {
-          List<Placemark> placeMarks =
-              await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
+          List<Placemark> placeMarks = await placemarkFromCoordinates(
+              latLng.latitude, latLng.longitude);
           Placemark place = placeMarks[0];
           _marker.add(Marker(
             markerId: const MarkerId('current_Postion'),
@@ -76,8 +80,6 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
               BitmapDescriptor.hueViolet,
             ),
           ));
-
-
 
           setState(() {});
           _authController.userCity = "${place.locality}";

@@ -5,15 +5,15 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:just_audio/just_audio.dart';
 
-final player = AudioPlayer();
+
+
 /*background notification handler*/
 Future<dynamic> firebaseMessagingBackgroundHandler(
     RemoteMessage message) async {
   await Firebase.initializeApp();
-  await player.setAsset('assets/notification_sound.mp3');
-  player.play();
+
+
   if (kDebugMode) {
     print('Message: ${message.data}');
   }

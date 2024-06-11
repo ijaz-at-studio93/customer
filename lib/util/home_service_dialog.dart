@@ -4,47 +4,30 @@ import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
-class RemoveAndAddServiceDialog extends StatefulWidget {
+class HomeServiceDialog extends StatefulWidget {
   final VoidCallback noPress;
   final VoidCallback yesPress;
-  final String? descriptionText;
-  const RemoveAndAddServiceDialog(
-      {super.key,
-      required this.noPress,
-      required this.yesPress,
-      this.descriptionText = "Are You Sure You Want a Clear Your Cart"});
+  const HomeServiceDialog(
+      {super.key, required this.noPress, required this.yesPress});
 
   @override
-  State<RemoveAndAddServiceDialog> createState() =>
-      _RemoveAndAddServiceDialogState();
+  State<HomeServiceDialog> createState() => _HomeServiceDialogState();
 }
 
-class _RemoveAndAddServiceDialogState extends State<RemoveAndAddServiceDialog> {
+class _HomeServiceDialogState extends State<HomeServiceDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
       child: Padding(
-        padding: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(15),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(
-              Icons.delete,
-              color: ColorConstant.redBgColor,
-              size: 35,
-            ),
-            const SizedBox(height: 10),
             Text(
-              "Are You sure?",
-              style:
-                  AppTextTheme.bold.copyWith(color: ColorConstant.blackColor),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              widget.descriptionText ?? "",
-              textScaler: const TextScaler.linear(0.90),
+              "Would You Like To Book For Home Service",
+              textScaler: const TextScaler.linear(0.85),
               style: AppTextTheme.medium
-                  .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
+                  .copyWith(color: ColorConstant.grayTextColor),
             ),
             const SizedBox(height: 10),
             Row(
@@ -54,6 +37,7 @@ class _RemoveAndAddServiceDialogState extends State<RemoveAndAddServiceDialog> {
                   onPressed: widget.noPress,
                   child: Text(
                     "NO",
+                    textScaler: const TextScaler.linear(0.85),
                     style: AppTextTheme.medium
                         .copyWith(color: Colors.red, fontSize: 16),
                   ),
@@ -62,6 +46,7 @@ class _RemoveAndAddServiceDialogState extends State<RemoveAndAddServiceDialog> {
                   onPressed: widget.yesPress,
                   child: Text(
                     "YES",
+                    textScaler: const TextScaler.linear(0.85),
                     style: AppTextTheme.medium.copyWith(
                         color: changeTheme(
                             SharedPrefs.readStringValue(PrefConstants.gender)),

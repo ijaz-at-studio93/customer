@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/animation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
@@ -20,6 +21,8 @@ import 'package:sallon_customer/model/review_list_data_model.dart';
 import 'package:sallon_customer/model/review_rating_data_model.dart';
 import 'package:sallon_customer/model/salon_details_artiest.dart';
 import 'package:sallon_customer/model/salon_details_model.dart';
+import 'package:sallon_customer/model/save_address_model.dart';
+import 'package:sallon_customer/model/search_model/search_model.dart';
 import 'package:sallon_customer/model/un_available_dates_model.dart';
 import 'package:sallon_customer/model/user_booking_qr_code_model.dart';
 import 'package:sallon_customer/util/logger.dart';
@@ -153,6 +156,16 @@ class HomeController extends GetxController {
   ReviewRatingUserModel get getReviewRatingUserModel =>
       _reviewRatingUserModel.value;
   set setReviewRatingUserModel(val) => _reviewRatingUserModel.value = val;
+
+  /*-------------- Search  Model  -------------------------*/
+  final Rx<SearchSalonModel> _searchSalonModel = SearchSalonModel().obs;
+  SearchSalonModel get getSearchSalonModel => _searchSalonModel.value;
+  set setSearchSalonModel(val) => _searchSalonModel.value = val;
+
+  /*-------------- Save Address Model  -------------------------*/
+  final Rx<SaveAddressModel> _saveAddressModel = SaveAddressModel().obs;
+  SaveAddressModel get getSaveAddressModel => _saveAddressModel.value;
+  set setSaveAddressModel(val) => _saveAddressModel.value = val;
 
   /*---------------- getHomeCategory ----------*/
   doGetHomeCategory() async {
@@ -315,12 +328,17 @@ class HomeController extends GetxController {
   doCreateBooking({
     required String salonArtistId,
     required String startAt,
+    required bool isHomeService,
+    required String userAddressId,
     required VoidCallback callback,
   }) async {
     try {
       _showBookingProgress.value = true;
       _createBookingAppointmentModel.value = await HomeAPI.userCreateBooking(
-          salonArtistId: salonArtistId, startAt: startAt);
+          salonArtistId: salonArtistId,
+          startAt: startAt,
+          isHomeService: isHomeService,
+          userAddressId: userAddressId);
       if (_createBookingAppointmentModel
               .value.data?.completionToken?.isNotEmpty ??
           false) {
@@ -408,11 +426,13 @@ class HomeController extends GetxController {
   /*>>>>>>>>>>>>>>>>>>>  CART <<<<<<<<<<<<<<<<<<<<<<<*/
   /*------------------------ Add Cart ----------------*/
   doAddCart(
-      {required String salonServiceId, required VoidCallback callback}) async {
+      {required String salonServiceId,
+      required bool isHomeService,
+      required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
-      _serviceAddCartModel.value =
-          await HomeAPI.serviceAddCart(salonServiceId: salonServiceId);
+      _serviceAddCartModel.value = await HomeAPI.serviceAddCart(
+          salonServiceId: salonServiceId, isHomeService: isHomeService);
       if (_serviceAddCartModel.value.success ?? false) {
         callback.call();
       }
@@ -660,6 +680,102 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _reviewRatingUserModel.value = await HomeAPI.getReviewRating();
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*-------------  Get Salon Search ---------------*/
+  doSalonSearch(
+      {required String query, required String lat, required String lng}) async {
+    try {
+      _showProgress.value = true;
+      _searchSalonModel.value =
+          await HomeAPI.searchForSalon(query: query, lat: lat, lng: lng);
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*--------------------  Save Address For User ---------------*/
+  doSaveAddress(
+      {required String geolocationLat,
+      required String geolocationLng,
+      required String address,
+      required String directions,
+      required String house,
+      required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.saveAddressUser(
+          geolocationLat: geolocationLat,
+          geolocationLng: geolocationLng,
+          address: address,
+          directions: directions,
+          house: house);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*----------------  Edit  Save Address For User --------------*/
+  doSaveEditAddress(
+      {required String geolocationLat,
+      required String geolocationLng,
+      required String address,
+      required String addressID,
+      required String directions,
+      required String house,
+      required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.saveEditAddressUser(
+          addressID: addressID,
+          geolocationLat: geolocationLat,
+          geolocationLng: geolocationLng,
+          address: address,
+          directions: directions,
+          house: house);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*--------------- Save Get Address ------------*/
+  doGetSaveAddress() async {
+    try {
+      _showProgress.value = true;
+      _saveAddressModel.value = await HomeAPI.getSaveAddressUser();
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*----------  Do  Delete Save Address ------------*/
+  doDeleteSaveAddress(
+      {required String id, required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.deleteSaveAddressUser(id: id);
+      if (result) {
+        callback.call();
+      }
     } catch (e) {
       showError(e);
     } finally {

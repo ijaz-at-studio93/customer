@@ -6,6 +6,7 @@ import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/auth_controller.dart';
+import 'package:sallon_customer/page/profile/add_address_page.dart';
 import 'package:sallon_customer/page/profile/edit_profile_page.dart';
 import 'package:sallon_customer/page/profile/favourite_salon_page.dart';
 import 'package:sallon_customer/page/profile/review_rating_page.dart';
@@ -82,6 +83,19 @@ class _ProfilePageState extends State<ProfilePage> {
                   name: "Review & Ratings",
                   onPress: () {
                     Get.to(() => const ReviewAndRatingPage());
+                  }),
+              const Divider(
+                  color: ColorConstant.garyDividerColor,
+                  indent: 20,
+                  endIndent: 20,
+                  thickness: 1),
+              _listTitleWidget(
+                  image: AssetsConstant.locationDetails,
+                  name: "Address",
+                  onPress: () {
+                    Get.to(() => const AddAddressPage(
+                      isSelect: false,
+                    ));
                   }),
               const Divider(
                   color: ColorConstant.garyDividerColor,

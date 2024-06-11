@@ -14,6 +14,8 @@ import 'package:sallon_customer/model/review_list_data_model.dart';
 import 'package:sallon_customer/model/review_rating_data_model.dart';
 import 'package:sallon_customer/model/salon_details_artiest.dart';
 import 'package:sallon_customer/model/salon_details_model.dart';
+import 'package:sallon_customer/model/save_address_model.dart';
+import 'package:sallon_customer/model/search_model/search_model.dart';
 import 'package:sallon_customer/model/un_available_dates_model.dart';
 import 'package:sallon_customer/model/user_booking_qr_code_model.dart';
 import '../model/current_booking_list_model.dart';
@@ -129,9 +131,15 @@ class HomeAPI {
   static Future<CreateBookingAppointmentModel> userCreateBooking({
     required String salonArtistId,
     required String startAt,
+    required bool isHomeService,
+    required String userAddressId,
   }) async {
-    final response = await DioClient.client.post("user/booking/create",
-        data: {"salonArtistId": salonArtistId, "startAt": startAt});
+    final response = await DioClient.client.post("user/booking/create", data: {
+      "salonArtistId": salonArtistId,
+      "startAt": startAt,
+      "isHomeService": isHomeService,
+      "userAddressId": userAddressId,
+    });
     if (response.isSuccess) {
       return CreateBookingAppointmentModel.fromJson(response.data);
     } else {
@@ -203,10 +211,12 @@ class HomeAPI {
 
   /*----------- Add Cart ------------*/
   static Future<ServiceAddCartModel> serviceAddCart(
-      {required String salonServiceId}) async {
-    final response = await DioClient.client
-        .put("user/cart/add", data: {"salonServiceId": salonServiceId});
-    if (response.isSuccess) {
+      {required String salonServiceId, required bool isHomeService}) async {
+    final response = await DioClient.client.put("user/cart/add", data: {
+      "salonServiceId": salonServiceId,
+      "isHomeService": isHomeService
+    });
+    if (response.data['success']) {
       return ServiceAddCartModel.fromJson(response.data);
     } else {
       throw response.data;
@@ -389,6 +399,92 @@ class HomeAPI {
     final response = await DioClient.client.get("user/review/list");
     if (response.isSuccess) {
       return ReviewRatingUserModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*--------------------- Search -------------------------- */
+  static Future<SearchSalonModel> searchForSalon(
+      {required String query, required String lat, required String lng}) async {
+    final response = await DioClient.client.get("user/home/search",
+        queryParameters: {
+          "q": query,
+          "lat": lat,
+          "lng": lng,
+          "limit": 10,
+          "distanceRadius": 50000
+        });
+    if (response.isSuccess) {
+      return SearchSalonModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*------------------ Save Address For User ---------------------------- */
+  static Future<bool> saveAddressUser({
+    required String geolocationLat,
+    required String geolocationLng,
+    required String address,
+    required String directions,
+    required String house,
+  }) async {
+    final response = await DioClient.client.post("user/address/create", data: {
+      "geolocationLat": geolocationLat,
+      "geolocationLng": geolocationLng,
+      "address": address,
+      "addressLabel": "Home",
+      "directions": directions,
+      "house": house
+    });
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*----------------- Save  Edit  Address For user ------------*/
+  static Future<bool> saveEditAddressUser({
+    required String geolocationLat,
+    required String geolocationLng,
+    required String address,
+    required String addressID,
+    required String directions,
+    required String house,
+  }) async {
+    final response =
+        await DioClient.client.patch("user/address/$addressID/update", data: {
+      "geolocationLat": geolocationLat,
+      "geolocationLng": geolocationLng,
+      "address": address,
+      "addressLabel": "Home",
+      "directions": directions,
+      "house": house
+    });
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*----------------  Get Save Address ------------------*/
+  static Future<SaveAddressModel> getSaveAddressUser() async {
+    final response = await DioClient.client.get("user/address/list");
+    if (response.isSuccess) {
+      return SaveAddressModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*-------------- Delete Save Address ---------------- */
+  static Future<bool> deleteSaveAddressUser({required String id}) async {
+    final response = await DioClient.client.delete("user/address/$id/delete");
+    if (response.isSuccess) {
+      return true;
     } else {
       throw response.data;
     }

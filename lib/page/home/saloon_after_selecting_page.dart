@@ -2,15 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
-import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:readmore/readmore.dart';
+import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/model/home_salon_list_model.dart';
 import 'package:sallon_customer/page/home/widget/customized_sheet_widget.dart';
 import 'package:sallon_customer/page/home/widget/over_view_list_tile_widget.dart';
 import 'package:sallon_customer/page/home/widget/stylist_list_grid_widget.dart';
@@ -20,18 +19,18 @@ import 'package:sallon_customer/project_specific/remove_and_add_service_dialog.d
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/util/NoItemsWidget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
-import 'package:sallon_customer/util/logger.dart';
+import 'package:sallon_customer/util/home_service_dialog.dart';
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
 import '../appointment/appointment_booking_page.dart';
 import '../search/stylist_search_page.dart';
 
 class SaloonAfterSelectingServicesPage extends StatefulWidget {
-  final HomeSalonDataList homeSalonModel;
+  final String id;
   final VoidCallback callback;
   const SaloonAfterSelectingServicesPage({
     super.key,
-    required this.homeSalonModel,
+    required this.id,
     required this.callback,
   });
 
@@ -50,12 +49,9 @@ class _SaloonAfterSelectingServicesPageState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _homeController.doGetHomeSalonDetails(
-          salonId: widget.homeSalonModel.id ?? "");
-      _homeController.doGetSalonDetailsService(
-          salonId: widget.homeSalonModel.id ?? "");
-      _homeController.doGetSalonArtiestListData(
-          salonId: widget.homeSalonModel.id ?? "");
+      _homeController.doGetHomeSalonDetails(salonId: widget.id);
+      _homeController.doGetSalonDetailsService(salonId: widget.id);
+      _homeController.doGetSalonArtiestListData(salonId: widget.id);
       _homeController.doGetCart();
     });
   }
@@ -91,8 +87,7 @@ class _SaloonAfterSelectingServicesPageState
         floatingActionButton: Obx(
           () => _homeController.getServiceAddCartModel.data?.items?.isEmpty ??
                   false ||
-                      _homeController.getServiceAddCartModel.data?.items ==
-                          null
+                      _homeController.getServiceAddCartModel.data?.items == null
               ? const SizedBox()
               : Stack(
                   alignment: Alignment.center,
@@ -272,7 +267,7 @@ class _SaloonAfterSelectingServicesPageState
                                                             ),
                                                           ),
                                                         ),
-                                                      const SizedBox(width: 10),
+                                                      const SizedBox(width: 2),
                                                       Container(
                                                         width: 33,
                                                         height: 33,
@@ -396,7 +391,7 @@ class _SaloonAfterSelectingServicesPageState
                             },
                             child: Container(
                               height: 45,
-                              width: Get.width * 0.4,
+                              width: Get.width * 0.3,
                               decoration: BoxDecoration(
                                 color: changeTheme(SharedPrefs.readStringValue(
                                     PrefConstants.gender)),
@@ -407,7 +402,7 @@ class _SaloonAfterSelectingServicesPageState
                                 children: [
                                   Text(
                                     "Select Stylist",
-                                    textScaler: const TextScaler.linear(0.85),
+                                    textScaler: const TextScaler.linear(0.70),
                                     style: AppTextTheme.medium.copyWith(
                                         fontSize: 16,
                                         color: ColorConstant.whiteColor),
@@ -438,22 +433,13 @@ class _SaloonAfterSelectingServicesPageState
                                               callback: () {
                                             _homeController
                                                 .doGetHomeSalonDetails(
-                                                    salonId: widget
-                                                            .homeSalonModel
-                                                            .id ??
-                                                        "");
+                                                    salonId: widget.id);
                                             _homeController
                                                 .doGetSalonDetailsService(
-                                                    salonId: widget
-                                                            .homeSalonModel
-                                                            .id ??
-                                                        "");
+                                                    salonId: widget.id);
                                             _homeController
                                                 .doGetSalonArtiestListData(
-                                                    salonId: widget
-                                                            .homeSalonModel
-                                                            .id ??
-                                                        "");
+                                                    salonId: widget.id);
                                             _homeController.doGetCart();
                                             Navigator.pop(context);
                                           });
@@ -577,15 +563,18 @@ class _SaloonAfterSelectingServicesPageState
                   GestureDetector(
                     onTap: () {
                       setState(() {
-                        widget.homeSalonModel.isFavourite =
-                            !(widget.homeSalonModel.isFavourite ?? false);
-                        if (widget.homeSalonModel.isFavourite ?? false) {
+                        _homeController.homeSalonDetailsData.data?.isFavourite =
+                            !(_homeController
+                                    .homeSalonDetailsData.data?.isFavourite ??
+                                false);
+                        if (_homeController
+                                .homeSalonDetailsData.data?.isFavourite ??
+                            false) {
                           _homeController.doAddFavouriteSalon(
-                              salonId: widget.homeSalonModel.id ?? "");
+                              salonId: widget.id ?? "");
                         } else {
                           _homeController.doRemoveFavouriteSalon(
-                              callback: () {},
-                              salonId: widget.homeSalonModel.id ?? "");
+                              callback: () {}, salonId: widget.id ?? "");
                         }
                       });
                     },
@@ -596,7 +585,9 @@ class _SaloonAfterSelectingServicesPageState
                           shape: BoxShape.circle,
                           color: ColorConstant.blackColor.withOpacity(0.50)),
                       child: Center(
-                          child: widget.homeSalonModel.isFavourite ?? false
+                          child: _homeController
+                                      .homeSalonDetailsData.data?.isFavourite ??
+                                  false
                               ? const Icon(
                                   CupertinoIcons.heart_fill,
                                   color: Colors.red,
@@ -634,7 +625,7 @@ class _SaloonAfterSelectingServicesPageState
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        "${widget.homeSalonModel.rating}",
+                        "${_homeController.homeSalonDetailsData.data?.rating}",
                         style: AppTextTheme.medium.copyWith(
                             fontSize: 11, color: ColorConstant.whiteColor),
                       ),
@@ -1009,109 +1000,288 @@ class _SaloonAfterSelectingServicesPageState
                                                 .isSelect ??
                                             false,
                                         addButtonTap: () {
-                                          if (widget.homeSalonModel.id !=
+                                          if (_homeController
+                                                  .getServiceAddCartModel
+                                                  .data
+                                                  ?.items
+                                                  ?.isEmpty ??
+                                              false ||
                                                   _homeController
-                                                      .getServiceAddCartModel
-                                                      .data
-                                                      ?.salonId &&
-                                              (_homeController
-                                                      .getServiceAddCartModel
-                                                      .data
-                                                      ?.items
-                                                      ?.isNotEmpty ??
-                                                  false)) {
+                                                          .getServiceAddCartModel
+                                                          .data
+                                                          ?.items ==
+                                                      null) {
                                             showDialog(
                                                 context: context,
                                                 builder: (context) {
-                                                  return RemoveAndAddServiceDialog(
-                                                      noPress: () {
+                                                  return HomeServiceDialog(
+                                                      yesPress: () {
                                                     Get.back();
-                                                  }, yesPress: () {
-                                                    setState(() {
-                                                      _homeController
-                                                          .doClearCart(
-                                                              callback: () {
+                                                    if (widget.id !=
+                                                            _homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.salonId &&
+                                                        (_homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.items
+                                                                ?.isNotEmpty ??
+                                                            false)) {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return RemoveAndAddServiceDialog(
+                                                                noPress: () {
+                                                              Get.back();
+                                                            }, yesPress: () {
+                                                              setState(() {
+                                                                _homeController
+                                                                    .doClearCart(
+                                                                        callback:
+                                                                            () {
+                                                                  _homeController
+                                                                      .doGetHomeSalonDetails(
+                                                                          salonId:
+                                                                              widget.id);
+                                                                  _homeController
+                                                                      .doGetSalonDetailsService(
+                                                                          salonId:
+                                                                              widget.id);
+                                                                  _homeController
+                                                                      .doGetSalonArtiestListData(
+                                                                          salonId:
+                                                                              widget.id);
+                                                                  _homeController
+                                                                      .doGetCart();
+                                                                });
+                                                                Navigator.pop(
+                                                                    context);
+                                                                serviceId = "";
+                                                                artiestId = "";
+                                                              });
+                                                            });
+                                                          });
+                                                    } else {
+                                                      if (_homeController
+                                                              .salonDetailsListData
+                                                              .data?[index]
+                                                              .services?[i]
+                                                              .homeService ??
+                                                          false) {
+                                                        setState(() {
+                                                          _homeController
+                                                              .salonDetailsListData
+                                                              .data?[index]
+                                                              .services?[i]
+                                                              .isSelect = !(_homeController
+                                                                  .salonDetailsListData
+                                                                  .data?[index]
+                                                                  .services?[i]
+                                                                  .isSelect ??
+                                                              false);
+
+                                                          if (_homeController
+                                                                  .salonDetailsListData
+                                                                  .data?[index]
+                                                                  .services?[i]
+                                                                  .isSelect ??
+                                                              false) {
+                                                            _homeController
+                                                                .doAddCart(
+                                                                    isHomeService:
+                                                                        true,
+                                                                    salonServiceId: _homeController
+                                                                            .salonDetailsListData
+                                                                            .data?[
+                                                                                index]
+                                                                            .services?[
+                                                                                i]
+                                                                            .id ??
+                                                                        "",
+                                                                    callback:
+                                                                        () {
+                                                                      _homeController
+                                                                          .doGetCart();
+                                                                    });
+                                                          } else {
+                                                            _homeController
+                                                                .doRemoveCart(
+                                                                    salonServiceId: _homeController
+                                                                            .salonDetailsListData
+                                                                            .data?[
+                                                                                index]
+                                                                            .services?[
+                                                                                i]
+                                                                            .id ??
+                                                                        "",
+                                                                    callback:
+                                                                        () {
+                                                                      _homeController
+                                                                          .doGetCart();
+                                                                    });
+                                                          }
+                                                        });
+                                                      } else {
+                                                        showMessage(
+                                                            "This Service Not Provide Home Service");
+                                                      }
+                                                    }
+                                                  }, noPress: () {
+                                                    if (widget.id !=
+                                                            _homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.salonId &&
+                                                        (_homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.items
+                                                                ?.isNotEmpty ??
+                                                            false)) {
+                                                      Get.back();
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (context) {
+                                                            return RemoveAndAddServiceDialog(
+                                                                noPress: () {
+                                                              Get.back();
+                                                            }, yesPress: () {
+                                                              setState(() {
+                                                                _homeController
+                                                                    .doClearCart(
+                                                                        callback:
+                                                                            () {
+                                                                  _homeController
+                                                                      .doGetHomeSalonDetails(
+                                                                          salonId:
+                                                                              widget.id);
+                                                                  _homeController
+                                                                      .doGetSalonDetailsService(
+                                                                          salonId:
+                                                                              widget.id);
+                                                                  _homeController
+                                                                      .doGetSalonArtiestListData(
+                                                                          salonId:
+                                                                              widget.id);
+                                                                  _homeController
+                                                                      .doGetCart();
+                                                                });
+                                                                Navigator.pop(
+                                                                    context);
+                                                                serviceId = "";
+                                                                artiestId = "";
+                                                              });
+                                                            });
+                                                          });
+                                                    } else {
+                                                      Get.back();
+                                                      setState(() {
                                                         _homeController
-                                                            .doGetHomeSalonDetails(
-                                                                salonId: widget
-                                                                        .homeSalonModel
-                                                                        .id ??
-                                                                    "");
-                                                        _homeController
-                                                            .doGetSalonDetailsService(
-                                                                salonId: widget
-                                                                        .homeSalonModel
-                                                                        .id ??
-                                                                    "");
-                                                        _homeController
-                                                            .doGetSalonArtiestListData(
-                                                                salonId: widget
-                                                                        .homeSalonModel
-                                                                        .id ??
-                                                                    "");
-                                                        _homeController
-                                                            .doGetCart();
+                                                                .salonDetailsListData
+                                                                .data?[index]
+                                                                .services?[i]
+                                                                .isSelect =
+                                                            !(_homeController
+                                                                    .salonDetailsListData
+                                                                    .data?[
+                                                                        index]
+                                                                    .services?[
+                                                                        i]
+                                                                    .isSelect ??
+                                                                false);
+
+                                                        if (_homeController
+                                                                .salonDetailsListData
+                                                                .data?[index]
+                                                                .services?[i]
+                                                                .isSelect ??
+                                                            false) {
+                                                          _homeController
+                                                              .doAddCart(
+                                                                  isHomeService:
+                                                                      false,
+                                                                  salonServiceId: _homeController
+                                                                          .salonDetailsListData
+                                                                          .data?[
+                                                                              index]
+                                                                          .services?[
+                                                                              i]
+                                                                          .id ??
+                                                                      "",
+                                                                  callback: () {
+                                                                    _homeController
+                                                                        .doGetCart();
+                                                                  });
+                                                        } else {
+                                                          _homeController
+                                                              .doRemoveCart(
+                                                                  salonServiceId: _homeController
+                                                                          .salonDetailsListData
+                                                                          .data?[
+                                                                              index]
+                                                                          .services?[
+                                                                              i]
+                                                                          .id ??
+                                                                      "",
+                                                                  callback: () {
+                                                                    _homeController
+                                                                        .doGetCart();
+                                                                  });
+                                                        }
                                                       });
-                                                      Navigator.pop(context);
-                                                      serviceId = "";
-                                                      artiestId = "";
-                                                    });
+                                                    }
                                                   });
                                                 });
                                           } else {
-                                            setState(() {
-                                              _homeController
-                                                  .salonDetailsListData
-                                                  .data?[index]
-                                                  .services?[i]
-                                                  .isSelect = !(_homeController
-                                                      .salonDetailsListData
-                                                      .data?[index]
-                                                      .services?[i]
-                                                      .isSelect ??
-                                                  false);
-
-                                              if (_homeController
-                                                      .salonDetailsListData
-                                                      .data?[index]
-                                                      .services?[i]
-                                                      .isSelect ??
-                                                  false) {
-                                                _homeController.doAddCart(
-                                                    salonServiceId: _homeController
-                                                            .salonDetailsListData
-                                                            .data?[index]
-                                                            .services?[i]
-                                                            .id ??
-                                                        "",
-                                                    callback: () {
-                                                      _homeController
-                                                          .doGetCart();
+                                            if (widget.id !=
+                                                    _homeController
+                                                        .getServiceAddCartModel
+                                                        .data
+                                                        ?.salonId &&
+                                                (_homeController
+                                                        .getServiceAddCartModel
+                                                        .data
+                                                        ?.items
+                                                        ?.isNotEmpty ??
+                                                    false)) {
+                                              showDialog(
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return RemoveAndAddServiceDialog(
+                                                        noPress: () {
+                                                      Get.back();
+                                                    }, yesPress: () {
+                                                      setState(() {
+                                                        _homeController
+                                                            .doClearCart(
+                                                                callback: () {
+                                                          _homeController
+                                                              .doGetHomeSalonDetails(
+                                                                  salonId:
+                                                                      widget
+                                                                          .id);
+                                                          _homeController
+                                                              .doGetSalonDetailsService(
+                                                                  salonId:
+                                                                      widget
+                                                                          .id);
+                                                          _homeController
+                                                              .doGetSalonArtiestListData(
+                                                                  salonId:
+                                                                      widget
+                                                                          .id);
+                                                          _homeController
+                                                              .doGetCart();
+                                                        });
+                                                        Navigator.pop(context);
+                                                        serviceId = "";
+                                                        artiestId = "";
+                                                      });
                                                     });
-                                              } else {
-                                                _homeController.doRemoveCart(
-                                                    salonServiceId: _homeController
-                                                            .salonDetailsListData
-                                                            .data?[index]
-                                                            .services?[i]
-                                                            .id ??
-                                                        "",
-                                                    callback: () {
-                                                      _homeController
-                                                          .doGetCart();
-                                                    });
-                                              }
-                                            });
-                                          }
-
-                                          /*setState(() {
-                                            if (serviceId != "") {
-                                              if (_homeController
-                                                      .salonDetailsListData
-                                                      .data?[index]
-                                                      .services?[i]
-                                                      .isSelect ??
-                                                  false) {
+                                                  });
+                                            } else {
+                                              setState(() {
                                                 _homeController
                                                     .salonDetailsListData
                                                     .data?[index]
@@ -1122,67 +1292,85 @@ class _SaloonAfterSelectingServicesPageState
                                                         .services?[i]
                                                         .isSelect ??
                                                     false);
-                                                serviceId = "";
-                                                artiestId = "";
-                                              } else {
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return RemoveAndAddServiceDialog(
-                                                          noPress: () {
-                                                        Get.back();
-                                                      }, yesPress: () {
-                                                        setState(() {
-                                                          _homeController
-                                                              .doGetHomeSalonDetails(
-                                                                  salonId: widget
-                                                                      .salonId);
-                                                          _homeController
-                                                              .doGetSalonDetailsService(
-                                                                  salonId: widget
-                                                                      .salonId);
-                                                          _homeController
-                                                              .doGetSalonArtiestListData(
-                                                                  salonId: widget
-                                                                      .salonId);
-                                                          Navigator.pop(
-                                                              context);
-                                                          serviceId = "";
-                                                          artiestId = "";
-                                                        });
-                                                      });
-                                                    });
-                                              }
-                                            } else {
-                                              _homeController
-                                                  .salonDetailsListData
-                                                  .data?[index]
-                                                  .services?[i]
-                                                  .isSelect = !(_homeController
-                                                      .salonDetailsListData
-                                                      .data?[index]
-                                                      .services?[i]
-                                                      .isSelect ??
-                                                  false);
 
-                                              if (_homeController
-                                                      .salonDetailsListData
-                                                      .data?[index]
-                                                      .services?[i]
-                                                      .isSelect ??
-                                                  false) {
-                                                serviceId = _homeController
+                                                if (_homeController
                                                         .salonDetailsListData
                                                         .data?[index]
                                                         .services?[i]
-                                                        .id ??
-                                                    "";
-                                              } else {
-                                                serviceId = "";
-                                                artiestId = "";
-                                              }
+                                                        .isSelect ??
+                                                    false) {
+                                                  if (_homeController
+                                                          .getServiceAddCartModel
+                                                          .data
+                                                          ?.isHomeService ??
+                                                      false) {
+                                                    if (_homeController
+                                                            .salonDetailsListData
+                                                            .data?[index]
+                                                            .services?[i]
+                                                            .homeService ??
+                                                        false) {
+                                                      _homeController.doAddCart(
+                                                          isHomeService: _homeController
+                                                                  .getServiceAddCartModel
+                                                                  .data
+                                                                  ?.isHomeService ??
+                                                              false,
+                                                          salonServiceId:
+                                                              _homeController
+                                                                      .salonDetailsListData
+                                                                      .data?[
+                                                                          index]
+                                                                      .services?[
+                                                                          i]
+                                                                      .id ??
+                                                                  "",
+                                                          callback: () {
+                                                            _homeController
+                                                                .doGetCart();
+                                                          });
+                                                    } else {
+                                                      showMessage(
+                                                          "This Service is not Provide Home Service");
+                                                    }
+                                                  } else {
+                                                    _homeController.doAddCart(
+                                                        isHomeService: _homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.isHomeService ??
+                                                            false,
+                                                        salonServiceId:
+                                                            _homeController
+                                                                    .salonDetailsListData
+                                                                    .data?[
+                                                                        index]
+                                                                    .services?[
+                                                                        i]
+                                                                    .id ??
+                                                                "",
+                                                        callback: () {
+                                                          _homeController
+                                                              .doGetCart();
+                                                        });
+                                                  }
+                                                } else {
+                                                  _homeController.doRemoveCart(
+                                                      salonServiceId:
+                                                          _homeController
+                                                                  .salonDetailsListData
+                                                                  .data?[index]
+                                                                  .services?[i]
+                                                                  .id ??
+                                                              "",
+                                                      callback: () {
+                                                        _homeController
+                                                            .doGetCart();
+                                                      });
+                                                }
+                                              });
                                             }
-                                          });*/
+                                          }
                                         },
                                         onTap: () {},
                                       );

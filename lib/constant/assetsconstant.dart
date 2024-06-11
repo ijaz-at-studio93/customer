@@ -38,6 +38,8 @@ class AssetsConstant {
   static const String about = "assets/images/about.png";
   static const String noInterNet = "assets/images/nointernet_connection.png";
   static const String placeHolder = "assets/images/place_holder.jpg";
+  static const String markerIcon = 'assets/images/marker.png';
+  static const String locationDetails = 'assets/images/location_details.png';
 
 
 }

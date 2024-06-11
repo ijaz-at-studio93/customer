@@ -27,6 +27,7 @@ class HomeSalonDetailsModel {
 }
 
 class Data {
+  double? rating;
   String? id;
   String? name;
   String? description;
@@ -38,23 +39,29 @@ class Data {
   GeoLocationPoint? geoLocationPoint;
   String? createdAt;
   String? updatedAt;
+  int? reviewCount;
   List<ServiceCategories>? serviceCategories;
+  bool? isFavourite;
 
   Data(
-      {this.id,
-      this.name,
-      this.description,
-      this.email,
-      this.countryCode,
-      this.mobile,
-      this.address,
-      this.image,
-      this.geoLocationPoint,
-      this.createdAt,
-      this.updatedAt,
-      this.serviceCategories});
+      {this.rating,
+        this.id,
+        this.name,
+        this.description,
+        this.email,
+        this.countryCode,
+        this.mobile,
+        this.address,
+        this.image,
+        this.geoLocationPoint,
+        this.createdAt,
+        this.updatedAt,
+        this.reviewCount,
+        this.serviceCategories,
+        this.isFavourite});
 
   Data.fromJson(Map<String, dynamic> json) {
+    rating = double.parse(json['rating'].toString());
     id = json['id'];
     name = json['name'];
     description = json['description'];
@@ -68,16 +75,19 @@ class Data {
         : null;
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
+    reviewCount = json['reviewCount'];
     if (json['serviceCategories'] != null) {
       serviceCategories = <ServiceCategories>[];
       json['serviceCategories'].forEach((v) {
         serviceCategories!.add(ServiceCategories.fromJson(v));
       });
     }
+    isFavourite = json['isFavourite'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
+    data['rating'] = rating;
     data['id'] = id;
     data['name'] = name;
     data['description'] = description;
@@ -91,10 +101,12 @@ class Data {
     }
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
+    data['reviewCount'] = reviewCount;
     if (serviceCategories != null) {
       data['serviceCategories'] =
           serviceCategories!.map((v) => v.toJson()).toList();
     }
+    data['isFavourite'] = isFavourite;
     return data;
   }
 }
@@ -175,14 +187,14 @@ class ServiceCategories {
 
   ServiceCategories(
       {this.id,
-      this.createdAt,
-      this.updatedAt,
-      this.deletedAt,
-      this.name,
-      this.description,
-      this.serviceableGender,
-      this.imageFemale,
-      this.imageMale});
+        this.createdAt,
+        this.updatedAt,
+        this.deletedAt,
+        this.name,
+        this.description,
+        this.serviceableGender,
+        this.imageFemale,
+        this.imageMale});
 
   ServiceCategories.fromJson(Map<String, dynamic> json) {
     id = json['id'];

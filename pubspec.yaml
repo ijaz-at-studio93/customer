@@ -64,8 +64,9 @@ dependencies:
   google_maps_flutter: ^2.6.1
   geolocator: ^11.0.0
   geocoding: ^3.0.0
-  just_audio: ^0.9.38
+
   logger: ^2.3.0
+  flutter_google_places_sdk: ^0.3.9
 
 
 
@@ -99,7 +100,7 @@ flutter:
     - assets/font/
     - assets/icon/
     - assets/images/
-    - assets/notification_sound.mp3
+
 
   # assets:
   #   - images/a_dot_burr.jpeg

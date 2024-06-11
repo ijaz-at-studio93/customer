@@ -22,6 +22,7 @@ import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import '../../constant/variable_constant.dart';
+import '../../util/logger.dart';
 import '../profile/profile_page.dart';
 import '../search/area_of_city_search_page.dart';
 
@@ -109,8 +110,9 @@ class _HomePageState extends State<HomePage> {
                           _homeController.getHomeSalonList.data!.rows![index],
                       onPress: () {
                         Get.to(() => SaloonAfterSelectingServicesPage(
-                              homeSalonModel: _homeController
-                                  .getHomeSalonList.data!.rows![index],
+                              id: _homeController
+                                      .getHomeSalonList.data?.rows?[index].id ??
+                                  "",
                               callback: () {
                                 getCurrentLatLng();
                               },
@@ -410,11 +412,11 @@ class _HomePageState extends State<HomePage> {
                           fit: BoxFit.cover,
                           imageUrl: _homeController
                                       .homeCategoryListResponseModel
-                                      .data![index]
+                                      .data?[index]
                                       .serviceableGender ==
                                   "male"
-                              ? "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data![index].imageFemale}"
-                              : "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data![index].imageFemale}",
+                              ? "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageMale}"
+                              : "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageFemale}",
                           placeholder: (context, url) => const Image(
                             image: AssetImage(AssetsConstant.placeHolder),
                             height: 80,
@@ -638,9 +640,66 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /*Current location lat lng*/
+  /*--------------------- Current location lat lng --------------------- */
   getCurrentLatLng() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    await Permission.location.onDeniedCallback(() async {
+      await Permission.location.request();
+      showMessage("Location services are disabled.");
+    }).onGrantedCallback(() async {
+      Position position = await Geolocator.getCurrentPosition();
+      List<Placemark> placeMarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      SharedPrefs.writeValue(
+          PrefConstants.longitude, position.longitude.toString());
+      SharedPrefs.writeValue(
+          PrefConstants.latitude, position.latitude.toString());
+
+      Placemark place = placeMarks[0];
+      _authController.userCity = "${place.locality}";
+      _authController.userCurrentLocation =
+          "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        _homeController.doGetHomeCategory();
+        _homeController.doGetHomeSalonList(
+            offset: 1,
+            size: 50,
+            lat: position.latitude,
+            lng: position.longitude);
+      });
+    }).onPermanentlyDeniedCallback(() async {
+      openAppSettings();
+      showMessage(
+          "Location permissions are permanently denied, we cannot request permissions.");
+    }).onRestrictedCallback(() async {
+      logger.e("Setting call Back");
+    }).onLimitedCallback(() {
+      showMessage("Notification Permission Request Limited");
+    }).onProvisionalCallback(() {
+      logger.e("Final Call Back");
+    }).request();
+
+    if (await Permission.location.isGranted) {
+      Position position = await Geolocator.getCurrentPosition();
+      List<Placemark> placeMarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
+
+      SharedPrefs.writeValue(
+          PrefConstants.longitude, position.longitude.toString());
+      SharedPrefs.writeValue(
+          PrefConstants.latitude, position.latitude.toString());
+
+      Placemark place = placeMarks[0];
+      _authController.userCity = "${place.locality}";
+      _authController.userCurrentLocation =
+          "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+
+      _homeController.doGetHomeCategory();
+      _homeController.doGetHomeSalonList(
+          offset: 1, size: 50, lat: position.latitude, lng: position.longitude);
+    }
+
+    /*bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission;
     if (!serviceEnabled) {
       await Permission.location.request();
@@ -662,19 +721,6 @@ class _HomePageState extends State<HomePage> {
           "Location permissions are permanently denied, we cannot request permissions.");
       return Future.error(
           'Location permissions are permanently denied, we cannot request permissions.');
-    }
-    Position position = await Geolocator.getCurrentPosition();
-    List<Placemark> placeMarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-
-    Placemark place = placeMarks[0];
-    _authController.userCity = "${place.locality}";
-    _authController.userCurrentLocation =
-        "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _homeController.doGetHomeCategory();
-      _homeController.doGetHomeSalonList(
-          offset: 1, size: 50, lat: position.latitude, lng: position.longitude);
-    });
+    }*/
   }
 }

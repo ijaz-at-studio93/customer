@@ -17,6 +17,10 @@ class AuthController extends GetxController {
   bool get showProgress => _showProgress.value;
   set setShowProgress(val) => _showProgress.value = val;
 
+  final Rx<bool> _googleMapProgress = false.obs;
+  bool get googleMapProgress => _googleMapProgress.value;
+  set googleMapProgress(apiCallAssign) => _googleMapProgress.value = apiCallAssign;
+
   final Rx<bool> _isDialogShow = true.obs;
   bool get isDialogShow => _isDialogShow.value;
   set setIsDialogShow(val) => _isDialogShow.value = val;

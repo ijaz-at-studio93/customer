@@ -28,6 +28,7 @@ class ServiceAddCartModel {
 class Data {
   String? cartId;
   String? salonId;
+  bool? isHomeService;
   List<Items>? items;
   int? price;
   List<String>? previewImages;
@@ -36,6 +37,7 @@ class Data {
   Data(
       {this.cartId,
       this.salonId,
+      this.isHomeService,
       this.items,
       this.price,
       this.previewImages,
@@ -44,6 +46,7 @@ class Data {
   Data.fromJson(Map<String, dynamic> json) {
     cartId = json['cartId'];
     salonId = json['salonId'];
+    isHomeService = json['isHomeService'];
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
@@ -67,6 +70,7 @@ class Data {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['cartId'] = cartId;
     data['salonId'] = salonId;
+    data['isHomeService'] = isHomeService;
     if (items != null) {
       data['items'] = items!.map((v) => v.toJson()).toList();
     }

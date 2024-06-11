@@ -67,10 +67,12 @@ class _FavouriteSalonPageState extends State<FavouriteSalonPage> {
                       shrinkWrap: true,
                       itemCount: _homeController.getFavSalonList.data?.length,
                       itemBuilder: (context, index) {
-                        return FavSalonCardWidget(
-                          favSalon:
-                              _homeController.getFavSalonList.data![index],
-                        );
+                        return _homeController.getFavSalonList.data == null
+                            ? const SizedBox()
+                            : FavSalonCardWidget(
+                                favSalon: _homeController
+                                    .getFavSalonList.data![index],
+                              );
                       },
                     ),
         ),

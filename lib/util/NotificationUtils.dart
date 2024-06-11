@@ -1,19 +1,15 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:just_audio/just_audio.dart';
 
 class NotificationUtils {
   static handleNotificationOnForeground(RemoteMessage remoteMessage) async {
-    final player = AudioPlayer();
     if (remoteMessage.notification != null) {
       String title = remoteMessage.data["title"] ?? "Notification";
       String message =
           remoteMessage.data['message'] ?? "You have a new notification";
       debugPrint('Notification $remoteMessage');
-      await player.setAsset(
-          'assets/notification_sound.mp3');
-      player.play();
+
       // FlutterRingtonePlayer.playNotification();
       Get.snackbar(title, message,
           snackPosition: SnackPosition.TOP,
@@ -25,7 +21,6 @@ class NotificationUtils {
           colorText: Colors.white, onTap: (_) async {
         Get.back();
         handleNotificationNavigation(remoteMessage, false);
-        await player.stop();
       });
     }
   }
