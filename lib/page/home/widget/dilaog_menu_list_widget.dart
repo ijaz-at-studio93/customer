@@ -3,17 +3,21 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
+import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 import '../../../controller/auth_controller.dart';
+import '../../../model/home_category_list_model.dart';
 
 class DialogMenuListWidget extends StatelessWidget {
-  final AuthController authController;
+  final CategoryListData categoryListData;
   final VoidCallback onPress;
   const DialogMenuListWidget(
-      {super.key, required this.onPress, required this.authController});
+      {super.key, required this.onPress, required this.categoryListData});
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +36,9 @@ class DialogMenuListWidget extends StatelessWidget {
                   width: 80,
                   // Horoscope image
                   fit: BoxFit.cover,
-                  imageUrl:
-                      'https://static.toiimg.com/thumb/msid-108614769/108614769.jpg?width=500&resizemode=4',
+                  imageUrl: categoryListData.serviceableGender == "male"
+                      ? "${APIConstants.image}${categoryListData.imageMale}"
+                      : "${APIConstants.image}${categoryListData.imageFemale}",
                   placeholder: (context, url) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
                     height: 80,
@@ -50,11 +55,12 @@ class DialogMenuListWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 10), // Space between image and text
+              const SizedBox(height: 10),
+              // Space between image and text
               SizedBox(
                 width: Get.width * 0.2,
                 child: Text(
-                  "Make Your Package", // Horoscope name
+                  categoryListData.name ?? "", // Horoscope name
                   maxLines: 2,
                   textAlign: TextAlign.center,
                   textScaler: const TextScaler.linear(0.85),
@@ -66,27 +72,27 @@ class DialogMenuListWidget extends StatelessWidget {
               ),
             ],
           ),
-          Obx(
-            () => Positioned(
-              right: -5,
-              top: -6,
-              child: authController.isSelectMenu
-                  ? Container(
-                      height: 21,
-                      width: 21,
-                      decoration: const BoxDecoration(
-                          color: ColorConstant.crossMarkColor,
-                          shape: BoxShape.circle),
-                      child: Center(
-                        child: Image.asset(
-                          AssetsConstant.xMark,
-                          width: 10,
-                          height: 10,
-                        ),
-                      ),
-                    )
-                  : const SizedBox(),
-            ),
+          Positioned(
+            right: -5,
+            top: 2,
+            child: categoryListData.isSelectCategory ?? false
+                ? Container(
+              height: 21,
+              width: 21,
+              decoration:   BoxDecoration(
+                  color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)),
+                  shape: BoxShape.circle),
+              child: Center(
+                child: Image.asset(
+                  AssetsConstant.xMark,
+                  color: ColorConstant.whiteColor,
+                  width: 10,
+                  height: 10,
+                ),
+              ),
+            )
+                : const SizedBox(),
           )
         ],
       ),

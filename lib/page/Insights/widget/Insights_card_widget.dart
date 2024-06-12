@@ -53,36 +53,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                     ),
                   ),
                 ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: GestureDetector(
-                    onTap: () {
 
-                    },
-                    child: Obx(
-                      () => Container(
-                        width: 38,
-                        height: 38,
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: ColorConstant.blackColor),
-                        child: Center(
-                          child: _authController.isInsightsFav
-                              ? const Icon(
-                                  CupertinoIcons.heart_fill,
-                                  color: Colors.red,
-                                )
-                              : Image.asset(
-                                  AssetsConstant.likeBlank,
-                                  height: 20,
-                                  width: 20,
-                                ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -95,7 +66,8 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
+                const SizedBox(),
+                /*Row(
                   children: [
                     const Icon(
                       Icons.remove_red_eye,
@@ -108,7 +80,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                           color: ColorConstant.grayTextColor, fontSize: 13),
                     ),
                   ],
-                ),
+                ),*/
                 Row(
                   children: [
                     ClipRRect(
@@ -142,7 +114,8 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                   ],
                 )
               ],
-            )
+            ),
+            const SizedBox(height: 10),
           ],
         ),
       ),

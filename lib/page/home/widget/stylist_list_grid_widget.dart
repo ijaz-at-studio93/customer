@@ -108,7 +108,7 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                       ),
                       const SizedBox(width: 3),
                       Text(
-                        '4.8',
+                        widget.salonArtiestListModel.rating.toString(),
                         style: AppTextTheme.medium.copyWith(
                             fontSize: 11, color: ColorConstant.yellowColor),
                       ),

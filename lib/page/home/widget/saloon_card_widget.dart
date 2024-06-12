@@ -180,6 +180,27 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           const SizedBox(),
                         const SizedBox(height: 5),
                         Row(
+                          children: [
+                            Text(
+                              "Starting From",
+                              style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.grayTextColor,
+                                  fontSize: 13),
+                            ),
+                            const
+                            SizedBox(width: 5),
+                            Text(
+                              "₹${widget.homeSalonModel.serviceStartingPrice} Onwards",
+                              style: AppTextTheme.bold.copyWith(
+                                  color: changeTheme(
+                                      SharedPrefs.readStringValue(
+                                          PrefConstants.gender)),
+                                  fontSize: 13),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 5),
+                        Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Image.asset(

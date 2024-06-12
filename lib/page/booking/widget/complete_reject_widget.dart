@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
@@ -38,10 +39,14 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                     style: AppTextTheme.regular
                         .copyWith(color: ColorConstant.idColor, fontSize: 16),
                   ),
-                  Text(
-                    "79828AH8918",
-                    style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 16),
+                  SizedBox(
+                    width: Get.width *0.4,
+                    child: Text(
+                      widget.historyList.idx ?? "",
+                      maxLines: 1,
+                      style: AppTextTheme.bold.copyWith(
+                          color: ColorConstant.blackColor, fontSize: 16),
+                    ),
                   ),
                 ],
               ),

@@ -17,9 +17,9 @@ import 'package:sallon_customer/page/home/widget/menu_dialog_widget.dart';
 import 'package:sallon_customer/page/home/widget/saloon_card_widget.dart';
 import 'package:sallon_customer/page/location/google_map.dart';
 import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
-import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/NoItemsWidget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import '../../constant/variable_constant.dart';
 import '../../util/logger.dart';
@@ -45,6 +45,15 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getCurrentLatLng();
+    if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
+      _selectedGender = 0;
+    }
+    if (SharedPrefs.readStringValue(PrefConstants.gender) == "0") {
+      _selectedGender = 0;
+    } else {
+      _selectedGender = 1;
+    }
+
     /* scrollController.addListener(() {
       if (_homeController.lat != 0.0 && _homeController.lng != 0.0) {
         if (scrollController.position.pixels ==
@@ -73,8 +82,8 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 10),
               _ourService(),
               const SizedBox(height: 15),
-              _offer(),
-              const SizedBox(height: 10),
+              /*  _offer(),
+              const SizedBox(height: 10),*/
               _saloonsFoundNear(),
               /*   ListView.builder(
                 shrinkWrap: true,
@@ -98,29 +107,34 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               )*/
-              ListView.builder(
-                  padding: EdgeInsets.zero,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount:
-                      _homeController.getHomeSalonList.data?.rows?.length ?? 0,
-                  shrinkWrap: true,
-                  itemBuilder: (context, index) {
-                    return SaloonCardWidget(
-                      homeSalonModel:
-                          _homeController.getHomeSalonList.data!.rows![index],
-                      onPress: () {
-                        Get.to(() => SaloonAfterSelectingServicesPage(
-                              id: _homeController
-                                      .getHomeSalonList.data?.rows?[index].id ??
-                                  "",
-                              callback: () {
-                                getCurrentLatLng();
-                              },
-                            ));
-                      },
-                      isFav: false,
-                    );
-                  })
+              _homeController.getHomeSalonList.data?.rows?.isEmpty ?? false
+                  ? const NoItemsWidget(
+                      text: "No Salon Found",
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.zero,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount:
+                          _homeController.getHomeSalonList.data?.rows?.length ??
+                              0,
+                      shrinkWrap: true,
+                      itemBuilder: (context, index) {
+                        return SaloonCardWidget(
+                          homeSalonModel: _homeController
+                              .getHomeSalonList.data!.rows![index],
+                          onPress: () {
+                            Get.to(() => SaloonAfterSelectingServicesPage(
+                                  id: _homeController.getHomeSalonList.data
+                                          ?.rows?[index].id ??
+                                      "",
+                                  callback: () {
+                                    getCurrentLatLng();
+                                  },
+                                ));
+                          },
+                          isFav: false,
+                        );
+                      })
             ],
           ),
         ),
@@ -144,11 +158,9 @@ class _HomePageState extends State<HomePage> {
                     SharedPrefs.writeValue(
                         PrefConstants.isSelectedGender, true);
                     SharedPrefs.writeValue(PrefConstants.gender, "0");
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return const MenuDialogWidget();
-                        });
+                    _homeController.doGetHomeCategory(
+                      gender: "male",
+                    );
                   });
                 },
                 child: Container(
@@ -193,11 +205,9 @@ class _HomePageState extends State<HomePage> {
                     SharedPrefs.writeValue(
                         PrefConstants.isSelectedGender, true);
                     SharedPrefs.writeValue(PrefConstants.gender, "1");
-                    showDialog(
-                        context: context,
-                        builder: (context) {
-                          return const MenuDialogWidget();
-                        });
+                    _homeController.doGetHomeCategory(
+                      gender: "female",
+                    );
                   });
                 },
                 child: Container(
@@ -252,7 +262,21 @@ class _HomePageState extends State<HomePage> {
         children: [
           GestureDetector(
             onTap: () {
-              Get.to(() => const GoogleMapGetLocation());
+              Get.to(() => GoogleMapGetLocation(
+                    callback: () {
+                      _homeController.doGetHomeSalonList(
+                        homeService: atHome,
+                        serviceCategoryId: [],
+                        offset: 1,
+                        size: 50,
+                        lat: double.parse(SharedPrefs.readStringValue(
+                            PrefConstants.latitude)),
+                        lng: double.parse(
+                          SharedPrefs.readStringValue(PrefConstants.longitude),
+                        ),
+                      );
+                    },
+                  ));
             },
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,7 +407,51 @@ class _HomePageState extends State<HomePage> {
                       .copyWith(fontSize: 19, color: ColorConstant.blackColor),
                 ),
                 TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return MenuDialogWidget(
+                              categoryListData:
+                                  _homeController.homeCategoryListResponseModel,
+                              callback: () {
+                                List<String> storeServiceId = [];
+                                setState(() {
+                                  for (int i = 0;
+                                      i <
+                                          _homeController
+                                              .homeCategoryListResponseModel
+                                              .data!
+                                              .length;
+                                      i++) {
+                                    if (_homeController
+                                            .homeCategoryListResponseModel
+                                            .data?[i]
+                                            .isSelectCategory ??
+                                        false) {
+                                      storeServiceId.add(_homeController
+                                              .homeCategoryListResponseModel
+                                              .data?[i]
+                                              .id ??
+                                          "");
+                                    }
+                                  }
+                                });
+                                _homeController.doGetHomeSalonList(
+                                    homeService: atHome,
+                                    serviceCategoryId: storeServiceId,
+                                    offset: 1,
+                                    size: 50,
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)));
+                              },
+                            );
+                          });
+                    },
                     child: Text(
                       "VIEW ALL",
                       style: AppTextTheme.medium.copyWith(
@@ -395,56 +463,128 @@ class _HomePageState extends State<HomePage> {
           SizedBox(
             height: 130,
             child: ListView.builder(
-                // padding: const EdgeInsets.only(left: 14, right: 14),
                 scrollDirection: Axis.horizontal,
                 itemCount: _homeController
                         .homeCategoryListResponseModel.data?.length ??
                     0,
                 shrinkWrap: true,
                 itemBuilder: (context, index) {
-                  return Column(
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(100),
-                        child: CachedNetworkImage(
-                          height: 80,
-                          width: 80,
-                          fit: BoxFit.cover,
-                          imageUrl: _homeController
+                  return GestureDetector(
+                    onTap: () {
+                      if (_homeController.homeCategoryListResponseModel
+                              .data?[index].isSelectCategory ??
+                          false) {
+                        _homeController.categoryId.remove(_homeController
+                                .homeCategoryListResponseModel
+                                .data?[index]
+                                .id ??
+                            "");
+
+                        _homeController.homeCategoryListResponseModel
+                            .data?[index].isSelectCategory = false;
+
+                        List<String> storeServiceId = [];
+                        setState(() {
+                          for (int i = 0;
+                              i <
+                                  _homeController.homeCategoryListResponseModel
+                                      .data!.length;
+                              i++) {
+                            if (_homeController.homeCategoryListResponseModel
+                                    .data?[i].isSelectCategory ??
+                                false) {
+                              storeServiceId.add(_homeController
                                       .homeCategoryListResponseModel
-                                      .data?[index]
-                                      .serviceableGender ==
-                                  "male"
-                              ? "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageMale}"
-                              : "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageFemale}",
-                          placeholder: (context, url) => const Image(
-                            image: AssetImage(AssetsConstant.placeHolder),
-                            height: 80,
-                            width: 80,
-                            fit: BoxFit.cover,
-                          ),
-                          errorWidget: (context, url, error) => const Image(
-                            image: AssetImage(AssetsConstant.placeHolder),
-                            height: 80,
-                            width: 80,
-                            fit: BoxFit.cover,
-                          ),
+                                      .data?[i]
+                                      .id ??
+                                  "");
+                            }
+                          }
+                        });
+                        _homeController.doGetHomeSalonList(
+                            homeService: atHome,
+                            serviceCategoryId: storeServiceId,
+                            offset: 1,
+                            size: 50,
+                            lat: double.parse(SharedPrefs.readStringValue(
+                                PrefConstants.latitude)),
+                            lng: double.parse(SharedPrefs.readStringValue(
+                                PrefConstants.longitude)));
+                      }
+                    },
+                    child: Column(
+                      children: [
+                        Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(100),
+                              child: CachedNetworkImage(
+                                height: 80,
+                                width: 80,
+                                fit: BoxFit.cover,
+                                imageUrl: SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                    ? "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageMale}"
+                                    : "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageFemale}",
+                                placeholder: (context, url) => const Image(
+                                  image: AssetImage(AssetsConstant.placeHolder),
+                                  height: 80,
+                                  width: 80,
+                                  fit: BoxFit.cover,
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Image(
+                                  image: AssetImage(AssetsConstant.placeHolder),
+                                  height: 80,
+                                  width: 80,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              right: -3,
+                              top: 2,
+                              child: _homeController
+                                          .homeCategoryListResponseModel
+                                          .data?[index]
+                                          .isSelectCategory ??
+                                      false
+                                  ? Container(
+                                      height: 21,
+                                      width: 21,
+                                      decoration: BoxDecoration(
+                                          color: changeTheme(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.gender)),
+                                          shape: BoxShape.circle),
+                                      child: Center(
+                                        child: Image.asset(
+                                          AssetsConstant.xMark,
+                                          color: ColorConstant.whiteColor,
+                                          width: 10,
+                                          height: 10,
+                                        ),
+                                      ),
+                                    )
+                                  : const SizedBox(),
+                            )
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        width: Get.width * 0.25,
-                        child: Text(
-                          _homeController.homeCategoryListResponseModel
-                                  .data?[index].name ??
-                              "",
-                          textAlign: TextAlign.center,
-                          maxLines: 2,
-                          style: AppTextTheme.medium.copyWith(
-                              fontSize: 13, color: ColorConstant.blackColor),
-                        ),
-                      )
-                    ],
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: Get.width * 0.25,
+                          child: Text(
+                            _homeController.homeCategoryListResponseModel
+                                    .data?[index].name ??
+                                "",
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            style: AppTextTheme.medium.copyWith(
+                                fontSize: 13, color: ColorConstant.blackColor),
+                          ),
+                        )
+                      ],
+                    ),
                   );
                 }),
           )
@@ -535,7 +675,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${_homeController.homeCategoryListResponseModel.data?.length} Saloons Found Near You",
+                  "${_homeController.getHomeSalonList.data?.rows?.length} Saloons Found Near You",
                   textScaler: const TextScaler.linear(0.70),
                   style: AppTextTheme.bold
                       .copyWith(fontSize: 19, color: ColorConstant.blackColor),
@@ -559,9 +699,18 @@ class _HomePageState extends State<HomePage> {
                           value: atHome,
                           activeColor: changeTheme(SharedPrefs.readStringValue(
                               PrefConstants.gender)),
-                          onChanged: (bool? value) {
+                          onChanged: (bool value) {
                             setState(() {
-                              atHome = value ?? false;
+                              atHome = value;
+                              _homeController.doGetHomeSalonList(
+                                  homeService: atHome,
+                                  serviceCategoryId: [],
+                                  offset: 1,
+                                  size: 50,
+                                  lat: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.latitude)),
+                                  lng: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.longitude)));
                             });
                           },
                         ),
@@ -660,12 +809,16 @@ class _HomePageState extends State<HomePage> {
       _authController.userCurrentLocation =
           "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        _homeController.doGetHomeCategory();
+        _homeController.doGetHomeCategory(
+          gender: _selectedGender == 0 ? "male" : "female",
+        );
         _homeController.doGetHomeSalonList(
+            homeService: atHome,
             offset: 1,
             size: 50,
             lat: position.latitude,
-            lng: position.longitude);
+            lng: position.longitude,
+            serviceCategoryId: []);
       });
     }).onPermanentlyDeniedCallback(() async {
       openAppSettings();
@@ -694,9 +847,16 @@ class _HomePageState extends State<HomePage> {
       _authController.userCurrentLocation =
           "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
 
-      _homeController.doGetHomeCategory();
+      _homeController.doGetHomeCategory(
+        gender: _selectedGender == 0 ? "male" : "female",
+      );
       _homeController.doGetHomeSalonList(
-          offset: 1, size: 50, lat: position.latitude, lng: position.longitude);
+          homeService: atHome,
+          serviceCategoryId: [],
+          offset: 1,
+          size: 50,
+          lat: position.latitude,
+          lng: position.longitude);
     }
 
     /*bool serviceEnabled = await Geolocator.isLocationServiceEnabled();

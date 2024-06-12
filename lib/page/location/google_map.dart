@@ -8,9 +8,11 @@ import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/auth_controller.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class GoogleMapGetLocation extends StatefulWidget {
-  const GoogleMapGetLocation({super.key});
+  final VoidCallback callback;
+  const GoogleMapGetLocation({super.key, required this.callback});
 
   @override
   State<GoogleMapGetLocation> createState() => _GoogleMapGetLocationState();
@@ -41,6 +43,7 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
         leading: IconButton(
           onPressed: () {
             Get.back();
+            widget.callback.call();
           },
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -54,7 +57,15 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
         actions: [
-
+          IconButton(
+              onPressed: () {
+                widget.callback.call();
+                Get.back();
+              },
+              icon: const Icon(
+                Icons.check_circle_rounded,
+                color: ColorConstant.blackColor,
+              ))
         ],
       ),
       body: GoogleMap(
@@ -70,21 +81,27 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
           _moveToInitialPosition();
         },
         onTap: (latLng) async {
-          List<Placemark> placeMarks = await placemarkFromCoordinates(
-              latLng.latitude, latLng.longitude);
+          List<Placemark> placeMarks =
+              await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
           Placemark place = placeMarks[0];
-          _marker.add(Marker(
-            markerId: const MarkerId('current_Postion'),
-            position: LatLng(latLng.latitude, latLng.longitude),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueViolet,
-            ),
-          ));
 
-          setState(() {});
+          setState(() {
+            _marker.add(Marker(
+              markerId: const MarkerId('current_Postion'),
+              position: LatLng(latLng.latitude, latLng.longitude),
+              icon: BitmapDescriptor.defaultMarkerWithHue(
+                BitmapDescriptor.hueViolet,
+              ),
+            ));
+          });
           _authController.userCity = "${place.locality}";
           _authController.userCurrentLocation =
               "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+
+          SharedPrefs.writeValue(
+              PrefConstants.longitude, latLng.longitude.toString());
+          SharedPrefs.writeValue(
+              PrefConstants.latitude, latLng.latitude.toString());
         },
         initialCameraPosition: CameraPosition(
           target: initialPosition ?? const LatLng(22.303894, 70.802162),
@@ -103,7 +120,7 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
         initialPosition ?? const LatLng(22.303894, 70.802162)));
   }
 
-  /*Current location lat lng*/
+  /*------------------------ Get Current Location to Lat Lng ------------------------*/
   getCurrentLatLng() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission;
@@ -132,12 +149,14 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
     }
     Position position = await Geolocator.getCurrentPosition();
     initialPosition = LatLng(position.latitude, position.latitude);
-    _marker.add(Marker(
-      markerId: const MarkerId('current_Postion'),
-      position: LatLng(position.latitude, position.longitude),
-      icon: BitmapDescriptor.defaultMarkerWithHue(
-        BitmapDescriptor.hueViolet,
-      ),
-    ));
+    setState(() {
+      _marker.add(Marker(
+        markerId: const MarkerId('current_Postion'),
+        position: LatLng(position.latitude, position.longitude),
+        icon: BitmapDescriptor.defaultMarkerWithHue(
+          BitmapDescriptor.hueViolet,
+        ),
+      ));
+    });
   }
 }

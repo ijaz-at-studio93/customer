@@ -4,8 +4,10 @@ import 'package:get/get.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/model/search_model/search_model.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class LocationTileWidget extends StatelessWidget {
   final VoidCallback onPress;
@@ -16,7 +18,7 @@ class LocationTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap:  onPress,
+      onTap: onPress,
       child: Container(
         width: Get.width,
         decoration: BoxDecoration(
@@ -38,7 +40,7 @@ class LocationTileWidget extends StatelessWidget {
                     height: Get.height * 0.25,
                     fit: BoxFit.fitWidth,
                     imageUrl:
-                    "${APIConstants.image}${salonListData.salon?.image ?? ""}",
+                        "${APIConstants.image}${salonListData.salon?.image ?? ""}",
                     placeholder: (context, url) => Image(
                       image: const AssetImage(AssetsConstant.placeHolder),
                       width: Get.width,
@@ -53,7 +55,6 @@ class LocationTileWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 Positioned(
                     bottom: 10,
                     left: 15,
@@ -105,12 +106,11 @@ class LocationTileWidget extends StatelessWidget {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Image.asset(
-                            AssetsConstant.locationNewIcon,
-                            height: 15,
-                            width: 15,
-                            color: ColorConstant.primaryColor
-                          ),
+                          Image.asset(AssetsConstant.locationNewIcon,
+                              height: 15,
+                              width: 15,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender))),
                           const SizedBox(width: 8),
                           SizedBox(
                             width: Get.width * 0.75,

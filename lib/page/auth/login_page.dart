@@ -1,17 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/auth_controller.dart';
-
 import 'package:sallon_customer/page/auth/otp_screen_page.dart';
-import 'package:sallon_customer/page/bottom_navigation_bar.dart';
 import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
-
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
@@ -82,55 +78,12 @@ class _LoginPageState extends State<LoginPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
+          const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              widget.splashPage
-                  ? const SizedBox(width: 34, height: 34)
-                  : InkWell(
-                      onTap: () {
-                        Get.back();
-                      },
-                      child: Container(
-                        height: 34,
-                        width: 34,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: ColorConstant.whiteColor,
-                          ),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.arrow_back_ios_new,
-                            color: ColorConstant.whiteColor,
-                            size: 12,
-                          ),
-                        ),
-                      ),
-                    ),
-              InkWell(
-                onTap: () {
-                  Get.offAll(() => const BottomNavBarPage());
-                },
-                child: Container(
-                  height: 40,
-                  width: 80,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(1),
-                    border: Border.all(
-                      color: ColorConstant.whiteColor.withOpacity(0.10),
-                    ),
-                  ),
-                  child: Center(
-                    child: Text(
-                      "Skip",
-                      style: AppTextTheme.regular.copyWith(
-                          color: ColorConstant.whiteColor, fontSize: 13),
-                    ),
-                  ),
-                ),
-              )
+              SizedBox(width: 34, height: 34)
+
+
             ],
           ),
           const SizedBox(height: 35),
@@ -296,8 +249,6 @@ class _LoginPageState extends State<LoginPage> {
       showMessage("Please enter mobile Number");
     } else if (_mobileTextEditingController.text.length != 10) {
       showMessage("Please enter 10 digit mobile Number");
-    } else if (!getWhatsappUpdate) {
-      showMessage("Please fill Get update on whatsapp");
     } else {
       _authController.doCheckMobileNumberRegistration(
           mobileNo: _mobileTextEditingController.text,

@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/model/artiest_list_model.dart';
 import 'package:sallon_customer/model/artiest_portfolio_model.dart';
@@ -22,8 +23,9 @@ import '../model/current_booking_list_model.dart';
 
 class HomeAPI {
   /*---------------------- home category ------------------*/ static Future<
-      HomeCategoryListModel> homeCategoryList() async {
-    final response = await DioClient.client.get("user/home/category/list");
+      HomeCategoryListModel> homeCategoryList({required String gender}) async {
+    final response = await DioClient.client
+        .get("user/home/category/list", queryParameters: {"gender": gender});
     if (response.isSuccess) {
       return HomeCategoryListModel.fromJson(response.data);
     } else {
@@ -35,18 +37,29 @@ class HomeAPI {
   static Future<HomeSalonModel> getSalonHome(
       {required int offset,
       required int size,
+        required List<String> serviceCategoryId,
       required double lat,
-      required double lng}) async {
-    final response = await DioClient.client.get(
-      '/user/home/salon/list',
-      queryParameters: {
-        'page': offset,
-        'limit': size,
-        "lat": lat == 0.0 ? 22.303894 : lat,
-        "lng": lng == 0.0 ? 22.303894 : lng,
-        "distanceRadius": 10000000
-      },
-    );
+      required double lng,
+        required  bool homeService
+      }) async {
+    final formData = FormData.fromMap({
+      'page': offset,
+      'limit': size,
+      "lat": lat == 0.0 ? 22.303894 : lat,
+      "lng": lng == 0.0 ? 22.303894 : lng,
+      "distanceRadius": 50000,
+      "homeService": homeService
+    });
+
+    if (serviceCategoryId.isNotEmpty) {
+      for (int i = 0; i < serviceCategoryId.length; i++) {
+        formData.fields.add(MapEntry("serviceCategoryId[]", serviceCategoryId[i]));
+
+      }
+    }
+
+    final response = await DioClient.client
+        .post('user/home/salon/list-post', data: formData);
     if (response.isSuccess) {
       return HomeSalonModel.fromJson(response.data);
     } else {

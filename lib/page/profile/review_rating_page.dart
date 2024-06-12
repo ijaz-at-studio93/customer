@@ -6,6 +6,7 @@ import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:sallon_customer/util/NoItemsWidget.dart';
 
 class ReviewAndRatingPage extends StatefulWidget {
   const ReviewAndRatingPage({super.key});
@@ -49,33 +50,36 @@ class _ReviewAndRatingPageState extends State<ReviewAndRatingPage> {
       ),
       body: Obx(() => _homeController.showProgress
           ? const ProgressBarView()
-          : ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              separatorBuilder: (context, index) {
-                return Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  height: 1,
-                  width: Get.width,
-                  color: const Color(0xffADADAD),
-                );
-              },
-              shrinkWrap: true,
-              itemCount: _homeController
-                      .getReviewRatingUserModel.data?.artists?.length ??
-                  0,
-              itemBuilder: (context, index) {
-                return _listTileWidget(
-                    rate: _homeController.getReviewRatingUserModel.data
-                            ?.artists?[index].rating ??
-                        0.0,
-                    title: _homeController.getReviewRatingUserModel.data
-                            ?.artists?[index].review ??
-                        "",
-                    userName: _homeController.getReviewRatingUserModel.data
-                            ?.artists?[index].artist?.name ??
-                        "");
-              })),
+          : _homeController.getReviewRatingUserModel.data?.artists?.isEmpty ??
+                  false
+              ? const NoItemsWidget(text: "No Any Review Rating Found")
+              : ListView.separated(
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  separatorBuilder: (context, index) {
+                    return Container(
+                      margin: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      height: 1,
+                      width: Get.width,
+                      color: const Color(0xffADADAD),
+                    );
+                  },
+                  shrinkWrap: true,
+                  itemCount: _homeController
+                          .getReviewRatingUserModel.data?.artists?.length ??
+                      0,
+                  itemBuilder: (context, index) {
+                    return _listTileWidget(
+                        rate: _homeController.getReviewRatingUserModel.data
+                                ?.artists?[index].rating ??
+                            0.0,
+                        title: _homeController.getReviewRatingUserModel.data
+                                ?.artists?[index].review ??
+                            "",
+                        userName: _homeController.getReviewRatingUserModel.data
+                                ?.artists?[index].artist?.name ??
+                            "");
+                  })),
     );
   }
 

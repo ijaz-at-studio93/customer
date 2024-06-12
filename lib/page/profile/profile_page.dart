@@ -94,8 +94,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   name: "Address",
                   onPress: () {
                     Get.to(() => const AddAddressPage(
-                      isSelect: false,
-                    ));
+                          isSelect: false,
+                        ));
                   }),
               const Divider(
                   color: ColorConstant.garyDividerColor,

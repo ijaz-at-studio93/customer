@@ -3,25 +3,29 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/controller/auth_controller.dart';
+import 'package:sallon_customer/controller/home_controller.dart';
+import 'package:sallon_customer/model/home_category_list_model.dart';
 import 'package:sallon_customer/page/home/widget/dilaog_menu_list_widget.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class MenuDialogWidget extends StatefulWidget {
-  const MenuDialogWidget({super.key});
+  final HomeCategoryListModel categoryListData;
+  final VoidCallback callback;
+  const MenuDialogWidget(
+      {super.key, required this.categoryListData, required this.callback});
 
   @override
   State<MenuDialogWidget> createState() => _MenuDialogWidgetState();
 }
 
 class _MenuDialogWidgetState extends State<MenuDialogWidget> {
-  final _authController = Get.find<AuthController>();
+  final _homeController = Get.find<HomeController>();
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      child: Stack(
-        clipBehavior: Clip.none,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Container(
             width: Get.width,
@@ -38,59 +42,66 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
                 crossAxisSpacing: 20.0, // Spacing between items horizontally
                 childAspectRatio: 0.6, // Aspect ratio of each item
               ),
-              itemCount: 5,
+              itemCount: widget.categoryListData.data?.length ?? 0,
               // Total number of items
               itemBuilder: (context, index) {
                 return DialogMenuListWidget(
-                  authController: _authController,
+                  categoryListData: widget.categoryListData.data![index],
                   onPress: () {
-                    if (_authController.isSelectMenu) {
-                      _authController.isSelectMenu = false;
-                    } else {
-                      _authController.isSelectMenu = true;
-                    }
+                    setState(() {
+                      widget.categoryListData.data?[index].isSelectCategory =
+                          !(widget.categoryListData.data?[index]
+                                  .isSelectCategory ??
+                              false);
+                      if (widget
+                              .categoryListData.data?[index].isSelectCategory ??
+                          false) {
+                        _homeController.categoryId
+                            .add(widget.categoryListData.data?[index].id);
+                      } else {
+                        _homeController.categoryId
+                            .remove(widget.categoryListData.data?[index].id);
+                      }
+                    });
                   },
                 );
               },
             ),
           ),
-          Obx(
-            () => _authController.isSelectMenu
-                ? Positioned(
-                    bottom: -60,
-                    left: 0,
-                    right: 0,
-                    child: ButtonWidget(
-                      buttonTitleText: "Done",
-                      onPress: () {},
-                      color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)),
-                    ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _homeController.categoryId.isNotEmpty
+                ? ButtonWidget(
+                    buttonTitleText: "Done",
+                    onPress: () {
+                      widget.callback.call();
+                      Get.back();
+                    },
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
                   )
-                : Positioned(
-                    bottom: -60,
-                    left: 0,
-                    right: 0,
-                    child: GestureDetector(
-                      onTap: () {
-                        Get.back();
-                      },
-                      child: Container(
-                        width: 48,
-                        height: 48,
-                        decoration: const BoxDecoration(
-                            color: ColorConstant.whiteColor,
-                            shape: BoxShape.circle),
-                        child: const Center(
-                          child: Icon(
-                            CupertinoIcons.xmark,
-                            color: ColorConstant.grayTextColor,
-                          ),
+                : GestureDetector(
+                    onTap: () {
+                      widget.callback.call();
+                      _homeController.categoryId.clear();
+                      Get.back();
+                    },
+                    child: Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                          color: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender)),
+                          shape: BoxShape.circle),
+                      child: const Center(
+                        child: Icon(
+                          CupertinoIcons.xmark,
+                          color: ColorConstant.whiteColor,
                         ),
                       ),
                     ),
                   ),
-          )
+          ),
         ],
       ),
     );

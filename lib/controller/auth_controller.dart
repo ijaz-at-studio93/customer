@@ -19,7 +19,8 @@ class AuthController extends GetxController {
 
   final Rx<bool> _googleMapProgress = false.obs;
   bool get googleMapProgress => _googleMapProgress.value;
-  set googleMapProgress(apiCallAssign) => _googleMapProgress.value = apiCallAssign;
+  set googleMapProgress(apiCallAssign) =>
+      _googleMapProgress.value = apiCallAssign;
 
   final Rx<bool> _isDialogShow = true.obs;
   bool get isDialogShow => _isDialogShow.value;
@@ -76,7 +77,9 @@ class AuthController extends GetxController {
       if (isRegister) {
         callback.call();
       } else {
-        Get.to(() => const CreateProfilePage());
+        Get.to(() => CreateProfilePage(
+              mobileNo: mobileNo,
+            ));
       }
     } catch (e) {
       showError(e);
@@ -91,11 +94,12 @@ class AuthController extends GetxController {
       required String name,
       required String cc,
       required String email,
+      required String gender,
       required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       _userMessage.value = await AuthAPI.signUp(
-          mobileNO: mobileNO, name: name, cc: cc, email: email);
+          mobileNO: mobileNO, name: name, cc: cc, email: email,gender: gender);
       if (_userMessage.value == "Verification code sent") {
         callback.call();
       } else {
@@ -233,7 +237,8 @@ class AuthController extends GetxController {
           verificationCode: verificationCode,
           image: image);
       await userDataStoreToSharedPrefs(_userResponseModel.value);
-      if (_userResponseModel.value.data?.id != null) {
+      if (_userResponseModel.value.data?.userData?.userId != null) {
+        initUserData();
         callback.call();
       }
     } catch (e) {

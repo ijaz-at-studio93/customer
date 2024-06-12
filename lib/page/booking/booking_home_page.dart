@@ -9,7 +9,9 @@ import 'package:sallon_customer/page/booking/widget/complete_reject_widget.dart'
 import 'package:sallon_customer/page/booking/widget/pending_card_widget.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
+import '../../constant/variable_constant.dart';
 import '../../util/NoItemsWidget.dart';
+import '../../util/SharedPrefs.dart';
 
 class BookingHomePage extends StatefulWidget {
   const BookingHomePage({super.key});
@@ -72,6 +74,7 @@ class _BookingHomePageState extends State<BookingHomePage> {
                                     child: PendingCardWidget(
                                       onPress: () {
                                         Get.to(() => QRCodePage(
+
                                             appointmentId: _homeController
                                                     .getCurrentBookingListModel
                                                     .data?[index]
@@ -134,7 +137,8 @@ class _BookingHomePageState extends State<BookingHomePage> {
       width: Get.width,
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: CupertinoSlidingSegmentedControl(
-          backgroundColor: ColorConstant.primaryColor,
+          backgroundColor: changeTheme(
+              SharedPrefs.readStringValue(PrefConstants.gender)) ?? Colors.transparent,
           padding: const EdgeInsets.all(6),
           groupValue: bookingOverView,
           thumbColor: ColorConstant.whiteColor,

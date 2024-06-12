@@ -28,6 +28,7 @@ class AuthAPI {
       {required String mobileNO,
       required String name,
       required String cc,
+      required String gender,
       required String email}) async {
     String? fcmToken = await FirebaseMessaging.instance.getToken();
 
@@ -37,6 +38,7 @@ class AuthAPI {
       "countryCode": "91",
       "fcmToken": fcmToken,
       "deviceId": SharedPrefs.readStringValue(PrefConstants.deviceId),
+      "gender": gender,
       "email": email
     };
 

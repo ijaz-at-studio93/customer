@@ -40,8 +40,11 @@ class Data {
   String? createdAt;
   String? updatedAt;
   int? reviewCount;
+  bool? homeService;
   List<ServiceCategories>? serviceCategories;
   bool? isFavourite;
+  String? startTiming;
+  String? endTiming;
 
   Data(
       {this.rating,
@@ -57,8 +60,13 @@ class Data {
         this.createdAt,
         this.updatedAt,
         this.reviewCount,
+        this.homeService,
         this.serviceCategories,
-        this.isFavourite});
+        this.isFavourite,
+        this.startTiming,
+        this.endTiming,
+
+      });
 
   Data.fromJson(Map<String, dynamic> json) {
     rating = double.parse(json['rating'].toString());
@@ -76,6 +84,7 @@ class Data {
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     reviewCount = json['reviewCount'];
+    homeService = json['homeService'];
     if (json['serviceCategories'] != null) {
       serviceCategories = <ServiceCategories>[];
       json['serviceCategories'].forEach((v) {
@@ -83,6 +92,8 @@ class Data {
       });
     }
     isFavourite = json['isFavourite'];
+    startTiming = json['startTiming'];
+    endTiming = json['endTiming'];
   }
 
   Map<String, dynamic> toJson() {
@@ -102,11 +113,14 @@ class Data {
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
     data['reviewCount'] = reviewCount;
+    data['homeService'] = homeService;
     if (serviceCategories != null) {
       data['serviceCategories'] =
           serviceCategories!.map((v) => v.toJson()).toList();
     }
     data['isFavourite'] = isFavourite;
+    data['startTiming'] = startTiming;
+    data['endTiming'] = endTiming;
     return data;
   }
 }

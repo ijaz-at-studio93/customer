@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/home/saloon_after_selecting_page.dart';
-import 'package:sallon_customer/page/home/widget/saloon_card_widget.dart';
 import 'package:sallon_customer/page/profile/fav_salon_card_widget.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
@@ -57,9 +55,10 @@ class _FavouriteSalonPageState extends State<FavouriteSalonPage> {
           ),
         ),
         body: Obx(
-          () => _homeController.gteShowAddProgress
+          () => _homeController.showProgress
               ? const ProgressBarView()
-              : _homeController.getFavSalonList.data?.isEmpty ?? false
+              : _homeController.getFavSalonList.data?.isEmpty ??
+                      false || _homeController.getFavSalonList.data == null
                   ? const NoItemsWidget(
                       text: "No Any Found Favourite Salon",
                     )

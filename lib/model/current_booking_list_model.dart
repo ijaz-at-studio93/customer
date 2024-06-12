@@ -35,9 +35,11 @@ class CurrentBookingListModel {
 class BookingData {
   double? orderAmount;
   String? bookingId;
+  String? idx;
   String? finalizedAt;
   String? appointmentId;
   String? orderStatus;
+  bool? isHomeService;
   String? startsAt;
   String? endsAt;
   Salon? salon;
@@ -47,9 +49,11 @@ class BookingData {
   BookingData(
       {this.orderAmount,
         this.bookingId,
+        this.idx,
         this.finalizedAt,
         this.appointmentId,
         this.orderStatus,
+        this.isHomeService,
         this.startsAt,
         this.endsAt,
         this.salon,
@@ -59,9 +63,11 @@ class BookingData {
   BookingData.fromJson(Map<String, dynamic> json) {
     orderAmount = double.parse(json['orderAmount'].toString());
     bookingId = json['bookingId'];
+    idx = json['idx'];
     finalizedAt = json['finalizedAt'];
     appointmentId = json['appointmentId'];
     orderStatus = json['orderStatus'];
+    isHomeService = json['isHomeService'];
     startsAt = json['startsAt'];
     endsAt = json['endsAt'];
     salon = json['salon'] != null ? Salon.fromJson(json['salon']) : null;
@@ -80,9 +86,11 @@ class BookingData {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['orderAmount'] = orderAmount;
     data['bookingId'] = bookingId;
+    data['idx'] = idx;
     data['finalizedAt'] = finalizedAt;
     data['appointmentId'] = appointmentId;
     data['orderStatus'] = orderStatus;
+    data['isHomeService'] = isHomeService;
     data['startsAt'] = startsAt;
     data['endsAt'] = endsAt;
     if (salon != null) {

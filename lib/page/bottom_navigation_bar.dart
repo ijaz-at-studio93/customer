@@ -47,10 +47,16 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
           showSelectedLabels: true,
           unselectedLabelStyle: AppTextTheme.medium
               .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
-          selectedLabelStyle: AppTextTheme.medium
-              .copyWith(color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)), fontSize: 14),
-          selectedItemColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+          selectedLabelStyle: AppTextTheme.medium.copyWith(
+              color: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender)),
+              fontSize: 14),
+          selectedItemColor:
+              changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
           unselectedItemColor: ColorConstant.grayTextColor,
+          selectedIconTheme: IconThemeData(
+              color: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender))),
           items: [
             BottomNavigationBarItem(
               icon: Image.asset(
@@ -58,7 +64,8 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                 height: 24,
                 width: 24,
                 color: _selectedIndex == 0
-                    ? changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
+                    ? changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender))
                     : ColorConstant.grayTextColor,
               ),
               label: 'Home',
@@ -80,7 +87,8 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                 height: 24,
                 width: 24,
                 color: _selectedIndex == 1
-                    ?changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
+                    ? changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender))
                     : ColorConstant.grayTextColor,
               ),
               label: 'Bookings',
@@ -91,7 +99,8 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                 height: 24,
                 width: 24,
                 color: _selectedIndex == 2
-                    ? changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
+                    ? changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender))
                     : ColorConstant.grayTextColor,
               ),
               label: 'Insights',
@@ -119,7 +128,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
       });
       Future.delayed(
         const Duration(seconds: 3),
-            () {
+        () {
           setState(() {
             _canPopNow = false;
             _currentBackPressTime = null;
@@ -128,5 +137,4 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
       );
     }
   }
-
 }

@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/page/appointment/qr_page.dart';
+import 'package:sallon_customer/page/bottom_navigation_bar.dart';
 import 'package:sallon_customer/project_specific/button_widget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import '../../constant/color_constant.dart';
@@ -176,12 +177,17 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
                         SharedPrefs.readStringValue(PrefConstants.gender)) ??
                     ColorConstant.primaryColor,
                 onPress: () {
-                  Get.back();
                   _homeController.doUploadPortFolio(
                       appointmentId: widget.salonAppointmentId,
                       isUpload: yourApproval == 1 ? true : false);
-                  Get.to(() =>
-                      QRCodePage(appointmentId: widget.salonAppointmentId));
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => QRCodePage(
+                              appointmentId: widget.salonAppointmentId)));
                 }),
           ),
         ],

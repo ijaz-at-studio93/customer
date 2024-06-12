@@ -31,7 +31,8 @@ class SalonDetailsArtiestModel {
   }
 }
 
-class  SalonArtiestListModel {
+class SalonArtiestListModel {
+  double? rating;
   String? id;
   String? name;
   String? dob;
@@ -42,7 +43,8 @@ class  SalonArtiestListModel {
   bool? isSelected;
 
   SalonArtiestListModel(
-      {this.id,
+      {this.rating,
+      this.id,
       this.name,
       this.dob,
       this.profileImage,
@@ -52,6 +54,7 @@ class  SalonArtiestListModel {
       this.isSelected});
 
   SalonArtiestListModel.fromJson(Map<String, dynamic> json) {
+    rating = double.parse(json['rating'].toString());
     id = json['id'];
     name = json['name'];
     dob = json['dob'];

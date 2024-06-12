@@ -12,7 +12,8 @@ import '../../project_specific/text_theme.dart';
 import 'otp_screen_page.dart';
 
 class CreateProfilePage extends StatefulWidget {
-  const CreateProfilePage({super.key});
+  final String mobileNo;
+  const CreateProfilePage({super.key, required this.mobileNo});
 
   @override
   State<CreateProfilePage> createState() => _CreateProfilePageState();
@@ -24,6 +25,13 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   final _nameTextEditingController = TextEditingController();
   final _emailTextEditingController = TextEditingController();
   final _authController = Get.find<AuthController>();
+
+  int selectGender = 1;
+  @override
+  void initState() {
+    super.initState();
+    _mobileTextEditingController.text = widget.mobileNo;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +51,109 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                       _columWithNameTextField(),
                       const SizedBox(height: 30),
                       _columPhoneWithTextField(),
+                      const SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Gender",
+                              style: AppTextTheme.regular.copyWith(
+                                  fontSize: 13,
+                                  color: ColorConstant.blackColor),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectGender = 1;
+                                    });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "male",
+                                        style: AppTextTheme.medium.copyWith(
+                                            color: ColorConstant.blackColor,
+                                            fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 15),
+                                      Container(
+                                        height: 16,
+                                        width: 16,
+                                        padding: const EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: selectGender == 1
+                                                ? ColorConstant.primaryColor
+                                                : ColorConstant.blackColor,
+                                          ),
+                                        ),
+                                        child: Container(
+                                          width: 10,
+                                          height: 10,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: selectGender == 1
+                                                ? ColorConstant.primaryColor
+                                                : Colors.transparent,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 15),
+                                GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      selectGender = 2;
+                                    });
+                                  },
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "female",
+                                        style: AppTextTheme.medium.copyWith(
+                                            color: ColorConstant.blackColor,
+                                            fontSize: 14),
+                                      ),
+                                      const SizedBox(width: 15),
+                                      Container(
+                                        height: 16,
+                                        width: 16,
+                                        padding: const EdgeInsets.all(2),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: selectGender == 2
+                                                ? ColorConstant.primaryColor
+                                                : ColorConstant.blackColor,
+                                          ),
+                                        ),
+                                        child: Container(
+                                          width: 10,
+                                          height: 10,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: selectGender == 2
+                                                ? ColorConstant.primaryColor
+                                                : Colors.transparent,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 30),
                       _columWithEmailTextField(),
                       const SizedBox(height: 35),
@@ -73,8 +184,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   _headerWidget() {
     return Container(
       width: Get.width,
-      height: Get.height * 0.23,
-      padding: const EdgeInsets.only(top: 45, left: 21, right: 21),
+      padding: const EdgeInsets.only(top: 50, left: 21, right: 21, bottom: 35),
       decoration: BoxDecoration(
           color:
               changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
@@ -156,6 +266,8 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                 SizedBox(
                   width: Get.width * 0.72,
                   child: TextField(
+                    readOnly: true,
+                    canRequestFocus: false,
                     controller: _mobileTextEditingController,
                     keyboardType: TextInputType.phone,
                     style: AppTextTheme.medium.copyWith(
@@ -266,6 +378,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
       showMessage("Please enter 10 digit mobile number");
     } else {
       _authController.doSignUp(
+          gender: selectGender == 1 ? "MALE" : "FEMALE",
           mobileNO: _mobileTextEditingController.text,
           name: _nameTextEditingController.text,
           cc: "91",

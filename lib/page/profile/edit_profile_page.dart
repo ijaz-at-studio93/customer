@@ -90,7 +90,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 width: 100,
                                 height: 100,
                                 fit: BoxFit.cover,
-                                imageUrl: "${APIConstants.image}${_authController.userResponseModel.data?.userData?.profileImage ?? ""}",
+                                imageUrl:
+                                    "${APIConstants.image}${_authController.userResponseModel.data?.userData?.profileImage ?? ""}",
                                 placeholder: (context, url) => const Image(
                                   image: AssetImage(AssetsConstant.placeHolder),
                                   width: 100,
@@ -385,21 +386,22 @@ class _EditProfilePageState extends State<EditProfilePage> {
       } else if (_verificationCode.text.length != 6) {
         showMessage("Please enter 6 Digit");
         return;
-      }else{
+      } else {
         _authController.doEditProfile(
             name: _nameTextEditingController.text,
             email: _emailTextEditingController.text,
             mobile: _authController.userResponseModel.data?.userData?.mobile !=
-                _mobileTextEditingController.text
+                    _mobileTextEditingController.text
                 ? _mobileTextEditingController.text
                 : "",
             cc: "91",
             verificationCode: _verificationCode.text,
             image: imagePath,
             callback: () {
-              Navigator.pop(context);
               setState(() {
                 _authController.initUserData();
+                Get.back();
+                showMessage("Profile Update SuccessFully");
               });
             });
       }
@@ -408,16 +410,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
           name: _nameTextEditingController.text,
           email: _emailTextEditingController.text,
           mobile: _authController.userResponseModel.data?.userData?.mobile !=
-              _mobileTextEditingController.text
+                  _mobileTextEditingController.text
               ? _mobileTextEditingController.text
               : "",
           cc: "91",
           verificationCode: _verificationCode.text,
           image: imagePath,
           callback: () {
-          Navigator.pop(context);
             setState(() {
               _authController.initUserData();
+              Get.back();
+              showMessage("Profile Update SuccessFully");
             });
           });
     }

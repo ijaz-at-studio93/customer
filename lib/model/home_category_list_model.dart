@@ -1,7 +1,7 @@
 class HomeCategoryListModel {
   int? statusCode;
   bool? success;
-  List<Data>? data;
+  List<CategoryListData>? data;
   String? message;
 
   HomeCategoryListModel(
@@ -11,9 +11,9 @@ class HomeCategoryListModel {
     statusCode = json['statusCode'];
     success = json['success'];
     if (json['data'] != null) {
-      data = <Data>[];
+      data = <CategoryListData>[];
       json['data'].forEach((v) {
-        data!.add(Data.fromJson(v));
+        data!.add(CategoryListData.fromJson(v));
       });
     }
     message = json['message'];
@@ -31,7 +31,7 @@ class HomeCategoryListModel {
   }
 }
 
-class Data {
+class CategoryListData {
   String? id;
   String? createdAt;
   String? updatedAt;
@@ -41,8 +41,9 @@ class Data {
   String? serviceableGender;
   String? imageFemale;
   String? imageMale;
+  bool? isSelectCategory;
 
-  Data(
+  CategoryListData(
       {this.id,
       this.createdAt,
       this.updatedAt,
@@ -51,9 +52,10 @@ class Data {
       this.description,
       this.serviceableGender,
       this.imageFemale,
-      this.imageMale});
+      this.imageMale,
+      this.isSelectCategory});
 
-  Data.fromJson(Map<String, dynamic> json) {
+  CategoryListData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];

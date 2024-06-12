@@ -24,6 +24,13 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
   final _homeController = Get.find<HomeController>();
 
   @override
+  void initState() {
+    super.initState();
+    _homeController.getSearchSalonModel.data = null;
+    _homeController.update();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstant.bgColor,
@@ -135,6 +142,7 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                       AssetsConstant.search,
                       width: 24,
                       height: 24,
+                      color:  changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
                     ),
                   ),
                 ),

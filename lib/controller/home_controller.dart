@@ -167,11 +167,15 @@ class HomeController extends GetxController {
   SaveAddressModel get getSaveAddressModel => _saveAddressModel.value;
   set setSaveAddressModel(val) => _saveAddressModel.value = val;
 
+  /*-------------  category Id  -----------------*/
+  final RxList categoryId = [].obs;
+
   /*---------------- getHomeCategory ----------*/
-  doGetHomeCategory() async {
+  doGetHomeCategory({required String gender}) async {
     try {
       _showProgress.value = true;
-      _homeCategoryListModel.value = await HomeAPI.homeCategoryList();
+      _homeCategoryListModel.value =
+          await HomeAPI.homeCategoryList(gender: gender);
     } catch (e) {
       showError(e);
     } finally {
@@ -246,11 +250,18 @@ class HomeController extends GetxController {
       {required int offset,
       required int size,
       required double lat,
-      required double lng}) async {
+      required List<String> serviceCategoryId,
+      required double lng,
+      required bool homeService}) async {
     try {
       _showProgress.value = true;
       _homeSalonList.value = await HomeAPI.getSalonHome(
-          offset: offset, size: size, lat: lat, lng: lng);
+          offset: offset,
+          size: size,
+          lat: lat,
+          lng: lng,
+          homeService: homeService,
+          serviceCategoryId: serviceCategoryId);
     } catch (e) {
       showError(e);
       logger.d("Do Get Home Salon List ${e.toString()}");
@@ -413,13 +424,13 @@ class HomeController extends GetxController {
   /*----------------  Fav Salon List -------------------*/
   doGetFavouriteSalon() async {
     try {
-      _showAddProgress.value = false;
+      _showProgress.value = true;
       _favSalonList.value = await HomeAPI.getFavouriteSalon();
     } catch (e) {
       showError(e);
       logger.d("Fav Salon List  ${e.toString()}");
     } finally {
-      _showAddProgress.value = false;
+      _showProgress.value = false;
     }
   }
 

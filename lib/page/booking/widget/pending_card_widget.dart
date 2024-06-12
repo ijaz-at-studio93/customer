@@ -38,7 +38,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                         .copyWith(color: ColorConstant.idColor, fontSize: 16),
                   ),
                   Text(
-                    "79828AH8918",
+                   widget.bookingData.idx ?? "",
                     style: AppTextTheme.bold.copyWith(
                         color: ColorConstant.blackColor, fontSize: 16),
                   ),

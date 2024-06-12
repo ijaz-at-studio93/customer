@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
+
+import 'package:sallon_customer/constant/variable_constant.dart';
+import 'package:sallon_customer/util/SharedPrefs.dart';
 
 class NoItemsWidget extends StatelessWidget {
   final String? text;
@@ -18,8 +20,10 @@ class NoItemsWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const Icon(Icons.emoji_people_outlined,
-                  size: 40, color: ColorConstant.primaryColor),
+              Icon(Icons.emoji_people_outlined,
+                  size: 40,
+                  color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender))),
               const SizedBox(height: 12),
               Text(text ?? 'No Data Found',
                   style: Get.textTheme.titleMedium!.copyWith(

@@ -1,9 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:readmore/readmore.dart';
 import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
@@ -20,6 +22,7 @@ import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/util/NoItemsWidget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import 'package:sallon_customer/util/home_service_dialog.dart';
+import 'package:sallon_customer/util/stylist_to_user_location.dart';
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
 import '../appointment/appointment_booking_page.dart';
@@ -687,7 +690,7 @@ class _SaloonAfterSelectingServicesPageState
                 labelStyle: AppTextTheme.medium
                     .copyWith(color: ColorConstant.whiteColor, fontSize: 13),
                 label: Text(
-                    "${_homeController.homeSalonDetailsData.data!.serviceCategories?[index].name}"),
+                    "${_homeController.homeSalonDetailsData.data?.serviceCategories?[index].name}"),
                 backgroundColor: ColorConstant.primaryColor,
                 onSelected: (bool value) {},
               ),
@@ -702,47 +705,24 @@ class _SaloonAfterSelectingServicesPageState
           ),
           const SizedBox(height: 20),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Image.asset(
+                AssetsConstant.calender,
+                height: 13,
+                width: 13,
+                color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)),
+              ),
+              const SizedBox(width: 5),
               Row(
                 children: [
-                  Image.asset(
-                    AssetsConstant.manWalk,
-                    height: 13,
-                    width: 13,
-                    color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),
-                  ),
-                  const SizedBox(width: 5),
                   Text(
-                    "20-25 min • 2.5 km",
+                    "Open ${_homeController.homeSalonDetailsData.data?.startTiming == null ? "NA" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.startTiming ?? "")}  -  Close  ${_homeController.homeSalonDetailsData.data?.endTiming == null ? "NA" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.endTiming ?? "")}   ",
                     style: AppTextTheme.medium.copyWith(
                         color: ColorConstant.blackColor, fontSize: 13),
-                  )
-                ],
-              ),
-              Container(
-                height: 15,
-                width: 1.5,
-                color: ColorConstant.grayColor,
-              ),
-              Row(
-                children: [
-                  Image.asset(
-                    AssetsConstant.calender,
-                    height: 13,
-                    width: 13,
-                    color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),
                   ),
-                  const SizedBox(width: 5),
-                  Text(
-                    "Mon-Sat • 11 am - 11 pm",
-                    style: AppTextTheme.medium.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 13),
-                  )
                 ],
-              ),
+              )
             ],
           ),
           const SizedBox(height: 10),
@@ -771,34 +751,46 @@ class _SaloonAfterSelectingServicesPageState
                   ),
                 ],
               ),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  color: ColorConstant.pinkBgColor,
-                  border: Border.all(color: ColorConstant.pinkStrokeColor),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.asset(
-                      AssetsConstant.locationShare,
-                      width: 12,
-                      height: 12,
-                      color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      "Get Direction",
-                      textScaler: const TextScaler.linear(0.85),
-                      style: AppTextTheme.medium.copyWith(
-                          fontSize: 12,
-                          color: changeTheme(SharedPrefs.readStringValue(
-                              PrefConstants.gender))),
-                    )
-                  ],
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => StylistToUserLocation(
+                        latitude: _homeController.homeSalonDetailsData.data
+                                ?.geoLocationPoint?.coordinates?[1] ??
+                            0.0,
+                        longitude: _homeController.homeSalonDetailsData.data
+                                ?.geoLocationPoint?.coordinates?[0] ??
+                            0.0,
+                      ));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    color: ColorConstant.pinkBgColor,
+                    border: Border.all(color: ColorConstant.pinkStrokeColor),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Image.asset(
+                        AssetsConstant.locationShare,
+                        width: 12,
+                        height: 12,
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        "Get Direction",
+                        textScaler: const TextScaler.linear(0.85),
+                        style: AppTextTheme.medium.copyWith(
+                            fontSize: 12,
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender))),
+                      )
+                    ],
+                  ),
                 ),
               )
             ],
@@ -1000,7 +992,101 @@ class _SaloonAfterSelectingServicesPageState
                                                 .isSelect ??
                                             false,
                                         addButtonTap: () {
-                                          if (_homeController
+                                          if (widget.id !=
+                                                  _homeController
+                                                      .getServiceAddCartModel
+                                                      .data
+                                                      ?.salonId &&
+                                              (_homeController
+                                                      .getServiceAddCartModel
+                                                      .data
+                                                      ?.items
+                                                      ?.isNotEmpty ??
+                                                  false)) {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return RemoveAndAddServiceDialog(
+                                                      noPress: () {
+                                                    Get.back();
+                                                  }, yesPress: () {
+                                                    setState(() {
+                                                      _homeController
+                                                          .doClearCart(
+                                                              callback: () {
+                                                        _homeController
+                                                            .doGetHomeSalonDetails(
+                                                                salonId:
+                                                                    widget.id);
+                                                        _homeController
+                                                            .doGetSalonDetailsService(
+                                                                salonId:
+                                                                    widget.id);
+                                                        _homeController
+                                                            .doGetSalonArtiestListData(
+                                                                salonId:
+                                                                    widget.id);
+                                                        _homeController
+                                                            .doGetCart();
+                                                      });
+                                                      Navigator.pop(context);
+                                                      serviceId = "";
+                                                      artiestId = "";
+                                                    });
+                                                  });
+                                                });
+                                          } else {
+                                            setState(() {
+                                              _homeController
+                                                  .salonDetailsListData
+                                                  .data?[index]
+                                                  .services?[i]
+                                                  .isSelect = !(_homeController
+                                                      .salonDetailsListData
+                                                      .data?[index]
+                                                      .services?[i]
+                                                      .isSelect ??
+                                                  false);
+
+                                              if (_homeController
+                                                      .salonDetailsListData
+                                                      .data?[index]
+                                                      .services?[i]
+                                                      .isSelect ??
+                                                  false) {
+                                                _homeController.doAddCart(
+                                                    isHomeService: _homeController
+                                                            .homeSalonDetailsData
+                                                            .data
+                                                            ?.homeService ??
+                                                        false,
+                                                    salonServiceId: _homeController
+                                                            .salonDetailsListData
+                                                            .data?[index]
+                                                            .services?[i]
+                                                            .id ??
+                                                        "",
+                                                    callback: () {
+                                                      _homeController
+                                                          .doGetCart();
+                                                    });
+                                              } else {
+                                                _homeController.doRemoveCart(
+                                                    salonServiceId: _homeController
+                                                            .salonDetailsListData
+                                                            .data?[index]
+                                                            .services?[i]
+                                                            .id ??
+                                                        "",
+                                                    callback: () {
+                                                      _homeController
+                                                          .doGetCart();
+                                                    });
+                                              }
+                                            });
+                                          }
+
+                                          /*if (_homeController
                                                   .getServiceAddCartModel
                                                   .data
                                                   ?.items
@@ -1282,33 +1368,33 @@ class _SaloonAfterSelectingServicesPageState
                                                   });
                                             } else {
                                               setState(() {
-                                                _homeController
-                                                    .salonDetailsListData
-                                                    .data?[index]
-                                                    .services?[i]
-                                                    .isSelect = !(_homeController
-                                                        .salonDetailsListData
-                                                        .data?[index]
-                                                        .services?[i]
-                                                        .isSelect ??
-                                                    false);
-
                                                 if (_homeController
-                                                        .salonDetailsListData
-                                                        .data?[index]
-                                                        .services?[i]
-                                                        .isSelect ??
+                                                        .getServiceAddCartModel
+                                                        .data
+                                                        ?.isHomeService ??
                                                     false) {
                                                   if (_homeController
-                                                          .getServiceAddCartModel
-                                                          .data
-                                                          ?.isHomeService ??
+                                                          .salonDetailsListData
+                                                          .data?[index]
+                                                          .services?[i]
+                                                          .homeService ??
                                                       false) {
+                                                    _homeController
+                                                        .salonDetailsListData
+                                                        .data?[index]
+                                                        .services?[i]
+                                                        .isSelect = !(_homeController
+                                                            .salonDetailsListData
+                                                            .data?[index]
+                                                            .services?[i]
+                                                            .isSelect ??
+                                                        false);
+
                                                     if (_homeController
                                                             .salonDetailsListData
                                                             .data?[index]
                                                             .services?[i]
-                                                            .homeService ??
+                                                            .isSelect ??
                                                         false) {
                                                       _homeController.doAddCart(
                                                           isHomeService: _homeController
@@ -1330,8 +1416,101 @@ class _SaloonAfterSelectingServicesPageState
                                                                 .doGetCart();
                                                           });
                                                     } else {
-                                                      showMessage(
-                                                          "This Service is not Provide Home Service");
+                                                      _homeController
+                                                          .doRemoveCart(
+                                                              salonServiceId: _homeController
+                                                                      .salonDetailsListData
+                                                                      .data?[
+                                                                          index]
+                                                                      .services?[
+                                                                          i]
+                                                                      .id ??
+                                                                  "",
+                                                              callback: () {
+                                                                _homeController
+                                                                    .doGetCart();
+                                                              });
+                                                    }
+                                                  } else {
+                                                    showMessage(
+                                                        "This Service is not Provide Home Service");
+                                                  }
+                                                } else {
+                                                  _homeController
+                                                      .salonDetailsListData
+                                                      .data?[index]
+                                                      .services?[i]
+                                                      .isSelect = !(_homeController
+                                                          .salonDetailsListData
+                                                          .data?[index]
+                                                          .services?[i]
+                                                          .isSelect ??
+                                                      false);
+
+                                                  if (_homeController
+                                                          .salonDetailsListData
+                                                          .data?[index]
+                                                          .services?[i]
+                                                          .isSelect ??
+                                                      false) {
+                                                    _homeController.doAddCart(
+                                                        isHomeService: _homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.isHomeService ??
+                                                            false,
+                                                        salonServiceId:
+                                                            _homeController
+                                                                    .salonDetailsListData
+                                                                    .data?[
+                                                                        index]
+                                                                    .services?[
+                                                                        i]
+                                                                    .id ??
+                                                                "",
+                                                        callback: () {
+                                                          _homeController
+                                                              .doGetCart();
+                                                        });
+                                                  } else {
+                                                    _homeController
+                                                        .doRemoveCart(
+                                                            salonServiceId:
+                                                                _homeController
+                                                                        .salonDetailsListData
+                                                                        .data?[
+                                                                            index]
+                                                                        .services?[
+                                                                            i]
+                                                                        .id ??
+                                                                    "",
+                                                            callback: () {
+                                                              _homeController
+                                                                  .doGetCart();
+                                                            });
+                                                  }
+                                                }
+
+                                                */ /*     if (_homeController
+                                                        .salonDetailsListData
+                                                        .data?[index]
+                                                        .services?[i]
+                                                        .isSelect ??
+                                                    false) {
+                                                  if (_homeController
+                                                          .getServiceAddCartModel
+                                                          .data
+                                                          ?.isHomeService ??
+                                                      false) {
+                                                    if (_homeController
+                                                            .salonDetailsListData
+                                                            .data?[index]
+                                                            .services?[i]
+                                                            .homeService ??
+                                                        false) {
+
+                                                    } else {
+
                                                     }
                                                   } else {
                                                     _homeController.doAddCart(
@@ -1355,22 +1534,11 @@ class _SaloonAfterSelectingServicesPageState
                                                         });
                                                   }
                                                 } else {
-                                                  _homeController.doRemoveCart(
-                                                      salonServiceId:
-                                                          _homeController
-                                                                  .salonDetailsListData
-                                                                  .data?[index]
-                                                                  .services?[i]
-                                                                  .id ??
-                                                              "",
-                                                      callback: () {
-                                                        _homeController
-                                                            .doGetCart();
-                                                      });
-                                                }
+
+                                                }*/ /*
                                               });
                                             }
-                                          }
+                                          }*/
                                         },
                                         onTap: () {},
                                       );
@@ -1415,5 +1583,17 @@ class _SaloonAfterSelectingServicesPageState
         ],
       ),
     );
+  }
+
+  String convertTimeTo12HourFormat(String time24) {
+    if (time24.isEmpty) {
+      return "";
+    } else {
+      // Parse the 24-hour format time
+      DateTime dateTime = DateFormat("HH:mm").parse(time24);
+      // Format the time to 12-hour format with AM/PM
+      String time12 = DateFormat("h:mm a").format(dateTime);
+      return time12;
+    }
   }
 }
