@@ -118,7 +118,7 @@ class CustomListTileWidget extends StatelessWidget {
                   width: 123,
                   height: 123,
                   fit: BoxFit.cover,
-                  imageUrl: "${APIConstants.image}${productImage ?? " "}",
+                  imageUrl: "${APIConstants.image}$productImage",
                   placeholder: (context, url) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
                     width: 108,

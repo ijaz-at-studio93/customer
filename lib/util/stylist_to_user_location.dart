@@ -1,15 +1,13 @@
 import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:geocoding/geocoding.dart';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:sallon_customer/util/logger.dart';
-
 import '../api/dio_client.dart';
 import '../constant/assetsconstant.dart';
 import '../constant/color_constant.dart';
@@ -64,7 +62,7 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
   }
 
   addPolyLine() {
-    PolylineId id = PolylineId("poly");
+    PolylineId id = const PolylineId("poly");
     Polyline polyline = Polyline(
         polylineId: id,
         width: 3,
@@ -167,9 +165,9 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
           position: LatLng(widget.latitude, widget.longitude),
           icon: destination));
     });
-    List<Placemark> placeMarks =
+  /*  List<Placemark> placeMarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placeMarks[0];
+    Placemark place = placeMarks[0];*/
   }
 
   void makeLines(
@@ -187,7 +185,6 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
     )
         .then((value) {
       for (var point in value.points) {
-        print(point);
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       }
     }).then((value) {

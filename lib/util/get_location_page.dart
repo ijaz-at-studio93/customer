@@ -33,7 +33,7 @@ class GetLocationPage extends StatefulWidget {
   final bool isEdit;
 
   const GetLocationPage({
-    Key? key,
+    super.key,
     required this.latitude,
     required this.longitude,
     required this.callback,
@@ -41,7 +41,7 @@ class GetLocationPage extends StatefulWidget {
     required this.isEdit,
     required this.house,
     required this.direction,
-  }) : super(key: key);
+  });
 
   @override
   State<GetLocationPage> createState() => _GetLocationPageState();
@@ -179,7 +179,7 @@ class _GetLocationPageState extends State<GetLocationPage> {
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
-        actions: [],
+
       ),
       resizeToAvoidBottomInset: true,
       body: Column(children: [
@@ -218,7 +218,6 @@ class _GetLocationPageState extends State<GetLocationPage> {
                               }
                             },
                             onCameraMove: (val) {
-                              print(val);
 
                             },
                             onTap: (tap) {

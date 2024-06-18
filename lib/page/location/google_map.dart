@@ -25,7 +25,7 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
   final List<Marker> _marker = <Marker>[];
 
   final _authController = Get.find<AuthController>();
-  final _locationAddress = TextEditingController();
+
 
   @override
   void initState() {

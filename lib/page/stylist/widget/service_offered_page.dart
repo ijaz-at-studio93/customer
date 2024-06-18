@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dash/flutter_dash.dart';
+
 
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
@@ -7,7 +7,7 @@ import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/model/artiest_portfolio_model.dart';
 import 'package:sallon_customer/page/stylist/widget/service_offered_list_tile_widget.dart';
 
-import '../../../project_specific/text_theme.dart';
+
 
 class ServiceAndOfferedPage extends StatefulWidget {
   final ArtiestPortfolio artiestPortfolio;

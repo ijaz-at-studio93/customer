@@ -753,7 +753,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         String year = DateFormat("yyyy").format(DateTime.now());
         String finalDate =
             "$year-${result.length == 1 ? '0$result' : result}-01";
-        print(finalDate);
+
         selectDate = finalDate;
         _homeController.doGetUnAvailableDatesListData(
             artiestId: widget.artiestId,

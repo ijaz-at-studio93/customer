@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:mime/mime.dart';
 import 'package:dio/dio.dart';
+import 'package:sallon_customer/model/app_update_model.dart';
+import 'package:sallon_customer/model/user_profile.dart';
 import 'package:sallon_customer/model/user_response_model.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
 import 'package:http_parser/http_parser.dart';
@@ -18,6 +20,29 @@ class AuthAPI {
         data: {'mobile': mobileNo, 'countryCode': countryCode});
     if (response.statusCode == 200 || response.statusCode == 203) {
       return response.data['data']['isRegistered'];
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*------------------  Get  Profile ----------------*/
+  static Future<UserProfile> getUserProfile() async {
+    final response = await DioClient.client.get('user/profile/me');
+    if (response.isSuccess) {
+      return UserProfile.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*--------------  App  Update ----------------*/
+  static Future<AppUpdateModel> appUpdate() async {
+    final response = await DioClient.client.get(
+      "common/app/config",
+    );
+
+    if (response.isSuccess) {
+      return AppUpdateModel.fromJson(response.data);
     } else {
       throw response.data;
     }

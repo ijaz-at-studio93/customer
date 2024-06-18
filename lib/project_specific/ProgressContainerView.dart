@@ -16,8 +16,7 @@ class ProgressContainerView extends StatelessWidget {
       this.progressText = "Please Wait",
       this.progressWidgetOpacity = 0.1,
       this.progressWidget,
-      Key? key})
-      : super(key: key);
+      super.key});
 
   @override
   Widget build(BuildContext context) {

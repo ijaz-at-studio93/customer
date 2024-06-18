@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
 import 'package:sallon_customer/page/stylist/widget/selected_fav_artist_card_widget.dart';

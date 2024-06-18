@@ -9,8 +9,6 @@ import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
-
-import '../../../controller/auth_controller.dart';
 import '../../../model/home_category_list_model.dart';
 
 class DialogMenuListWidget extends StatelessWidget {
@@ -77,21 +75,21 @@ class DialogMenuListWidget extends StatelessWidget {
             top: 2,
             child: categoryListData.isSelectCategory ?? false
                 ? Container(
-              height: 21,
-              width: 21,
-              decoration:   BoxDecoration(
-                  color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)),
-                  shape: BoxShape.circle),
-              child: Center(
-                child: Image.asset(
-                  AssetsConstant.xMark,
-                  color: ColorConstant.whiteColor,
-                  width: 10,
-                  height: 10,
-                ),
-              ),
-            )
+                    height: 21,
+                    width: 21,
+                    decoration: BoxDecoration(
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                        shape: BoxShape.circle),
+                    child: Center(
+                      child: Image.asset(
+                        AssetsConstant.xMark,
+                        color: ColorConstant.whiteColor,
+                        width: 10,
+                        height: 10,
+                      ),
+                    ),
+                  )
                 : const SizedBox(),
           )
         ],

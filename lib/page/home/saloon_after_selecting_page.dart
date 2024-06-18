@@ -1,13 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:readmore/readmore.dart';
-import 'package:sallon_customer/api/dio_client.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/assetsconstant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
@@ -21,7 +19,6 @@ import 'package:sallon_customer/project_specific/remove_and_add_service_dialog.d
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/util/NoItemsWidget.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
-import 'package:sallon_customer/util/home_service_dialog.dart';
 import 'package:sallon_customer/util/stylist_to_user_location.dart';
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
@@ -379,18 +376,7 @@ class _SaloonAfterSelectingServicesPageState
                                       );
                                     });
                               }
-                              /*showModalBottomSheet(
-                              isScrollControlled: true,
-                              shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(32),
-                                topRight: Radius.circular(32),
-                              )),
-                              context: context,
-                              builder: (context) {
-                                return const ViewCartWidget(
-                                );
-                              });*/
+
                             },
                             child: Container(
                               height: 45,
@@ -574,10 +560,10 @@ class _SaloonAfterSelectingServicesPageState
                                 .homeSalonDetailsData.data?.isFavourite ??
                             false) {
                           _homeController.doAddFavouriteSalon(
-                              salonId: widget.id ?? "");
+                              salonId: widget.id);
                         } else {
                           _homeController.doRemoveFavouriteSalon(
-                              callback: () {}, salonId: widget.id ?? "");
+                              callback: () {}, salonId: widget.id);
                         }
                       });
                     },

@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
@@ -265,16 +266,17 @@ class _HomePageState extends State<HomePage> {
               Get.to(() => GoogleMapGetLocation(
                     callback: () {
                       _homeController.doGetHomeSalonList(
-                        homeService: atHome,
-                        serviceCategoryId: [],
-                        offset: 1,
-                        size: 50,
-                        lat: double.parse(SharedPrefs.readStringValue(
-                            PrefConstants.latitude)),
-                        lng: double.parse(
-                          SharedPrefs.readStringValue(PrefConstants.longitude),
-                        ),
-                      );
+                          homeService: atHome,
+                          serviceCategoryId: [],
+                          offset: 1,
+                          size: 50,
+                          lat: double.parse(SharedPrefs.readStringValue(
+                              PrefConstants.latitude)),
+                          lng: double.parse(SharedPrefs.readStringValue(
+                              PrefConstants.longitude)),
+                          orderBy: "createdAt",
+                          nearest: false,
+                          fourPlusRating: false);
                     },
                   ));
             },
@@ -437,6 +439,7 @@ class _HomePageState extends State<HomePage> {
                                     }
                                   }
                                 });
+
                                 _homeController.doGetHomeSalonList(
                                     homeService: atHome,
                                     serviceCategoryId: storeServiceId,
@@ -447,7 +450,10 @@ class _HomePageState extends State<HomePage> {
                                             PrefConstants.latitude)),
                                     lng: double.parse(
                                         SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)));
+                                            PrefConstants.longitude)),
+                                    orderBy: "createdAt",
+                                    nearest: false,
+                                    fourPlusRating: false);
                               },
                             );
                           });
@@ -501,6 +507,7 @@ class _HomePageState extends State<HomePage> {
                             }
                           }
                         });
+
                         _homeController.doGetHomeSalonList(
                             homeService: atHome,
                             serviceCategoryId: storeServiceId,
@@ -509,7 +516,10 @@ class _HomePageState extends State<HomePage> {
                             lat: double.parse(SharedPrefs.readStringValue(
                                 PrefConstants.latitude)),
                             lng: double.parse(SharedPrefs.readStringValue(
-                                PrefConstants.longitude)));
+                                PrefConstants.longitude)),
+                            orderBy: "createdAt",
+                            nearest: false,
+                            fourPlusRating: false);
                       }
                     },
                     child: Column(
@@ -523,7 +533,9 @@ class _HomePageState extends State<HomePage> {
                                 height: 80,
                                 width: 80,
                                 fit: BoxFit.cover,
-                                imageUrl: SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                imageUrl: SharedPrefs.readStringValue(
+                                            PrefConstants.gender) ==
+                                        "0"
                                     ? "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageMale}"
                                     : "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageFemale}",
                                 placeholder: (context, url) => const Image(
@@ -593,7 +605,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /*--------------------  Offer -------------------*/
+  /*-------------------- Offer -------------------*/
   _offer() {
     return SizedBox(
       height: 100,
@@ -664,6 +676,7 @@ class _HomePageState extends State<HomePage> {
 
   /*------------ Saloons Found Near ----------- */
   bool atHome = false;
+  int select = 0;
   _saloonsFoundNear() {
     return Container(
       color: ColorConstant.whiteColor,
@@ -702,6 +715,7 @@ class _HomePageState extends State<HomePage> {
                           onChanged: (bool value) {
                             setState(() {
                               atHome = value;
+
                               _homeController.doGetHomeSalonList(
                                   homeService: atHome,
                                   serviceCategoryId: [],
@@ -710,7 +724,10 @@ class _HomePageState extends State<HomePage> {
                                   lat: double.parse(SharedPrefs.readStringValue(
                                       PrefConstants.latitude)),
                                   lng: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.longitude)));
+                                      PrefConstants.longitude)),
+                                  orderBy: "createdAt",
+                                  nearest: false,
+                                  fourPlusRating: false);
                             });
                           },
                         ),
@@ -723,47 +740,103 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
             height: 50,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  children: [
-                    Container(
-                      width: Get.width * 0.3,
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                              color: ColorConstant.grayBorderColor, width: 1)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Image.asset(
-                            AssetsConstant.filter,
-                            height: 14,
-                            width: 14,
-                          ),
-                          Text(
-                            "Sort By",
-                            style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.blackColor, fontSize: 13),
-                          ),
-                          Image.asset(
-                            AssetsConstant.arrowDown,
-                            height: 10,
-                            width: 10,
-                          ),
-                        ],
-                      ),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: Get.width * 0.3,
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(
+                            color: ColorConstant.grayBorderColor, width: 1)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset(
+                          AssetsConstant.filter,
+                          height: 14,
+                          width: 14,
+                        ),
+                        DropdownButton(
+                          value: dropdownvalue,
+                          icon: const SizedBox(),
+                          items: items.map((String items) {
+                            return DropdownMenuItem(
+                              value: items,
+                              child: Text(items,
+                                  style: AppTextTheme.medium.copyWith(
+                                      color: ColorConstant.blackColor,
+                                      fontSize: 13)),
+                            );
+                          }).toList(),
+                          // After selecting the desired option,it will
+                          // change button value to selected value
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              dropdownvalue = newValue ?? "";
+
+                              _homeController.doGetHomeSalonList(
+                                  homeService: atHome,
+                                  serviceCategoryId: [],
+                                  offset: 1,
+                                  size: 50,
+                                  lat: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.latitude)),
+                                  lng: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.longitude)),
+                                  orderBy: dropdownvalue == "Sort By"
+                                      ? "createdAt"
+                                      : dropdownvalue == "Newest"
+                                          ? "createdAt"
+                                          : "name",
+                                  nearest: false,
+                                  fourPlusRating: false);
+                            });
+                          },
+                        ),
+                        Image.asset(
+                          AssetsConstant.arrowDown,
+                          height: 10,
+                          width: 10,
+                        ),
+                      ],
                     ),
-                    Row(
-                      children: List.generate(
-                        5,
-                        (index) => Container(
+                  ),
+                  Row(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            select = 1;
+                            _homeController.doGetHomeSalonList(
+                                homeService: atHome,
+                                serviceCategoryId: [],
+                                offset: 1,
+                                size: 50,
+                                lat: double.parse(SharedPrefs.readStringValue(
+                                    PrefConstants.latitude)),
+                                lng: double.parse(SharedPrefs.readStringValue(
+                                    PrefConstants.longitude)),
+                                orderBy: dropdownvalue == "Sort By"
+                                    ? "createdAt"
+                                    : dropdownvalue == "Newest"
+                                        ? "createdAt"
+                                        : "name",
+                                nearest: true,
+                                fourPlusRating: false);
+                          });
+                        },
+                        child: Container(
                           padding: const EdgeInsets.all(10),
                           margin: const EdgeInsets.all(5),
                           decoration: BoxDecoration(
+                            color: select == 1
+                                ? changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender))
+                                : ColorConstant.whiteColor,
                             borderRadius: BorderRadius.circular(6),
                             border: Border.all(
                                 color: ColorConstant.grayBorderColor, width: 1),
@@ -772,15 +845,63 @@ class _HomePageState extends State<HomePage> {
                             child: Text(
                               "Nearest",
                               style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.blackColor,
+                                  color: select == 1
+                                      ? ColorConstant.whiteColor
+                                      : ColorConstant.blackColor,
                                   fontSize: 13),
                             ),
                           ),
                         ),
                       ),
-                    )
-                  ],
-                ),
+                      InkWell(
+                        onTap: () {
+                          setState(() {
+                            select = 2;
+                            _homeController.doGetHomeSalonList(
+                                homeService: atHome,
+                                serviceCategoryId: [],
+                                offset: 1,
+                                size: 50,
+                                lat: double.parse(SharedPrefs.readStringValue(
+                                    PrefConstants.latitude)),
+                                lng: double.parse(SharedPrefs.readStringValue(
+                                    PrefConstants.longitude)),
+                                orderBy: dropdownvalue == "Sort By"
+                                    ? "createdAt"
+                                    : dropdownvalue == "Newest"
+                                        ? "createdAt"
+                                        : "name",
+                                nearest: false,
+                                fourPlusRating: true);
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          margin: const EdgeInsets.all(5),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6),
+                            color: select == 2
+                                ? changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender))
+                                : ColorConstant.whiteColor,
+                            border: Border.all(
+                                color: ColorConstant.grayBorderColor, width: 1),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Rating",
+                              style: AppTextTheme.medium.copyWith(
+                                  color: select == 2
+                                      ? ColorConstant.whiteColor
+                                      : ColorConstant.blackColor,
+                                  fontSize: 13),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
               ),
             ),
           ),
@@ -788,6 +909,10 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  /*------------------ DropDown  ------------*/
+  String dropdownvalue = 'Sort By';
+  var items = ['Sort By', 'Newest', 'Name'];
 
   /*--------------------- Current location lat lng --------------------- */
   getCurrentLatLng() async {
@@ -814,11 +939,14 @@ class _HomePageState extends State<HomePage> {
         );
         _homeController.doGetHomeSalonList(
             homeService: atHome,
+            serviceCategoryId: [],
             offset: 1,
             size: 50,
             lat: position.latitude,
             lng: position.longitude,
-            serviceCategoryId: []);
+            orderBy: "createdAt",
+            nearest: false,
+            fourPlusRating: false);
       });
     }).onPermanentlyDeniedCallback(() async {
       openAppSettings();
@@ -856,7 +984,10 @@ class _HomePageState extends State<HomePage> {
           offset: 1,
           size: 50,
           lat: position.latitude,
-          lng: position.longitude);
+          lng: position.longitude,
+          orderBy: "createdAt",
+          nearest: false,
+          fourPlusRating: false);
     }
 
     /*bool serviceEnabled = await Geolocator.isLocationServiceEnabled();

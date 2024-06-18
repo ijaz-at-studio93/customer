@@ -93,7 +93,7 @@ class _QRCodePageState extends State<QRCodePage> {
                         isCornerRounded: true,
                         padding: const EdgeInsets.all(23),
                         width: Get.width,
-                        height: Get.height * 0.6,
+                        height: Get.height * 0.65,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [

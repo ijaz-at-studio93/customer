@@ -1,14 +1,13 @@
 import 'dart:io';
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:sallon_customer/api/auth_api.dart';
 import 'package:sallon_customer/api/dio_client.dart';
+import 'package:sallon_customer/model/app_update_model.dart';
 import 'package:sallon_customer/model/otp_verify_model.dart';
+import 'package:sallon_customer/model/user_profile.dart';
 import 'package:sallon_customer/model/user_response_model.dart';
 import 'package:sallon_customer/page/auth/login_page.dart';
-
 import '../page/auth/create_profile_page.dart';
 import '../util/SharedPrefs.dart';
 
@@ -65,6 +64,32 @@ class AuthController extends GetxController {
   set setOtpVerifyModelResponseModel(val) =>
       _otpVerifyModelResponseModel.value = val;
 
+  /*-------------  App  Update -------------*/
+  final Rx<AppUpdateModel> _appUpdateModel = AppUpdateModel().obs;
+  AppUpdateModel get getAppUpdateModel => _appUpdateModel.value;
+  set setAppUpdateModel(val) => _appUpdateModel.value = val;
+
+  /*--------------  User Profile ---------------------*/
+  final Rx<UserProfile> _userProfile = UserProfile().obs;
+  UserProfile get getUserProfile => _userProfile.value;
+  set setUserProfile(val) => _userProfile.value = val;
+
+  /*--------------  User Profile -------------------*/
+  doGetProfile({required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      _userProfile.value = await AuthAPI.getUserProfile();
+
+      if (_userProfile.value.data?.id?.isNotEmpty ?? false) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
   /*------------ Do check Mobile Number registration--------*/
   doCheckMobileNumberRegistration(
       {required String mobileNo,
@@ -99,7 +124,7 @@ class AuthController extends GetxController {
     try {
       _showProgress.value = true;
       _userMessage.value = await AuthAPI.signUp(
-          mobileNO: mobileNO, name: name, cc: cc, email: email,gender: gender);
+          mobileNO: mobileNO, name: name, cc: cc, email: email, gender: gender);
       if (_userMessage.value == "Verification code sent") {
         callback.call();
       } else {
@@ -248,36 +273,12 @@ class AuthController extends GetxController {
     }
   }
 
-  /*-------------  Reset App ---------------*/
-  resetApp() async {
-    await SharedPrefs.writeValue(PrefConstants.gender, "0");
-    await SharedPrefs.writeValue(PrefConstants.isUserLogin, false);
-    await SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
-    Get.offAll(() => const LoginPage(splashPage: false));
-  }
-
-/*------ Store Map ------*/
-/*  final Rx<ModelName> _userResponseModel = ModelName().obs;
-  UserResponseModel get userResponseModel => _userResponseModel.value;
-  set setUser(usr) => _userResponseModel.value = usr;*/
-
-/*------ Store List ------*/
-/*final RxList<ModelName> _getCategoryList =
-      <ModelName>[].obs;
-  List<ModelName> get categoryList => _getCategoryList;*/
-
-/*Login API Calling and store user data SharedPrefs*/
-/* login(
-      {required String email,
-      required String password,
-      required VoidCallback callback}) async {
+  /*------------  App  Update ------------------*/
+  doAppUpdate({required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
-      _userResponseModel.value = await AuthAPI.doLogin(email, password);
-      await userDataStoreToSharedPrefs(_userResponseModel.value);
-      await getCategoryList();
-      */ /*Route Here*/ /*
-      if (_userResponseModel.value.emailAddress != "") {
+      _appUpdateModel.value = await AuthAPI.appUpdate();
+      if (_appUpdateModel.value.statusCode == 200) {
         callback.call();
       }
     } catch (e) {
@@ -285,50 +286,13 @@ class AuthController extends GetxController {
     } finally {
       _showProgress.value = false;
     }
-  }*/
-
-/*Store userDataStoreToSharedPrefs Data*/
-/*Future<void> userDataStoreToSharedPrefs(UserResponseModel model) async {
-    _userResponseModel.value = model;
-    debugPrint(model.toString());
-    if (model.token != null) {
-      debugPrint("AccessTOKEN1:${model.token ?? ''}");
-
-      await SharedPrefs.writeValue(PrefConstants.token, model.token);
-    }
-    await SharedPrefs.writeValue(PrefConstants.userModel, model.toJson());
-    await SharedPrefs.writeValue(PrefConstants.userId, model.id.toString());
-    await SharedPrefs.writeValue(PrefConstants.isUserLogin, true);
   }
-  */
 
-/*------------------ init User Data ------------------ */
-/*initUserData() async {
-    try {
-      _socialLoginProgress.value = true;
-      if (SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
-        */ /*user Profile Model*/ /*
-        _userResponseModel.value = await AuthAPI.getProfile();
-        userDataStoreToSharedPrefs(_userResponseModel.value);
-        await getCategoryList();
-        */ /*without Profile  api*/ /*
-        // debugPrint(_userResponseModel.value.token);
-        // _userResponseModel.value = UserResponseModel.fromJson(SharedPrefs.read(PrefConstants.userModel));
-        // userDataStoreToSharedPrefs(_userResponseModel.value);
-      }
-    } catch (e) {
-      debugPrint(e.toString());
-    } finally {
-      _socialLoginProgress.value = false;
-    }
-  }*/
-
-/*------------------- RestAPP --------------*/
-/* resetApp() async {
+  /*-------------  Reset App ---------------*/
+  resetApp() async {
+    await SharedPrefs.writeValue(PrefConstants.gender, "0");
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, false);
-    await SharedPrefs.writeValue(PrefConstants.isSocialLogin, false);
     await SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
-    await SharedPrefs.writeValue(PrefConstants.isRemember, false);
-    Get.offAll(() => const LoginPage());
-  }*/
+    Get.offAll(() => const LoginPage(splashPage: false));
+  }
 }

@@ -34,12 +34,16 @@ class _EditProfilePageState extends State<EditProfilePage> {
   @override
   void initState() {
     super.initState();
-    _nameTextEditingController.text =
-        _authController.userResponseModel.data?.userData?.name ?? "";
-    _mobileTextEditingController.text =
-        _authController.userResponseModel.data?.userData?.mobile ?? "";
-    _emailTextEditingController.text =
-        _authController.userResponseModel.data?.userData?.email ?? "";
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _authController.doGetProfile(callback: () {
+        _nameTextEditingController.text =
+            _authController.getUserProfile.data?.name ?? "";
+        _mobileTextEditingController.text =
+            _authController.getUserProfile.data?.mobile ?? "";
+        _emailTextEditingController.text =
+            _authController.getUserProfile.data?.email ?? "";
+      });
+    });
   }
 
   @override
@@ -91,7 +95,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 height: 100,
                                 fit: BoxFit.cover,
                                 imageUrl:
-                                    "${APIConstants.image}${_authController.userResponseModel.data?.userData?.profileImage ?? ""}",
+                                    "${APIConstants.image}${_authController.getUserProfile.data?.profileImage ?? ""}",
                                 placeholder: (context, url) => const Image(
                                   image: AssetImage(AssetsConstant.placeHolder),
                                   width: 100,
@@ -242,8 +246,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     controller: _mobileTextEditingController,
                     onChanged: (val) {
                       setState(() {
-                        if (_authController
-                                    .userResponseModel.data?.userData?.mobile !=
+                        if (_authController.getUserProfile.data?.mobile !=
                                 _mobileTextEditingController.text &&
                             _mobileTextEditingController.text.length == 10) {
                           isOtpEnable = true;
@@ -378,7 +381,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     } else if (_mobileTextEditingController.text.length != 10) {
       showMessage("Please enter 10 digit mobile number");
       return;
-    } else if (_authController.userResponseModel.data?.userData?.mobile !=
+    } else if (_authController.getUserProfile.data?.mobile !=
         _mobileTextEditingController.text) {
       if (_verificationCode.text.isEmpty) {
         showMessage("Please enter Otp");
@@ -390,7 +393,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         _authController.doEditProfile(
             name: _nameTextEditingController.text,
             email: _emailTextEditingController.text,
-            mobile: _authController.userResponseModel.data?.userData?.mobile !=
+            mobile: _authController.getUserProfile.data?.mobile !=
                     _mobileTextEditingController.text
                 ? _mobileTextEditingController.text
                 : "",
@@ -398,18 +401,17 @@ class _EditProfilePageState extends State<EditProfilePage> {
             verificationCode: _verificationCode.text,
             image: imagePath,
             callback: () {
-              setState(() {
-                _authController.initUserData();
+              _authController.doGetProfile(callback: () {
                 Get.back();
                 showMessage("Profile Update SuccessFully");
               });
-            });
+            }); 
       }
     } else {
       _authController.doEditProfile(
           name: _nameTextEditingController.text,
           email: _emailTextEditingController.text,
-          mobile: _authController.userResponseModel.data?.userData?.mobile !=
+          mobile: _authController.getUserProfile.data?.mobile !=
                   _mobileTextEditingController.text
               ? _mobileTextEditingController.text
               : "",
@@ -418,9 +420,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
           image: imagePath,
           callback: () {
             setState(() {
-              _authController.initUserData();
-              Get.back();
-              showMessage("Profile Update SuccessFully");
+              _authController.doGetProfile(callback: () {
+                Get.back();
+                showMessage("Profile Update SuccessFully");
+              });
             });
           });
     }

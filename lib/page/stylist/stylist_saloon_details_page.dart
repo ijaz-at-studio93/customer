@@ -1,23 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_image_stack/flutter_image_stack.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-
 import 'package:get/get.dart';
 import 'package:sallon_customer/constant/api_constant.dart';
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/appointment/appointment_booking_page.dart';
 import 'package:sallon_customer/page/stylist/widget/review_and_ratings_widget.dart';
 import 'package:sallon_customer/page/stylist/widget/service_offered_page.dart';
 import 'package:sallon_customer/page/stylist/widget/stylist_portfolio_gird_view.dart';
 import 'package:sallon_customer/project_specific/progressbar_view.dart';
-
 import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 import 'package:sallon_customer/util/SharedPrefs.dart';
-
 import '../../constant/assetsconstant.dart';
 
 class StylistSaloonDetailsPage extends StatefulWidget {

@@ -246,13 +246,17 @@ class HomeController extends GetxController {
   }
 
   /*------------------------- Do Get Home Salon List -------------*/
-  doGetHomeSalonList(
-      {required int offset,
-      required int size,
-      required double lat,
-      required List<String> serviceCategoryId,
-      required double lng,
-      required bool homeService}) async {
+  doGetHomeSalonList({
+    required int offset,
+    required int size,
+    required List<String> serviceCategoryId,
+    required double lat,
+    required double lng,
+    required String orderBy,
+    required bool nearest,
+    required bool fourPlusRating,
+    required bool homeService,
+  }) async {
     try {
       _showProgress.value = true;
       _homeSalonList.value = await HomeAPI.getSalonHome(
@@ -261,7 +265,10 @@ class HomeController extends GetxController {
           lat: lat,
           lng: lng,
           homeService: homeService,
-          serviceCategoryId: serviceCategoryId);
+          serviceCategoryId: serviceCategoryId,
+          fourPlusRating: fourPlusRating,
+          nearest: nearest,
+          orderBy: orderBy);
     } catch (e) {
       showError(e);
       logger.d("Do Get Home Salon List ${e.toString()}");
@@ -674,10 +681,10 @@ class HomeController extends GetxController {
   }
 
   /*---------------- Get Blog Data ----------------*/
-  doGetBlogData() async {
+  doGetBlogData({required double lat, required double lng}) async {
     try {
       _showProgress.value = true;
-      _blogDataModel.value = await HomeAPI.getBlogData();
+      _blogDataModel.value = await HomeAPI.getBlogData(lat: lat, lng: lng);
     } catch (e) {
       showError(e);
       logger.d(e);

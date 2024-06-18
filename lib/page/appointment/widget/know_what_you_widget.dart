@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
+
 import 'package:sallon_customer/constant/color_constant.dart';
 import 'package:sallon_customer/constant/variable_constant.dart';
 import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
-import 'package:sallon_customer/project_specific/edit_product_button_widget.dart';
+
 import 'package:sallon_customer/project_specific/remove_button_widget.dart';
 import 'package:sallon_customer/project_specific/text_theme.dart';
 
