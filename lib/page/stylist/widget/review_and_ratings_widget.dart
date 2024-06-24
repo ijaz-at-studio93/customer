@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/model/artiest_portfolio_model.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/model/artiest_portfolio_model.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
 
 class ReviewAndRating extends StatefulWidget {
   final ArtiestPortfolio artiestPortfolio;

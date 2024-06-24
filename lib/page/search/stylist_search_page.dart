@@ -1,20 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/page/search/widget/stylist_list_tile_widget.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/search/widget/stylist_list_tile_widget.dart';
+import 'package:salon_customer/project_specific/progressbar_view.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
 
 import '../../constant/assetsconstant.dart';
 import '../../constant/color_constant.dart';
+import '../../model/artist_search_model.dart';
+import '../stylist/stylist_saloon_details_page.dart';
 
 class StylistSearchPage extends StatefulWidget {
-  const StylistSearchPage({super.key});
+  final String salonId;
+
+  const StylistSearchPage({
+    super.key,
+    required this.salonId,
+  });
 
   @override
   State<StylistSearchPage> createState() => _StylistSearchPageState();
 }
 
 class _StylistSearchPageState extends State<StylistSearchPage> {
+  final _homeController = Get.find<HomeController>();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _homeController.doGetSearchArtiest(salonId: widget.salonId, q: "");
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,32 +55,62 @@ class _StylistSearchPageState extends State<StylistSearchPage> {
       body: Column(
         children: [
           _searchTextField(),
-          const SizedBox(height: 2),
-          _stylistFoundWidget(),
-          Expanded(
-              child: ListView.separated(
-                  separatorBuilder: (context, index) {
-                    return Column(
-                      children: [
-                        const SizedBox(height: 15),
-                        Container(
-                          height: 1,
-                          width: Get.width,
-                          color: ColorConstant.dividerColor,
-                        ),
-                        const SizedBox(height: 15),
-                      ],
-                    );
-                  },
-                  itemCount: 15,
-                  shrinkWrap: true,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                  itemBuilder: (context, index) {
-                    return StylistListTileWidget(
-                      onPress: () {},
-                    );
-                  }))
+          Obx(
+            () => Expanded(
+                child: _homeController.showProgress
+                    ? const ProgressBarView()
+                    : _homeController.getArtistSearchModel.data?.isEmpty ??
+                            false
+                        ? const NoItemsWidget(
+                            text: "Search Artiest Not Found",
+                          )
+                        : ListView.separated(
+                            separatorBuilder: (context, index) {
+                              return Column(
+                                children: [
+                                  const SizedBox(height: 15),
+                                  Container(
+                                    height: 1,
+                                    width: Get.width,
+                                    color: ColorConstant.dividerColor,
+                                  ),
+                                  const SizedBox(height: 15),
+                                ],
+                              );
+                            },
+                            itemCount: _homeController
+                                    .getArtistSearchModel.data?.length ??
+                                0,
+                            shrinkWrap: true,
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 20),
+                            itemBuilder: (context, index) {
+                              return StylistListTileWidget(
+                                image: _homeController.getArtistSearchModel
+                                        .data?[index].item?.profileImage ??
+                                    "",
+                                name: _homeController.getArtistSearchModel
+                                        .data?[index].item?.name ??
+                                    "",
+                                rating: _homeController.getArtistSearchModel
+                                        .data?[index].item?.rating ??
+                                    0.0,
+                                review: _homeController.getArtistSearchModel
+                                        .data?[index].item?.reviewCount ??
+                                    0,
+                                onPress: () {
+                                  Get.to(() => StylistSaloonDetailsPage(
+                                        artiestId: _homeController
+                                                .getArtistSearchModel
+                                                .data?[index]
+                                                .item
+                                                ?.id ??
+                                            "",
+                                      ));
+                                },
+                              );
+                            })),
+          )
         ],
       ),
     );
@@ -108,11 +158,21 @@ class _StylistSearchPageState extends State<StylistSearchPage> {
                 SizedBox(
                   width: Get.width * 0.8,
                   child: TextField(
+                    textInputAction: TextInputAction.search,
+                    onSubmitted: (val) {
+                      if (val.isEmpty) {
+                        _homeController.doGetSearchArtiest(
+                            salonId: widget.salonId, q: "");
+                      } else {
+                        _homeController.doGetSearchArtiest(
+                            salonId: widget.salonId, q: val);
+                      }
+                    },
                     style: AppTextTheme.medium.copyWith(
                         color: ColorConstant.blackColor, fontSize: 14),
                     decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: "Search For saloon Service or stylist",
+                        hintText: "Search For stylist",
                         hintStyle: AppTextTheme.medium.copyWith(
                             color: ColorConstant.grayTextColor, fontSize: 13)),
                   ),
@@ -138,7 +198,7 @@ class _StylistSearchPageState extends State<StylistSearchPage> {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Text(
-              "24 Stylist Found",
+              "${_homeController.getArtistSearchModel.data?.length} Stylist Found",
               style: AppTextTheme.bold
                   .copyWith(fontSize: 16, color: ColorConstant.blackColor),
             ),
@@ -151,70 +211,6 @@ class _StylistSearchPageState extends State<StylistSearchPage> {
                 length: Get.width * 0.9,
                 dashLength: 3,
                 dashColor: ColorConstant.grayColor),
-          ),
-          const SizedBox(height: 20),
-          SizedBox(
-            height: 50,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  children: [
-                    Container(
-                      width: Get.width * 0.3,
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                              color: ColorConstant.grayBorderColor, width: 1)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Image.asset(
-                            AssetsConstant.filter,
-                            height: 14,
-                            width: 14,
-                          ),
-                          Text(
-                            "Sort By",
-                            style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.blackColor, fontSize: 13),
-                          ),
-                          Image.asset(
-                            AssetsConstant.arrowDown,
-                            height: 10,
-                            width: 10,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Row(
-                      children: List.generate(
-                        5,
-                        (index) => Container(
-                          padding: const EdgeInsets.all(10),
-                          margin: const EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                                color: ColorConstant.grayBorderColor, width: 1),
-                          ),
-                          child: Center(
-                            child: Text(
-                              "Highest Rating",
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.blackColor,
-                                  fontSize: 13),
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-            ),
           ),
         ],
       ),

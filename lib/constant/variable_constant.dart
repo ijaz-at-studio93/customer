@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
 
 const double fixPadding = 10.0;
 

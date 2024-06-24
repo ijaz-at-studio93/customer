@@ -4,11 +4,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/controller/auth_controller.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/controller/auth_controller.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 class GoogleMapGetLocation extends StatefulWidget {
   final VoidCallback callback;

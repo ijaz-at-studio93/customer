@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
-import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/NoItemsWidget.dart';
-import 'package:sallon_customer/util/logger.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/model/cart/service_add_cart_model.dart';
+import 'package:salon_customer/project_specific/ProgressContainerView.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/util/logger.dart';
 import 'custom_list_tile_widget.dart';
 
 class CustomizedSheetWidget extends StatefulWidget {

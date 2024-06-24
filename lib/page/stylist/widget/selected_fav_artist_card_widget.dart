@@ -1,14 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/model/artiest_list_model.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/model/artiest_list_model.dart';
 
-import 'package:sallon_customer/project_specific/remove_button_widget.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/project_specific/remove_button_widget.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 import '../../../project_specific/text_theme.dart';
 import '../stylist_saloon_details_page.dart';

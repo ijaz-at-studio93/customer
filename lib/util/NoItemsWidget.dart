@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 class NoItemsWidget extends StatelessWidget {
   final String? text;

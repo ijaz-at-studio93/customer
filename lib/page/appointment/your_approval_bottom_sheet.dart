@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/page/appointment/qr_page.dart';
+import 'package:salon_customer/page/appointment/qr_page.dart';
 
-import 'package:sallon_customer/project_specific/button_widget.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/project_specific/button_widget.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/color_constant.dart';
 import '../../constant/variable_constant.dart';
 import '../../controller/home_controller.dart';

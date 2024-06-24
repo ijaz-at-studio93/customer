@@ -1,4 +1,4 @@
-# sallon_customer
+# salon_customer
 
 A new Flutter project.
 

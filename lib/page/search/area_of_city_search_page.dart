@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/home/saloon_after_selecting_page.dart';
-import 'package:sallon_customer/page/search/widget/location_title_widget.dart';
-import 'package:sallon_customer/project_specific/progressbar_view.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/NoItemsWidget.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/home/saloon_after_selecting_page.dart';
+import 'package:salon_customer/page/search/widget/location_title_widget.dart';
+import 'package:salon_customer/project_specific/progressbar_view.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 class AreaOfCitySearchPage extends StatefulWidget {
   const AreaOfCitySearchPage({super.key});

@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 import '../../../model/booking_history_list_model.dart';
 
@@ -140,7 +142,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
           ),
           const SizedBox(height: 20),
           Text(
-            "Item",
+            "Service",
             style: AppTextTheme.medium
                 .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
           ),
@@ -153,7 +155,8 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                 labelStyle: AppTextTheme.medium
                     .copyWith(color: ColorConstant.whiteColor, fontSize: 13),
                 label:   Text(widget.historyList.items?[index].service?.name ?? "")  ,
-                backgroundColor: ColorConstant.primaryColor,
+                backgroundColor: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)),
                 onSelected: (bool value) {},
               ) :  const SizedBox(),
             ),

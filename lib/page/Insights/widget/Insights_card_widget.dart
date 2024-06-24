@@ -3,12 +3,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
 
-import 'package:sallon_customer/model/blog_data_model.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/model/blog_data_model.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
 
 class InsightsCardWidget extends StatefulWidget {
   final VoidCallback onPress;

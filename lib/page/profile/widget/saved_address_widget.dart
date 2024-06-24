@@ -1,11 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/model/save_address_model.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/get_location_page.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/model/save_address_model.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/get_location_page.dart';
 
 import '../../../project_specific/remove_and_add_service_dialog.dart';
 

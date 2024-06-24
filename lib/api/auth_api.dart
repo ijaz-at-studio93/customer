@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:mime/mime.dart';
 import 'package:dio/dio.dart';
-import 'package:sallon_customer/model/app_update_model.dart';
-import 'package:sallon_customer/model/user_profile.dart';
-import 'package:sallon_customer/model/user_response_model.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/model/app_update_model.dart';
+import 'package:salon_customer/model/user_profile.dart';
+import 'package:salon_customer/model/user_response_model.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:http_parser/http_parser.dart';
 import '../model/otp_verify_model.dart';
 import 'dio_client.dart';

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/page/Insights/Insights_home_page.dart';
-import 'package:sallon_customer/page/booking/booking_home_page.dart';
-import 'package:sallon_customer/page/home/home_page.dart';
-import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/page/Insights/Insights_home_page.dart';
+import 'package:salon_customer/page/booking/booking_home_page.dart';
+import 'package:salon_customer/page/home/home_page.dart';
+import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
 
 import '../constant/variable_constant.dart';
 import '../util/SharedPrefs.dart';

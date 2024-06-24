@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/stylist/widget/selected_fav_artist_card_widget.dart';
-import 'package:sallon_customer/project_specific/progressbar_view.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/stylist/widget/selected_fav_artist_card_widget.dart';
+import 'package:salon_customer/project_specific/progressbar_view.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
 
 import '../../constant/assetsconstant.dart';
 

@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/model/artiest_portfolio_model.dart';
-import 'package:sallon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/model/artiest_portfolio_model.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
 
 class StylistPortfolioGridview extends StatefulWidget {
   final ArtiestPortfolio artiestPortfolio;

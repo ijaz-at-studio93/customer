@@ -2,17 +2,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/stylist/widget/review_and_ratings_widget.dart';
-import 'package:sallon_customer/page/stylist/widget/service_offered_page.dart';
-import 'package:sallon_customer/page/stylist/widget/stylist_portfolio_gird_view.dart';
-import 'package:sallon_customer/project_specific/progressbar_view.dart';
-import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/stylist/widget/review_and_ratings_widget.dart';
+import 'package:salon_customer/page/stylist/widget/service_offered_page.dart';
+import 'package:salon_customer/page/stylist/widget/stylist_portfolio_gird_view.dart';
+import 'package:salon_customer/project_specific/progressbar_view.dart';
+import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/assetsconstant.dart';
 
 class StylistSaloonDetailsPage extends StatefulWidget {
@@ -221,39 +221,164 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
       children: [
         SizedBox(height: Get.height * 0.07),
         Text(
-          _homeController.getArtiestDetailsModel.data?.name ?? "",
+          "Basic Information",
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
-        const SizedBox(height: 5),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Column(
           children: [
-            RatingBar.builder(
-              initialRating:
-                  _homeController.getArtiestDetailsModel.data?.rating ?? 0.0,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: true,
-              itemCount: 5,
-              itemSize: 25.0,
-              ignoreGestures: true,
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
-                    ColorConstant.primaryColor,
-                size: 25,
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.person,
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                        size: 20),
+                    const SizedBox(width: 5),
+                    Text(
+                      _homeController.getArtiestDetailsModel.data?.name ?? "",
+                      style: AppTextTheme.bold
+                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
+                    ),
+                  ],
+                ),
               ),
-              onRatingUpdate: (rating) {},
             ),
-            Text(
-              "(${_homeController.getArtiestDetailsModel.data?.reviewCount ?? 0} Reviews)",
-              style: AppTextTheme.medium
-                  .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.email,
+                        size: 20,
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender))),
+                    const SizedBox(width: 5),
+                    Text(
+                      _homeController.getArtiestDetailsModel.data?.email ?? "",
+                      style: AppTextTheme.bold
+                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.phone,
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                        size: 20),
+                    const SizedBox(width: 5),
+                    Text(
+                      "+91 ${_homeController.getArtiestDetailsModel.data?.mobile ?? ""}",
+                      style: AppTextTheme.bold
+                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_month,
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                        size: 20),
+                    const SizedBox(width: 5),
+                    Text(
+                      "+91 ${_homeController.getArtiestDetailsModel.data?.dob ?? ""}",
+                      style: AppTextTheme.bold
+                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.local_laundry_service_sharp,
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                        size: 20),
+                    const SizedBox(width: 5),
+                    Text(
+                      "${_homeController.getArtiestDetailsModel.data?.experience ?? ""} year",
+                      style: AppTextTheme.bold
+                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    Icon(Icons.home,
+                        color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                        size: 20),
+                    const SizedBox(width: 5),
+                    Text(
+                      _homeController.getArtiestDetailsModel.data?.homeService ==
+                              true
+                          ? "Home Service Available"
+                          : "Only Salon Service",
+                      style: AppTextTheme.bold
+                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
-        )
+        ),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                RatingBar.builder(
+                  initialRating:
+                      _homeController.getArtiestDetailsModel.data?.rating ?? 0.0,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  itemCount: 5,
+                  itemSize: 25.0,
+                  ignoreGestures: true,
+                  itemBuilder: (context, _) => Icon(
+                    Icons.star,
+                    color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
+                    size: 25,
+                  ),
+                  onRatingUpdate: (rating) {},
+                ),
+                Text(
+                  "(${_homeController.getArtiestDetailsModel.data?.reviewCount ?? 0} Reviews)",
+                  style: AppTextTheme.medium
+                      .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
+                ),
+              ],
+            ),
+          ),
+        ),
       ],
     );
   }

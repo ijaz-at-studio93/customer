@@ -1,7 +1,7 @@
-import 'package:sallon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
 import 'package:flutter/material.dart';
-import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 class ProgressBarView extends StatelessWidget {
   const ProgressBarView({super.key});

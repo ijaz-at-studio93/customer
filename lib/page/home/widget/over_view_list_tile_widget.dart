@@ -4,15 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/model/category_service_list_model.dart';
-import 'package:sallon_customer/project_specific/add_button_widget.dart';
-import 'package:sallon_customer/project_specific/remove_button_widget.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/model/category_service_list_model.dart';
+import 'package:salon_customer/project_specific/add_button_widget.dart';
+import 'package:salon_customer/project_specific/remove_button_widget.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 class OverviewListTileWidget extends StatefulWidget {
   final Services servicesList;

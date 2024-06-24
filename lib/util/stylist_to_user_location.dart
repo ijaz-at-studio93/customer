@@ -7,7 +7,7 @@ import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-import 'package:sallon_customer/util/logger.dart';
+import 'package:salon_customer/util/logger.dart';
 import '../api/dio_client.dart';
 import '../constant/assetsconstant.dart';
 import '../constant/color_constant.dart';

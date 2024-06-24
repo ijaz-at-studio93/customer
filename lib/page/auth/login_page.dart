@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/controller/auth_controller.dart';
-import 'package:sallon_customer/page/auth/otp_screen_page.dart';
-import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
-import 'package:sallon_customer/project_specific/button_widget.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/controller/auth_controller.dart';
+import 'package:salon_customer/page/auth/otp_screen_page.dart';
+import 'package:salon_customer/project_specific/ProgressContainerView.dart';
+import 'package:salon_customer/project_specific/button_widget.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 class LoginPage extends StatefulWidget {
   final bool splashPage;

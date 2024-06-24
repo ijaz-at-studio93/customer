@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
 
 import '../constant/assetsconstant.dart';
 import '../constant/color_constant.dart';

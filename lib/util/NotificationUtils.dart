@@ -1,6 +1,9 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+
+final _homeController = Get.find<HomeController>();
 
 class NotificationUtils {
   static handleNotificationOnForeground(RemoteMessage remoteMessage) async {
@@ -9,7 +12,7 @@ class NotificationUtils {
       String message =
           remoteMessage.data['message'] ?? "You have a new notification";
       debugPrint('Notification $remoteMessage');
-
+      _homeController.doGetCurrentBookingListData();
       // FlutterRingtonePlayer.playNotification();
       Get.snackbar(title, message,
           snackPosition: SnackPosition.TOP,

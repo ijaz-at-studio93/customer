@@ -1,13 +1,13 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/api/auth_api.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/model/app_update_model.dart';
-import 'package:sallon_customer/model/otp_verify_model.dart';
-import 'package:sallon_customer/model/user_profile.dart';
-import 'package:sallon_customer/model/user_response_model.dart';
-import 'package:sallon_customer/page/auth/login_page.dart';
+import 'package:salon_customer/api/auth_api.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/model/app_update_model.dart';
+import 'package:salon_customer/model/otp_verify_model.dart';
+import 'package:salon_customer/model/user_profile.dart';
+import 'package:salon_customer/model/user_response_model.dart';
+import 'package:salon_customer/page/auth/login_page.dart';
 import '../page/auth/create_profile_page.dart';
 import '../util/SharedPrefs.dart';
 

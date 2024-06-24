@@ -1,19 +1,19 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/controller/auth_controller.dart';
-import 'package:sallon_customer/page/profile/add_address_page.dart';
-import 'package:sallon_customer/page/profile/edit_profile_page.dart';
-import 'package:sallon_customer/page/profile/favourite_salon_page.dart';
-import 'package:sallon_customer/page/profile/review_rating_page.dart';
-import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
-import 'package:sallon_customer/project_specific/log_out_dialog.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/controller/auth_controller.dart';
+import 'package:salon_customer/page/profile/add_address_page.dart';
+import 'package:salon_customer/page/profile/edit_profile_page.dart';
+import 'package:salon_customer/page/profile/favourite_salon_page.dart';
+import 'package:salon_customer/page/profile/review_rating_page.dart';
+import 'package:salon_customer/project_specific/ProgressContainerView.dart';
+import 'package:salon_customer/project_specific/log_out_dialog.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 import 'about_app_page.dart';
 

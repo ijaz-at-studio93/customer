@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/model/salon_details_artiest.dart';
-import 'package:sallon_customer/project_specific/remove_button_widget.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/model/salon_details_artiest.dart';
+import 'package:salon_customer/project_specific/remove_button_widget.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
 import '../../../constant/api_constant.dart';
 import '../../../constant/variable_constant.dart';
 import '../../../util/SharedPrefs.dart';
@@ -68,7 +68,7 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                     ),
                   ),
                 ),
-                Positioned(
+              /*  Positioned(
                   top: 10,
                   left: 12,
                   child: Container(
@@ -85,7 +85,7 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                       ),
                     ),
                   ),
-                )
+                )*/
               ],
             ),
             Padding(
@@ -163,7 +163,7 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                 Get.to(() => StylistSaloonDetailsPage(
                       artiestId: widget.salonArtiestListModel.id ?? "",
                     ));
-                /*Get.to(() => const AboutStylistPage());*/
+
               },
               child: Text(
                 "View Profile",

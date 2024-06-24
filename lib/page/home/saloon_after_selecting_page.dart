@@ -6,20 +6,20 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
 import 'package:readmore/readmore.dart';
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/variable_constant.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/home/widget/customized_sheet_widget.dart';
-import 'package:sallon_customer/page/home/widget/over_view_list_tile_widget.dart';
-import 'package:sallon_customer/page/home/widget/stylist_list_grid_widget.dart';
-import 'package:sallon_customer/page/stylist/selecting_artist_bottom_sheet.dart';
-import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
-import 'package:sallon_customer/project_specific/remove_and_add_service_dialog.dart';
-import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
-import 'package:sallon_customer/util/NoItemsWidget.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
-import 'package:sallon_customer/util/stylist_to_user_location.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/home/widget/customized_sheet_widget.dart';
+import 'package:salon_customer/page/home/widget/over_view_list_tile_widget.dart';
+import 'package:salon_customer/page/home/widget/stylist_list_grid_widget.dart';
+import 'package:salon_customer/page/stylist/selecting_artist_bottom_sheet.dart';
+import 'package:salon_customer/project_specific/ProgressContainerView.dart';
+import 'package:salon_customer/project_specific/remove_and_add_service_dialog.dart';
+import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/util/stylist_to_user_location.dart';
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
 import '../appointment/appointment_booking_page.dart';
@@ -336,6 +336,9 @@ class _SaloonAfterSelectingServicesPageState
                                           AssetsConstant.arrowUpIcon,
                                           height: 8,
                                           width: 11,
+                                          color: changeTheme(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.gender)),
                                         )
                                       ],
                                     ),
@@ -376,7 +379,6 @@ class _SaloonAfterSelectingServicesPageState
                                       );
                                     });
                               }
-
                             },
                             child: Container(
                               height: 45,
@@ -439,9 +441,10 @@ class _SaloonAfterSelectingServicesPageState
                                     });
                                   });
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               CupertinoIcons.xmark_circle_fill,
-                              color: ColorConstant.primaryColor,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)),
                             ),
                           ),
                         ],
@@ -536,7 +539,9 @@ class _SaloonAfterSelectingServicesPageState
                   buttonWidget(
                     imageUrl: AssetsConstant.iconSearch,
                     onPress: () {
-                      Get.to(() => const StylistSearchPage());
+                      Get.to(() => StylistSearchPage(
+                            salonId: widget.id,
+                          ));
                     },
                     h: 24,
                     w: 24,
@@ -677,7 +682,8 @@ class _SaloonAfterSelectingServicesPageState
                     .copyWith(color: ColorConstant.whiteColor, fontSize: 13),
                 label: Text(
                     "${_homeController.homeSalonDetailsData.data?.serviceCategories?[index].name}"),
-                backgroundColor: ColorConstant.primaryColor,
+                backgroundColor: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)),
                 onSelected: (bool value) {},
               ),
             ),

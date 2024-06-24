@@ -3,29 +3,31 @@ import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/api/home_api.dart';
-import 'package:sallon_customer/model/artiest_list_model.dart';
-import 'package:sallon_customer/model/artiest_portfolio_model.dart';
-import 'package:sallon_customer/model/availabilities_time_sloat_model.dart';
-import 'package:sallon_customer/model/blog_data_model.dart';
-import 'package:sallon_customer/model/booking_history_list_model.dart';
-import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
-import 'package:sallon_customer/model/category_service_list_model.dart';
-import 'package:sallon_customer/model/create_booking_appoiment_model.dart';
-import 'package:sallon_customer/model/current_booking_list_model.dart';
-import 'package:sallon_customer/model/favourite_salon_list_data_model.dart';
-import 'package:sallon_customer/model/home_category_list_model.dart';
-import 'package:sallon_customer/model/home_salon_list_model.dart';
-import 'package:sallon_customer/model/review_list_data_model.dart';
-import 'package:sallon_customer/model/review_rating_data_model.dart';
-import 'package:sallon_customer/model/salon_details_artiest.dart';
-import 'package:sallon_customer/model/salon_details_model.dart';
-import 'package:sallon_customer/model/save_address_model.dart';
-import 'package:sallon_customer/model/search_model/search_model.dart';
-import 'package:sallon_customer/model/un_available_dates_model.dart';
-import 'package:sallon_customer/model/user_booking_qr_code_model.dart';
-import 'package:sallon_customer/util/logger.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/api/home_api.dart';
+import 'package:salon_customer/model/artiest_list_model.dart';
+import 'package:salon_customer/model/artiest_portfolio_model.dart';
+import 'package:salon_customer/model/artist_search_model.dart';
+import 'package:salon_customer/model/availabilities_time_sloat_model.dart';
+import 'package:salon_customer/model/blog_data_model.dart';
+import 'package:salon_customer/model/booking_history_list_model.dart';
+import 'package:salon_customer/model/cart/order_id_model.dart';
+import 'package:salon_customer/model/cart/service_add_cart_model.dart';
+import 'package:salon_customer/model/category_service_list_model.dart';
+import 'package:salon_customer/model/create_booking_appoiment_model.dart';
+import 'package:salon_customer/model/current_booking_list_model.dart';
+import 'package:salon_customer/model/favourite_salon_list_data_model.dart';
+import 'package:salon_customer/model/home_category_list_model.dart';
+import 'package:salon_customer/model/home_salon_list_model.dart';
+import 'package:salon_customer/model/review_list_data_model.dart';
+import 'package:salon_customer/model/review_rating_data_model.dart';
+import 'package:salon_customer/model/salon_details_artiest.dart';
+import 'package:salon_customer/model/salon_details_model.dart';
+import 'package:salon_customer/model/save_address_model.dart';
+import 'package:salon_customer/model/search_model/search_model.dart';
+import 'package:salon_customer/model/un_available_dates_model.dart';
+import 'package:salon_customer/model/user_booking_qr_code_model.dart';
+import 'package:salon_customer/util/logger.dart';
 
 class HomeController extends GetxController {
   /*>>>>>>>>>>>>>>>>>>>> Loader <<<<<<<<<<<<<<<<<<<<<*/
@@ -166,6 +168,16 @@ class HomeController extends GetxController {
   final Rx<SaveAddressModel> _saveAddressModel = SaveAddressModel().obs;
   SaveAddressModel get getSaveAddressModel => _saveAddressModel.value;
   set setSaveAddressModel(val) => _saveAddressModel.value = val;
+
+  /*----------------  Artiest  Search ---------------*/
+  final Rx<ArtistSearchModel> _artistSearchModel = ArtistSearchModel().obs;
+  ArtistSearchModel get getArtistSearchModel => _artistSearchModel.value;
+  set setArtistSearchModel(val) => _artistSearchModel.value = val;
+
+  /*--------------  get  Order Id -----------*/
+  final Rx<OrderIdModel> _orderIdModel = OrderIdModel().obs;
+  OrderIdModel get getOrderIdModel => _orderIdModel.value;
+  set setOrderIdModel(val) => _orderIdModel.value = val;
 
   /*-------------  category Id  -----------------*/
   final RxList categoryId = [].obs;
@@ -559,6 +571,18 @@ class HomeController extends GetxController {
     }
   }
 
+  /*-------------  Get Order Id Model ---------------*/
+  doGetOrderId() async {
+    try {
+      _showProgress.value = true;
+      _orderIdModel.value = await HomeAPI.orderIdGet();
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
   /*----------------------------  Upload PortFolio --------------------*/
   doUploadPortFolio(
       {required String appointmentId, required bool isUpload}) async {
@@ -778,6 +802,19 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _saveAddressModel.value = await HomeAPI.getSaveAddressUser();
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*------------------ Search  Artiest ------------------*/
+  doGetSearchArtiest({required String salonId, required String q}) async {
+    try {
+      _showProgress.value = true;
+      _artistSearchModel.value =
+          await HomeAPI.searchArtiest(salonId: salonId, q: q);
     } catch (e) {
       showError(e);
     } finally {

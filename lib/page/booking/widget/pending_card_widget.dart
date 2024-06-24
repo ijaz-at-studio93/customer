@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:sallon_customer/model/current_booking_list_model.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/model/current_booking_list_model.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../../constant/color_constant.dart';
 
 class PendingCardWidget extends StatefulWidget {
@@ -38,7 +40,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                         .copyWith(color: ColorConstant.idColor, fontSize: 16),
                   ),
                   Text(
-                   widget.bookingData.idx ?? "",
+                    widget.bookingData.idx ?? "",
                     style: AppTextTheme.bold.copyWith(
                         color: ColorConstant.blackColor, fontSize: 16),
                   ),
@@ -111,7 +113,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
           ),
           const SizedBox(height: 20),
           Text(
-            "Item",
+            "Service",
             style: AppTextTheme.medium
                 .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
           ),
@@ -120,13 +122,17 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
             runSpacing: 4.0, // gap between lines
             children: List.generate(
               widget.bookingData.items?.length ?? 0,
-              (index) =>   widget.bookingData.items?[index].isService  ??  false ?  FilterChip(
-                labelStyle: AppTextTheme.medium
-                    .copyWith(color: ColorConstant.whiteColor, fontSize: 13),
-                label:   Text(widget.bookingData.items?[index].service?.name ?? "")  ,
-                backgroundColor: ColorConstant.primaryColor,
-                onSelected: (bool value) {},
-              ) :  const SizedBox(),
+              (index) => widget.bookingData.items?[index].isService ?? false
+                  ? FilterChip(
+                      labelStyle: AppTextTheme.medium.copyWith(
+                          color: ColorConstant.whiteColor, fontSize: 13),
+                      label: Text(
+                          widget.bookingData.items?[index].service?.name ?? ""),
+                backgroundColor: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)),
+                      onSelected: (bool value) {},
+                    )
+                  : const SizedBox(),
             ),
           ),
           const SizedBox(height: 10),

@@ -2,14 +2,14 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/model/review_list_data_model.dart';
-import 'package:sallon_customer/project_specific/button_widget.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/model/review_list_data_model.dart';
+import 'package:salon_customer/project_specific/button_widget.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
 
 class ProductRatingListTile extends StatefulWidget {
   final Products products;

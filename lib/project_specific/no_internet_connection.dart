@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/project_specific/button_widget.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/project_specific/button_widget.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
 
 class NoInternetConnection extends StatefulWidget {
   const NoInternetConnection({super.key});

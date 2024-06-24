@@ -3,7 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import 'package:get/get.dart' hide Response;
-import 'package:sallon_customer/project_specific/no_internet_connection.dart';
+import 'package:salon_customer/project_specific/no_internet_connection.dart';
 
 import '../controller/auth_controller.dart';
 import 'dio_connectivity_request_retrier.dart';

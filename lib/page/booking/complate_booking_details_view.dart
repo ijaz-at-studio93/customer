@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/booking/widget/product_rating_list_tile.dart';
-import 'package:sallon_customer/page/booking/widget/service_rating_list_tile.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/booking/widget/product_rating_list_tile.dart';
+import 'package:salon_customer/page/booking/widget/service_rating_list_tile.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
 import '../../project_specific/progressbar_view.dart';
 import 'widget/artist_rating_list_tile.dart';
 

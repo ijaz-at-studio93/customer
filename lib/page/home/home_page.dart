@@ -7,21 +7,21 @@ import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/assetsconstant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/controller/auth_controller.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/home/saloon_after_selecting_page.dart';
-import 'package:sallon_customer/page/home/widget/menu_dialog_widget.dart';
-import 'package:sallon_customer/page/home/widget/saloon_card_widget.dart';
-import 'package:sallon_customer/page/location/google_map.dart';
-import 'package:sallon_customer/project_specific/ProgressContainerView.dart';
-import 'package:sallon_customer/project_specific/status_bar_color_appbar.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
-import 'package:sallon_customer/util/NoItemsWidget.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/controller/auth_controller.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/home/saloon_after_selecting_page.dart';
+import 'package:salon_customer/page/home/widget/menu_dialog_widget.dart';
+import 'package:salon_customer/page/home/widget/saloon_card_widget.dart';
+import 'package:salon_customer/page/location/google_map.dart';
+import 'package:salon_customer/project_specific/ProgressContainerView.dart';
+import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/variable_constant.dart';
 import '../../util/logger.dart';
 import '../profile/profile_page.dart';
@@ -40,29 +40,19 @@ class _HomePageState extends State<HomePage> {
   final _authController = Get.find<AuthController>();
   final _homeController = Get.find<HomeController>();
 
-  ScrollController scrollController = ScrollController();
-
   @override
   void initState() {
     super.initState();
     getCurrentLatLng();
     if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
       _selectedGender = 0;
-    }
-    if (SharedPrefs.readStringValue(PrefConstants.gender) == "0") {
-      _selectedGender = 0;
     } else {
-      _selectedGender = 1;
-    }
-
-    /* scrollController.addListener(() {
-      if (_homeController.lat != 0.0 && _homeController.lng != 0.0) {
-        if (scrollController.position.pixels ==
-            scrollController.position.maxScrollExtent) {
-          _homeController.fetchPosts();
-        }
+      if (SharedPrefs.readStringValue(PrefConstants.gender) == "0") {
+        _selectedGender = 0;
+      } else {
+        _selectedGender = 1;
       }
-    });*/
+    }
   }
 
   @override
@@ -74,7 +64,6 @@ class _HomePageState extends State<HomePage> {
         () => ProgressContainerView(
           isProgressRunning: _homeController.showProgress,
           child: ListView(
-            controller: scrollController,
             shrinkWrap: true,
             children: [
               _headerWidget(),
@@ -83,35 +72,9 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 10),
               _ourService(),
               const SizedBox(height: 15),
-              /*  _offer(),
-              const SizedBox(height: 10),*/
               _saloonsFoundNear(),
-              /*   ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _homeController.salonList.length +
-                    (_homeController.isLoading.value ? 1 : 0),
-                itemBuilder: (context, index) {
-                  if (index == _homeController.salonList.length) {
-                    return const ProgressBarView();
-                  }
-                  return SaloonCardWidget(
-                    isFav: false,
-                    homeSalonModel: _homeController.salonList[index],
-                    onPress: () {
-                      Get.to(
-                        () => SaloonAfterSelectingServicesPage(
-                          salonId: _homeController.salonList[index].id ?? "",
-                        ),
-                      );
-                    },
-                  );
-                },
-              )*/
               _homeController.getHomeSalonList.data?.rows?.isEmpty ?? false
-                  ? const NoItemsWidget(
-                      text: "No Salon Found",
-                    )
+                  ? const NoItemsWidget(text: "No Salon Found")
                   : ListView.builder(
                       padding: EdgeInsets.zero,
                       physics: const NeverScrollableScrollPhysics(),
@@ -274,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                               PrefConstants.latitude)),
                           lng: double.parse(SharedPrefs.readStringValue(
                               PrefConstants.longitude)),
-                          orderBy: "createdAt",
+                          orderBy: "",
                           nearest: false,
                           fourPlusRating: false);
                     },
@@ -451,7 +414,7 @@ class _HomePageState extends State<HomePage> {
                                     lng: double.parse(
                                         SharedPrefs.readStringValue(
                                             PrefConstants.longitude)),
-                                    orderBy: "createdAt",
+                                    orderBy: "",
                                     nearest: false,
                                     fourPlusRating: false);
                               },
@@ -517,7 +480,7 @@ class _HomePageState extends State<HomePage> {
                                 PrefConstants.latitude)),
                             lng: double.parse(SharedPrefs.readStringValue(
                                 PrefConstants.longitude)),
-                            orderBy: "createdAt",
+                            orderBy: "",
                             nearest: false,
                             fourPlusRating: false);
                       }
@@ -725,7 +688,7 @@ class _HomePageState extends State<HomePage> {
                                       PrefConstants.latitude)),
                                   lng: double.parse(SharedPrefs.readStringValue(
                                       PrefConstants.longitude)),
-                                  orderBy: "createdAt",
+                                  orderBy: "",
                                   nearest: false,
                                   fourPlusRating: false);
                             });
@@ -739,7 +702,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(
-            height: 50,
+
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Row(
@@ -747,6 +710,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Container(
                     width: Get.width * 0.3,
+                    height: 50,
                     padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6),
@@ -772,8 +736,6 @@ class _HomePageState extends State<HomePage> {
                                       fontSize: 13)),
                             );
                           }).toList(),
-                          // After selecting the desired option,it will
-                          // change button value to selected value
                           onChanged: (String? newValue) {
                             setState(() {
                               dropdownvalue = newValue ?? "";
@@ -788,7 +750,7 @@ class _HomePageState extends State<HomePage> {
                                   lng: double.parse(SharedPrefs.readStringValue(
                                       PrefConstants.longitude)),
                                   orderBy: dropdownvalue == "Sort By"
-                                      ? "createdAt"
+                                      ? ""
                                       : dropdownvalue == "Newest"
                                           ? "createdAt"
                                           : "name",
@@ -805,6 +767,7 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
+                  const SizedBox(width: 6),
                   Row(
                     children: [
                       InkWell(
@@ -821,7 +784,7 @@ class _HomePageState extends State<HomePage> {
                                 lng: double.parse(SharedPrefs.readStringValue(
                                     PrefConstants.longitude)),
                                 orderBy: dropdownvalue == "Sort By"
-                                    ? "createdAt"
+                                    ? ""
                                     : dropdownvalue == "Newest"
                                         ? "createdAt"
                                         : "name",
@@ -830,8 +793,9 @@ class _HomePageState extends State<HomePage> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(10),
-                          margin: const EdgeInsets.all(5),
+                          width: Get.width * 0.22,
+                          height: 50,
+
                           decoration: BoxDecoration(
                             color: select == 1
                                 ? changeTheme(SharedPrefs.readStringValue(
@@ -853,6 +817,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
+                      const SizedBox(width: 4),
                       InkWell(
                         onTap: () {
                           setState(() {
@@ -867,7 +832,7 @@ class _HomePageState extends State<HomePage> {
                                 lng: double.parse(SharedPrefs.readStringValue(
                                     PrefConstants.longitude)),
                                 orderBy: dropdownvalue == "Sort By"
-                                    ? "createdAt"
+                                    ? ""
                                     : dropdownvalue == "Newest"
                                         ? "createdAt"
                                         : "name",
@@ -876,8 +841,8 @@ class _HomePageState extends State<HomePage> {
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.all(10),
-                          margin: const EdgeInsets.all(5),
+                          width: Get.width * 0.22,
+                          height: 50,
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(6),
                             color: select == 2
@@ -944,7 +909,7 @@ class _HomePageState extends State<HomePage> {
             size: 50,
             lat: position.latitude,
             lng: position.longitude,
-            orderBy: "createdAt",
+            orderBy: "",
             nearest: false,
             fourPlusRating: false);
       });
@@ -985,7 +950,7 @@ class _HomePageState extends State<HomePage> {
           size: 50,
           lat: position.latitude,
           lng: position.longitude,
-          orderBy: "createdAt",
+          orderBy: "",
           nearest: false,
           fourPlusRating: false);
     }

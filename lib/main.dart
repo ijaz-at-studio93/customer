@@ -6,13 +6,13 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/controller/auth_controller.dart';
-import 'package:sallon_customer/controller/home_controller.dart';
-import 'package:sallon_customer/page/splash_page.dart';
-import 'package:sallon_customer/util/NotificationUtils.dart';
-import 'package:sallon_customer/util/SharedPrefs.dart';
-import 'package:sallon_customer/util/notification_service.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/controller/auth_controller.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/splash_page.dart';
+import 'package:salon_customer/util/NotificationUtils.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/util/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -102,7 +102,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Salon',
+      title: 'Salon Customer',
       theme: ThemeData(
         fontFamily: "Satoshi",
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

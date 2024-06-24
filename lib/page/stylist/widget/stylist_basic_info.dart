@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:readmore/readmore.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
 
 class StylistBasicInfo extends StatefulWidget {
   const StylistBasicInfo({super.key});

@@ -1,4 +1,4 @@
-import 'package:sallon_customer/project_specific/progressbar_view.dart';
+import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 

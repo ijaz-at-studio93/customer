@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 
 import 'package:get/get.dart';
-import 'package:sallon_customer/constant/api_constant.dart';
-import 'package:sallon_customer/constant/color_constant.dart';
-import 'package:sallon_customer/model/artiest_portfolio_model.dart';
-import 'package:sallon_customer/page/stylist/widget/service_offered_list_tile_widget.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/model/artiest_portfolio_model.dart';
+import 'package:salon_customer/page/stylist/widget/service_offered_list_tile_widget.dart';
 
 
 

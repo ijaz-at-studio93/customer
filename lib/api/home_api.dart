@@ -1,24 +1,26 @@
 import 'package:dio/dio.dart';
-import 'package:sallon_customer/api/dio_client.dart';
-import 'package:sallon_customer/model/artiest_list_model.dart';
-import 'package:sallon_customer/model/artiest_portfolio_model.dart';
-import 'package:sallon_customer/model/availabilities_time_sloat_model.dart';
-import 'package:sallon_customer/model/blog_data_model.dart';
-import 'package:sallon_customer/model/booking_history_list_model.dart';
-import 'package:sallon_customer/model/cart/service_add_cart_model.dart';
-import 'package:sallon_customer/model/category_service_list_model.dart';
-import 'package:sallon_customer/model/create_booking_appoiment_model.dart';
-import 'package:sallon_customer/model/favourite_salon_list_data_model.dart';
-import 'package:sallon_customer/model/home_category_list_model.dart';
-import 'package:sallon_customer/model/home_salon_list_model.dart';
-import 'package:sallon_customer/model/review_list_data_model.dart';
-import 'package:sallon_customer/model/review_rating_data_model.dart';
-import 'package:sallon_customer/model/salon_details_artiest.dart';
-import 'package:sallon_customer/model/salon_details_model.dart';
-import 'package:sallon_customer/model/save_address_model.dart';
-import 'package:sallon_customer/model/search_model/search_model.dart';
-import 'package:sallon_customer/model/un_available_dates_model.dart';
-import 'package:sallon_customer/model/user_booking_qr_code_model.dart';
+import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/model/artiest_list_model.dart';
+import 'package:salon_customer/model/artiest_portfolio_model.dart';
+import 'package:salon_customer/model/artist_search_model.dart';
+import 'package:salon_customer/model/availabilities_time_sloat_model.dart';
+import 'package:salon_customer/model/blog_data_model.dart';
+import 'package:salon_customer/model/booking_history_list_model.dart';
+import 'package:salon_customer/model/cart/order_id_model.dart';
+import 'package:salon_customer/model/cart/service_add_cart_model.dart';
+import 'package:salon_customer/model/category_service_list_model.dart';
+import 'package:salon_customer/model/create_booking_appoiment_model.dart';
+import 'package:salon_customer/model/favourite_salon_list_data_model.dart';
+import 'package:salon_customer/model/home_category_list_model.dart';
+import 'package:salon_customer/model/home_salon_list_model.dart';
+import 'package:salon_customer/model/review_list_data_model.dart';
+import 'package:salon_customer/model/review_rating_data_model.dart';
+import 'package:salon_customer/model/salon_details_artiest.dart';
+import 'package:salon_customer/model/salon_details_model.dart';
+import 'package:salon_customer/model/save_address_model.dart';
+import 'package:salon_customer/model/search_model/search_model.dart';
+import 'package:salon_customer/model/un_available_dates_model.dart';
+import 'package:salon_customer/model/user_booking_qr_code_model.dart';
 import '../model/current_booking_list_model.dart';
 
 class HomeAPI {
@@ -54,8 +56,11 @@ class HomeAPI {
       "orderDirection": "DESC",
       "nearest": nearest,
       "fourPlusRating": fourPlusRating,
-      "orderBy": orderBy,
     });
+
+    if (orderBy.isNotEmpty) {
+      formData.fields.add(MapEntry("orderBy", orderBy));
+    }
 
     if (serviceCategoryId.isNotEmpty) {
       for (int i = 0; i < serviceCategoryId.length; i++) {
@@ -496,6 +501,30 @@ class HomeAPI {
     final response = await DioClient.client.get("user/address/list");
     if (response.isSuccess) {
       return SaveAddressModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*----------------  Artiest  Search -------------*/
+  static Future<ArtistSearchModel> searchArtiest(
+      {required String salonId, required String q}) async {
+    final response = await DioClient.client
+        .get("user/salon/$salonId/artist/search", queryParameters: {
+      "q": q,
+    });
+    if (response.isSuccess) {
+      return ArtistSearchModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*-------------- get  Order Id  -----------*/
+  static Future<OrderIdModel> orderIdGet() async {
+    final response = await DioClient.client.get("user/cart/razorpay/orderId");
+    if (response.isSuccess) {
+      return OrderIdModel.fromJson(response.data);
     } else {
       throw response.data;
     }

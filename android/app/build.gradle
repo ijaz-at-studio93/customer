@@ -69,5 +69,7 @@ dependencies {
     implementation "com.google.firebase:firebase-core:21.1.1"
     implementation "com.google.android.ump:user-messaging-platform:2.2.0"
     implementation 'com.android.support:multidex:1.0.3'
-    implementation platform('com.google.firebase:firebase-bom:33.0.0')
+    implementation platform('com.google.firebase:firebase-bom:33.1.1')
+    api 'com.razorpay:checkout:1.6.39'
+    implementation 'com.google.code.gson:gson:2.10.1'
 }
