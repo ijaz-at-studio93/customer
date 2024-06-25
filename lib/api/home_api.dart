@@ -24,8 +24,8 @@ import 'package:salon_customer/model/user_booking_qr_code_model.dart';
 import '../model/current_booking_list_model.dart';
 
 class HomeAPI {
-  /*---------------------- home category ------------------*/ static Future<
-      HomeCategoryListModel> homeCategoryList({required String gender}) async {
+  /*---------------------- home category ------------------*/
+  static Future<HomeCategoryListModel> homeCategoryList({required String gender}) async {
     final response = await DioClient.client
         .get("user/home/category/list", queryParameters: {"gender": gender});
     if (response.isSuccess) {
@@ -184,7 +184,7 @@ class HomeAPI {
     }
   }
 
-  /*------------------------------------ Current Booking List Model ----------------*/
+  /*------------------------------------ Current Booking List Model -----------------------*/
   static Future<CurrentBookingListModel> currentBookingList() async {
     final response =
         await DioClient.client.get("user/booking/current-booking/list");

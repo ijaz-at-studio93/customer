@@ -17,7 +17,8 @@ import 'package:salon_customer/util/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DioClient.init();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+   );
   Get.put(AuthController());
   Get.put(HomeController());
   await GetStorage.init();

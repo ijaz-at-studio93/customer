@@ -7,6 +7,25 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:9001451192:android:8836c1686be55ed370fe4d",
+        "android_client_info": {
+          "package_name": "com.ananta.saloon"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCGQSFK-wIwU452TaX8jtvmAR5yD-mQlPU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:9001451192:android:b378fec7894f8aea70fe4d",
         "android_client_info": {
           "package_name": "com.ananta.scout"

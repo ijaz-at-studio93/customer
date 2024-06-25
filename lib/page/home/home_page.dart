@@ -36,7 +36,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   /*-------------------  Controller ----------------------*/
-  int _selectedGender = 0;
+
   final _authController = Get.find<AuthController>();
   final _homeController = Get.find<HomeController>();
 
@@ -45,12 +45,12 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getCurrentLatLng();
     if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
-      _selectedGender = 0;
+      selectedGender.value  = 0;
     } else {
       if (SharedPrefs.readStringValue(PrefConstants.gender) == "0") {
-        _selectedGender = 0;
+        selectedGender.value = 0;
       } else {
-        _selectedGender = 1;
+        selectedGender.value = 1;
       }
     }
   }
@@ -118,7 +118,7 @@ class _HomePageState extends State<HomePage> {
               child: InkWell(
                 onTap: () {
                   setState(() {
-                    _selectedGender = 0;
+                    selectedGender.value = 0;
                     SharedPrefs.writeValue(
                         PrefConstants.isSelectedGender, true);
                     SharedPrefs.writeValue(PrefConstants.gender, "0");
@@ -131,7 +131,7 @@ class _HomePageState extends State<HomePage> {
                   height: 50,
                   width: 100,
                   decoration: BoxDecoration(
-                    color: _selectedGender == 0
+                    color:  selectedGender.value == 0
                         ? ColorConstant.primaryColor
                         : ColorConstant.whiteColor,
                     borderRadius: const BorderRadius.only(
@@ -145,14 +145,14 @@ class _HomePageState extends State<HomePage> {
                       Image.asset(AssetsConstant.man,
                           height: 24,
                           width: 24,
-                          color: _selectedGender == 0
+                          color:  selectedGender.value == 0
                               ? ColorConstant.whiteColor
                               : ColorConstant.grayTextColor),
                       const SizedBox(width: 8),
                       Text(
                         "man",
                         style: AppTextTheme.medium.copyWith(
-                            color: _selectedGender == 0
+                            color:  selectedGender.value == 0
                                 ? ColorConstant.whiteColor
                                 : ColorConstant.grayTextColor),
                       )
@@ -165,7 +165,7 @@ class _HomePageState extends State<HomePage> {
               child: InkWell(
                 onTap: () {
                   setState(() {
-                    _selectedGender = 1;
+                    selectedGender.value = 1;
                     SharedPrefs.writeValue(
                         PrefConstants.isSelectedGender, true);
                     SharedPrefs.writeValue(PrefConstants.gender, "1");
@@ -178,7 +178,7 @@ class _HomePageState extends State<HomePage> {
                   height: 50,
                   width: 100,
                   decoration: BoxDecoration(
-                      color: _selectedGender == 1
+                      color:  selectedGender.value == 1
                           ? ColorConstant.primary2
                           : ColorConstant.whiteColor,
                       borderRadius: const BorderRadius.only(
@@ -192,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                         AssetsConstant.woman,
                         height: 24,
                         width: 24,
-                        color: _selectedGender == 1
+                        color:  selectedGender.value == 1
                             ? ColorConstant.whiteColor
                             : ColorConstant.grayTextColor,
                       ),
@@ -200,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         "Women",
                         style: AppTextTheme.medium.copyWith(
-                            color: _selectedGender == 1
+                            color:  selectedGender.value == 1
                                 ? ColorConstant.whiteColor
                                 : ColorConstant.grayTextColor),
                       )
@@ -900,7 +900,7 @@ class _HomePageState extends State<HomePage> {
           "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         _homeController.doGetHomeCategory(
-          gender: _selectedGender == 0 ? "male" : "female",
+          gender:  selectedGender.value == 0 ? "male" : "female",
         );
         _homeController.doGetHomeSalonList(
             homeService: atHome,
@@ -941,7 +941,7 @@ class _HomePageState extends State<HomePage> {
           "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
 
       _homeController.doGetHomeCategory(
-        gender: _selectedGender == 0 ? "male" : "female",
+        gender:  selectedGender.value == 0 ? "male" : "female",
       );
       _homeController.doGetHomeSalonList(
           homeService: atHome,

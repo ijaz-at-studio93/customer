@@ -40,78 +40,85 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                 ? const BookingHomePage()
                 : const InsightsHomePage(),
         extendBody: false,
-        bottomNavigationBar: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex,
-          showUnselectedLabels: true,
-          showSelectedLabels: true,
-          unselectedLabelStyle: AppTextTheme.medium
-              .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
-          selectedLabelStyle: AppTextTheme.medium.copyWith(
-              color: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender)),
-              fontSize: 14),
-          selectedItemColor:
-              changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-          unselectedItemColor: ColorConstant.grayTextColor,
-          selectedIconTheme: IconThemeData(
-              color: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender))),
-          items: [
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                AssetsConstant.home,
-                height: 24,
-                width: 24,
-                color: _selectedIndex == 0
-                    ? changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender))
-                    : ColorConstant.grayTextColor,
-              ),
-              label: 'Home',
-            ),
-            /* BottomNavigationBarItem(
-              icon: Image.asset(
-                AssetsConstant.home,
-                height: 35,
-                width: 35,
-                color: _selectedIndex == 1
-                    ? ColorConstant.primaryColor
-                    : ColorConstant.grayTextColor,
-              ),
-              label: 'Explore',
-            ),*/
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                AssetsConstant.bookings,
-                height: 24,
-                width: 24,
-                color: _selectedIndex == 1
-                    ? changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender))
-                    : ColorConstant.grayTextColor,
-              ),
-              label: 'Bookings',
-            ),
-            BottomNavigationBarItem(
-              icon: Image.asset(
-                AssetsConstant.insights,
-                height: 24,
-                width: 24,
-                color: _selectedIndex == 2
-                    ? changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender))
-                    : ColorConstant.grayTextColor,
-              ),
-              label: 'Insights',
-            ),
-          ],
-          onTap: (val) {
-            setState(() {
-              _selectedIndex = val;
-            });
-          },
-        ),
+        bottomNavigationBar: ValueListenableBuilder(
+            valueListenable: selectedGender,
+            builder: (context, v, c) {
+              return BottomNavigationBar(
+                type: BottomNavigationBarType.fixed,
+                currentIndex: _selectedIndex,
+                showUnselectedLabels: true,
+                showSelectedLabels: true,
+                unselectedLabelStyle: AppTextTheme.medium
+                    .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),
+                selectedLabelStyle: AppTextTheme.medium.copyWith(
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
+                    fontSize: 14),
+                selectedItemColor: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)),
+                unselectedItemColor: ColorConstant.grayTextColor,
+                selectedIconTheme: IconThemeData(
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender))),
+                items: [
+                  BottomNavigationBarItem(
+                    icon: Image.asset(
+                      AssetsConstant.home,
+                      height: 24,
+                      width: 24,
+                      color: _selectedIndex == 0
+                          ? selectedGender.value == 0
+                              ? ColorConstant.primaryColor
+                              : ColorConstant.primary2
+                          : ColorConstant.grayTextColor,
+                    ),
+                    label: 'Home',
+                  ),
+                  /* BottomNavigationBarItem(
+                  icon: Image.asset(
+                    AssetsConstant.home,
+                    height: 35,
+                    width: 35,
+                    color: _selectedIndex == 1
+                        ? ColorConstant.primaryColor
+                        : ColorConstant.grayTextColor,
+                  ),
+                  label: 'Explore',
+                ),*/
+                  BottomNavigationBarItem(
+                    icon: Image.asset(
+                      AssetsConstant.bookings,
+                      height: 24,
+                      width: 24,
+                      color: _selectedIndex == 1
+                          ?selectedGender.value == 0
+                          ? ColorConstant.primaryColor
+                          : ColorConstant.primary2
+                          : ColorConstant.grayTextColor,
+                    ),
+                    label: 'Bookings',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Image.asset(
+                      AssetsConstant.insights,
+                      height: 24,
+                      width: 24,
+                      color: _selectedIndex == 2
+                          ?selectedGender.value == 0
+                          ? ColorConstant.primaryColor
+                          : ColorConstant.primary2
+                          : ColorConstant.grayTextColor,
+                    ),
+                    label: 'Insights',
+                  ),
+                ],
+                onTap: (val) {
+                  setState(() {
+                    _selectedIndex = val;
+                  });
+                },
+              );
+            }),
       ),
     );
   }

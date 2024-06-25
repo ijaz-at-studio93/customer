@@ -19,3 +19,6 @@ Color? changeTheme(String data) {
 
 String userServiceAddressIdSelect  =  "";
 int yourApproval = 1;
+
+
+ValueNotifier<int> selectedGender =  ValueNotifier(0);
