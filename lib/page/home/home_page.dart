@@ -6,6 +6,7 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
+import 'package:open_settings/open_settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/constant/api_constant.dart';
@@ -63,7 +64,7 @@ class _HomePageState extends State<HomePage> {
       body: Obx(
         () => ProgressContainerView(
           isProgressRunning: _homeController.showProgress,
-          child: ListView(
+          child:   ListView(
             shrinkWrap: true,
             children: [
               _headerWidget(),
@@ -915,6 +916,7 @@ class _HomePageState extends State<HomePage> {
       });
     }).onPermanentlyDeniedCallback(() async {
       openAppSettings();
+      OpenSettings.openLocationSourceSetting();
       showMessage(
           "Location permissions are permanently denied, we cannot request permissions.");
     }).onRestrictedCallback(() async {

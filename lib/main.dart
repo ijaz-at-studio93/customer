@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -17,8 +19,7 @@ import 'package:salon_customer/util/notification_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DioClient.init();
-  await Firebase.initializeApp(
-   );
+  await Firebase.initializeApp();
   Get.put(AuthController());
   Get.put(HomeController());
   await GetStorage.init();
@@ -68,7 +69,10 @@ class _MyAppState extends State<MyApp> {
   }
 
   initNotification() async {
-    String? token = await FirebaseMessaging.instance.getToken();
+    String? token = Platform.isAndroid
+        ? await FirebaseMessaging.instance.getToken()
+        : await FirebaseMessaging.instance.getAPNSToken();
+
     await SharedPrefs.writeValue(PrefConstants.fcmToken, token);
 
     FirebaseMessaging.instance.onTokenRefresh.listen((token) async {

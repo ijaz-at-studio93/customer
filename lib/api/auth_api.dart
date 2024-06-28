@@ -55,13 +55,12 @@ class AuthAPI {
       required String cc,
       required String gender,
       required String email}) async {
-    String? fcmToken = await FirebaseMessaging.instance.getToken();
 
     Map<String, dynamic> mapData = {
       "mobile": mobileNO,
       "name": name,
       "countryCode": "91",
-      "fcmToken": fcmToken,
+      "fcmToken": SharedPrefs.readStringValue(PrefConstants.fcmToken),
       "deviceId": SharedPrefs.readStringValue(PrefConstants.deviceId),
       "gender": gender,
       "email": email
@@ -100,13 +99,13 @@ class AuthAPI {
       {required String mobile,
       required String cc,
       required String verificationCode}) async {
-    String? fcmToken = await FirebaseMessaging.instance.getToken();
+
     final response = await DioClient.client
         .post('auth/user/login/mobile-verification-code', data: {
       "mobile": mobile,
       "countryCode": "91",
       "verificationCode": verificationCode,
-      "fcmToken": fcmToken,
+      "fcmToken": SharedPrefs.readStringValue(PrefConstants.fcmToken),
       "deviceId": SharedPrefs.readStringValue(PrefConstants.deviceId)
     });
     if (response.statusCode == 200) {
