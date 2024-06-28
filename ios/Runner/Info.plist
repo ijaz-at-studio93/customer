@@ -41,6 +41,18 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+    <key>NSCameraUsageDescription</key>
+        <string>You need to provide camera access to upload profile image using phone camera or you can directly upload from gallery.</string>
+        <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>Application requires user’s location information while the app is running in the foreground.</string>
+        <key>NSLocationAlwaysUsageDescription</key>
+        <string>Will you allow this app to always know your location?</string>
+        <key>NSLocationUsageDescription</key>
+        <string>We need location permission to get your current location using which we display list of nearby store , without that we can't fetch list of store</string>
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>Do you allow this app to know your current location?</string>
+        <key>NSPhotoLibraryUsageDescription</key>
+        <string>You need to provide photo album access to upload profile image or you can directly upload using camera.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
