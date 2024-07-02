@@ -47,7 +47,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                 ],
               ),
               Text(
-                "${convertDate(date: widget.bookingData.startsAt ?? "")}- ${convertDate(date: widget.bookingData.endsAt ?? "")}",
+                "${convertDate(date: widget.bookingData.startsAt ?? "")} - ${convertDate(date: widget.bookingData.endsAt ?? "")}",
                 style: AppTextTheme.regular
                     .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
               )
@@ -61,6 +61,23 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
             dashColor: const Color(0xffCFCFCF),
           ),
           const SizedBox(height: 15),
+          Row(
+            children: [
+              Text(
+                "Booking Date : ",
+                style: AppTextTheme.medium
+                    .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                convertFinalDate(date:  widget.bookingData.finalizedAt ?? ""),
+                textScaler: const TextScaler.linear(0.85),
+                style: AppTextTheme.bold
+                    .copyWith(fontSize: 16, color: ColorConstant.blackColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
           Row(
             children: [
               Text(
@@ -128,8 +145,8 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                           color: ColorConstant.whiteColor, fontSize: 13),
                       label: Text(
                           widget.bookingData.items?[index].service?.name ?? ""),
-                backgroundColor: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)),
+                      backgroundColor: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
                       onSelected: (bool value) {},
                     )
                   : const SizedBox(),
@@ -165,5 +182,20 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
     DateTime dateTime = DateTime.parse(dateTimeString);
     String formattedTime = DateFormat('h:mm a').format(dateTime);
     return formattedTime;
+  }
+
+  /*---------------- Date Convert Fun  -------------*/
+  String convertFinalDate({required String date}) {
+    if (date.isEmpty) {
+      return "";
+    } else {
+      String dateTimeString = date;
+      // Parse the date string into a DateTime object
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      // Format the DateTime object into the desired format
+      String formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
+
+      return formattedDate;
+    }
   }
 }

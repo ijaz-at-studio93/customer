@@ -13,7 +13,8 @@ import '../../../model/booking_history_list_model.dart';
 class CompleteAndRejectWidget extends StatefulWidget {
   final HistoryList historyList;
   final VoidCallback onPress;
-  const CompleteAndRejectWidget({super.key, required this.historyList, required this.onPress});
+  const CompleteAndRejectWidget(
+      {super.key, required this.historyList, required this.onPress});
 
   @override
   State<CompleteAndRejectWidget> createState() =>
@@ -42,7 +43,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                         .copyWith(color: ColorConstant.idColor, fontSize: 16),
                   ),
                   SizedBox(
-                    width: Get.width *0.4,
+                    width: Get.width * 0.4,
                     child: Text(
                       widget.historyList.idx ?? "",
                       maxLines: 1,
@@ -67,6 +68,23 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
             dashColor: const Color(0xffCFCFCF),
           ),
           const SizedBox(height: 15),
+          Row(
+            children: [
+              Text(
+                "Booking Date : ",
+                style: AppTextTheme.medium
+                    .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                convertFinalDate(date: widget.historyList.finalizedAt ?? ""),
+                textScaler: const TextScaler.linear(0.85),
+                style: AppTextTheme.bold
+                    .copyWith(fontSize: 16, color: ColorConstant.blackColor),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
           Row(
             children: [
               Text(
@@ -151,14 +169,17 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
             runSpacing: 4.0, // gap between lines
             children: List.generate(
               widget.historyList.items?.length ?? 0,
-                  (index) =>   widget.historyList.items?[index].isService  ??  false ?  FilterChip(
-                labelStyle: AppTextTheme.medium
-                    .copyWith(color: ColorConstant.whiteColor, fontSize: 13),
-                label:   Text(widget.historyList.items?[index].service?.name ?? "")  ,
-                backgroundColor: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)),
-                onSelected: (bool value) {},
-              ) :  const SizedBox(),
+              (index) => widget.historyList.items?[index].isService ?? false
+                  ? FilterChip(
+                      labelStyle: AppTextTheme.medium.copyWith(
+                          color: ColorConstant.whiteColor, fontSize: 13),
+                      label: Text(
+                          widget.historyList.items?[index].service?.name ?? ""),
+                      backgroundColor: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
+                      onSelected: (bool value) {},
+                    )
+                  : const SizedBox(),
             ),
           ),
           const SizedBox(height: 10),
@@ -193,5 +214,17 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
     DateTime dateTime = DateTime.parse(dateTimeString);
     String formattedTime = DateFormat('h:mm a').format(dateTime);
     return formattedTime;
+  }
+
+  /*---------------- Date Convert Fun  -------------*/
+  String convertFinalDate({required String date}) {
+    if (date.isEmpty) {
+      return "";
+    } else {
+      String dateTimeString = date;
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      String formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
+      return formattedDate;
+    }
   }
 }

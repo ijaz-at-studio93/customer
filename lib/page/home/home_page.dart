@@ -151,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                               : ColorConstant.grayTextColor),
                       const SizedBox(width: 8),
                       Text(
-                        "man",
+                        "Man",
                         style: AppTextTheme.medium.copyWith(
                             color:  selectedGender.value == 0
                                 ? ColorConstant.whiteColor
@@ -703,7 +703,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(
-
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15),
               child: Row(
@@ -796,7 +795,6 @@ class _HomePageState extends State<HomePage> {
                         child: Container(
                           width: Get.width * 0.22,
                           height: 50,
-
                           decoration: BoxDecoration(
                             color: select == 1
                                 ? changeTheme(SharedPrefs.readStringValue(
