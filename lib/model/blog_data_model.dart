@@ -38,6 +38,7 @@ class BlogData {
   String? createdAt;
   String? body;
   Artist? artist;
+  bool?  isFavourite;
 
   BlogData(
       {this.id,
@@ -46,7 +47,9 @@ class BlogData {
       this.image,
       this.createdAt,
       this.body,
-      this.artist});
+      this.artist,
+      this.isFavourite
+      });
 
   BlogData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -55,6 +58,7 @@ class BlogData {
     image = json['image'];
     createdAt = json['createdAt'];
     body = json['body'];
+    isFavourite =  json['isFavourite'];
     artist = json['artist'] != null ? Artist.fromJson(json['artist']) : null;
   }
 
@@ -66,6 +70,7 @@ class BlogData {
     data['image'] = image;
     data['createdAt'] = createdAt;
     data['body'] = body;
+    data['isFavourite'] = isFavourite;
     if (artist != null) {
       data['artist'] = artist!.toJson();
     }

@@ -33,7 +33,7 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   height: 1,
                   width: Get.width,
-                  color: const Color(0xffADADAD),
+                  color:ColorConstant.idColor,
                 );
               },
               shrinkWrap: true,
@@ -75,7 +75,7 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
             direction: Axis.horizontal,
             length: Get.width * 0.89,
             dashLength: 2,
-            dashColor: ColorConstant.grayTextColor,
+            dashColor: ColorConstant.crossMarkColor,
           ),
         ),
         const SizedBox(height: 12),

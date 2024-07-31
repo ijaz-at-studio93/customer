@@ -1,26 +1,31 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
-
+import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/model/blog_data_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
+import '../../../util/SharedPrefs.dart';
 
 class InsightsCardWidget extends StatefulWidget {
   final VoidCallback onPress;
   final BlogData blogData;
+  final bool isFav;
   const InsightsCardWidget(
-      {super.key, required this.onPress, required this.blogData});
+      {super.key,
+      required this.onPress,
+      required this.blogData,
+      required this.isFav});
 
   @override
   State<InsightsCardWidget> createState() => _InsightsCardWidgetState();
 }
 
 class _InsightsCardWidgetState extends State<InsightsCardWidget> {
+  final _homeController = Get.find<HomeController>();
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +36,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
-            color: ColorConstant.grayColor.withOpacity(0.2),
+          /*  color: ColorConstant.grayColor.withOpacity(0.2),*/
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,15 +70,101 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                       ),
                     ),
                   ),
+                  Positioned(
+                    top: 15,
+                    right: 10,
+                    child: widget.isFav
+                        ? GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _homeController.doRemoveBlog(
+                                    callback: () {
+                                      if (widget.isFav) {
+                                        _homeController.doGetFavBlogData();
+                                      }
+                                    },
+                                    blogId: widget.blogData.id ?? "");
+                              });
+                            },
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: ColorConstant.blackColor
+                                      .withOpacity(0.50)),
+                              child: Center(
+                                child: widget.blogData.isFavourite ?? true
+                                    ? const Icon(
+                                        CupertinoIcons.heart_fill,
+                                        color: Colors.red,
+                                      )
+                                    : Image.asset(
+                                        AssetsConstant.likeBlank,
+                                        height: 20,
+                                        width: 20,
+                                        color: ColorConstant.whiteColor,
+                                      ),
+                              ),
+                            ),
+                          )
+                        : GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                widget.blogData.isFavourite =
+                                    !(widget.blogData.isFavourite ?? false);
+                                if (widget.blogData.isFavourite ?? false) {
+                                  _homeController.doAddFavBlog(
+                                      callback: () {},
+                                      blogId: widget.blogData.id ?? "");
+                                } else {
+                                  _homeController.doRemoveBlog(
+                                      callback: () {
+                                        _homeController.doGetBlogData(
+                                          lat: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.latitude)),
+                                          lng: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.longitude)),
+                                        );
+                                      },
+                                      blogId: widget.blogData.id ?? "");
+                                }
+                              });
+                            },
+                            child: Container(
+                              width: 38,
+                              height: 38,
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: ColorConstant.blackColor
+                                      .withOpacity(0.50)),
+                              child: Center(
+                                child: widget.blogData.isFavourite ?? false
+                                    ? const Icon(
+                                        CupertinoIcons.heart_fill,
+                                        color: Colors.red,
+                                      )
+                                    : Image.asset(
+                                        AssetsConstant.likeBlank,
+                                        height: 20,
+                                        width: 20,
+                                        color: ColorConstant.whiteColor,
+                                      ),
+                              ),
+                            ),
+                          ),
+                  )
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
               Text(
                 widget.blogData.title ?? "",
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.blackColor, fontSize: 16),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 12),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

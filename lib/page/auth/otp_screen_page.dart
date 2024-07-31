@@ -80,7 +80,6 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
   _headerWidget() {
     return Container(
       width: Get.width,
-
       padding: const EdgeInsets.only(top: 50, left: 21, right: 21, bottom: 35),
       decoration: BoxDecoration(
         color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??

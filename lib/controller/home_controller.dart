@@ -44,12 +44,20 @@ class HomeController extends GetxController {
   bool get showBookingProgress => _showBookingProgress.value;
   set setShowBookingProgress(val) => _showBookingProgress.value = val;
 
-  /*------------------------- Store Data Home Category ----------------*/
+  /*------------------------- category All Data Get Home Category ----------------*/
   final Rx<HomeCategoryListModel> _homeCategoryListModel =
       HomeCategoryListModel().obs;
   HomeCategoryListModel get homeCategoryListResponseModel =>
       _homeCategoryListModel.value;
   set setCategory(val) => _homeCategoryListModel.value = val;
+
+  /*------------------ Add  Category  Make Package Data get ---------*/
+  final Rx<HomeCategoryListModel> _getLastMakeYourOwnPackage =
+      HomeCategoryListModel().obs;
+  HomeCategoryListModel get getLastMakeYourOwnPackageModel =>
+      _getLastMakeYourOwnPackage.value;
+  set getLastMakeYourOwnPackageModel(val) =>
+      _getLastMakeYourOwnPackage.value = val;
 
   /*------------------ Store Salon Details  Data ------------*/
   final Rx<HomeSalonDetailsModel> _homeSalonDetailsData =
@@ -152,6 +160,11 @@ class HomeController extends GetxController {
   BlogDataModel get getBlogDataModel => _blogDataModel.value;
   set setBlogDataModel(val) => _blogDataModel.value = val;
 
+  /*----------------- Fav Blog Data ----------------------*/
+  final Rx<BlogDataModel> _favBlogDataModel = BlogDataModel().obs;
+  BlogDataModel get getFavBlogDataModel => _favBlogDataModel.value;
+  set getFavBlogDataModel(val) => _favBlogDataModel.value = val;
+
   /*--------------------  Rating  & Review Model  -----------------*/
   final Rx<ReviewRatingUserModel> _reviewRatingUserModel =
       ReviewRatingUserModel().obs;
@@ -188,6 +201,56 @@ class HomeController extends GetxController {
       _showProgress.value = true;
       _homeCategoryListModel.value =
           await HomeAPI.homeCategoryList(gender: gender);
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*------------------ Get Make Package Data  ------------*/
+  doGetMakePackageData() async {
+    try {
+      _showProgress.value = true;
+      _getLastMakeYourOwnPackage.value = await HomeAPI.makePackageDataGet();
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*----------------------  Add One Package Data  ------------*/
+  doAddPackageOneData({
+    required List<String> serviceCategoryIds,
+    required VoidCallback callback,
+  }) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.createOwnPackage(
+          serviceCategoryIds: serviceCategoryIds);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*----------------------  Remove One Category Data --------------*/
+  doRemovePackageData({
+    required List<String> serviceCategoryIds,
+    required VoidCallback callback,
+  }) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.removePackageCategory(
+          serviceCategoryIds: serviceCategoryIds);
+      if (result) {
+        callback.call();
+      }
     } catch (e) {
       showError(e);
     } finally {
@@ -261,7 +324,6 @@ class HomeController extends GetxController {
   doGetHomeSalonList({
     required int offset,
     required int size,
-    required List<String> serviceCategoryId,
     required double lat,
     required double lng,
     required String orderBy,
@@ -277,7 +339,6 @@ class HomeController extends GetxController {
           lat: lat,
           lng: lng,
           homeService: homeService,
-          serviceCategoryId: serviceCategoryId,
           fourPlusRating: fourPlusRating,
           nearest: nearest,
           orderBy: orderBy);
@@ -712,6 +773,48 @@ class HomeController extends GetxController {
     } catch (e) {
       showError(e);
       logger.d(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*------------------- Add Fav Blog -----------------*/
+  doAddFavBlog({required String blogId, required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.addFavBlog(blogId);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*--------------------- Remove Fav Blog --------------------*/
+  doRemoveBlog({required String blogId, required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.removeBlog(blogId);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*---------------------- get Fav Blog Data  ----------------*/
+  doGetFavBlogData() async {
+    try {
+      _showProgress.value = true;
+      _favBlogDataModel.value = await HomeAPI.getFavBlogData();
+    } catch (e) {
+      showError(e);
     } finally {
       _showProgress.value = false;
     }

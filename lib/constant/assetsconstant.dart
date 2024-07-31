@@ -29,6 +29,7 @@ class AssetsConstant {
   static const String sosIcon = "assets/icon/sos.png";
   static const String editIcon = "assets/icon/edit.png";
   static const String arrowLeftIcon = "assets/icon/arrow-left.png";
+  static const String newOfferIcon = "assets/icon/new_offer_icon.png";
 
   /*--------------- Image -------------------*/
   static const String offer = "assets/images/offer.png";
@@ -43,6 +44,8 @@ class AssetsConstant {
   static const String locationDetails = 'assets/images/location_details.png';
   static const String salonIcon = "assets/images/hair-salon.png";
   static const String avatarDesign = "assets/images/avatar-design.png";
+  static const String makePackageImage = "assets/images/make_package.png";
+  static const String addPackageImage = "assets/images/add_icon_for_package.png";
 
 
 }

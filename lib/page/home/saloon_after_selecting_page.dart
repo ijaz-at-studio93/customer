@@ -27,11 +27,13 @@ import '../search/stylist_search_page.dart';
 
 class SaloonAfterSelectingServicesPage extends StatefulWidget {
   final String id;
+  final String avRating;
   final VoidCallback callback;
   const SaloonAfterSelectingServicesPage({
     super.key,
     required this.id,
     required this.callback,
+    required this.avRating,
   });
 
   @override
@@ -86,11 +88,13 @@ class _SaloonAfterSelectingServicesPageState
               ),
             ),
           ),
-          floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
           floatingActionButton: Obx(
             () => _homeController.getServiceAddCartModel.data?.items?.isEmpty ??
                     false ||
-                        _homeController.getServiceAddCartModel.data?.items == null
+                        _homeController.getServiceAddCartModel.data?.items ==
+                            null
                 ? const SizedBox()
                 : Stack(
                     alignment: Alignment.center,
@@ -137,7 +141,8 @@ class _SaloonAfterSelectingServicesPageState
                                                         child: ClipRRect(
                                                           borderRadius:
                                                               BorderRadius
-                                                                  .circular(100),
+                                                                  .circular(
+                                                                      100),
                                                           child:
                                                               CachedNetworkImage(
                                                             fit: BoxFit.cover,
@@ -146,7 +151,8 @@ class _SaloonAfterSelectingServicesPageState
                                                             imageUrl:
                                                                 "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
                                                             placeholder:
-                                                                (context, url) =>
+                                                                (context,
+                                                                        url) =>
                                                                     const Image(
                                                               image: AssetImage(
                                                                   AssetsConstant
@@ -155,9 +161,10 @@ class _SaloonAfterSelectingServicesPageState
                                                               width: 30,
                                                               height: 30,
                                                             ),
-                                                            errorWidget: (context,
-                                                                    url, error) =>
-                                                                const Image(
+                                                            errorWidget:
+                                                                (context, url,
+                                                                        error) =>
+                                                                    const Image(
                                                               image: AssetImage(
                                                                   AssetsConstant
                                                                       .placeHolder),
@@ -190,15 +197,15 @@ class _SaloonAfterSelectingServicesPageState
                                                                           100),
                                                               child:
                                                                   CachedNetworkImage(
-                                                                fit: BoxFit.cover,
+                                                                fit: BoxFit
+                                                                    .cover,
                                                                 width: 30,
                                                                 height: 30,
                                                                 imageUrl:
                                                                     "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
-                                                                placeholder:
-                                                                    (context,
-                                                                            url) =>
-                                                                        const Image(
+                                                                placeholder: (context,
+                                                                        url) =>
+                                                                    const Image(
                                                                   image: AssetImage(
                                                                       AssetsConstant
                                                                           .placeHolder),
@@ -238,15 +245,15 @@ class _SaloonAfterSelectingServicesPageState
                                                                           100),
                                                               child:
                                                                   CachedNetworkImage(
-                                                                fit: BoxFit.cover,
+                                                                fit: BoxFit
+                                                                    .cover,
                                                                 width: 35,
                                                                 height: 35,
                                                                 imageUrl:
                                                                     "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
-                                                                placeholder:
-                                                                    (context,
-                                                                            url) =>
-                                                                        const Image(
+                                                                placeholder: (context,
+                                                                        url) =>
+                                                                    const Image(
                                                                   image: AssetImage(
                                                                       AssetsConstant
                                                                           .placeHolder),
@@ -270,17 +277,16 @@ class _SaloonAfterSelectingServicesPageState
                                                               ),
                                                             ),
                                                           ),
-                                                        const SizedBox(width: 2),
+                                                        const SizedBox(
+                                                            width: 2),
                                                         Container(
                                                           width: 33,
                                                           height: 33,
-                                                          decoration:
-                                                              const BoxDecoration(
-                                                                  color:
-                                                                      ColorConstant
-                                                                          .primaryColor,
-                                                                  shape: BoxShape
-                                                                      .circle),
+                                                          decoration: const BoxDecoration(
+                                                              color: ColorConstant
+                                                                  .primaryColor,
+                                                              shape: BoxShape
+                                                                  .circle),
                                                           child: Center(
                                                             child: Text(
                                                               _homeController
@@ -290,9 +296,10 @@ class _SaloonAfterSelectingServicesPageState
                                                                       ?.length
                                                                       .toString() ??
                                                                   "",
-                                                              style: AppTextTheme
-                                                                  .medium
-                                                                  .copyWith(
+                                                              style:
+                                                                  AppTextTheme
+                                                                      .medium
+                                                                      .copyWith(
                                                                 color: ColorConstant
                                                                     .whiteColor,
                                                               ),
@@ -323,7 +330,8 @@ class _SaloonAfterSelectingServicesPageState
                                   },
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         children: [
@@ -331,8 +339,8 @@ class _SaloonAfterSelectingServicesPageState
                                             "${_homeController.getServiceAddCartModel.data?.items?.length} Added",
                                             style: AppTextTheme.bold.copyWith(
                                                 fontSize: 13,
-                                                color:
-                                                    ColorConstant.grayTextColor),
+                                                color: ColorConstant
+                                                    .grayTextColor),
                                           ),
                                           const SizedBox(width: 2),
                                           Image.asset(
@@ -387,17 +395,20 @@ class _SaloonAfterSelectingServicesPageState
                               },
                               child: Container(
                                 height: 45,
-                                width: Get.width * 0.3,
+                                width: Get.width * 0.4,
                                 decoration: BoxDecoration(
-                                  color: changeTheme(SharedPrefs.readStringValue(
-                                      PrefConstants.gender)),
+                                  color: changeTheme(
+                                      SharedPrefs.readStringValue(
+                                          PrefConstants.gender)),
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Text(
-                                      artiestId.isNotEmpty  ? "Book Slot" : "Select Stylist",
+                                      artiestId.isNotEmpty
+                                          ? "Book Slot"
+                                          : "Select Stylist",
                                       textScaler: const TextScaler.linear(0.70),
                                       style: AppTextTheme.medium.copyWith(
                                           fontSize: 16,
@@ -412,8 +423,7 @@ class _SaloonAfterSelectingServicesPageState
                                   ],
                                 ),
                               ),
-                            ),
-                            IconButton(
+                            ), /*IconButton(
                               onPressed: () {
                                 showDialog(
                                     context: context,
@@ -451,7 +461,7 @@ class _SaloonAfterSelectingServicesPageState
                                 color: changeTheme(SharedPrefs.readStringValue(
                                     PrefConstants.gender)),
                               ),
-                            ),
+                            ),*/
                           ],
                         ),
                       ),
@@ -606,47 +616,75 @@ class _SaloonAfterSelectingServicesPageState
         Positioned(
             bottom: 16,
             left: 19,
+            right: 10,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      color: ColorConstant.greenColor,
-                      borderRadius: BorderRadius.circular(5)),
-                  width: 60,
-                  height: 30,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(
-                        Icons.star,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                      const SizedBox(width: 3),
-                      Text(
-                        "${_homeController.homeSalonDetailsData.data?.rating}",
-                        style: AppTextTheme.medium.copyWith(
-                            fontSize: 11, color: ColorConstant.whiteColor),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 13),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                Row(
                   children: [
-                    Text(
-                      "Ratings",
-                      style: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.whiteColor, fontSize: 13),
+                    Container(
+                      decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          color: ColorConstant.greenColor,
+                          borderRadius: BorderRadius.circular(5)),
+                      width: 60,
+                      height: 30,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            "${_homeController.homeSalonDetailsData.data?.rating}",
+                            style: AppTextTheme.medium.copyWith(
+                                fontSize: 11, color: ColorConstant.whiteColor),
+                          ),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 5),
-                    const Dash(
-                      direction: Axis.horizontal,
-                      length: 80,
-                      dashLength: 2,
-                      dashColor: ColorConstant.whiteColor,
+                    const SizedBox(width: 13),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${_homeController.homeSalonDetailsData.data?.rating} Ratings",
+                          style: AppTextTheme.medium.copyWith(
+                              color: ColorConstant.whiteColor, fontSize: 13),
+                        ),
+                        const SizedBox(height: 5),
+                        const Dash(
+                          direction: Axis.horizontal,
+                          length: 70,
+                          dashLength: 2,
+                          dashColor: ColorConstant.whiteColor,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(
+                      Icons.star,
+                      color: ColorConstant.yellowColor,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      widget.avRating,
+                      style: AppTextTheme.medium.copyWith(
+                          fontSize: 11, color: ColorConstant.yellowColor),
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      'Average Stylist Rating',
+                      style: AppTextTheme.medium.copyWith(
+                          fontSize: 13, color: ColorConstant.whiteColor),
                     ),
                   ],
                 )
@@ -683,7 +721,15 @@ class _SaloonAfterSelectingServicesPageState
               _homeController
                       .homeSalonDetailsData.data?.serviceCategories?.length ??
                   0,
-              (index) => FilterChip(
+              (index) => Text(
+                index == 0
+                    ? "${_homeController.homeSalonDetailsData.data?.serviceCategories?[index].name}"
+                    : " •  ${_homeController.homeSalonDetailsData.data?.serviceCategories?[index].name}",
+                style: AppTextTheme.medium
+                    .copyWith(color: ColorConstant.grayTextColor, fontSize: 13),
+              )
+
+              /*FilterChip(
                 labelStyle: AppTextTheme.medium
                     .copyWith(color: ColorConstant.whiteColor, fontSize: 13),
                 label: Text(
@@ -691,7 +737,8 @@ class _SaloonAfterSelectingServicesPageState
                 backgroundColor: changeTheme(
                     SharedPrefs.readStringValue(PrefConstants.gender)),
                 onSelected: (bool value) {},
-              ),
+              )*/
+              ,
             ),
           ),
           const SizedBox(height: 20),
@@ -930,32 +977,20 @@ class _SaloonAfterSelectingServicesPageState
                       : ListView.builder(
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
+                          padding: EdgeInsets.zero,
                           itemCount: _homeController
                                   .salonDetailsListData.data?.length ??
                               0,
                           itemBuilder: (context, index) {
                             return ExpansionTile(
                               initiallyExpanded: index == 0 ? true : false,
-                              title: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    _homeController.salonDetailsListData
-                                            .data?[index].name ??
-                                        "",
-                                    style: AppTextTheme.bold.copyWith(
-                                        color: ColorConstant.blackColor,
-                                        fontSize: 19),
-                                  ),
-                                  const SizedBox(height: 15),
-                                  Dash(
-                                    direction: Axis.horizontal,
-                                    length: Get.width * 0.75,
-                                    dashLength: 2,
-                                    dashColor: ColorConstant.grayTextColor,
-                                  ),
-                                  const SizedBox(height: 20),
-                                ],
+                              title: Text(
+                                _homeController.salonDetailsListData
+                                        .data?[index].name ??
+                                    "",
+                                style: AppTextTheme.bold.copyWith(
+                                    color: ColorConstant.blackColor,
+                                    fontSize: 19),
                               ),
                               children: [
                                 ListView.separated(
@@ -1012,7 +1047,6 @@ class _SaloonAfterSelectingServicesPageState
                                                       _homeController
                                                           .doClearCart(
                                                               callback: () {
-
                                                         _homeController
                                                             .doGetHomeSalonDetails(
                                                                 salonId:
@@ -1566,7 +1600,7 @@ class _SaloonAfterSelectingServicesPageState
                       crossAxisCount: 2,
                       mainAxisSpacing: 12.0,
                       crossAxisSpacing: 12.0,
-                      childAspectRatio: 0.62, // Aspect ratio of each item
+                      childAspectRatio: 0.7, // Aspect ratio of each item
                     ),
                     itemCount: _homeController
                             .getSalonDetailsArtiestData.data?.length ??

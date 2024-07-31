@@ -92,6 +92,7 @@ class HomeSalonDataList {
   bool? isFavourite;
   double? serviceStartingPrice;
   double? serviceMaxPrice;
+  double?  averageArtistRatings;
 
   HomeSalonDataList(
       {this.id,
@@ -112,6 +113,7 @@ class HomeSalonDataList {
         this.isFavourite,
         this.serviceStartingPrice,
         this.serviceMaxPrice,
+        this.averageArtistRatings,
 
 
       });
@@ -137,6 +139,7 @@ class HomeSalonDataList {
     isFavourite = json['isFavourite'];
     serviceStartingPrice = double.parse(json['serviceStartingPrice'].toString());
     serviceMaxPrice = double.parse(json['serviceMaxPrice'].toString());
+    averageArtistRatings = double.parse(json['averageArtistRatings'].toString());
   }
 
   Map<String, dynamic> toJson() {
@@ -161,6 +164,7 @@ class HomeSalonDataList {
     data['isFavourite'] = isFavourite;
     data['serviceStartingPrice'] = serviceStartingPrice;
     data['serviceMaxPrice'] = serviceMaxPrice;
+    data['averageArtistRatings'] = averageArtistRatings;
     return data;
   }
 }

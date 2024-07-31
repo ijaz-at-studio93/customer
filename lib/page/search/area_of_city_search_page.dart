@@ -91,6 +91,7 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                                     onPress: () {
                                       Get.to(() =>
                                           SaloonAfterSelectingServicesPage(
+                                              avRating: "",
                                               id: _homeController
                                                       .getSearchSalonModel
                                                       .data?[index]
@@ -142,7 +143,8 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                       AssetsConstant.search,
                       width: 24,
                       height: 24,
-                      color:  changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+                      color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
                     ),
                   ),
                 ),

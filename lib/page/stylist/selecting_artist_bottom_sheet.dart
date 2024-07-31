@@ -110,7 +110,7 @@ class _SelectingArtistBottomSheetWidgetState
                                 12.0, // Spacing between items vertically
                             crossAxisSpacing:
                                 12.0, // Spacing between items horizontally
-                            childAspectRatio: 0.56, // Aspect ratio of each item
+                            childAspectRatio: 0.62, // Aspect ratio of each item
                           ),
                           itemCount:
                               _homeController.getArtiestListData.data?.length ??

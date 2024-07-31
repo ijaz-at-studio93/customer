@@ -157,7 +157,7 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                             ),
                           ),
                   ),
-            !widget.isView ? const SizedBox(height: 39) : const SizedBox(),
+            /*!widget.isView ? const SizedBox() : const SizedBox(),*/
             TextButton(
               onPressed: () {
                 Get.to(() => StylistSaloonDetailsPage(

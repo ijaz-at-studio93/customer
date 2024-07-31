@@ -74,7 +74,6 @@ class _BookingHomePageState extends State<BookingHomePage> {
                                     child: PendingCardWidget(
                                       onPress: () {
                                         Get.to(() => QRCodePage(
-
                                             appointmentId: _homeController
                                                     .getCurrentBookingListModel
                                                     .data?[index]

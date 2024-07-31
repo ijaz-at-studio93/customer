@@ -70,7 +70,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                convertFinalDate(date:  widget.bookingData.finalizedAt ?? ""),
+                convertFinalDate(date: widget.bookingData.finalizedAt ?? ""),
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
@@ -134,20 +134,19 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
             style: AppTextTheme.medium
                 .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
           ),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 8.0, // gap between adjacent chips
             runSpacing: 4.0, // gap between lines
             children: List.generate(
               widget.bookingData.items?.length ?? 0,
               (index) => widget.bookingData.items?[index].isService ?? false
-                  ? FilterChip(
-                      labelStyle: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.whiteColor, fontSize: 13),
-                      label: Text(
-                          widget.bookingData.items?[index].service?.name ?? ""),
-                      backgroundColor: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)),
-                      onSelected: (bool value) {},
+                  ? Text(
+                      index == 0
+                          ? "${widget.bookingData.items?[index].service?.name ?? ""}"
+                          : " •  ${widget.bookingData.items?[index].service?.name ?? ""}",
+                      style: AppTextTheme.medium.copyWith(
+                          color: ColorConstant.grayTextColor, fontSize: 13),
                     )
                   : const SizedBox(),
             ),

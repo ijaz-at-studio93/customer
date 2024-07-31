@@ -14,8 +14,8 @@ import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/log_out_dialog.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-
 import 'about_app_page.dart';
+import 'fav_blog_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final VoidCallback callback;
@@ -105,6 +105,17 @@ class _ProfilePageState extends State<ProfilePage> {
                       endIndent: 20,
                       thickness: 1),
                   _listTitleWidget(
+                      image: AssetsConstant.insights,
+                      name: "Saved Insights",
+                      onPress: () {
+                        Get.to(() => const BlogFavPage());
+                      }),
+                  const Divider(
+                      color: ColorConstant.garyDividerColor,
+                      indent: 20,
+                      endIndent: 20,
+                      thickness: 1),
+                  _listTitleWidget(
                       image: AssetsConstant.locationDetails,
                       name: "Address",
                       onPress: () {
@@ -130,7 +141,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       image: AssetsConstant.about,
                       name: "About Us",
                       onPress: () {
-                        Get.to(()=> const AboutAppPage());
+                        Get.to(() => const AboutAppPage());
                       }),
                   const Divider(
                       color: ColorConstant.garyDividerColor,

@@ -33,6 +33,7 @@ class ColorConstant {
   static const Color dividerRedLightColor = Color(0xffEDE5E5);
   static const Color primary2 = Color(0xffCD73B4);
   static const Color textFieldBG = Color(0xFF262828);
+  static const Color offerTextColor = Color(0xFFE423AE);
 }
 
 

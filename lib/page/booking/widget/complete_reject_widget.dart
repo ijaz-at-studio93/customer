@@ -164,24 +164,24 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
             style: AppTextTheme.medium
                 .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
           ),
+          const SizedBox(height: 10),
           Wrap(
             spacing: 8.0, // gap between adjacent chips
             runSpacing: 4.0, // gap between lines
             children: List.generate(
               widget.historyList.items?.length ?? 0,
-              (index) => widget.historyList.items?[index].isService ?? false
-                  ? FilterChip(
-                      labelStyle: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.whiteColor, fontSize: 13),
-                      label: Text(
-                          widget.historyList.items?[index].service?.name ?? ""),
-                      backgroundColor: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)),
-                      onSelected: (bool value) {},
-                    )
+                  (index) => widget.historyList.items?[index].isService ?? false
+                  ? Text(
+                index == 0
+                    ? "${ widget.historyList.items?[index].service?.name ?? ""}"
+                    : " •  ${ widget.historyList.items?[index].service?.name ?? ""}",
+                style: AppTextTheme.medium.copyWith(
+                    color: ColorConstant.grayTextColor, fontSize: 13),
+              )
                   : const SizedBox(),
             ),
           ),
+
           const SizedBox(height: 10),
           widget.historyList.orderStatus == "salon_artist_rejected"
               ? const SizedBox()

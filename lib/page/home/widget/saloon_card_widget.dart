@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
@@ -37,7 +38,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
         child: Container(
           width: Get.width,
           decoration: BoxDecoration(
-            color: ColorConstant.whiteColor,
+            color: ColorConstant.crossMarkColor,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(color: ColorConstant.strokeColor, width: 1.5),
           ),
@@ -69,6 +70,21 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         fit: BoxFit.fitWidth,
                       ),
                     ),
+                  ),
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          ColorConstant.blackColor,
+                          Colors.black.withOpacity(0),
+                          Colors.black.withOpacity(0),
+                        ],
+                      ),
+                    ),
+                    width: Get.width,
+                    height: Get.height * 0.25,
                   ),
                   Positioned(
                     top: 10,
@@ -104,39 +120,38 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                                   AssetsConstant.likeBlank,
                                   height: 20,
                                   width: 20,
-                                  color: changeTheme(
-                                      SharedPrefs.readStringValue(
-                                          PrefConstants.gender)),
+                                  color: ColorConstant.whiteColor,
                                 ),
                         ),
                       ),
                     ),
                   ),
                   Positioned(
-                      bottom: 10,
-                      left: 15,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            color: ColorConstant.yellowColor,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            widget.homeSalonModel.rating.toString(),
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 11, color: ColorConstant.yellowColor),
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            'Average Stylist rating',
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 13, color: ColorConstant.whiteColor),
-                          ),
-                        ],
-                      )),
+                    bottom: 10,
+                    left: 15,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          color: ColorConstant.yellowColor,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          widget.homeSalonModel.averageArtistRatings.toString(),
+                          style: AppTextTheme.medium.copyWith(
+                              fontSize: 11, color: ColorConstant.yellowColor),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                            'Average Stylist Rating',
+                          style: AppTextTheme.medium.copyWith(
+                              fontSize: 13, color: ColorConstant.whiteColor),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 10),
@@ -187,8 +202,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                                   color: ColorConstant.grayTextColor,
                                   fontSize: 13),
                             ),
-                            const
-                            SizedBox(width: 5),
+                            const SizedBox(width: 5),
                             Text(
                               "₹${widget.homeSalonModel.serviceStartingPrice} Onwards",
                               style: AppTextTheme.bold.copyWith(
@@ -199,8 +213,9 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 5),
-                        Row(
+                        const SizedBox(
+                            height:
+                                5), /* Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Image.asset(
@@ -221,13 +236,57 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                               ),
                             ),
                           ],
-                        ),
+                        ),*/
                       ],
                     ),
+                    Container(
+                      height: 28,
+                      width: 52,
+                      decoration: BoxDecoration(
+                          color: ColorConstant.greenColor,
+                          borderRadius: BorderRadius.circular(5)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.star,
+                              color: ColorConstant.whiteColor, size: 16),
+                          const SizedBox(width: 2),
+                          Text(
+                            widget.homeSalonModel.rating.toString(),
+                            style: AppTextTheme.medium.copyWith(
+                                color: ColorConstant.whiteColor, fontSize: 11),
+                          )
+                        ],
+                      ),
+                    )
                   ],
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 5),
+              Dash(
+                direction: Axis.horizontal,
+                length: Get.width * 0.8,
+                dashLength: 2,
+                dashColor: ColorConstant.grayTextColor,
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 20),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      AssetsConstant.newOfferIcon,
+                      width: 20,
+                      height: 20,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      "Upto 20% Off ",
+                      style: AppTextTheme.bold.copyWith(
+                          color: ColorConstant.offerTextColor, fontSize: 13),
+                    )
+                  ],
+                ),
+              )
             ],
           ),
         ),

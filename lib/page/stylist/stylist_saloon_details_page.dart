@@ -24,13 +24,15 @@ class StylistSaloonDetailsPage extends StatefulWidget {
       _StylistSaloonDetailsPageState();
 }
 
-class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
+class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
+    with SingleTickerProviderStateMixin {
   final _homeController = Get.find<HomeController>();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      _tabController = TabController(length: 3, vsync: this);
       _homeController.doGetArtiestPortfolio(artistId: widget.artiestId);
     });
   }
@@ -49,12 +51,12 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
                     _imageHeaderWidget(),
                     _nameContainColum(),
                     _tabBarView(),
-                    isSelectedTab == 1
+                    isSelectedTab == 0
                         ? ServiceAndOfferedPage(
                             artiestPortfolio:
                                 _homeController.getArtiestDetailsModel,
                           )
-                        : isSelectedTab == 2
+                        : isSelectedTab == 1
                             ? StylistPortfolioGridview(
                                 artiestPortfolio:
                                     _homeController.getArtiestDetailsModel,
@@ -225,158 +227,43 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
-        Column(
-          children: [
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.person,
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)),
-                        size: 20),
-                    const SizedBox(width: 5),
-                    Text(
-                      _homeController.getArtiestDetailsModel.data?.name ?? "",
-                      style: AppTextTheme.bold
-                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.email,
-                        size: 20,
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender))),
-                    const SizedBox(width: 5),
-                    Text(
-                      _homeController.getArtiestDetailsModel.data?.email ?? "",
-                      style: AppTextTheme.bold
-                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.phone,
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)),
-                        size: 20),
-                    const SizedBox(width: 5),
-                    Text(
-                      "+91 ${_homeController.getArtiestDetailsModel.data?.mobile ?? ""}",
-                      style: AppTextTheme.bold
-                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.calendar_month,
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)),
-                        size: 20),
-                    const SizedBox(width: 5),
-                    Text(
-                      "+91 ${_homeController.getArtiestDetailsModel.data?.dob ?? ""}",
-                      style: AppTextTheme.bold
-                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.local_laundry_service_sharp,
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)),
-                        size: 20),
-                    const SizedBox(width: 5),
-                    Text(
-                      "${_homeController.getArtiestDetailsModel.data?.experience ?? ""} year",
-                      style: AppTextTheme.bold
-                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    Icon(Icons.home,
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)),
-                        size: 20),
-                    const SizedBox(width: 5),
-                    Text(
-                      _homeController.getArtiestDetailsModel.data?.homeService ==
-                              true
-                          ? "Home Service Available"
-                          : "Only Salon Service",
-                      style: AppTextTheme.bold
-                          .copyWith(color: ColorConstant.blackColor, fontSize: 14),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+        const SizedBox(height: 5),
+        Text(
+          _homeController.getArtiestDetailsModel.data?.name ?? "",
+          style: AppTextTheme.bold.copyWith(
+              color: ColorConstant.blackColor, fontSize: 14),
         ),
-        Card(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                RatingBar.builder(
-                  initialRating:
-                      _homeController.getArtiestDetailsModel.data?.rating ?? 0.0,
-                  minRating: 1,
-                  direction: Axis.horizontal,
-                  allowHalfRating: true,
-                  itemCount: 5,
-                  itemSize: 25.0,
-                  ignoreGestures: true,
-                  itemBuilder: (context, _) => Icon(
-                    Icons.star,
-                    color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)) ??
-                        ColorConstant.primaryColor,
-                    size: 25,
-                  ),
-                  onRatingUpdate: (rating) {},
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              RatingBar.builder(
+                initialRating:
+                    _homeController.getArtiestDetailsModel.data?.rating ??
+                        0.0,
+                minRating: 1,
+                direction: Axis.horizontal,
+                allowHalfRating: true,
+                itemCount: 5,
+                itemSize: 25.0,
+                ignoreGestures: true,
+                itemBuilder: (context, _) => Icon(
+                  Icons.star,
+                  color: changeTheme(SharedPrefs.readStringValue(
+                          PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
+                  size: 25,
                 ),
-                Text(
-                  "(${_homeController.getArtiestDetailsModel.data?.reviewCount ?? 0} Reviews)",
-                  style: AppTextTheme.medium
-                      .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
-                ),
-              ],
-            ),
+                onRatingUpdate: (rating) {},
+              ),
+              const  SizedBox(width: 5),
+              Text(
+                "(${_homeController.getArtiestDetailsModel.data?.reviewCount ?? 0} Reviews)",
+                style: AppTextTheme.medium.copyWith(
+                    fontSize: 13, color: ColorConstant.grayTextColor),
+              ),
+            ],
           ),
         ),
       ],
@@ -384,9 +271,26 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
   }
 
   /*------------- Tab Bar View ------------*/
-  int isSelectedTab = 1;
+  int isSelectedTab = 0;
   _tabBarView() {
-    return Column(
+    return TabBar(
+      labelPadding: EdgeInsets.zero,
+      controller: _tabController,
+      labelColor: _selectedColor,
+      indicatorColor: _selectedColor,
+      indicatorWeight: 2,
+      unselectedLabelColor: _unselectedColor,
+      indicatorSize: TabBarIndicatorSize.tab,
+      /* indicator: MaterialDesignIndicator(
+          indicatorHeight: 4, indicatorColor: _selectedColor),*/
+      tabs: _tabs,
+      onTap: (val) {
+        setState(() {
+          isSelectedTab = val;
+        });
+      },
+    );
+    /*return Column(
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
@@ -510,6 +414,19 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage> {
           color: const Color(0xffADADAD),
         ),
       ],
-    );
+    );*/
   }
+
+  /*------------- Tab Bar View  -------------*/
+  late TabController _tabController;
+  final _selectedColor =
+      changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
+          ColorConstant.primaryColor;
+  final _unselectedColor = ColorConstant.grayTextColor;
+
+  final _tabs = [
+    Tab(text: 'Service Offered'),
+    Tab(text: 'Portfolio'),
+    Tab(text: 'Review & ratings'),
+  ];
 }

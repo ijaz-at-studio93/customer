@@ -10,7 +10,6 @@ import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
 import 'package:salon_customer/controller/home_controller.dart';
-import 'package:salon_customer/main.dart';
 import 'package:salon_customer/page/appointment/widget/know_what_you_widget.dart';
 import 'package:salon_customer/page/appointment/widget/popular_service_widget.dart';
 import 'package:salon_customer/page/appointment/your_approval_bottom_sheet.dart';
@@ -112,7 +111,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                         )
                       : Column(
                           children: [
-                            Container(
+                          /*  Container(
                               width: Get.width,
                               color: ColorConstant.whiteColor,
                               padding: const EdgeInsets.symmetric(
@@ -148,7 +147,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 2),
+                            const SizedBox(height: 2),*/
                             /*-------------- Select Time Slot  ---------------*/
                             Container(
                               color: ColorConstant.whiteColor,

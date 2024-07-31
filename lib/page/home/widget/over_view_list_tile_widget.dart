@@ -51,11 +51,29 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                     overflow: TextOverflow.ellipsis,
                     textScaler: const TextScaler.linear(0.85),
                     style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 17),
+                        color: ColorConstant.blackColor, fontSize: 18),
                   ),
                 ),
                 const SizedBox(height: 5),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.star,
+                      size: 15,
+                    ),
+                    const SizedBox(width: 2),
+                    Text(
+                      "${widget.servicesList.rating} (Reviews)",
+                      textScaler: const TextScaler.linear(0.85),
+                      style: AppTextTheme.medium.copyWith(
+                          color: ColorConstant.grayColor, fontSize: 16),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+
+            /*    Row(
                   children: [
                     Text(
                       "Gender • ",
@@ -71,7 +89,7 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 5),
+                const SizedBox(height: 5),*/
                 Row(
                   children: [
                     Text(
@@ -88,23 +106,9 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 5),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.star,
-                      size: 15,
-                    ),
-                    Text(
-                      "${widget.servicesList.rating}",
-                      textScaler: const TextScaler.linear(0.85),
-                      style: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.grayColor, fontSize: 16),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                widget.servicesList.homeService ?? false
+                /*widget.servicesList.homeService ?? false
                     ? Row(
                         children: [
                           const Icon(Icons.home, size: 15),
@@ -118,7 +122,7 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                         ],
                       )
                     : const SizedBox(),
-                const SizedBox(height: 5),
+                const SizedBox(height: 5),*/
                 Dash(
                   direction: Axis.horizontal,
                   length: Get.width * 0.5,

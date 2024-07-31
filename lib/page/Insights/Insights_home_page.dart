@@ -7,7 +7,6 @@ import 'package:salon_customer/page/Insights/widget/Insights_card_widget.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
 
@@ -69,6 +68,7 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
                         const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                     itemBuilder: (context, i) {
                       return InsightsCardWidget(
+                        isFav: false,
                         blogData: _homeController.getBlogDataModel.data![i],
                         onPress: () {
                           Get.to(() => InsightsDetailPage(

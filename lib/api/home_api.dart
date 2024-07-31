@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/model/artiest_list_model.dart';
 import 'package:salon_customer/model/artiest_portfolio_model.dart';
@@ -21,11 +22,12 @@ import 'package:salon_customer/model/save_address_model.dart';
 import 'package:salon_customer/model/search_model/search_model.dart';
 import 'package:salon_customer/model/un_available_dates_model.dart';
 import 'package:salon_customer/model/user_booking_qr_code_model.dart';
+import 'package:salon_customer/util/logger.dart';
 import '../model/current_booking_list_model.dart';
 
 class HomeAPI {
-  /*---------------------- home category ------------------*/
-  static Future<HomeCategoryListModel> homeCategoryList({required String gender}) async {
+  /*---------------------- home category ------------------*/ static Future<
+      HomeCategoryListModel> homeCategoryList({required String gender}) async {
     final response = await DioClient.client
         .get("user/home/category/list", queryParameters: {"gender": gender});
     if (response.isSuccess) {
@@ -35,11 +37,62 @@ class HomeAPI {
     }
   }
 
+  /*--------------- Make Package Data Get ---------------------- */
+  static Future<HomeCategoryListModel> makePackageDataGet() async {
+    final response =
+        await DioClient.client.get("user/home/get-last-make-your-own-package");
+    if (response.isSuccess) {
+      return HomeCategoryListModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*---------------  crate Package Package Category --------------*/
+  static Future<bool> createOwnPackage(
+      {required List<String> serviceCategoryIds}) async {
+    final formData = FormData.fromMap({});
+
+    if (serviceCategoryIds.isNotEmpty) {
+      for (int i = 0; i < serviceCategoryIds.length; i++) {
+        formData.fields
+            .add(MapEntry("serviceCategoryIds[]", serviceCategoryIds[i]));
+      }
+    }
+    logger.e(formData);
+    final response = await DioClient.client
+        .patch("user/home/make-your-own-package-add-service", data: formData);
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*----------------------  remove Package Category -----------------*/
+  static Future<bool> removePackageCategory(
+      {required List<String> serviceCategoryIds}) async {
+    final formData = FormData.fromMap({});
+    if (serviceCategoryIds.isNotEmpty) {
+      for (int i = 0; i < serviceCategoryIds.length; i++) {
+        formData.fields
+            .add(MapEntry("serviceCategoryIds[]", serviceCategoryIds[i]));
+      }
+    }
+    final response = await DioClient.client.patch(
+        "user/home/make-your-own-package-remove-service",
+        data: formData);
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
   /*-------------------  get Salon  Salon -----------------*/
   static Future<HomeSalonModel> getSalonHome(
       {required int offset,
       required int size,
-      required List<String> serviceCategoryId,
       required double lat,
       required double lng,
       required String orderBy,
@@ -60,13 +113,6 @@ class HomeAPI {
 
     if (orderBy.isNotEmpty) {
       formData.fields.add(MapEntry("orderBy", orderBy));
-    }
-
-    if (serviceCategoryId.isNotEmpty) {
-      for (int i = 0; i < serviceCategoryId.length; i++) {
-        formData.fields
-            .add(MapEntry("serviceCategoryId[]", serviceCategoryId[i]));
-      }
     }
 
     final response = await DioClient.client
@@ -259,7 +305,6 @@ class HomeAPI {
     }
   }
 
-
   /*------------- Get User Cart  Data -------------*/
   static Future<ServiceAddCartModel> getUserCart() async {
     final response = await DioClient.client.get("user/cart");
@@ -420,6 +465,42 @@ class HomeAPI {
       throw response.data;
     }
   }
+
+  /*-----------------  Get Fav BlogData ------------*/
+  static Future<BlogDataModel> getFavBlogData()async{
+    final response = await DioClient.client.get("user/blog/save");
+    if (response.isSuccess) {
+      return BlogDataModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+
+  }
+
+
+  /*----------------  Add Fav Blog ----------------*/
+  static Future<bool> addFavBlog(String blogId) async {
+    final response = await DioClient.client
+        .put("user/blog/save/add", data: {"blogId": blogId});
+    if(response.isSuccess){
+      return  true;
+    }else{
+      return  response.data;
+    }
+  }
+  
+  
+  /*----------------- Remove Blog ---------------------*/
+  static  Future<bool>  removeBlog(String blogId) async{
+    final  response  =   await  DioClient.client.delete("/user/blog/save/remove",
+        data: {"blogId": blogId}
+    );
+    if(response.isSuccess){
+      return true;
+    }else{
+      return  response.data;
+    }
+  }  
 
   /*------------------- Review & Rating ------------------*/
   static Future<ReviewRatingUserModel> getReviewRating() async {

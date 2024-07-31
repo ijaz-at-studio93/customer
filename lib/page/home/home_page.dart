@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     getCurrentLatLng();
     if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
-      selectedGender.value  = 0;
+      selectedGender.value = 0;
     } else {
       if (SharedPrefs.readStringValue(PrefConstants.gender) == "0") {
         selectedGender.value = 0;
@@ -64,7 +64,7 @@ class _HomePageState extends State<HomePage> {
       body: Obx(
         () => ProgressContainerView(
           isProgressRunning: _homeController.showProgress,
-          child:   ListView(
+          child: ListView(
             shrinkWrap: true,
             children: [
               _headerWidget(),
@@ -89,6 +89,13 @@ class _HomePageState extends State<HomePage> {
                               .getHomeSalonList.data!.rows![index],
                           onPress: () {
                             Get.to(() => SaloonAfterSelectingServicesPage(
+                                  avRating: _homeController
+                                          .getHomeSalonList
+                                          .data
+                                          ?.rows?[index]
+                                          .averageArtistRatings
+                                          .toString() ??
+                                      "",
                                   id: _homeController.getHomeSalonList.data
                                           ?.rows?[index].id ??
                                       "",
@@ -132,7 +139,7 @@ class _HomePageState extends State<HomePage> {
                   height: 50,
                   width: 100,
                   decoration: BoxDecoration(
-                    color:  selectedGender.value == 0
+                    color: selectedGender.value == 0
                         ? ColorConstant.primaryColor
                         : ColorConstant.whiteColor,
                     borderRadius: const BorderRadius.only(
@@ -146,14 +153,14 @@ class _HomePageState extends State<HomePage> {
                       Image.asset(AssetsConstant.man,
                           height: 24,
                           width: 24,
-                          color:  selectedGender.value == 0
+                          color: selectedGender.value == 0
                               ? ColorConstant.whiteColor
                               : ColorConstant.grayTextColor),
                       const SizedBox(width: 8),
                       Text(
-                        "Man",
+                        "Men",
                         style: AppTextTheme.medium.copyWith(
-                            color:  selectedGender.value == 0
+                            color: selectedGender.value == 0
                                 ? ColorConstant.whiteColor
                                 : ColorConstant.grayTextColor),
                       )
@@ -179,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                   height: 50,
                   width: 100,
                   decoration: BoxDecoration(
-                      color:  selectedGender.value == 1
+                      color: selectedGender.value == 1
                           ? ColorConstant.primary2
                           : ColorConstant.whiteColor,
                       borderRadius: const BorderRadius.only(
@@ -193,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                         AssetsConstant.woman,
                         height: 24,
                         width: 24,
-                        color:  selectedGender.value == 1
+                        color: selectedGender.value == 1
                             ? ColorConstant.whiteColor
                             : ColorConstant.grayTextColor,
                       ),
@@ -201,7 +208,7 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         "Women",
                         style: AppTextTheme.medium.copyWith(
-                            color:  selectedGender.value == 1
+                            color: selectedGender.value == 1
                                 ? ColorConstant.whiteColor
                                 : ColorConstant.grayTextColor),
                       )
@@ -231,7 +238,6 @@ class _HomePageState extends State<HomePage> {
                     callback: () {
                       _homeController.doGetHomeSalonList(
                           homeService: atHome,
-                          serviceCategoryId: [],
                           offset: 1,
                           size: 50,
                           lat: double.parse(SharedPrefs.readStringValue(
@@ -249,8 +255,8 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Image.asset(
                   AssetsConstant.location,
-                  width: 40,
-                  height: 40,
+                  width: 35,
+                  height: 35,
                   color: changeTheme(
                       SharedPrefs.readStringValue(PrefConstants.gender)),
                 ),
@@ -261,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                     Text(
                       _authController.userCity,
                       style: AppTextTheme.bold.copyWith(
-                          color: ColorConstant.blackColor, fontSize: 20),
+                          color: ColorConstant.blackColor, fontSize: 18),
                     ),
                     const SizedBox(height: 3),
                     _homeController.showProgress
@@ -274,7 +280,7 @@ class _HomePageState extends State<HomePage> {
                                 maxLines: 1,
                                 style: AppTextTheme.medium.copyWith(
                                     color: ColorConstant.grayColor,
-                                    fontSize: 13),
+                                    fontSize: 12),
                               ),
                             ),
                           ),
@@ -292,8 +298,8 @@ class _HomePageState extends State<HomePage> {
                   ));
             },
             child: Container(
-              width: 42,
-              height: 42,
+              width: 40,
+              height: 40,
               decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: changeTheme(
@@ -305,7 +311,7 @@ class _HomePageState extends State<HomePage> {
                             .toUpperCase() ??
                         "",
                     style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.whiteColor, fontSize: 20)),
+                        color: ColorConstant.whiteColor, fontSize: 18)),
               ),
             ),
           )
@@ -369,8 +375,9 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text(
                   "Our Services",
+                  textScaler: const TextScaler.linear(0.90),
                   style: AppTextTheme.bold
-                      .copyWith(fontSize: 19, color: ColorConstant.blackColor),
+                      .copyWith(fontSize: 17, color: ColorConstant.blackColor),
                 ),
                 TextButton(
                     onPressed: () {
@@ -404,9 +411,16 @@ class _HomePageState extends State<HomePage> {
                                   }
                                 });
 
+                                if (storeServiceId.isNotEmpty) {
+                                  _homeController.doAddPackageOneData(
+                                      serviceCategoryIds: storeServiceId,
+                                      callback: () {
+                                        _homeController.doGetMakePackageData();
+                                      });
+                                }
+
                                 _homeController.doGetHomeSalonList(
                                     homeService: atHome,
-                                    serviceCategoryId: storeServiceId,
                                     offset: 1,
                                     size: 50,
                                     lat: double.parse(
@@ -432,137 +446,323 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
             height: 130,
-            child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _homeController
-                        .homeCategoryListResponseModel.data?.length ??
-                    0,
-                shrinkWrap: true,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
+            child: _homeController
+                        .getLastMakeYourOwnPackageModel.data?.isEmpty ??
+                    false
+                ? GestureDetector(
                     onTap: () {
-                      if (_homeController.homeCategoryListResponseModel
-                              .data?[index].isSelectCategory ??
-                          false) {
-                        _homeController.categoryId.remove(_homeController
-                                .homeCategoryListResponseModel
-                                .data?[index]
-                                .id ??
-                            "");
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return MenuDialogWidget(
+                              categoryListData:
+                                  _homeController.homeCategoryListResponseModel,
+                              callback: () {
+                                List<String> storeServiceId = [];
+                                setState(() {
+                                  for (int i = 0;
+                                      i <
+                                          _homeController
+                                              .homeCategoryListResponseModel
+                                              .data!
+                                              .length;
+                                      i++) {
+                                    if (_homeController
+                                            .homeCategoryListResponseModel
+                                            .data?[i]
+                                            .isSelectCategory ??
+                                        false) {
+                                      storeServiceId.add(_homeController
+                                              .homeCategoryListResponseModel
+                                              .data?[i]
+                                              .id ??
+                                          "");
+                                    }
+                                  }
+                                });
 
-                        _homeController.homeCategoryListResponseModel
-                            .data?[index].isSelectCategory = false;
-
-                        List<String> storeServiceId = [];
-                        setState(() {
-                          for (int i = 0;
-                              i <
-                                  _homeController.homeCategoryListResponseModel
-                                      .data!.length;
-                              i++) {
-                            if (_homeController.homeCategoryListResponseModel
-                                    .data?[i].isSelectCategory ??
-                                false) {
-                              storeServiceId.add(_homeController
-                                      .homeCategoryListResponseModel
-                                      .data?[i]
-                                      .id ??
-                                  "");
-                            }
-                          }
-                        });
-
-                        _homeController.doGetHomeSalonList(
-                            homeService: atHome,
-                            serviceCategoryId: storeServiceId,
-                            offset: 1,
-                            size: 50,
-                            lat: double.parse(SharedPrefs.readStringValue(
-                                PrefConstants.latitude)),
-                            lng: double.parse(SharedPrefs.readStringValue(
-                                PrefConstants.longitude)),
-                            orderBy: "",
-                            nearest: false,
-                            fourPlusRating: false);
-                      }
+                                if (storeServiceId.isNotEmpty) {
+                                  _homeController.doAddPackageOneData(
+                                      serviceCategoryIds: storeServiceId,
+                                      callback: () {
+                                        _homeController.doGetMakePackageData();
+                                      });
+                                }
+                                _homeController.doGetHomeSalonList(
+                                    homeService: atHome,
+                                    offset: 1,
+                                    size: 50,
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)),
+                                    orderBy: "",
+                                    nearest: false,
+                                    fourPlusRating: false);
+                              },
+                            );
+                          });
                     },
-                    child: Column(
+                    child: Row(
                       children: [
-                        Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(100),
-                              child: CachedNetworkImage(
-                                height: 80,
-                                width: 80,
-                                fit: BoxFit.cover,
-                                imageUrl: SharedPrefs.readStringValue(
-                                            PrefConstants.gender) ==
-                                        "0"
-                                    ? "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageMale}"
-                                    : "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageFemale}",
-                                placeholder: (context, url) => const Image(
-                                  image: AssetImage(AssetsConstant.placeHolder),
-                                  height: 80,
-                                  width: 80,
-                                  fit: BoxFit.cover,
-                                ),
-                                errorWidget: (context, url, error) =>
-                                    const Image(
-                                  image: AssetImage(AssetsConstant.placeHolder),
-                                  height: 80,
-                                  width: 80,
-                                  fit: BoxFit.cover,
-                                ),
+                        const SizedBox(width: 20),
+                        Container(
+                            width: 95,
+                            height: 95,
+                            clipBehavior: Clip.antiAlias,
+                            decoration: ShapeDecoration(
+                              gradient: const RadialGradient(
+                                center: Alignment(0.57, 0.07),
+                                radius: 0.90,
+                                colors: [Color(0xFFE1D5FF), Colors.white],
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(64),
                               ),
                             ),
-                            Positioned(
-                              right: -3,
-                              top: 2,
-                              child: _homeController
-                                          .homeCategoryListResponseModel
-                                          .data?[index]
-                                          .isSelectCategory ??
-                                      false
-                                  ? Container(
-                                      height: 21,
-                                      width: 21,
-                                      decoration: BoxDecoration(
-                                          color: changeTheme(
-                                              SharedPrefs.readStringValue(
-                                                  PrefConstants.gender)),
-                                          shape: BoxShape.circle),
-                                      child: Center(
-                                        child: Image.asset(
-                                          AssetsConstant.xMark,
-                                          color: ColorConstant.whiteColor,
-                                          width: 10,
-                                          height: 10,
-                                        ),
-                                      ),
-                                    )
-                                  : const SizedBox(),
-                            )
-                          ],
-                        ),
-                        const SizedBox(height: 12),
-                        SizedBox(
-                          width: Get.width * 0.25,
-                          child: Text(
-                            _homeController.homeCategoryListResponseModel
-                                    .data?[index].name ??
-                                "",
-                            textAlign: TextAlign.center,
-                            maxLines: 2,
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 13, color: ColorConstant.blackColor),
-                          ),
-                        )
+                            child: Center(
+                              child: Image.asset(
+                                AssetsConstant.makePackageImage,
+                                width: 50,
+                                height: 50,
+                              ),
+                            )),
                       ],
                     ),
-                  );
-                }),
+                  )
+                : Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: ListView.builder(
+                            physics: const BouncingScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            itemCount: _homeController
+                                    .getLastMakeYourOwnPackageModel
+                                    .data
+                                    ?.length ??
+                                0,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              return GestureDetector(
+                                onTap: () {
+                                  var id = _homeController
+                                      .getLastMakeYourOwnPackageModel
+                                      .data?[index]
+                                      .id;
+
+                                  for (int i = 0;
+                                      i <
+                                          _homeController
+                                              .homeCategoryListResponseModel
+                                              .data!
+                                              .length;
+                                      i++) {
+                                    if (id ==
+                                        _homeController
+                                            .homeCategoryListResponseModel
+                                            .data?[i]
+                                            .id) {
+                                      _homeController
+                                          .homeCategoryListResponseModel
+                                          .data?[i]
+                                          .isSelectCategory = false;
+                                    }
+                                  }
+
+                                  List<String> storeServiceId = [];
+                                  storeServiceId.add(_homeController
+                                          .getLastMakeYourOwnPackageModel
+                                          .data?[index]
+                                          .id ??
+                                      "");
+                                  _homeController.doRemovePackageData(
+                                      serviceCategoryIds: storeServiceId,
+                                      callback: () {
+                                        _homeController.doGetMakePackageData();
+                                      });
+                                  _homeController.doGetHomeSalonList(
+                                      homeService: atHome,
+                                      offset: 1,
+                                      size: 50,
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)),
+                                      orderBy: "",
+                                      nearest: false,
+                                      fourPlusRating: false);
+                                },
+                                child: Column(
+                                  children: [
+                                    Stack(
+                                      clipBehavior: Clip.none,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(100),
+                                          child: CachedNetworkImage(
+                                            height: 80,
+                                            width: 80,
+                                            fit: BoxFit.cover,
+                                            imageUrl: SharedPrefs
+                                                        .readStringValue(
+                                                            PrefConstants
+                                                                .gender) ==
+                                                    "0"
+                                                ? "${APIConstants.image}${_homeController.getLastMakeYourOwnPackageModel.data?[index].imageMale}"
+                                                : "${APIConstants.image}${_homeController.getLastMakeYourOwnPackageModel.data?[index].imageFemale}",
+                                            placeholder: (context, url) =>
+                                                const Image(
+                                              image: AssetImage(
+                                                  AssetsConstant.placeHolder),
+                                              height: 80,
+                                              width: 80,
+                                              fit: BoxFit.cover,
+                                            ),
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    const Image(
+                                              image: AssetImage(
+                                                  AssetsConstant.placeHolder),
+                                              height: 80,
+                                              width: 80,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          right: -3,
+                                          top: 2,
+                                          child: Container(
+                                            height: 21,
+                                            width: 21,
+                                            decoration: BoxDecoration(
+                                                color: changeTheme(
+                                                    SharedPrefs.readStringValue(
+                                                        PrefConstants.gender)),
+                                                shape: BoxShape.circle),
+                                            child: Center(
+                                              child: Image.asset(
+                                                AssetsConstant.xMark,
+                                                color: ColorConstant.whiteColor,
+                                                width: 10,
+                                                height: 10,
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    SizedBox(
+                                      width: Get.width * 0.25,
+                                      child: Text(
+                                        _homeController
+                                                .homeCategoryListResponseModel
+                                                .data?[index]
+                                                .name ??
+                                            "",
+                                        textAlign: TextAlign.center,
+                                        maxLines: 2,
+                                        style: AppTextTheme.medium.copyWith(
+                                            fontSize: 13,
+                                            color: ColorConstant.blackColor),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            }),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: GestureDetector(
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return MenuDialogWidget(
+                                    categoryListData: _homeController
+                                        .homeCategoryListResponseModel,
+                                    callback: () {
+                                      List<String> storeServiceId = [];
+                                      setState(() {
+                                        for (int i = 0;
+                                            i <
+                                                _homeController
+                                                    .homeCategoryListResponseModel
+                                                    .data!
+                                                    .length;
+                                            i++) {
+                                          if (_homeController
+                                                  .homeCategoryListResponseModel
+                                                  .data?[i]
+                                                  .isSelectCategory ??
+                                              false) {
+                                            storeServiceId.add(_homeController
+                                                    .homeCategoryListResponseModel
+                                                    .data?[i]
+                                                    .id ??
+                                                "");
+                                          }
+                                        }
+                                      });
+
+                                      if (storeServiceId.isNotEmpty) {
+                                        _homeController.doAddPackageOneData(
+                                            serviceCategoryIds: storeServiceId,
+                                            callback: () {
+                                              _homeController
+                                                  .doGetMakePackageData();
+                                            });
+                                      }
+                                      _homeController.doGetHomeSalonList(
+                                          homeService: atHome,
+                                          offset: 1,
+                                          size: 50,
+                                          lat: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.latitude)),
+                                          lng: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.longitude)),
+                                          orderBy: "",
+                                          nearest: false,
+                                          fourPlusRating: false);
+                                    },
+                                  );
+                                });
+                          },
+                          child: Container(
+                              width: 80,
+                              height: 80,
+                              clipBehavior: Clip.none,
+                              decoration: ShapeDecoration(
+                                gradient: const RadialGradient(
+                                  center: Alignment(0.57, 0.07),
+                                  radius: 0.90,
+                                  colors: [Color(0xFFE1D5FF), Colors.white],
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(64),
+                                ),
+                              ),
+                              child: Center(
+                                child: Image.asset(
+                                  AssetsConstant.addPackageImage,
+                                  width: 30,
+                                  height: 30,
+                                ),
+                              )),
+                        ),
+                      ),
+                    ],
+                  ),
           )
         ],
       ),
@@ -647,15 +847,15 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${_homeController.getHomeSalonList.data?.rows?.length} Saloons Found Near You",
-                  textScaler: const TextScaler.linear(0.70),
+                  "${_homeController.getHomeSalonList.data?.rows?.length} Salons Found Near You",
+                  textScaler: const TextScaler.linear(0.90),
                   style: AppTextTheme.bold
-                      .copyWith(fontSize: 19, color: ColorConstant.blackColor),
+                      .copyWith(fontSize: 17, color: ColorConstant.blackColor),
                 ),
                 const SizedBox(width: 5),
                 Container(
@@ -665,7 +865,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Text(
                         "Home Service",
-                        style: AppTextTheme.medium.copyWith(
+                        style: AppTextTheme.bold.copyWith(
                             color: changeTheme(SharedPrefs.readStringValue(
                                 PrefConstants.gender)),
                             fontSize: 13),
@@ -682,7 +882,6 @@ class _HomePageState extends State<HomePage> {
 
                               _homeController.doGetHomeSalonList(
                                   homeService: atHome,
-                                  serviceCategoryId: [],
                                   offset: 1,
                                   size: 50,
                                   lat: double.parse(SharedPrefs.readStringValue(
@@ -731,7 +930,7 @@ class _HomePageState extends State<HomePage> {
                             return DropdownMenuItem(
                               value: items,
                               child: Text(items,
-                                  style: AppTextTheme.medium.copyWith(
+                                  style: AppTextTheme.bold.copyWith(
                                       color: ColorConstant.blackColor,
                                       fontSize: 13)),
                             );
@@ -742,7 +941,6 @@ class _HomePageState extends State<HomePage> {
 
                               _homeController.doGetHomeSalonList(
                                   homeService: atHome,
-                                  serviceCategoryId: [],
                                   offset: 1,
                                   size: 50,
                                   lat: double.parse(SharedPrefs.readStringValue(
@@ -776,7 +974,6 @@ class _HomePageState extends State<HomePage> {
                             select = 1;
                             _homeController.doGetHomeSalonList(
                                 homeService: atHome,
-                                serviceCategoryId: [],
                                 offset: 1,
                                 size: 50,
                                 lat: double.parse(SharedPrefs.readStringValue(
@@ -807,7 +1004,7 @@ class _HomePageState extends State<HomePage> {
                           child: Center(
                             child: Text(
                               "Nearest",
-                              style: AppTextTheme.medium.copyWith(
+                              style: AppTextTheme.bold.copyWith(
                                   color: select == 1
                                       ? ColorConstant.whiteColor
                                       : ColorConstant.blackColor,
@@ -823,7 +1020,6 @@ class _HomePageState extends State<HomePage> {
                             select = 2;
                             _homeController.doGetHomeSalonList(
                                 homeService: atHome,
-                                serviceCategoryId: [],
                                 offset: 1,
                                 size: 50,
                                 lat: double.parse(SharedPrefs.readStringValue(
@@ -854,7 +1050,7 @@ class _HomePageState extends State<HomePage> {
                           child: Center(
                             child: Text(
                               "Rating",
-                              style: AppTextTheme.medium.copyWith(
+                              style: AppTextTheme.bold.copyWith(
                                   color: select == 2
                                       ? ColorConstant.whiteColor
                                       : ColorConstant.blackColor,
@@ -899,11 +1095,10 @@ class _HomePageState extends State<HomePage> {
           "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         _homeController.doGetHomeCategory(
-          gender:  selectedGender.value == 0 ? "male" : "female",
+          gender: selectedGender.value == 0 ? "male" : "female",
         );
         _homeController.doGetHomeSalonList(
             homeService: atHome,
-            serviceCategoryId: [],
             offset: 1,
             size: 50,
             lat: position.latitude,
@@ -940,12 +1135,9 @@ class _HomePageState extends State<HomePage> {
       _authController.userCurrentLocation =
           "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
 
-      _homeController.doGetHomeCategory(
-        gender:  selectedGender.value == 0 ? "male" : "female",
-      );
+      _homeController.doGetMakePackageData();
       _homeController.doGetHomeSalonList(
           homeService: atHome,
-          serviceCategoryId: [],
           offset: 1,
           size: 50,
           lat: position.latitude,
