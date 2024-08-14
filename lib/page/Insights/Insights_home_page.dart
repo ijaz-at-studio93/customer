@@ -51,11 +51,11 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
             ? const ProgressBarView()
             : _homeController.getBlogDataModel.data?.isEmpty ??
                     false || _homeController.getBlogDataModel.data == null
-                ? const NoItemsWidget(text: "No Blog Data Found")
+                ? const NoItemsWidget(text: "No insight data is available")
                 : ListView.separated(
                     separatorBuilder: (context, i) {
                       return const Divider(
-                        thickness: 2,
+                        thickness: 1,
                         color: ColorConstant.divider2Color,
                         indent: 20,
                         endIndent: 20,
@@ -71,7 +71,16 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
                         isFav: false,
                         blogData: _homeController.getBlogDataModel.data![i],
                         onPress: () {
+                          _homeController.doAddViewForBlogSection(
+                              blogID: _homeController
+                                      .getBlogDataModel.data?[i].id ??
+                                  "");
                           Get.to(() => InsightsDetailPage(
+                                video: _homeController.getBlogDataModel.data?[i]
+                                            .video?.isEmpty ??
+                                        false
+                                    ? ""
+                                    : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].video ?? ""}",
                                 body: _homeController.getBlogDataModel.data?[i]
                                         .description ??
                                     "",
@@ -82,7 +91,7 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
                                         .getBlogDataModel.data?[i].body ??
                                     "",
                                 image:
-                                    "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].image ?? ""}",
+                                _homeController.getBlogDataModel.data?[i].image?.isEmpty ??  false ? "" : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].image ?? ""}",
                               ));
                         },
                       );

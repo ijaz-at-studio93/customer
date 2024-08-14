@@ -35,8 +35,10 @@ class BlogData {
   String? title;
   String? description;
   String? image;
+  String? video;
   String? createdAt;
   String? body;
+  int? viewCount;
   Artist? artist;
   bool?  isFavourite;
 
@@ -45,8 +47,10 @@ class BlogData {
       this.title,
       this.description,
       this.image,
+      this.video,
       this.createdAt,
       this.body,
+      this.viewCount,
       this.artist,
       this.isFavourite
       });
@@ -56,8 +60,10 @@ class BlogData {
     title = json['title'];
     description = json['description'];
     image = json['image'];
+    video = json['video'];
     createdAt = json['createdAt'];
     body = json['body'];
+    viewCount = json['viewCount'];
     isFavourite =  json['isFavourite'];
     artist = json['artist'] != null ? Artist.fromJson(json['artist']) : null;
   }
@@ -68,8 +74,10 @@ class BlogData {
     data['title'] = title;
     data['description'] = description;
     data['image'] = image;
+    data['video'] = video;
     data['createdAt'] = createdAt;
     data['body'] = body;
+    data['viewCount'] = viewCount;
     data['isFavourite'] = isFavourite;
     if (artist != null) {
       data['artist'] = artist!.toJson();

@@ -53,20 +53,20 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     ),
                     child: CachedNetworkImage(
                       width: Get.width,
-                      height: Get.height * 0.25,
+                      height: Get.height * 0.20,
                       fit: BoxFit.fitWidth,
                       imageUrl:
                           "${APIConstants.image}${widget.homeSalonModel.image}",
                       placeholder: (context, url) => Image(
                         image: const AssetImage(AssetsConstant.placeHolder),
                         width: Get.width,
-                        height: Get.height * 0.25,
+                        height: Get.height * 0.20,
                         fit: BoxFit.fitWidth,
                       ),
                       errorWidget: (context, url, error) => Image(
                         image: const AssetImage(AssetsConstant.placeHolder),
                         width: Get.width,
-                        height: Get.height * 0.25,
+                        height: Get.height * 0.20,
                         fit: BoxFit.fitWidth,
                       ),
                     ),
@@ -145,7 +145,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         ),
                         const SizedBox(width: 5),
                         Text(
-                            'Average Stylist Rating',
+                          'Average Stylist Rating',
                           style: AppTextTheme.medium.copyWith(
                               fontSize: 13, color: ColorConstant.whiteColor),
                         ),
@@ -154,7 +154,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Row(
@@ -175,24 +175,11 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           ),
                         ),
                         const SizedBox(height: 5),
-                        if (widget.homeSalonModel.homeService ?? false)
-                          Row(
-                            children: [
-                              Icon(Icons.home,
-                                  size: 20,
-                                  color: changeTheme(
-                                      SharedPrefs.readStringValue(
-                                          PrefConstants.gender))),
-                              Text(
-                                " • Available for Home",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.grayTextColor,
-                                    fontSize: 13),
-                              ),
-                            ],
-                          )
-                        else
-                          const SizedBox(),
+                        Text(
+                          "${widget.homeSalonModel.distanceTime} Min • ${widget.homeSalonModel.homeService == true ? "Available for Home" : "Available for Shop"}",
+                          style: AppTextTheme.medium.copyWith(
+                              color: ColorConstant.grayTextColor, fontSize: 13),
+                        ),
                         const SizedBox(height: 5),
                         Row(
                           children: [
@@ -262,7 +249,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                   ],
                 ),
               ),
-              const SizedBox(height: 5),
+              const SizedBox(height: 2),
               Dash(
                 direction: Axis.horizontal,
                 length: Get.width * 0.8,
@@ -270,7 +257,8 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                 dashColor: ColorConstant.grayTextColor,
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
                 child: Row(
                   children: [
                     Image.asset(

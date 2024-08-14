@@ -28,26 +28,27 @@ class DialogMenuListWidget extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(100),
                 child: CachedNetworkImage(
-                  height: 80,
-                  width: 80,
+                  height: 70,
+                  width: 70,
                   // Horoscope image
                   fit: BoxFit.cover,
-                  imageUrl: categoryListData.serviceableGender == "male"
+                  imageUrl: SharedPrefs.readStringValue(PrefConstants.gender) ==
+                          "0"
                       ? "${APIConstants.image}${categoryListData.imageMale}"
                       : "${APIConstants.image}${categoryListData.imageFemale}",
                   placeholder: (context, url) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
-                    height: 80,
-                    width: 80,
+                    height: 70,
+                    width: 70,
                     // Horoscope image
                     fit: BoxFit.cover,
                   ),
                   errorWidget: (context, url, error) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
-                    height: 80,
-                    width: 80,
+                    height: 70,
+                    width: 70,
                     // Horoscope image
                     fit: BoxFit.cover,
                   ),
@@ -59,7 +60,7 @@ class DialogMenuListWidget extends StatelessWidget {
                 width: Get.width * 0.2,
                 child: Text(
                   categoryListData.name ?? "", // Horoscope name
-                  maxLines: 2,
+                  maxLines: 1,
                   textAlign: TextAlign.center,
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.medium
@@ -71,8 +72,8 @@ class DialogMenuListWidget extends StatelessWidget {
             ],
           ),
           Positioned(
-            right: -5,
-            top: 2,
+            right: -3,
+            top: 10,
             child: categoryListData.isSelectCategory ?? false
                 ? Container(
                     height: 21,

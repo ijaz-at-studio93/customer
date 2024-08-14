@@ -58,7 +58,7 @@ class _BookingHomePageState extends State<BookingHomePage> {
                                     .getCurrentBookingListModel.data?.isEmpty ??
                                 false
                             ? const NoItemsWidget(
-                                text: "No Any Pending Booking",
+                                text: "There are no current bookings on record",
                               )
                             : ListView.builder(
                                 shrinkWrap: true,
@@ -90,7 +90,7 @@ class _BookingHomePageState extends State<BookingHomePage> {
                                     .getBookingHistoryListModel.data?.isEmpty ??
                                 false
                             ? const NoItemsWidget(
-                                text: "No Any Pending Booking",
+                                text: "There are no completed bookings available.",
                               )
                             : ListView.builder(
                                 shrinkWrap: true,

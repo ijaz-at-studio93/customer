@@ -91,7 +91,7 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                                     onPress: () {
                                       Get.to(() =>
                                           SaloonAfterSelectingServicesPage(
-                                              avRating: "",
+
                                               id: _homeController
                                                       .getSearchSalonModel
                                                       .data?[index]
@@ -116,7 +116,7 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
         children: [
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            height: 55,
+            height: 48,
             width: Get.width,
             decoration: ShapeDecoration(
               color: ColorConstant.whiteColor,

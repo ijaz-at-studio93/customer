@@ -5,15 +5,23 @@ import 'package:readmore/readmore.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
+import 'package:salon_customer/page/stylist/widget/network_video_view_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 
 class InsightsDetailPage extends StatefulWidget {
   final String image;
-  final String  title;
-  final String  subTitle;
-  final String  body;
-  const InsightsDetailPage({super.key, required this.image, required this.title, required this.subTitle, required this.body});
+  final String video;
+  final String title;
+  final String subTitle;
+  final String body;
+  const InsightsDetailPage(
+      {super.key,
+      required this.image,
+      required this.title,
+      required this.subTitle,
+      required this.body,
+      required this.video});
 
   @override
   State<InsightsDetailPage> createState() => _InsightsDetailPageState();
@@ -46,24 +54,26 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CachedNetworkImage(
-              width: Get.width,
-              height: Get.height * 0.3,
-              fit: BoxFit.cover,
-              imageUrl: widget.image,
-              placeholder: (context, url) => Image(
-                image: const AssetImage(AssetsConstant.placeHolder),
-                width: Get.width,
-                height: Get.height * 0.3,
-                fit: BoxFit.cover,
-              ),
-              errorWidget: (context, url, error) => Image(
-                image: const AssetImage(AssetsConstant.placeHolder),
-                width: Get.width,
-                height: Get.height * 0.3,
-                fit: BoxFit.cover,
-              ),
-            ),
+            widget.image.isEmpty
+                ? NetworkVideoViewWidget(videoString: widget.video)
+                : CachedNetworkImage(
+                    width: Get.width,
+                    height: Get.height * 0.3,
+                    fit: BoxFit.cover,
+                    imageUrl: widget.image,
+                    placeholder: (context, url) => Image(
+                      image: const AssetImage(AssetsConstant.placeHolder),
+                      width: Get.width,
+                      height: Get.height * 0.3,
+                      fit: BoxFit.cover,
+                    ),
+                    errorWidget: (context, url, error) => Image(
+                      image: const AssetImage(AssetsConstant.placeHolder),
+                      width: Get.width,
+                      height: Get.height * 0.3,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
             const SizedBox(height: 18),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),

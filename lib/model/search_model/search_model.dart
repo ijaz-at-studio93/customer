@@ -78,7 +78,7 @@ class SalonListData {
     id = json['id'];
     image = json['image'];
     name = json['name'];
-    rating = json['rating'];
+    rating = double.parse(json['rating'].toString());
     reviewCount = json['reviewCount'];
   }
 

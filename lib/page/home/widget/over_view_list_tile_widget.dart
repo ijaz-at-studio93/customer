@@ -51,7 +51,7 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                     overflow: TextOverflow.ellipsis,
                     textScaler: const TextScaler.linear(0.85),
                     style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 18),
+                        color: ColorConstant.blackColor, fontSize: 16),
                   ),
                 ),
                 const SizedBox(height: 5),
@@ -72,24 +72,6 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                   ],
                 ),
                 const SizedBox(height: 5),
-
-            /*    Row(
-                  children: [
-                    Text(
-                      "Gender • ",
-                      textScaler: const TextScaler.linear(0.85),
-                      style: AppTextTheme.bold.copyWith(
-                          color: ColorConstant.blackColor, fontSize: 16),
-                    ),
-                    Text(
-                      widget.servicesList.gender ?? "",
-                      textScaler: const TextScaler.linear(0.85),
-                      style: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.grayColor, fontSize: 16),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),*/
                 Row(
                   children: [
                     Text(
@@ -106,23 +88,7 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 5),
-                /*widget.servicesList.homeService ?? false
-                    ? Row(
-                        children: [
-                          const Icon(Icons.home, size: 15),
-                          const SizedBox(width: 5),
-                          Text(
-                            "Is service available",
-                            textScaler: const TextScaler.linear(0.85),
-                            style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.grayColor, fontSize: 16),
-                          ),
-                        ],
-                      )
-                    : const SizedBox(),
-                const SizedBox(height: 5),*/
                 Dash(
                   direction: Axis.horizontal,
                   length: Get.width * 0.5,

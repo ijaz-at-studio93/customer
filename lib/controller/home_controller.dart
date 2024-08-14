@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/animation.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/api/dio_client.dart';
@@ -11,6 +12,7 @@ import 'package:salon_customer/model/artist_search_model.dart';
 import 'package:salon_customer/model/availabilities_time_sloat_model.dart';
 import 'package:salon_customer/model/blog_data_model.dart';
 import 'package:salon_customer/model/booking_history_list_model.dart';
+import 'package:salon_customer/model/cart/get_product_model.dart';
 import 'package:salon_customer/model/cart/order_id_model.dart';
 import 'package:salon_customer/model/cart/service_add_cart_model.dart';
 import 'package:salon_customer/model/category_service_list_model.dart';
@@ -21,6 +23,7 @@ import 'package:salon_customer/model/home_category_list_model.dart';
 import 'package:salon_customer/model/home_salon_list_model.dart';
 import 'package:salon_customer/model/review_list_data_model.dart';
 import 'package:salon_customer/model/review_rating_data_model.dart';
+import 'package:salon_customer/model/salonId_reviews_model.dart';
 import 'package:salon_customer/model/salon_details_artiest.dart';
 import 'package:salon_customer/model/salon_details_model.dart';
 import 'package:salon_customer/model/save_address_model.dart';
@@ -28,6 +31,8 @@ import 'package:salon_customer/model/search_model/search_model.dart';
 import 'package:salon_customer/model/un_available_dates_model.dart';
 import 'package:salon_customer/model/user_booking_qr_code_model.dart';
 import 'package:salon_customer/util/logger.dart';
+
+import '../model/artiest_popular_service_model.dart';
 
 class HomeController extends GetxController {
   /*>>>>>>>>>>>>>>>>>>>> Loader <<<<<<<<<<<<<<<<<<<<<*/
@@ -63,7 +68,7 @@ class HomeController extends GetxController {
   final Rx<HomeSalonDetailsModel> _homeSalonDetailsData =
       HomeSalonDetailsModel().obs;
   HomeSalonDetailsModel get homeSalonDetailsData => _homeSalonDetailsData.value;
-  set setSalonDetails(val) => _homeCategoryListModel.value = val;
+  set setSalonDetails(val) => _homeSalonDetailsData.value = val;
 
   /*----------------------  Store Data Salon Details Service Data -----------------*/
   final Rx<CategoryServicesListModel> _salonDetailsListData =
@@ -155,6 +160,12 @@ class HomeController extends GetxController {
   ServiceAddCartModel get getServiceAddCartModel => _serviceAddCartModel.value;
   set setServiceAddCartModel(val) => _serviceAddCartModel.value = val;
 
+  /*--------------- Product  List Data Get  -------------*/
+  final Rx<ServiceProductModel> _serviceProductModel =
+      ServiceProductModel().obs;
+  ServiceProductModel get getServiceProductModel => _serviceProductModel.value;
+  set setServiceProductModel(val) => _serviceProductModel.value = val;
+
   /*--------------------  BlogDataModel  -----------------*/
   final Rx<BlogDataModel> _blogDataModel = BlogDataModel().obs;
   BlogDataModel get getBlogDataModel => _blogDataModel.value;
@@ -192,6 +203,20 @@ class HomeController extends GetxController {
   OrderIdModel get getOrderIdModel => _orderIdModel.value;
   set setOrderIdModel(val) => _orderIdModel.value = val;
 
+  /*------------------- Artiest  Popular Service -------------*/
+  final Rx<ArtistPopularServicesModel> _artistPopularServicesModel =
+      ArtistPopularServicesModel().obs;
+  ArtistPopularServicesModel get getArtistPopularServicesModel =>
+      _artistPopularServicesModel.value;
+  set setArtistPopularServicesModel(val) =>
+      _artistPopularServicesModel.value = val;
+
+  /*------------------------ Salon Review For Customer ----------------*/
+  final Rx<SalonIdReviewsModel> _salonIdReviewsModel =
+      SalonIdReviewsModel().obs;
+  SalonIdReviewsModel get getSalonIdReviewsModel => _salonIdReviewsModel.value;
+  set setSalonIdReviewsModel(val) => _salonIdReviewsModel.value = val;
+
   /*-------------  category Id  -----------------*/
   final RxList categoryId = [].obs;
 
@@ -213,6 +238,18 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _getLastMakeYourOwnPackage.value = await HomeAPI.makePackageDataGet();
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*--------------  Get Product For Service ----------------*/
+  doGetProductData({required String serviceId}) async {
+    try {
+      _showProgress.value = true;
+      _serviceProductModel.value = await HomeAPI.getServiceProduct(serviceId);
     } catch (e) {
       showError(e);
     } finally {
@@ -293,11 +330,15 @@ class HomeController extends GetxController {
   /* ------------------------ Pagination End ------------------------ */
 
   /*------------------ Get Salon Details ----------------*/
-  doGetHomeSalonDetails({required String salonId}) async {
+  doGetHomeSalonDetails({
+    required String salonId,
+    required String lat,
+    required String lng,
+  }) async {
     try {
       _showProgress.value = true;
       _homeSalonDetailsData.value =
-          await HomeAPI.getSalonDetail(salonId: salonId);
+          await HomeAPI.getSalonDetail(salonId: salonId, lng: lng, lat: lat);
     } catch (e) {
       showError(e);
       logger.d("DO Get Artiest List Data ${e.toString()}");
@@ -560,7 +601,7 @@ class HomeController extends GetxController {
       _serviceAddCartModel.value = await HomeAPI.getUserCart();
     } catch (e) {
       showError(e);
-      logger.d(" Get Cart ${e.toString()}");
+      logger.d("Get Cart ${e.toString()}");
     } finally {
       _showProgress.value = false;
     }
@@ -585,11 +626,14 @@ class HomeController extends GetxController {
   /*----------------- Add Cart in  Product ------------------*/
 
   doAddProductCart(
-      {required String productId, required VoidCallback callback}) async {
+      {required String productId,
+      required String productSelectedServiceId,
+      required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
-      _serviceAddCartModel.value =
-          await HomeAPI.addProductCart(productId: productId);
+      _serviceAddCartModel.value = await HomeAPI.addProductCart(
+          productId: productId,
+          productSelectedServiceId: productSelectedServiceId);
       if (_serviceAddCartModel.value.success ?? false) {
         callback.call();
       }
@@ -603,10 +647,14 @@ class HomeController extends GetxController {
 
   /*----------------- Remove Cart in  Product ------------------*/
   doRemoveProductCart(
-      {required String productId, required VoidCallback callback}) async {
+      {required String productId,
+      required String productSelectedServiceId,
+      required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
-      bool result = await HomeAPI.removeProductCart(productId: productId);
+      bool result = await HomeAPI.removeProductCart(
+          productId: productId,
+          productSelectedServiceId: productSelectedServiceId);
       if (result) {
         callback.call();
       }
@@ -841,6 +889,7 @@ class HomeController extends GetxController {
           await HomeAPI.searchForSalon(query: query, lat: lat, lng: lng);
     } catch (e) {
       showError(e);
+      logger.d("Search  Data  Error $e");
     } finally {
       _showProgress.value = false;
     }
@@ -925,7 +974,7 @@ class HomeController extends GetxController {
     }
   }
 
-  /*----------  Do  Delete Save Address ------------*/
+  /*----------  Do Delete Save Address ------------*/
   doDeleteSaveAddress(
       {required String id, required VoidCallback callback}) async {
     try {
@@ -934,6 +983,49 @@ class HomeController extends GetxController {
       if (result) {
         callback.call();
       }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*-------------------------  Do Get PopularServiceByYourStylist ---------------*/
+  doGetPopularServiceByYourStylist({required String stylistId}) async {
+    try {
+      _showProgress.value = true;
+      _artistPopularServicesModel.value =
+          await HomeAPI.getPopularServiceByYourStylist(stylistId);
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*----------------------- Do Add View For Blog Section ----------------*/
+  doAddViewForBlogSection({required String blogID}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.addBlogView(blogID);
+      if (result) {
+        if (kDebugMode) {
+          print(result);
+        }
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*---------------  Salon Id to  review get ----------------*/
+  doGetSalonReview({required String salonId}) async {
+    try {
+      _showProgress.value = true;
+      _salonIdReviewsModel.value =
+          await HomeAPI.salonIdToReview(salonId: salonId);
     } catch (e) {
       showError(e);
     } finally {

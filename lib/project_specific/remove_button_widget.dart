@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
-
 import '../constant/color_constant.dart';
 
 class RemoveButtonWidget extends StatefulWidget {

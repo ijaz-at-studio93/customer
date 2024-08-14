@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
+import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
@@ -9,7 +10,24 @@ import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../../constant/variable_constant.dart';
 
 class PopularServiceWidget extends StatelessWidget {
-  const PopularServiceWidget({super.key});
+  final String image;
+  final String name;
+  final String price;
+  final double rating;
+  final String review;
+  final String duration;
+  final bool isAdd;
+  final VoidCallback addButtonTap;
+  const PopularServiceWidget(
+      {super.key,
+      required this.image,
+      required this.name,
+      required this.price,
+      required this.rating,
+      required this.review,
+      required this.duration,
+      required this.addButtonTap,
+      required this.isAdd});
 
   @override
   Widget build(BuildContext context) {
@@ -29,14 +47,19 @@ class PopularServiceWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(6),
               child: CachedNetworkImage(
                 fit: BoxFit.cover,
-                imageUrl:
-                    'https://images.unsplash.com/photo-1488376739361-ed24c9beb6d0?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fHBsYXklMjBpY29ufGVufDB8fDB8fHww',
+                imageUrl: '${APIConstants.image}$image',
                 placeholder: (context, url) => const Image(
-                    image: AssetImage(AssetsConstant.placeHolder),
-                    fit: BoxFit.cover),
+                  image: AssetImage(AssetsConstant.placeHolder),
+                  fit: BoxFit.cover,
+                  width: 110,
+                  height: 110,
+                ),
                 errorWidget: (context, url, error) => const Image(
-                    image: AssetImage(AssetsConstant.placeHolder),
-                    fit: BoxFit.cover),
+                  image: AssetImage(AssetsConstant.placeHolder),
+                  fit: BoxFit.cover,
+                  width: 110,
+                  height: 110,
+                ),
               ),
             ),
           ),
@@ -45,20 +68,22 @@ class PopularServiceWidget extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Low Fade Hair',
+                name,
                 style: AppTextTheme.bold
                     .copyWith(color: ColorConstant.blackColor, fontSize: 16),
               ),
               const SizedBox(height: 5),
               Row(
                 children: [
-                  const Icon(
-                    Icons.star,
-                    size: 12,
+                  Image.asset(
+                    AssetsConstant.starIcon,
+                    height: 13,
+                    width: 13,
                     color: ColorConstant.grayTextColor,
                   ),
+                  const SizedBox(width: 2),
                   Text(
-                    '4.8 (76 Reviews)',
+                    '$rating ($review Reviews)',
                     style: AppTextTheme.medium.copyWith(
                         color: ColorConstant.grayTextColor, fontSize: 12),
                   ),
@@ -75,7 +100,7 @@ class PopularServiceWidget extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(
-                    '₹399',
+                    '₹$price',
                     style: AppTextTheme.bold.copyWith(
                         fontSize: 16, color: ColorConstant.blackColor),
                   ),
@@ -90,37 +115,62 @@ class PopularServiceWidget extends StatelessWidget {
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    '35 min',
+                    '$duration min',
                     style: AppTextTheme.medium.copyWith(
                         color: ColorConstant.grayTextColor, fontSize: 16),
                   )
                 ],
               ),
               const SizedBox(height: 10),
-              Container(
-                width: 100,
-                height: 30,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(6),
-                  color: ColorConstant.pinkBgColor,
-                  border: Border.all(
-                    color: changeTheme(SharedPrefs.readStringValue(
-                            PrefConstants.gender)) ??
-                        ColorConstant.primaryColor,
-                  ),
-                ),
-                child: Center(
-                  child: Text(
-                    "Add",
-                    style: AppTextTheme.medium.copyWith(
-                      fontSize: 13,
-                      color: changeTheme(SharedPrefs.readStringValue(
-                              PrefConstants.gender)) ??
-                          ColorConstant.primaryColor,
+              isAdd
+                  ? GestureDetector(
+                      onTap: addButtonTap,
+                      child: Container(
+                        width: 100,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6),
+                          color: ColorConstant.removeBgButton,
+                          border: Border.all(color: ColorConstant.redBgColor),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Remove",
+                            style: AppTextTheme.medium.copyWith(
+                              fontSize: 13,
+                              color: ColorConstant.redBgColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : GestureDetector(
+                      onTap: addButtonTap,
+                      child: Container(
+                        width: 100,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(6),
+                          color: ColorConstant.pinkBgColor,
+                          border: Border.all(
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender)) ??
+                                ColorConstant.primaryColor,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            "Add",
+                            style: AppTextTheme.medium.copyWith(
+                              fontSize: 13,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  ColorConstant.primaryColor,
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
             ],
           ),
         ],

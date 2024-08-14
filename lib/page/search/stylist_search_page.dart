@@ -6,10 +6,8 @@ import 'package:salon_customer/page/search/widget/stylist_list_tile_widget.dart'
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
-
 import '../../constant/assetsconstant.dart';
 import '../../constant/color_constant.dart';
-import '../../model/artist_search_model.dart';
 import '../stylist/stylist_saloon_details_page.dart';
 
 class StylistSearchPage extends StatefulWidget {
@@ -100,6 +98,7 @@ class _StylistSearchPageState extends State<StylistSearchPage> {
                                     0,
                                 onPress: () {
                                   Get.to(() => StylistSaloonDetailsPage(
+                                   salonId: widget.salonId,
                                         artiestId: _homeController
                                                 .getArtistSearchModel
                                                 .data?[index]
@@ -124,7 +123,7 @@ class _StylistSearchPageState extends State<StylistSearchPage> {
         children: [
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-            height: 55,
+            height: 48,
             width: Get.width,
             decoration: ShapeDecoration(
               color: ColorConstant.whiteColor,

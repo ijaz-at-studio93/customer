@@ -33,6 +33,7 @@ class Data {
   int? price;
   List<String>? previewImages;
   List<ServicesAvailableProductList>? servicesAvailableProductList;
+  List<ServicesWithProduct>? servicesWithProduct;
 
   Data(
       {this.cartId,
@@ -41,7 +42,9 @@ class Data {
       this.items,
       this.price,
       this.previewImages,
-      this.servicesAvailableProductList});
+      this.servicesAvailableProductList,
+        this.servicesWithProduct
+      });
 
   Data.fromJson(Map<String, dynamic> json) {
     cartId = json['cartId'];
@@ -64,6 +67,12 @@ class Data {
             .add(ServicesAvailableProductList.fromJson(v));
       });
     }
+    if (json['servicesWithProduct'] != null) {
+      servicesWithProduct = <ServicesWithProduct>[];
+      json['servicesWithProduct'].forEach((v) {
+        servicesWithProduct!.add(ServicesWithProduct.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -79,6 +88,10 @@ class Data {
     if (servicesAvailableProductList != null) {
       data['servicesAvailableProductList'] =
           servicesAvailableProductList!.map((v) => v.toJson()).toList();
+    }
+    if (servicesWithProduct != null) {
+      data['servicesWithProduct'] =
+          servicesWithProduct!.map((v) => v.toJson()).toList();
     }
     return data;
   }
@@ -190,7 +203,7 @@ class Service {
 
 class Product {
   int? price;
-  int? rating;
+  double? rating;
   String? id;
   String? createdAt;
   String? updatedAt;
@@ -218,7 +231,7 @@ class Product {
 
   Product.fromJson(Map<String, dynamic> json) {
     price = json['price'];
-    rating = json['rating'];
+    rating = double.parse(json['rating'].toString());
     id = json['id'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
@@ -310,6 +323,110 @@ class ServicesAvailableProductList {
     data['rating'] = rating;
     data['isAdded'] = isAdded;
     data['count'] = count;
+    return data;
+  }
+}
+
+class ServicesWithProduct {
+  int? price;
+  double? rating;
+  String? id;
+  String? createdAt;
+  String? updatedAt;
+  String? description;
+  int? duration;
+  String? gender;
+  String? image;
+  String? name;
+  String? salonId;
+  String? status;
+  bool? homeService;
+  int? reviewCount;
+  List<Product>? products;
+  String? serviceId;
+  int? totalCost;
+  int? totalServiceCost;
+  int? totalProductCost;
+  int? totalProductCount;
+  String? productsName;
+
+  ServicesWithProduct(
+      {this.price,
+        this.rating,
+        this.id,
+        this.createdAt,
+        this.updatedAt,
+        this.description,
+        this.duration,
+        this.gender,
+        this.image,
+        this.name,
+        this.salonId,
+        this.status,
+        this.homeService,
+        this.reviewCount,
+        this.products,
+        this.serviceId,
+        this.totalCost,
+        this.totalServiceCost,
+        this.totalProductCost,
+        this.totalProductCount,
+        this.productsName});
+
+  ServicesWithProduct.fromJson(Map<String, dynamic> json) {
+    price = json['price'];
+    rating = double.parse(json['rating'].toString());
+    id = json['id'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    description = json['description'];
+    duration = json['duration'];
+    gender = json['gender'];
+    image = json['image'];
+    name = json['name'];
+    salonId = json['salonId'];
+    status = json['status'];
+    homeService = json['homeService'];
+    reviewCount = json['reviewCount'];
+    if (json['products'] != null) {
+      products = <Product>[];
+      json['products'].forEach((v) {
+        products!.add(  Product.fromJson(v));
+      });
+    }
+    serviceId = json['serviceId'];
+    totalCost = json['totalCost'];
+    totalServiceCost = json['totalServiceCost'];
+    totalProductCost = json['totalProductCost'];
+    totalProductCount = json['totalProductCount'];
+    productsName = json['productsName'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['price'] = price;
+    data['rating'] = rating;
+    data['id'] = id;
+    data['createdAt'] = createdAt;
+    data['updatedAt'] = updatedAt;
+    data['description'] = description;
+    data['duration'] = duration;
+    data['gender'] = gender;
+    data['image'] = image;
+    data['name'] = name;
+    data['salonId'] = salonId;
+    data['status'] = status;
+    data['homeService'] = homeService;
+    data['reviewCount'] = reviewCount;
+    if (products != null) {
+      data['products'] = products!.map((v) => v.toJson()).toList();
+    }
+    data['serviceId'] = serviceId;
+    data['totalCost'] = totalCost;
+    data['totalServiceCost'] = totalServiceCost;
+    data['totalProductCost'] = totalProductCost;
+    data['totalProductCount'] = totalProductCount;
+    data['productsName'] = productsName;
     return data;
   }
 }

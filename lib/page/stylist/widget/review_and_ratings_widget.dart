@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/model/artiest_portfolio_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
@@ -23,34 +24,40 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
       padding: const EdgeInsets.symmetric(vertical: 30),
       child: widget.artiestPortfolio.data?.reviews?.isEmpty ?? false
           ? const NoItemsWidget(
-              text: "No Review Rating Found",
+              text: "No reviews or ratings are available.",
             )
-          : ListView.separated(
-              padding: const EdgeInsets.symmetric(vertical: 5),
-              separatorBuilder: (context, index) {
-                return Container(
-                  margin:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                  height: 1,
-                  width: Get.width,
-                  color:ColorConstant.idColor,
-                );
-              },
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: widget.artiestPortfolio.data?.reviews?.length ?? 0,
-              itemBuilder: (context, index) {
-                return _listTileWidget(
-                    rate:
-                        widget.artiestPortfolio.data?.reviews?[index].rating ??
-                            0.0,
-                    title:
-                        widget.artiestPortfolio.data?.reviews?[index].review ??
-                            "",
-                    userName: widget.artiestPortfolio.data?.reviews?[index].user
-                            ?.name ??
-                        "");
-              }),
+          : Column(
+              children: [
+                ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 5),
+                    separatorBuilder: (context, index) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 10),
+                        height: 1,
+                        width: Get.width,
+                        color: ColorConstant.idColor,
+                      );
+                    },
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount:
+                        widget.artiestPortfolio.data?.reviews?.length ?? 0,
+                    itemBuilder: (context, index) {
+                      return _listTileWidget(
+                          rate: widget.artiestPortfolio.data?.reviews?[index]
+                                  .rating ??
+                              0.0,
+                          title: widget.artiestPortfolio.data?.reviews?[index]
+                                  .review ??
+                              "",
+                          userName: widget.artiestPortfolio.data
+                                  ?.reviews?[index].user?.name ??
+                              "");
+                    }),
+                SizedBox(height: Get.height * 0.12)
+              ],
+            ),
     );
   }
 
@@ -103,14 +110,24 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
           child: Row(
             children: [
               Text(
-                "Posted On $userName",
-                style: AppTextTheme.bold
-                    .copyWith(fontSize: 13, color: ColorConstant.blackColor),
+                "$userName • Posted On ${widget.artiestPortfolio.data?.createdAt == "" || widget.artiestPortfolio.data?.createdAt == null ? "" : convertDate(widget.artiestPortfolio.data?.createdAt ?? "")}",
+                style: AppTextTheme.medium
+                    .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
               ),
             ],
           ),
         )
       ],
     );
+  }
+
+  String convertDate(String dateString) {
+    // Parse the input date string to a DateTime object
+    DateTime dateTime = DateTime.parse(dateString);
+
+    // Format the DateTime object to the desired format
+    String formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
+
+    return formattedDate;
   }
 }

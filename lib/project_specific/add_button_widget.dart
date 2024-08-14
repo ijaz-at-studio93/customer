@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
-
 import '../constant/color_constant.dart';
 
 class AddButtonWidget extends StatefulWidget {
@@ -18,8 +17,8 @@ class _AddButtonWidgetState extends State<AddButtonWidget> {
     return InkWell(
       onTap: widget.onPress,
       child: Container(
-        width: 70,
-        height: 35,
+        height: 39,
+        width: 110,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           color: ColorConstant.pinkBgColor,

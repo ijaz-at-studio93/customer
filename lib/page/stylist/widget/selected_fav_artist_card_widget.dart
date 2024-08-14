@@ -6,18 +6,20 @@ import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/model/artiest_list_model.dart';
-
 import 'package:salon_customer/project_specific/remove_button_widget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-
 import '../../../project_specific/text_theme.dart';
 import '../stylist_saloon_details_page.dart';
 
 class SelectedFavArtistCardWidget extends StatelessWidget {
   final VoidCallback onPress;
   final Artiest artiest;
+  final String salonId;
   const SelectedFavArtistCardWidget(
-      {super.key, required this.onPress, required this.artiest});
+      {super.key,
+      required this.onPress,
+      required this.artiest,
+      required this.salonId});
 
   @override
   Widget build(BuildContext context) {
@@ -135,6 +137,7 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
           TextButton(
             onPressed: () {
               Get.to(() => StylistSaloonDetailsPage(
+                    salonId: salonId,
                     artiestId: artiest.id ?? "",
                   ));
             },

@@ -2,22 +2,28 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/stylist/selecting_artist_bottom_sheet.dart';
 import 'package:salon_customer/page/stylist/widget/review_and_ratings_widget.dart';
-import 'package:salon_customer/page/stylist/widget/service_offered_page.dart';
+import 'package:salon_customer/page/stylist/widget/service_offered_list_tile_widget.dart';
 import 'package:salon_customer/page/stylist/widget/stylist_portfolio_gird_view.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/assetsconstant.dart';
+import '../appointment/appointment_booking_page.dart';
+import '../home/widget/selected_services_sheet_page.dart';
 
 class StylistSaloonDetailsPage extends StatefulWidget {
   final String artiestId;
-  const StylistSaloonDetailsPage({super.key, required this.artiestId});
+  final String salonId;
+  const StylistSaloonDetailsPage(
+      {super.key, required this.artiestId, required this.salonId});
 
   @override
   State<StylistSaloonDetailsPage> createState() =>
@@ -27,16 +33,19 @@ class StylistSaloonDetailsPage extends StatefulWidget {
 class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
     with SingleTickerProviderStateMixin {
   final _homeController = Get.find<HomeController>();
-
+  final box = GetStorage();
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _tabController = TabController(length: 3, vsync: this);
       _homeController.doGetArtiestPortfolio(artistId: widget.artiestId);
+      _homeController.doGetCart();
     });
   }
 
+  String serviceId = "";
+  String artiestId = "";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,10 +61,174 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                     _nameContainColum(),
                     _tabBarView(),
                     isSelectedTab == 0
-                        ? ServiceAndOfferedPage(
-                            artiestPortfolio:
-                                _homeController.getArtiestDetailsModel,
-                          )
+                        ? ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.only(bottom: Get.height * 0.16),
+                            itemCount: _homeController.getArtiestDetailsModel
+                                    .data?.categorizedServiceList?.length ??
+                                0,
+                            itemBuilder: (context, index) {
+                              return ExpansionTile(
+                                initiallyExpanded: index == 0 ? true : false,
+                                title: Text(
+                                  _homeController
+                                          .getArtiestDetailsModel
+                                          .data
+                                          ?.categorizedServiceList?[index]
+                                          .name ??
+                                      "",
+                                  style: AppTextTheme.bold.copyWith(
+                                      color: ColorConstant.blackColor,
+                                      fontSize: 19),
+                                ),
+                                children: [
+                                  ListView.separated(
+                                      separatorBuilder: (context, i) {
+                                        return Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 20, bottom: 20),
+                                          height: 1,
+                                          width: Get.width,
+                                          color: ColorConstant.dividerColor,
+                                        );
+                                      },
+                                      shrinkWrap: true,
+                                      itemCount: _homeController
+                                              .getArtiestDetailsModel
+                                              .data
+                                              ?.categorizedServiceList?[index]
+                                              .services
+                                              ?.length ??
+                                          0,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (context, i) {
+                                        return ServiceOfferListTileWidget(
+                                          rate: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .rating ??
+                                              0.0,
+                                          image:
+                                              "${APIConstants.image}${_homeController.getArtiestDetailsModel.data?.categorizedServiceList?[index].services?[i].image ?? 0.0}",
+                                          name: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .name ??
+                                              "",
+                                          description: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .description ??
+                                              "",
+                                          price: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .price
+                                                  .toString() ??
+                                              "",
+                                          duration: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .duration
+                                                  .toString() ??
+                                              "",
+                                          reviewCount: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .reviewCount
+                                                  .toString() ??
+                                              "",
+                                          isSelect: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .isAddedToCart ??
+                                              false,
+                                          addButtonTap: () {
+                                            _homeController
+                                                .getArtiestDetailsModel
+                                                .data
+                                                ?.categorizedServiceList?[index]
+                                                .services?[i]
+                                                .isAddedToCart = !(_homeController
+                                                    .getArtiestDetailsModel
+                                                    .data
+                                                    ?.categorizedServiceList?[
+                                                        index]
+                                                    .services?[i]
+                                                    .isAddedToCart ??
+                                                false);
+
+                                            if (_homeController
+                                                    .getArtiestDetailsModel
+                                                    .data
+                                                    ?.categorizedServiceList?[
+                                                        index]
+                                                    .services?[i]
+                                                    .isAddedToCart ??
+                                                false) {
+                                              _homeController.doAddCart(
+                                                  salonServiceId: _homeController
+                                                          .getArtiestDetailsModel
+                                                          .data
+                                                          ?.categorizedServiceList?[
+                                                              index]
+                                                          .services?[i]
+                                                          .id ??
+                                                      "",
+                                                  isHomeService: _homeController
+                                                          .homeSalonDetailsData
+                                                          .data
+                                                          ?.homeService ??
+                                                      false,
+                                                  callback: () {
+                                                    artiestId =
+                                                        widget.artiestId;
+                                                    _homeController.doGetCart();
+                                                  });
+                                            } else {
+                                              _homeController.doRemoveCart(
+                                                  salonServiceId: _homeController
+                                                          .getArtiestDetailsModel
+                                                          .data
+                                                          ?.categorizedServiceList?[
+                                                              index]
+                                                          .services?[i]
+                                                          .id ??
+                                                      "",
+                                                  callback: () {
+                                                    _homeController.doGetCart();
+                                                  });
+                                            }
+                                          },
+                                        );
+                                      }),
+                                  const SizedBox(height: 22),
+                                ],
+                              );
+                            })
                         : isSelectedTab == 1
                             ? StylistPortfolioGridview(
                                 artiestPortfolio:
@@ -67,6 +240,387 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                               )
                   ],
                 ),
+              ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Obx(
+        () => _homeController.getServiceAddCartModel.data?.items?.isEmpty ??
+                false ||
+                    _homeController.getServiceAddCartModel.data?.items == null
+            ? const SizedBox()
+            : Stack(
+                alignment: Alignment.center,
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    width: Get.width,
+                    height: 100,
+                    decoration: const BoxDecoration(
+                      color: ColorConstant.whiteColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0x1E000000),
+                          blurRadius: 8,
+                          offset: Offset(-2, -2),
+                          spreadRadius: 0,
+                        )
+                      ],
+                    ),
+                    clipBehavior: Clip.none,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            _homeController.getServiceAddCartModel.data
+                                        ?.previewImages?.isEmpty ??
+                                    false
+                                ? const SizedBox()
+                                : Row(
+                                    children: [
+                                      _homeController
+                                                  .getServiceAddCartModel
+                                                  .data
+                                                  ?.previewImages
+                                                  ?.length ==
+                                              1
+                                          ? Row(
+                                              children: [
+                                                for (int i = 0; i < 1; i++)
+                                                  Align(
+                                                    widthFactor: 0.8,
+                                                    child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              100),
+                                                      child: CachedNetworkImage(
+                                                        fit: BoxFit.cover,
+                                                        width: 30,
+                                                        height: 30,
+                                                        imageUrl:
+                                                            "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
+                                                        placeholder:
+                                                            (context, url) =>
+                                                                const Image(
+                                                          image: AssetImage(
+                                                              AssetsConstant
+                                                                  .placeHolder),
+                                                          fit: BoxFit.cover,
+                                                          width: 30,
+                                                          height: 30,
+                                                        ),
+                                                        errorWidget: (context,
+                                                                url, error) =>
+                                                            const Image(
+                                                          image: AssetImage(
+                                                              AssetsConstant
+                                                                  .placeHolder),
+                                                          fit: BoxFit.cover,
+                                                          width: 30,
+                                                          height: 30,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                              ],
+                                            )
+                                          : _homeController
+                                                      .getServiceAddCartModel
+                                                      .data
+                                                      ?.previewImages
+                                                      ?.length ==
+                                                  2
+                                              ? Row(
+                                                  children: [
+                                                    for (int i = 0; i < 2; i++)
+                                                      Align(
+                                                        widthFactor: 0.8,
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            fit: BoxFit.cover,
+                                                            width: 30,
+                                                            height: 30,
+                                                            imageUrl:
+                                                                "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
+                                                            placeholder:
+                                                                (context,
+                                                                        url) =>
+                                                                    const Image(
+                                                              image: AssetImage(
+                                                                  AssetsConstant
+                                                                      .placeHolder),
+                                                              fit: BoxFit.cover,
+                                                              width: 30,
+                                                              height: 30,
+                                                            ),
+                                                            errorWidget:
+                                                                (context, url,
+                                                                        error) =>
+                                                                    const Image(
+                                                              image: AssetImage(
+                                                                  AssetsConstant
+                                                                      .placeHolder),
+                                                              fit: BoxFit.cover,
+                                                              width: 30,
+                                                              height: 30,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      )
+                                                  ],
+                                                )
+                                              : Row(
+                                                  children: [
+                                                    for (int i = 0; i < 2; i++)
+                                                      Align(
+                                                        widthFactor: 0.7,
+                                                        child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            fit: BoxFit.cover,
+                                                            width: 35,
+                                                            height: 35,
+                                                            imageUrl:
+                                                                "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
+                                                            placeholder:
+                                                                (context,
+                                                                        url) =>
+                                                                    const Image(
+                                                              image: AssetImage(
+                                                                  AssetsConstant
+                                                                      .placeHolder),
+                                                              fit: BoxFit.cover,
+                                                              width: 35,
+                                                              height: 35,
+                                                            ),
+                                                            errorWidget:
+                                                                (context, url,
+                                                                        error) =>
+                                                                    const Image(
+                                                              image: AssetImage(
+                                                                  AssetsConstant
+                                                                      .placeHolder),
+                                                              fit: BoxFit.cover,
+                                                              width: 35,
+                                                              height: 35,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    const SizedBox(width: 2),
+                                                    Container(
+                                                      width: 33,
+                                                      height: 33,
+                                                      decoration:
+                                                          const BoxDecoration(
+                                                              color:
+                                                                  ColorConstant
+                                                                      .primaryColor,
+                                                              shape: BoxShape
+                                                                  .circle),
+                                                      child: Center(
+                                                        child: Text(
+                                                          _homeController
+                                                                  .getServiceAddCartModel
+                                                                  .data
+                                                                  ?.previewImages
+                                                                  ?.length
+                                                                  .toString() ??
+                                                              "",
+                                                          style: AppTextTheme
+                                                              .medium
+                                                              .copyWith(
+                                                            color: ColorConstant
+                                                                .whiteColor,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ),
+                                    ],
+                                  ),
+                            const SizedBox(width: 15),
+                            GestureDetector(
+                              onTap: () {
+                                showModalBottomSheet(
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(32),
+                                      topRight: Radius.circular(32),
+                                    )),
+                                    context: context,
+                                    builder: (context) {
+                                      return SelectedServiceSheetPage(
+                                        salonId: widget.salonId,
+                                        artiestId: artiestId,
+                                        serviceId: serviceId,
+                                      );
+                                    });
+
+                                /*  showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(
+                                          topLeft: Radius.circular(32),
+                                          topRight: Radius.circular(32),
+                                        )),
+                                        context: context,
+                                        builder: (context) {
+                                          return CustomizedSheetWidget(
+                                            serviceAddCartModel: _homeController
+                                                .getServiceAddCartModel,
+                                          );
+                                        });*/
+                              },
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Text(
+                                        "${_homeController.getServiceAddCartModel.data?.items?.length} Added",
+                                        style: AppTextTheme.bold.copyWith(
+                                            fontSize: 13,
+                                            color: ColorConstant.grayTextColor),
+                                      ),
+                                      const SizedBox(width: 2),
+                                      Image.asset(
+                                        AssetsConstant.arrowUpIcon,
+                                        height: 8,
+                                        width: 11,
+                                        color: changeTheme(
+                                            SharedPrefs.readStringValue(
+                                                PrefConstants.gender)),
+                                      )
+                                    ],
+                                  ),
+                                  Text(
+                                    "₹${_homeController.getServiceAddCartModel.data?.price ?? ""}",
+                                    style: AppTextTheme.bold.copyWith(
+                                        fontSize: 19,
+                                        color: ColorConstant.blackColor),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            if (artiestId != "") {
+                              Get.to(() => AppointmentBookingPage(
+                                    artiestId: artiestId,
+                                  ));
+                            } else {
+                              showModalBottomSheet(
+                                  isScrollControlled: true,
+                                  isDismissible: false,
+                                  enableDrag: false,
+                                  shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(32),
+                                    topRight: Radius.circular(32),
+                                  )),
+                                  context: context,
+                                  builder: (context) {
+                                    return SelectingArtistBottomSheetWidget(
+                                      salonId: widget.salonId,
+                                      serviceId: serviceId,
+                                      callback: () {
+                                        setState(() {
+                                          artiestId = box.read('artiestId');
+                                        });
+                                      },
+                                    );
+                                  });
+                            }
+                          },
+                          child: Container(
+                            height: 45,
+                            width: Get.width * 0.4,
+                            decoration: BoxDecoration(
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  artiestId.isNotEmpty
+                                      ? "Book Slot"
+                                      : "Select Stylist",
+                                  textScaler: const TextScaler.linear(0.70),
+                                  style: AppTextTheme.medium.copyWith(
+                                      fontSize: 16,
+                                      color: ColorConstant.whiteColor),
+                                ),
+                                const SizedBox(width: 10),
+                                const Icon(
+                                  Icons.arrow_forward,
+                                  color: ColorConstant.whiteColor,
+                                  size: 20,
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        /*IconButton(
+                              onPressed: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return RemoveAndAddServiceDialog(
+                                          noPress: () {
+                                        Get.back();
+                                      }, yesPress: () {
+                                        setState(() {
+                                          _homeController.doClearCart(
+                                              callback: () {
+                                            _homeController.doClearCart(
+                                                callback: () {
+                                              _homeController
+                                                  .doGetHomeSalonDetails(
+                                                      salonId: widget.id);
+                                              _homeController
+                                                  .doGetSalonDetailsService(
+                                                      salonId: widget.id);
+                                              _homeController
+                                                  .doGetSalonArtiestListData(
+                                                      salonId: widget.id);
+                                              _homeController.doGetCart();
+                                              Navigator.pop(context);
+                                            });
+                                          });
+                                          serviceId = "";
+                                          artiestId = "";
+                                        });
+                                      });
+                                    });
+                              },
+                              icon: Icon(
+                                CupertinoIcons.xmark_circle_fill,
+                                color: changeTheme(SharedPrefs.readStringValue(
+                                    PrefConstants.gender)),
+                              ),
+                            ),*/
+                      ],
+                    ),
+                  ),
+                ],
               ),
       ),
     );
@@ -230,8 +784,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
         const SizedBox(height: 5),
         Text(
           _homeController.getArtiestDetailsModel.data?.name ?? "",
-          style: AppTextTheme.bold.copyWith(
-              color: ColorConstant.blackColor, fontSize: 14),
+          style: AppTextTheme.bold
+              .copyWith(color: ColorConstant.blackColor, fontSize: 14),
         ),
         Padding(
           padding: const EdgeInsets.all(8.0),
@@ -240,8 +794,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
             children: [
               RatingBar.builder(
                 initialRating:
-                    _homeController.getArtiestDetailsModel.data?.rating ??
-                        0.0,
+                    _homeController.getArtiestDetailsModel.data?.rating ?? 0.0,
                 minRating: 1,
                 direction: Axis.horizontal,
                 allowHalfRating: true,
@@ -250,18 +803,18 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                 ignoreGestures: true,
                 itemBuilder: (context, _) => Icon(
                   Icons.star,
-                  color: changeTheme(SharedPrefs.readStringValue(
-                          PrefConstants.gender)) ??
+                  color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
                       ColorConstant.primaryColor,
                   size: 25,
                 ),
                 onRatingUpdate: (rating) {},
               ),
-              const  SizedBox(width: 5),
+              const SizedBox(width: 5),
               Text(
                 "(${_homeController.getArtiestDetailsModel.data?.reviewCount ?? 0} Reviews)",
-                style: AppTextTheme.medium.copyWith(
-                    fontSize: 13, color: ColorConstant.grayTextColor),
+                style: AppTextTheme.medium
+                    .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
               ),
             ],
           ),
@@ -281,8 +834,6 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
       indicatorWeight: 2,
       unselectedLabelColor: _unselectedColor,
       indicatorSize: TabBarIndicatorSize.tab,
-      /* indicator: MaterialDesignIndicator(
-          indicatorHeight: 4, indicatorColor: _selectedColor),*/
       tabs: _tabs,
       onTap: (val) {
         setState(() {
@@ -425,8 +976,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
   final _unselectedColor = ColorConstant.grayTextColor;
 
   final _tabs = [
-    Tab(text: 'Service Offered'),
-    Tab(text: 'Portfolio'),
-    Tab(text: 'Review & ratings'),
+    const Tab(text: 'Service Offered'),
+    const Tab(text: 'Portfolio'),
+    const Tab(text: 'Review & ratings'),
   ];
 }

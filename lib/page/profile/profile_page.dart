@@ -14,7 +14,7 @@ import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/log_out_dialog.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-import 'about_app_page.dart';
+import 'widget/about_app_page.dart';
 import 'fav_blog_page.dart';
 
 class ProfilePage extends StatefulWidget {

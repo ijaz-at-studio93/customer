@@ -8,7 +8,7 @@ import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:http_parser/http_parser.dart';
 import '../model/otp_verify_model.dart';
 import 'dio_client.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+
 
 class AuthAPI {
   /*--------------------- CheckMobileNumberIsRegister  Or Not --------------------- */ static Future<

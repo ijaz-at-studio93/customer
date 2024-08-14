@@ -30,7 +30,6 @@ class _FavSalonCardWidgetState extends State<FavSalonCardWidget> {
       child: GestureDetector(
         onTap: () {
           Get.to(() => SaloonAfterSelectingServicesPage(
-                avRating: "",
                 id: widget.favSalon.id ?? "",
                 callback: () {},
               ));

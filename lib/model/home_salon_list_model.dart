@@ -88,6 +88,7 @@ class HomeSalonDataList {
   double? rating;
   int? reviewCount;
   int? distance;
+  int? distanceTime;
   bool? homeService;
   bool? isFavourite;
   double? serviceStartingPrice;
@@ -109,6 +110,7 @@ class HomeSalonDataList {
         this.rating,
         this.reviewCount,
         this.distance,
+        this.distanceTime,
         this.homeService,
         this.isFavourite,
         this.serviceStartingPrice,
@@ -135,6 +137,7 @@ class HomeSalonDataList {
     rating =    double.parse(json['rating'].toString());
     reviewCount = json['reviewCount'];
     distance = json['distance'];
+    distanceTime = json['distanceTime'];
     homeService = json['homeService'];
     isFavourite = json['isFavourite'];
     serviceStartingPrice = double.parse(json['serviceStartingPrice'].toString());
@@ -160,6 +163,7 @@ class HomeSalonDataList {
     data['rating'] = rating;
     data['reviewCount'] = reviewCount;
     data['distance'] = distance;
+    data['distanceTime'] = distanceTime;
     data['homeService'] = homeService;
     data['isFavourite'] = isFavourite;
     data['serviceStartingPrice'] = serviceStartingPrice;

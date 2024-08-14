@@ -1,12 +1,13 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/model/artiest_list_model.dart';
+import 'package:salon_customer/model/artiest_popular_service_model.dart';
 import 'package:salon_customer/model/artiest_portfolio_model.dart';
 import 'package:salon_customer/model/artist_search_model.dart';
 import 'package:salon_customer/model/availabilities_time_sloat_model.dart';
 import 'package:salon_customer/model/blog_data_model.dart';
 import 'package:salon_customer/model/booking_history_list_model.dart';
+import 'package:salon_customer/model/cart/get_product_model.dart';
 import 'package:salon_customer/model/cart/order_id_model.dart';
 import 'package:salon_customer/model/cart/service_add_cart_model.dart';
 import 'package:salon_customer/model/category_service_list_model.dart';
@@ -16,6 +17,7 @@ import 'package:salon_customer/model/home_category_list_model.dart';
 import 'package:salon_customer/model/home_salon_list_model.dart';
 import 'package:salon_customer/model/review_list_data_model.dart';
 import 'package:salon_customer/model/review_rating_data_model.dart';
+import 'package:salon_customer/model/salonId_reviews_model.dart';
 import 'package:salon_customer/model/salon_details_artiest.dart';
 import 'package:salon_customer/model/salon_details_model.dart';
 import 'package:salon_customer/model/save_address_model.dart';
@@ -125,9 +127,16 @@ class HomeAPI {
   }
 
   /*---------------------- Salon Detail --------------------*/
-  static Future<HomeSalonDetailsModel> getSalonDetail(
-      {required String salonId}) async {
-    final response = await DioClient.client.get("user/salon/$salonId/details");
+  static Future<HomeSalonDetailsModel> getSalonDetail({
+    required String salonId,
+    required String lat,
+    required String lng,
+  }) async {
+    final response = await DioClient.client
+        .get("user/salon/$salonId/details", queryParameters: {
+      "lat": lat,
+      "lng": lng,
+    });
     if (response.isSuccess) {
       return HomeSalonDetailsModel.fromJson(response.data);
     } else {
@@ -138,8 +147,8 @@ class HomeAPI {
   /*---------------- Salon  Details Category service  List ----------------*/
   static Future<CategoryServicesListModel> getSalonDetailsCategoryServiceList(
       {required String salonId}) async {
-    final response =
-        await DioClient.client.get("user/salon/$salonId/category/services");
+    final response = await DioClient.client
+        .get("user/salon/$salonId/category/services-with-selected-categories");
     if (response.isSuccess) {
       return CategoryServicesListModel.fromJson(response.data);
     } else {
@@ -293,6 +302,17 @@ class HomeAPI {
     }
   }
 
+  /*------------ get Service Product -----------------*/
+  static Future<ServiceProductModel> getServiceProduct(String serviceId) async {
+    final response =
+        await DioClient.client.get("user/salon/service/$serviceId/products");
+    if (response.isSuccess) {
+      return ServiceProductModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
   /*------------------ Remove Cart -------------------*/
   static Future<bool> serviceRemoveAddCart(
       {required String salonServiceId}) async {
@@ -327,9 +347,12 @@ class HomeAPI {
 
   /*------------------ Add cart Product ---------------------*/
   static Future<ServiceAddCartModel> addProductCart(
-      {required String productId}) async {
-    final response = await DioClient.client
-        .put("user/cart/add", data: {"productId": productId});
+      {required String productId,
+      required String productSelectedServiceId}) async {
+    final response = await DioClient.client.put("user/cart/add", data: {
+      "productId": productId,
+      "productSelectedServiceId": productSelectedServiceId
+    });
     if (response.isSuccess) {
       return ServiceAddCartModel.fromJson(response.data);
     } else {
@@ -338,9 +361,13 @@ class HomeAPI {
   }
 
   /*------------------  Remove  Cart Product ---------------------*/
-  static Future<bool> removeProductCart({required String productId}) async {
-    final response = await DioClient.client
-        .put("user/cart/remove", data: {"productId": productId});
+  static Future<bool> removeProductCart(
+      {required String productId,
+      required String productSelectedServiceId}) async {
+    final response = await DioClient.client.put("user/cart/remove", data: {
+      "productId": productId,
+      "productSelectedServiceId": productSelectedServiceId
+    });
     if (response.isSuccess) {
       return true;
     } else {
@@ -467,40 +494,36 @@ class HomeAPI {
   }
 
   /*-----------------  Get Fav BlogData ------------*/
-  static Future<BlogDataModel> getFavBlogData()async{
+  static Future<BlogDataModel> getFavBlogData() async {
     final response = await DioClient.client.get("user/blog/save");
     if (response.isSuccess) {
       return BlogDataModel.fromJson(response.data);
     } else {
       throw response.data;
     }
-
   }
-
 
   /*----------------  Add Fav Blog ----------------*/
   static Future<bool> addFavBlog(String blogId) async {
     final response = await DioClient.client
         .put("user/blog/save/add", data: {"blogId": blogId});
-    if(response.isSuccess){
-      return  true;
-    }else{
-      return  response.data;
+    if (response.isSuccess) {
+      return true;
+    } else {
+      return response.data;
     }
   }
-  
-  
+
   /*----------------- Remove Blog ---------------------*/
-  static  Future<bool>  removeBlog(String blogId) async{
-    final  response  =   await  DioClient.client.delete("/user/blog/save/remove",
-        data: {"blogId": blogId}
-    );
-    if(response.isSuccess){
+  static Future<bool> removeBlog(String blogId) async {
+    final response = await DioClient.client
+        .delete("/user/blog/save/remove", data: {"blogId": blogId});
+    if (response.isSuccess) {
       return true;
-    }else{
-      return  response.data;
+    } else {
+      return response.data;
     }
-  }  
+  }
 
   /*------------------- Review & Rating ------------------*/
   static Future<ReviewRatingUserModel> getReviewRating() async {
@@ -612,11 +635,46 @@ class HomeAPI {
     }
   }
 
-  /*-------------- Delete Save Address ---------------- */
+  /*----------------------------- Delete Save Address ---------------- */
   static Future<bool> deleteSaveAddressUser({required String id}) async {
     final response = await DioClient.client.delete("user/address/$id/delete");
     if (response.isSuccess) {
       return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*------------------------ Popular Service By Your Stylist  ----------------------*/
+
+  static Future<ArtistPopularServicesModel> getPopularServiceByYourStylist(
+      String artistId) async {
+    final response = await DioClient.client
+        .get("user/cart/artist/$artistId/popular-services");
+    if (response.isSuccess) {
+      return ArtistPopularServicesModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*------------------  Blog View Count ----------------------*/
+  static Future<bool> addBlogView(String blogId) async {
+    final response =
+        await DioClient.client.get("user/blog/$blogId/increase-view");
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*-------------------  SalonId Reviews  --------------------*/
+  static Future<SalonIdReviewsModel> salonIdToReview(
+      {required String salonId}) async {
+    final response = await DioClient.client.get("user/salon/$salonId/reviews");
+    if (response.isSuccess) {
+      return SalonIdReviewsModel.fromJson(response.data);
     } else {
       throw response.data;
     }

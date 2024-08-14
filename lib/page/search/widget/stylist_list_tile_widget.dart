@@ -29,20 +29,20 @@ class StylistListTileWidget extends StatelessWidget {
           ClipRRect(
             borderRadius: BorderRadius.circular(100),
             child: CachedNetworkImage(
-              height: 76,
-              width: 76,
+              height: 60,
+              width: 60,
               fit: BoxFit.cover,
               imageUrl: '${APIConstants.image}$image',
               placeholder: (context, url) => const Image(
                 image: AssetImage(AssetsConstant.placeHolder),
-                height: 76,
-                width: 76,
+                height: 60,
+                width: 60,
                 fit: BoxFit.cover,
               ),
               errorWidget: (context, url, error) => const Image(
                 image: AssetImage(AssetsConstant.placeHolder),
-                height: 76,
-                width: 76,
+                height: 60,
+                width: 60,
                 fit: BoxFit.cover,
               ),
             ),

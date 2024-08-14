@@ -4,9 +4,9 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_customer/constant/color_constant.dart';
-import 'package:salon_customer/constant/variable_constant.dart';
+
 import 'package:salon_customer/project_specific/text_theme.dart';
-import 'package:salon_customer/util/SharedPrefs.dart';
+
 
 import '../../../model/booking_history_list_model.dart';
 

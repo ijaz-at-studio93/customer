@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/appointment/appointment_booking_page.dart';
 import 'package:salon_customer/page/stylist/widget/selected_fav_artist_card_widget.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
@@ -12,10 +13,11 @@ import '../../constant/assetsconstant.dart';
 
 class SelectingArtistBottomSheetWidget extends StatefulWidget {
   final String serviceId;
+  final String salonId;
   final VoidCallback callback;
 
   const SelectingArtistBottomSheetWidget(
-      {super.key, required this.serviceId, required this.callback});
+      {super.key, required this.serviceId, required this.callback, required this.salonId});
 
   @override
   State<SelectingArtistBottomSheetWidget> createState() =>
@@ -117,9 +119,20 @@ class _SelectingArtistBottomSheetWidgetState
                                   0,
                           itemBuilder: (context, index) {
                             return SelectedFavArtistCardWidget(
+                             salonId: widget.salonId,
                               artiest: _homeController
                                   .getArtiestListData.data![index],
                               onPress: () {
+
+                                Navigator.pop(context);
+                                Get.to(() => AppointmentBookingPage(
+                                  artiestId: _homeController
+                                      .getArtiestListData
+                                      .data![index]
+                                      .id ??
+                                      "",
+                                ));
+
                                 setState(() {
                                   _homeController
                                       .getArtiestListData
@@ -139,12 +152,13 @@ class _SelectingArtistBottomSheetWidgetState
                                         "";
                                     box.write("artiestId", artiestId);
                                     widget.callback.call();
-                                    Get.back();
+
                                   } else {
                                     artiestId = "";
                                     box.remove("artiestId");
                                   }
                                 });
+
                               },
                             );
                           },

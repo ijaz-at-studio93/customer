@@ -8,7 +8,7 @@ import 'package:salon_customer/model/home_category_list_model.dart';
 import 'package:salon_customer/page/home/widget/dilaog_menu_list_widget.dart';
 import 'package:salon_customer/project_specific/button_widget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-import 'package:salon_customer/util/logger.dart';
+
 
 class MenuDialogWidget extends StatefulWidget {
   final HomeCategoryListModel categoryListData;
@@ -64,7 +64,9 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
                             .remove(widget.categoryListData.data?[index].id);
 
                         _homeController.doRemovePackageData(
-                            serviceCategoryIds: ["${widget.categoryListData.data?[index].id}"],
+                            serviceCategoryIds: [
+                              "${widget.categoryListData.data?[index].id}"
+                            ],
                             callback: () {
                               _homeController.doGetMakePackageData();
                             });
@@ -81,7 +83,6 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
                 ? ButtonWidget(
                     buttonTitleText: "Done",
                     onPress: () {
-                      logger.f("Data Length ${_homeController.categoryId.length}");
                       widget.callback.call();
                       Get.back();
                     },

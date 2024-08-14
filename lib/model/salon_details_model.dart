@@ -39,12 +39,15 @@ class Data {
   GeoLocationPoint? geoLocationPoint;
   String? createdAt;
   String? updatedAt;
-  int? reviewCount;
+  String? reviewCount;
   bool? homeService;
   List<ServiceCategories>? serviceCategories;
   bool? isFavourite;
   String? startTiming;
   String? endTiming;
+  double? distance;
+  double? distanceTime;
+  double? averageArtistRatings;
 
   Data(
       {this.rating,
@@ -65,7 +68,9 @@ class Data {
         this.isFavourite,
         this.startTiming,
         this.endTiming,
-
+        this.distance,
+        this.distanceTime,
+        this.averageArtistRatings,
       });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -83,7 +88,7 @@ class Data {
         : null;
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
-    reviewCount = json['reviewCount'];
+    reviewCount = json['reviewCount'].toString();
     homeService = json['homeService'];
     if (json['serviceCategories'] != null) {
       serviceCategories = <ServiceCategories>[];
@@ -94,6 +99,9 @@ class Data {
     isFavourite = json['isFavourite'];
     startTiming = json['startTiming'];
     endTiming = json['endTiming'];
+    distance = double.parse(json['distance'].toString());
+    distanceTime = double.parse(json['distanceTime'].toString());
+    averageArtistRatings = double.parse(json['averageArtistRatings'].toString());
   }
 
   Map<String, dynamic> toJson() {
@@ -121,6 +129,9 @@ class Data {
     data['isFavourite'] = isFavourite;
     data['startTiming'] = startTiming;
     data['endTiming'] = endTiming;
+    data['distance'] = distance;
+    data['distanceTime'] = distanceTime;
+    data['averageArtistRatings'] = averageArtistRatings;
     return data;
   }
 }

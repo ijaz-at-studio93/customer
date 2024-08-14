@@ -9,7 +9,6 @@ import '../../util/NoItemsWidget.dart';
 import '../Insights/insights_detail_page.dart';
 import '../Insights/widget/Insights_card_widget.dart';
 
-
 class BlogFavPage extends StatefulWidget {
   const BlogFavPage({super.key});
 
@@ -18,8 +17,6 @@ class BlogFavPage extends StatefulWidget {
 }
 
 class _BlogFavPageState extends State<BlogFavPage> {
-
-
   final _homeController = Get.find<HomeController>();
   @override
   void initState() {
@@ -52,46 +49,58 @@ class _BlogFavPageState extends State<BlogFavPage> {
         ),
       ),
       body: Obx(
-            () => _homeController.showProgress
+        () => _homeController.showProgress
             ? const ProgressBarView()
             : _homeController.getFavBlogDataModel.data?.isEmpty ??
-            false || _homeController.getFavBlogDataModel.data == null
-            ? const NoItemsWidget(text: "No Insights Data Found")
-            : ListView.separated(
-            separatorBuilder: (context, i) {
-              return const Divider(
-                thickness: 2,
-                color: ColorConstant.divider2Color,
-                indent: 20,
-                endIndent: 20,
-              );
-            },
-            shrinkWrap: true,
-            itemCount:
-            _homeController.getFavBlogDataModel.data?.length ?? 0,
-            padding:
-            const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-            itemBuilder: (context, i) {
-              return InsightsCardWidget(
-                isFav: true,
-                blogData: _homeController.getFavBlogDataModel.data![i],
-                onPress: () {
-                  Get.to(() => InsightsDetailPage(
-                    body: _homeController.getFavBlogDataModel.data?[i]
-                        .description ??
-                        "",
-                    title: _homeController
-                        .getFavBlogDataModel.data?[i].title ??
-                        "",
-                    subTitle: _homeController
-                        .getFavBlogDataModel.data?[i].body ??
-                        "",
-                    image:
-                    "${APIConstants.image}${_homeController.getFavBlogDataModel.data?[i].image ?? ""}",
-                  ));
-                },
-              );
-            }),
+                    false || _homeController.getFavBlogDataModel.data == null
+                ? const NoItemsWidget(text: "No Insights Data Found")
+                : ListView.separated(
+                    separatorBuilder: (context, i) {
+                      return const Divider(
+                        thickness: 2,
+                        color: ColorConstant.divider2Color,
+                        indent: 20,
+                        endIndent: 20,
+                      );
+                    },
+                    shrinkWrap: true,
+                    itemCount:
+                        _homeController.getFavBlogDataModel.data?.length ?? 0,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                    itemBuilder: (context, i) {
+                      return InsightsCardWidget(
+                        isFav: true,
+                        blogData: _homeController.getFavBlogDataModel.data![i],
+                        onPress: () {
+                          _homeController.doAddViewForBlogSection(
+                              blogID: _homeController
+                                      .getFavBlogDataModel.data?[i].id ??
+                                  "");
+                          Get.to(() => InsightsDetailPage(
+                                video: _homeController.getFavBlogDataModel
+                                            .data![i].video?.isEmpty ??
+                                        false
+                                    ? ""
+                                    : "${APIConstants.image}${_homeController.getFavBlogDataModel.data?[i].video ?? ""}",
+                                body: _homeController.getFavBlogDataModel
+                                        .data?[i].description ??
+                                    "",
+                                title: _homeController
+                                        .getFavBlogDataModel.data?[i].title ??
+                                    "",
+                                subTitle: _homeController
+                                        .getFavBlogDataModel.data?[i].body ??
+                                    "",
+                                image: _homeController.getFavBlogDataModel
+                                            .data?[i].image?.isEmpty ??
+                                        false
+                                    ? ""
+                                    : "${APIConstants.image}${_homeController.getFavBlogDataModel.data?[i].image ?? ""}",
+                              ));
+                        },
+                      );
+                    }),
       ),
     );
   }

@@ -14,6 +14,7 @@ import '../../stylist/stylist_saloon_details_page.dart';
 class StylistListGridWidget extends StatefulWidget {
   final VoidCallback onPress;
   final bool isView;
+  final String id;
   final SalonArtiestListModel salonArtiestListModel;
 
   const StylistListGridWidget({
@@ -21,6 +22,7 @@ class StylistListGridWidget extends StatefulWidget {
     required this.onPress,
     required this.salonArtiestListModel,
     required this.isView,
+    required this.id,
   });
 
   @override
@@ -67,8 +69,7 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                       fit: BoxFit.cover,
                     ),
                   ),
-                ),
-              /*  Positioned(
+                ), /*  Positioned(
                   top: 10,
                   left: 12,
                   child: Container(
@@ -117,7 +118,7 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+
             !widget.isView
                 ? const SizedBox()
                 : GestureDetector(
@@ -161,9 +162,9 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
             TextButton(
               onPressed: () {
                 Get.to(() => StylistSaloonDetailsPage(
+                      salonId: widget.id,
                       artiestId: widget.salonArtiestListModel.id ?? "",
                     ));
-
               },
               child: Text(
                 "View Profile",
