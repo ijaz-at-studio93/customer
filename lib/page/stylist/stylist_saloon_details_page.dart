@@ -15,15 +15,22 @@ import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../constant/assetsconstant.dart';
 import '../appointment/appointment_booking_page.dart';
+import '../home/widget/add_product_sheet_widget.dart';
 import '../home/widget/selected_services_sheet_page.dart';
+import '../search/stylist_search_page.dart';
 
 class StylistSaloonDetailsPage extends StatefulWidget {
   final String artiestId;
   final String salonId;
+  final bool isViewDetails;
   const StylistSaloonDetailsPage(
-      {super.key, required this.artiestId, required this.salonId});
+      {super.key,
+      required this.artiestId,
+      required this.salonId,
+      required this.isViewDetails});
 
   @override
   State<StylistSaloonDetailsPage> createState() =>
@@ -38,6 +45,9 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    if (widget.isViewDetails) {
+      stylistId.value = widget.artiestId;
+    }
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doGetArtiestPortfolio(artistId: widget.artiestId);
       _homeController.doGetCart();
@@ -45,7 +55,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
   }
 
   String serviceId = "";
-  String artiestId = "";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -166,7 +176,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                                                   .services?[i]
                                                   .isAddedToCart ??
                                               false,
-                                          addButtonTap: () {
+                                          addButtonTap: () async {
                                             _homeController
                                                 .getArtiestDetailsModel
                                                 .data
@@ -189,6 +199,63 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                                                     .services?[i]
                                                     .isAddedToCart ??
                                                 false) {
+                                              showModalBottomSheet(
+                                                  context: context,
+                                                  isScrollControlled: true,
+                                                  shape:
+                                                      const RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius.only(
+                                                    topLeft:
+                                                        Radius.circular(32),
+                                                    topRight:
+                                                        Radius.circular(32),
+                                                  )),
+                                                  builder: (context) {
+                                                    return AddProductSheetWidget(
+                                                      price: _homeController
+                                                              .getArtiestDetailsModel
+                                                              .data
+                                                              ?.categorizedServiceList?[
+                                                                  index]
+                                                              .services?[i]
+                                                              .price ??
+                                                          0,
+                                                      rating: _homeController
+                                                              .getArtiestDetailsModel
+                                                              .data
+                                                              ?.categorizedServiceList?[
+                                                                  index]
+                                                              .services?[i]
+                                                              .rating ??
+                                                          0.0,
+                                                      review: _homeController
+                                                              .getArtiestDetailsModel
+                                                              .data
+                                                              ?.categorizedServiceList?[
+                                                                  index]
+                                                              .services?[i]
+                                                              .reviewCount
+                                                              ?.toInt() ??
+                                                          0,
+                                                      nameOfService: _homeController
+                                                              .getArtiestDetailsModel
+                                                              .data
+                                                              ?.categorizedServiceList?[
+                                                                  index]
+                                                              .services?[i]
+                                                              .name ??
+                                                          "",
+                                                      serviceId: _homeController
+                                                              .getArtiestDetailsModel
+                                                              .data
+                                                              ?.categorizedServiceList?[
+                                                                  index]
+                                                              .services?[i]
+                                                              .id ??
+                                                          "",
+                                                    );
+                                                  });
                                               _homeController.doAddCart(
                                                   salonServiceId: _homeController
                                                           .getArtiestDetailsModel
@@ -198,15 +265,82 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                                                           .services?[i]
                                                           .id ??
                                                       "",
-                                                  isHomeService: _homeController
-                                                          .homeSalonDetailsData
-                                                          .data
-                                                          ?.homeService ??
-                                                      false,
+                                                  isHomeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
                                                   callback: () {
-                                                    artiestId =
+                                                    stylistId.value =
                                                         widget.artiestId;
                                                     _homeController.doGetCart();
+                                                    _homeController
+                                                        .doGetSalonDetailsService(
+                                                            salonId:
+                                                                widget.salonId);
+
+                                                    /* showModalBottomSheet(
+                                                        context: context,
+                                                        isScrollControlled:
+                                                            true,
+                                                        shape:
+                                                            const RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .only(
+                                                          topLeft:
+                                                              Radius.circular(
+                                                                  32),
+                                                          topRight:
+                                                              Radius.circular(
+                                                                  32),
+                                                        )),
+                                                        builder: (context) {
+                                                          return AddProductSheetWidget(
+                                                            price: _homeController
+                                                                    .getArtiestDetailsModel
+                                                                    .data
+                                                                    ?.categorizedServiceList?[
+                                                                        index]
+                                                                    .services?[
+                                                                        i]
+                                                                    .price ??
+                                                                0,
+                                                            rating: _homeController
+                                                                    .getArtiestDetailsModel
+                                                                    .data
+                                                                    ?.categorizedServiceList?[
+                                                                        index]
+                                                                    .services?[
+                                                                        i]
+                                                                    .rating ??
+                                                                0.0,
+                                                            review: _homeController
+                                                                    .getArtiestDetailsModel
+                                                                    .data
+                                                                    ?.categorizedServiceList?[
+                                                                        index]
+                                                                    .services?[
+                                                                        i]
+                                                                    .reviewCount
+                                                                    ?.toInt() ??
+                                                                0,
+                                                            nameOfService: _homeController
+                                                                    .getArtiestDetailsModel
+                                                                    .data
+                                                                    ?.categorizedServiceList?[
+                                                                        index]
+                                                                    .services?[
+                                                                        i]
+                                                                    .name ??
+                                                                "",
+                                                            serviceId: _homeController
+                                                                    .getArtiestDetailsModel
+                                                                    .data
+                                                                    ?.categorizedServiceList?[
+                                                                        index]
+                                                                    .services?[
+                                                                        i]
+                                                                    .id ??
+                                                                "",
+                                                          );
+                                                        });*/
                                                   });
                                             } else {
                                               _homeController.doRemoveCart(
@@ -244,9 +378,10 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Obx(
-        () => _homeController.getServiceAddCartModel.data?.items?.isEmpty ??
-                false ||
-                    _homeController.getServiceAddCartModel.data?.items == null
+        () => _homeController.getServiceAddCartModel.data?.servicesWithProduct?.isEmpty ??
+            false ||
+                _homeController.getServiceAddCartModel.data?.servicesWithProduct ==
+                    null
             ? const SizedBox()
             : Stack(
                 alignment: Alignment.center,
@@ -464,7 +599,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                                     builder: (context) {
                                       return SelectedServiceSheetPage(
                                         salonId: widget.salonId,
-                                        artiestId: artiestId,
+                                        artiestId: stylistId.value,
                                         serviceId: serviceId,
                                       );
                                     });
@@ -520,9 +655,9 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                         ),
                         GestureDetector(
                           onTap: () {
-                            if (artiestId != "") {
+                            if (stylistId.value != "") {
                               Get.to(() => AppointmentBookingPage(
-                                    artiestId: artiestId,
+                                    artiestId: stylistId.value,
                                   ));
                             } else {
                               showModalBottomSheet(
@@ -540,9 +675,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                                       salonId: widget.salonId,
                                       serviceId: serviceId,
                                       callback: () {
-                                        setState(() {
-                                          artiestId = box.read('artiestId');
-                                        });
+                                        setState(() {});
                                       },
                                     );
                                   });
@@ -559,15 +692,20 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Text(
-                                  artiestId.isNotEmpty
-                                      ? "Book Slot"
-                                      : "Select Stylist",
-                                  textScaler: const TextScaler.linear(0.70),
-                                  style: AppTextTheme.medium.copyWith(
-                                      fontSize: 16,
-                                      color: ColorConstant.whiteColor),
-                                ),
+                                ValueListenableBuilder(
+                                    valueListenable: stylistId,
+                                    builder: (context, v, c) {
+                                      return Text(
+                                        stylistId.value.isNotEmpty
+                                            ? "Book Slot"
+                                            : "Select Stylist",
+                                        textScaler:
+                                            const TextScaler.linear(0.70),
+                                        style: AppTextTheme.medium.copyWith(
+                                            fontSize: 16,
+                                            color: ColorConstant.whiteColor),
+                                      );
+                                    }),
                                 const SizedBox(width: 10),
                                 const Icon(
                                   Icons.arrow_forward,
@@ -577,8 +715,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                               ],
                             ),
                           ),
-                        ),
-                        /*IconButton(
+                        ), /*IconButton(
                               onPressed: () {
                                 showDialog(
                                     context: context,
@@ -681,14 +818,20 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                 children: [
                   buttonWidget(
                     imageUrl: AssetsConstant.iconSearch,
-                    onPress: () {},
+                    onPress: () {
+                      Get.to(() => StylistSearchPage(
+                            salonId: stylistId.value,
+                          ));
+                    },
                     h: 24,
                     w: 24,
                   ),
                   const SizedBox(width: 15),
                   buttonWidget(
                     imageUrl: AssetsConstant.shareIcon,
-                    onPress: () {},
+                    onPress: () {
+                      Share.share("https://play.google.com/store/apps");
+                    },
                     h: 18,
                     w: 18,
                   ),

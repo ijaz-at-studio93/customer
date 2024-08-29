@@ -27,6 +27,8 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     getVersionApp();
+    stylistId.value = "";
+    stylistId.notifyListeners();
   }
 
   @override

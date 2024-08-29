@@ -146,9 +146,11 @@ class _AddProductSheetWidgetState extends State<AddProductSheetWidget> {
                                         .getServiceProductModel.data?.length ??
                                     0,
                                 itemBuilder: (context, index) {
-
-
-
+                                  isAddForProduct = _homeController
+                                      .getServiceProductModel
+                                      .data?[index]
+                                      .isAddedToCart ??
+                                      false;
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
                                         vertical: 15),
@@ -190,19 +192,20 @@ class _AddProductSheetWidgetState extends State<AddProductSheetWidget> {
                                                 _homeController
                                                     .getServiceProductModel
                                                     .data?[index]
-                                                    .isAdded = true;
+                                                    .isAddedToCart = true;
                                               });
                                               _homeController.doGetCart();
                                               isAddForProduct = _homeController
-                                                  .getServiceProductModel
-                                                  .data?[index]
-                                                  .isAdded ??
+                                                      .getServiceProductModel
+                                                      .data?[index]
+                                                      .isAddedToCart ??
                                                   false;
                                             });
                                       },
                                       isRemove: () {
                                         _homeController.doRemoveProductCart(
-                                          productSelectedServiceId: widget.serviceId,
+                                            productSelectedServiceId:
+                                                widget.serviceId,
                                             productId: _homeController
                                                     .getServiceProductModel
                                                     .data?[index]
@@ -213,20 +216,20 @@ class _AddProductSheetWidgetState extends State<AddProductSheetWidget> {
                                                 _homeController
                                                     .getServiceProductModel
                                                     .data?[index]
-                                                    .isAdded = false;
+                                                    .isAddedToCart = false;
                                               });
                                               _homeController.doGetCart();
                                               isAddForProduct = _homeController
-                                                  .getServiceProductModel
-                                                  .data?[index]
-                                                  .isAdded ??
+                                                      .getServiceProductModel
+                                                      .data?[index]
+                                                      .isAddedToCart ??
                                                   false;
                                             });
                                       },
                                       isAdded: _homeController
                                               .getServiceProductModel
                                               .data?[index]
-                                              .isAdded ??
+                                              .isAddedToCart ??
                                           false,
                                     ),
                                   );

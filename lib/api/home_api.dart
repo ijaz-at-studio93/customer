@@ -98,19 +98,21 @@ class HomeAPI {
       required double lat,
       required double lng,
       required String orderBy,
+      required String serviceGender,
       required bool nearest,
       required bool fourPlusRating,
       required bool homeService}) async {
     final formData = FormData.fromMap({
       'page': offset,
       'limit': size,
-      "lat": lat == 0.0 ? 22.303894 : lat,
-      "lng": lng == 0.0 ? 22.303894 : lng,
+      "lat": lat == 0.0 ? 00.00 : lat,
+      "lng": lng == 0.0 ? 00.00 : lng,
       "distanceRadius": 50000,
       "homeService": homeService,
-      "orderDirection": "DESC",
+      "orderDirection": orderBy == "name" ? "ASC" : "DESC",
       "nearest": nearest,
       "fourPlusRating": fourPlusRating,
+      "serviceGender" : serviceGender,
     });
 
     if (orderBy.isNotEmpty) {
@@ -289,14 +291,14 @@ class HomeAPI {
   /*>>>>>>>>>>>>>>>>>>>>> CART ADD <<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
   /*----------- Add Cart ------------*/
-  static Future<ServiceAddCartModel> serviceAddCart(
+  static Future<bool> serviceAddCart(
       {required String salonServiceId, required bool isHomeService}) async {
     final response = await DioClient.client.put("user/cart/add", data: {
       "salonServiceId": salonServiceId,
       "isHomeService": isHomeService
     });
-    if (response.data['success']) {
-      return ServiceAddCartModel.fromJson(response.data);
+    if (response.isSuccess) {
+      return true;
     } else {
       throw response.data;
     }

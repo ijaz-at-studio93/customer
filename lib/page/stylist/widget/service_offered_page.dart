@@ -6,6 +6,7 @@ import 'package:salon_customer/model/artiest_portfolio_model.dart';
 import 'package:salon_customer/page/stylist/widget/service_offered_list_tile_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import '../../../controller/home_controller.dart';
+import '../../../util/SharedPrefs.dart';
 
 class ServiceAndOfferedPage extends StatefulWidget {
   final ArtiestPortfolio artiestPortfolio;
@@ -142,11 +143,7 @@ class _ServiceAndOfferedPageState extends State<ServiceAndOfferedPage> {
                                         .services?[i]
                                         .id ??
                                     "",
-                                isHomeService: _homeController
-                                        .homeSalonDetailsData
-                                        .data
-                                        ?.homeService ??
-                                    false,
+                                isHomeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
                                 callback: () {
                                   _homeController.doGetCart();
                                 });

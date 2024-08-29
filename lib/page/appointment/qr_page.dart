@@ -36,6 +36,8 @@ class _QRCodePageState extends State<QRCodePage> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doCreateQrCode(appointmentId: widget.appointmentId);
       _homeController.doClearCart(callback: () {
+        stylistId.value = "";
+        stylistId.notifyListeners();
         _homeController.doGetCart();
       });
     });

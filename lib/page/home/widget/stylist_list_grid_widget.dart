@@ -118,8 +118,7 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                 ],
               ),
             ),
-
-            !widget.isView
+            /* !widget.isView
                 ? const SizedBox()
                 : GestureDetector(
                     onTap: () {
@@ -157,11 +156,12 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                               ),
                             ),
                           ),
-                  ),
+                  ),*/
             /*!widget.isView ? const SizedBox() : const SizedBox(),*/
             TextButton(
               onPressed: () {
                 Get.to(() => StylistSaloonDetailsPage(
+                      isViewDetails: true,
                       salonId: widget.id,
                       artiestId: widget.salonArtiestListModel.id ?? "",
                     ));

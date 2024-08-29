@@ -98,7 +98,8 @@ class _StylistSearchPageState extends State<StylistSearchPage> {
                                     0,
                                 onPress: () {
                                   Get.to(() => StylistSaloonDetailsPage(
-                                   salonId: widget.salonId,
+                                        isViewDetails: false,
+                                        salonId: widget.salonId,
                                         artiestId: _homeController
                                                 .getArtistSearchModel
                                                 .data?[index]

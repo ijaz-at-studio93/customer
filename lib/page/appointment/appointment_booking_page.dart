@@ -175,14 +175,20 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                                           index]
                                                                       .id ??
                                                                   "",
-                                                          isHomeService: _homeController
-                                                                  .homeSalonDetailsData
-                                                                  .data
-                                                                  ?.homeService ??
-                                                              false,
+                                                          isHomeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
                                                           callback: () {
                                                             _homeController
                                                                 .doGetCart();
+                                                            if (_homeController
+                                                                    .getServiceAddCartModel
+                                                                    .data
+                                                                    ?.items ==
+                                                                null) {
+                                                              stylistId.value =
+                                                                  "";
+                                                              stylistId
+                                                                  .notifyListeners();
+                                                            }
                                                           });
                                                     } else {
                                                       _homeController
@@ -197,6 +203,17 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                               callback: () {
                                                                 _homeController
                                                                     .doGetCart();
+
+                                                                if (_homeController
+                                                                        .getServiceAddCartModel
+                                                                        .data
+                                                                        ?.items ==
+                                                                    null) {
+                                                                  stylistId
+                                                                      .value = "";
+                                                                  stylistId
+                                                                      .notifyListeners();
+                                                                }
                                                               });
                                                     }
                                                   },
@@ -423,7 +440,22 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                         .serviceId ??
                                                     "",
                                                 callback: () {
+                                                  _homeController
+                                                      .doGetSalonDetailsService(
+                                                          salonId: _homeController
+                                                                  .getServiceAddCartModel
+                                                                  .data
+                                                                  ?.salonId ??
+                                                              "");
                                                   _homeController.doGetCart();
+                                                  if (_homeController
+                                                          .getServiceAddCartModel
+                                                          .data
+                                                          ?.items ==
+                                                      null) {
+                                                    stylistId.value = "";
+                                                    stylistId.notifyListeners();
+                                                  }
                                                 });
                                           },
                                           items: _homeController
@@ -447,9 +479,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         floatingActionButton: Obx(
           () => _homeController.showProgress
               ? const SizedBox()
-              : _homeController.getServiceAddCartModel.data?.items?.isEmpty ??
+              : _homeController.getServiceAddCartModel.data?.servicesWithProduct?.isEmpty ??
                       false ||
-                          _homeController.getServiceAddCartModel.data?.items ==
+                          _homeController.getServiceAddCartModel.data?.servicesWithProduct ==
                               null
                   ? const SizedBox()
                   : Container(
@@ -642,6 +674,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               salonArtistId: widget.artiestId,
               startAt: isoDateTime,
               callback: () {
+                stylistId.value = "";
+                stylistId.notifyListeners();
                 showModalBottomSheet(
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
@@ -670,6 +704,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             salonArtistId: widget.artiestId,
             startAt: isoDateTime,
             callback: () {
+              stylistId.value = "";
+              stylistId.notifyListeners();
               showModalBottomSheet(
                   isScrollControlled: true,
                   shape: const RoundedRectangleBorder(
@@ -710,6 +746,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               salonArtistId: widget.artiestId,
               startAt: isoDateTime,
               callback: () {
+                stylistId.value = "";
+                stylistId.notifyListeners();
                 showModalBottomSheet(
                     isScrollControlled: true,
                     shape: const RoundedRectangleBorder(
@@ -730,6 +768,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               });
         }
       } else {
+        stylistId.value = "";
         _homeController.doCreateBooking(
             userAddressId: "",
             isHomeService:

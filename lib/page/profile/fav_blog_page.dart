@@ -78,6 +78,11 @@ class _BlogFavPageState extends State<BlogFavPage> {
                                       .getFavBlogDataModel.data?[i].id ??
                                   "");
                           Get.to(() => InsightsDetailPage(
+                                externalLink: _homeController
+                                        .getFavBlogDataModel
+                                        .data?[i]
+                                        .externalLink ??
+                                    "",
                                 video: _homeController.getFavBlogDataModel
                                             .data![i].video?.isEmpty ??
                                         false

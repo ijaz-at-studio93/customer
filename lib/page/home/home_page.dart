@@ -44,6 +44,11 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     getCurrentLatLng();
+    if (SharedPrefs.readBoolValue(PrefConstants.isHomeService)) {
+      atHome = true;
+    } else {
+      atHome = false;
+    }
     if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
       selectedGender.value = 0;
     } else {
@@ -74,7 +79,9 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 15),
                   _saloonsFoundNear(),
                   _homeController.getHomeSalonList.data?.rows?.isEmpty ?? false
-                      ? const NoItemsWidget(text: "No salons were found.")
+                      ? const NoItemsWidget(
+                          text: "No salons were found.",
+                        )
                       : ListView.builder(
                           padding: EdgeInsets.zero,
                           physics: const NeverScrollableScrollPhysics(),
@@ -228,6 +235,8 @@ class _HomePageState extends State<HomePage> {
               Get.to(() => GoogleMapGetLocation(
                     callback: () {
                       _homeController.doGetHomeSalonList(
+                          serviceGender:
+                              selectedGender.value == 0 ? "male" : "female",
                           homeService: atHome,
                           offset: 1,
                           size: 50,
@@ -409,6 +418,9 @@ class _HomePageState extends State<HomePage> {
                                 }
 
                                 _homeController.doGetHomeSalonList(
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
                                     homeService: atHome,
                                     offset: 1,
                                     size: 50,
@@ -481,6 +493,9 @@ class _HomePageState extends State<HomePage> {
                                           });
                                     }
                                     _homeController.doGetHomeSalonList(
+                                        serviceGender: selectedGender.value == 0
+                                            ? "male"
+                                            : "female",
                                         homeService: atHome,
                                         offset: 1,
                                         size: 50,
@@ -572,6 +587,9 @@ class _HomePageState extends State<HomePage> {
                                       });
 
                                   _homeController.doGetHomeSalonList(
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
                                       homeService: atHome,
                                       offset: 1,
                                       size: 50,
@@ -691,6 +709,9 @@ class _HomePageState extends State<HomePage> {
                                         _homeController.doGetMakePackageData();
                                       });
                                   _homeController.doGetHomeSalonList(
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
                                       homeService: atHome,
                                       offset: 1,
                                       size: 50,
@@ -770,7 +791,7 @@ class _HomePageState extends State<HomePage> {
                                       width: Get.width * 0.25,
                                       child: Text(
                                         _homeController
-                                                .homeCategoryListResponseModel
+                                                .getLastMakeYourOwnPackageModel
                                                 .data?[index]
                                                 .name ??
                                             "",
@@ -833,6 +854,10 @@ class _HomePageState extends State<HomePage> {
                                               });
                                         }
                                         _homeController.doGetHomeSalonList(
+                                            serviceGender:
+                                                selectedGender.value == 0
+                                                    ? "male"
+                                                    : "female",
                                             homeService: atHome,
                                             offset: 1,
                                             size: 50,
@@ -974,7 +999,7 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  "${_homeController.getHomeSalonList.data?.rows?.length} Salons Found Near You",
+                  "${_homeController.getHomeSalonList.data?.rows?.length ?? 0} Salons Found Near You",
                   textScaler: const TextScaler.linear(0.90),
                   style: AppTextTheme.bold
                       .copyWith(fontSize: 17, color: ColorConstant.blackColor),
@@ -1001,8 +1026,17 @@ class _HomePageState extends State<HomePage> {
                           onChanged: (bool value) {
                             setState(() {
                               atHome = value;
-
+                              if (atHome) {
+                                SharedPrefs.writeValue(
+                                    PrefConstants.isHomeService, true);
+                              } else {
+                                SharedPrefs.writeValue(
+                                    PrefConstants.isHomeService, false);
+                              }
                               _homeController.doGetHomeSalonList(
+                                  serviceGender: selectedGender.value == 0
+                                      ? "male"
+                                      : "female",
                                   homeService: atHome,
                                   offset: 1,
                                   size: 50,
@@ -1065,6 +1099,9 @@ class _HomePageState extends State<HomePage> {
                                 dropdownvalue = newValue ?? "";
 
                                 _homeController.doGetHomeSalonList(
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
                                     homeService: atHome,
                                     offset: 1,
                                     size: 50,
@@ -1098,22 +1135,51 @@ class _HomePageState extends State<HomePage> {
                         InkWell(
                           onTap: () {
                             setState(() {
-                              select = 1;
-                              _homeController.doGetHomeSalonList(
-                                  homeService: atHome,
-                                  offset: 1,
-                                  size: 50,
-                                  lat: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.latitude)),
-                                  lng: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.longitude)),
-                                  orderBy: dropdownvalue == "Sort By"
-                                      ? ""
-                                      : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : "name",
-                                  nearest: true,
-                                  fourPlusRating: false);
+                              if (select == 0 || select == 2) {
+                                select = 1;
+                                _homeController.doGetHomeSalonList(
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    homeService: atHome,
+                                    offset: 1,
+                                    size: 50,
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)),
+                                    orderBy: dropdownvalue == "Sort By"
+                                        ? ""
+                                        : dropdownvalue == "Newest"
+                                            ? "createdAt"
+                                            : "name",
+                                    nearest: true,
+                                    fourPlusRating: false);
+                              } else {
+                                select = 0;
+                                _homeController.doGetHomeSalonList(
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    homeService: atHome,
+                                    offset: 1,
+                                    size: 50,
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)),
+                                    orderBy: dropdownvalue == "Sort By"
+                                        ? ""
+                                        : dropdownvalue == "Newest"
+                                            ? "createdAt"
+                                            : "name",
+                                    nearest: false,
+                                    fourPlusRating: false);
+                              }
                             });
                           },
                           child: Container(
@@ -1145,22 +1211,51 @@ class _HomePageState extends State<HomePage> {
                         InkWell(
                           onTap: () {
                             setState(() {
-                              select = 2;
-                              _homeController.doGetHomeSalonList(
-                                  homeService: atHome,
-                                  offset: 1,
-                                  size: 50,
-                                  lat: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.latitude)),
-                                  lng: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.longitude)),
-                                  orderBy: dropdownvalue == "Sort By"
-                                      ? ""
-                                      : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : "name",
-                                  nearest: false,
-                                  fourPlusRating: true);
+                              if (select == 0 || select == 1) {
+                                select = 2;
+                                _homeController.doGetHomeSalonList(
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    homeService: atHome,
+                                    offset: 1,
+                                    size: 50,
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)),
+                                    orderBy: dropdownvalue == "Sort By"
+                                        ? ""
+                                        : dropdownvalue == "Newest"
+                                            ? "createdAt"
+                                            : "name",
+                                    nearest: false,
+                                    fourPlusRating: true);
+                              } else {
+                                select = 0;
+                                _homeController.doGetHomeSalonList(
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    homeService: atHome,
+                                    offset: 1,
+                                    size: 50,
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)),
+                                    orderBy: dropdownvalue == "Sort By"
+                                        ? ""
+                                        : dropdownvalue == "Newest"
+                                            ? "createdAt"
+                                            : "name",
+                                    nearest: false,
+                                    fourPlusRating: false);
+                              }
                             });
                           },
                           child: Container(
@@ -1187,8 +1282,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 4),
+                        ), /*const SizedBox(width: 4),
                         InkWell(
                           onTap: () {
                             setState(() {
@@ -1219,7 +1313,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                        ),
+                        ),*/
                       ],
                     )
                   ],
@@ -1261,6 +1355,7 @@ class _HomePageState extends State<HomePage> {
           gender: selectedGender.value == 0 ? "male" : "female",
         );
         _homeController.doGetHomeSalonList(
+            serviceGender: selectedGender.value == 0 ? "male" : "female",
             homeService: atHome,
             offset: 1,
             size: 50,
@@ -1301,6 +1396,7 @@ class _HomePageState extends State<HomePage> {
       _homeController.doGetMakePackageData();
 
       _homeController.doGetHomeSalonList(
+          serviceGender: selectedGender.value == 0 ? "male" : "female",
           homeService: atHome,
           offset: 1,
           size: 50,
@@ -1310,29 +1406,5 @@ class _HomePageState extends State<HomePage> {
           nearest: false,
           fourPlusRating: false);
     }
-
-    /*bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    LocationPermission permission;
-    if (!serviceEnabled) {
-      await Permission.location.request();
-      showMessage("Location services are disabled.");
-      return Future.error('Location services are disabled.');
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        await Permission.location.request();
-        showMessage("Location permissions are denied");
-        return Future.error('Location permissions are denied');
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      openAppSettings();
-      showMessage(
-          "Location permissions are permanently denied, we cannot request permissions.");
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }*/
   }
 }

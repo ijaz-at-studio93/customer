@@ -8,6 +8,7 @@ import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/page/stylist/widget/network_video_view_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class InsightsDetailPage extends StatefulWidget {
   final String image;
@@ -15,13 +16,15 @@ class InsightsDetailPage extends StatefulWidget {
   final String title;
   final String subTitle;
   final String body;
+  final String externalLink;
   const InsightsDetailPage(
       {super.key,
       required this.image,
       required this.title,
       required this.subTitle,
       required this.body,
-      required this.video});
+      required this.video,
+      required this.externalLink});
 
   @override
   State<InsightsDetailPage> createState() => _InsightsDetailPageState();
@@ -94,6 +97,21 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
                     .copyWith(color: ColorConstant.blackColor, fontSize: 16),
               ),
             ),
+            widget.externalLink.isEmpty
+                ? const SizedBox()
+                : Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 20),
+                    child: TextButton(
+                      onPressed: () {
+                        _launchURL(widget.externalLink);
+                      },
+                      child: Text(
+                        widget.externalLink,
+                        style: AppTextTheme.medium.copyWith(
+                            color: ColorConstant.primaryColor, fontSize: 16),
+                      ),
+                    )),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
               child: ReadMoreText(
@@ -119,5 +137,13 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
         ),
       ),
     );
+  }
+
+  void _launchURL(String urlData) async {
+    if (await canLaunch(urlData)) {
+      await launch(urlData);
+    } else {
+      throw 'Could not launch $urlData';
+    }
   }
 }

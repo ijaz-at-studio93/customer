@@ -40,7 +40,7 @@ class Data {
   String? createdAt;
   String? updatedAt;
   String? reviewCount;
-  bool? homeService;
+  String? homeService;
   List<ServiceCategories>? serviceCategories;
   bool? isFavourite;
   String? startTiming;

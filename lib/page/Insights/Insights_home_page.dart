@@ -76,6 +76,9 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
                                       .getBlogDataModel.data?[i].id ??
                                   "");
                           Get.to(() => InsightsDetailPage(
+                                externalLink: _homeController.getBlogDataModel
+                                        .data?[i].externalLink ??
+                                    "",
                                 video: _homeController.getBlogDataModel.data?[i]
                                             .video?.isEmpty ??
                                         false
@@ -90,8 +93,11 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
                                 subTitle: _homeController
                                         .getBlogDataModel.data?[i].body ??
                                     "",
-                                image:
-                                _homeController.getBlogDataModel.data?[i].image?.isEmpty ??  false ? "" : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].image ?? ""}",
+                                image: _homeController.getBlogDataModel.data?[i]
+                                            .image?.isEmpty ??
+                                        false
+                                    ? ""
+                                    : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].image ?? ""}",
                               ));
                         },
                       );

@@ -368,6 +368,7 @@ class HomeController extends GetxController {
     required double lat,
     required double lng,
     required String orderBy,
+    required String serviceGender,
     required bool nearest,
     required bool fourPlusRating,
     required bool homeService,
@@ -380,6 +381,7 @@ class HomeController extends GetxController {
           lat: lat,
           lng: lng,
           homeService: homeService,
+          serviceGender: serviceGender,
           fourPlusRating: fourPlusRating,
           nearest: nearest,
           orderBy: orderBy);
@@ -563,14 +565,14 @@ class HomeController extends GetxController {
       required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
-      _serviceAddCartModel.value = await HomeAPI.serviceAddCart(
+      bool result = await HomeAPI.serviceAddCart(
           salonServiceId: salonServiceId, isHomeService: isHomeService);
-      if (_serviceAddCartModel.value.success ?? false) {
+      if (result) {
         callback.call();
       }
     } catch (e) {
       showError(e);
-      logger.d("Add Cart  ${e.toString()}");
+      logger.d("Add Cart  ${e}");
     } finally {
       _showProgress.value = false;
     }

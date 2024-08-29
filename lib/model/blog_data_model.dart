@@ -38,6 +38,7 @@ class BlogData {
   String? video;
   String? createdAt;
   String? body;
+  String? externalLink;
   int? viewCount;
   Artist? artist;
   bool?  isFavourite;
@@ -50,6 +51,7 @@ class BlogData {
       this.video,
       this.createdAt,
       this.body,
+      this.externalLink,
       this.viewCount,
       this.artist,
       this.isFavourite
@@ -63,6 +65,7 @@ class BlogData {
     video = json['video'];
     createdAt = json['createdAt'];
     body = json['body'];
+    externalLink = json['externalLink'];
     viewCount = json['viewCount'];
     isFavourite =  json['isFavourite'];
     artist = json['artist'] != null ? Artist.fromJson(json['artist']) : null;
@@ -77,6 +80,7 @@ class BlogData {
     data['video'] = video;
     data['createdAt'] = createdAt;
     data['body'] = body;
+    data['externalLink'] = externalLink;
     data['viewCount'] = viewCount;
     data['isFavourite'] = isFavourite;
     if (artist != null) {

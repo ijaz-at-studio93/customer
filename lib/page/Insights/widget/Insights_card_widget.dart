@@ -46,7 +46,10 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                       ? Container(
                           width: Get.width,
                           height: Get.height * 0.22,
+                          decoration: BoxDecoration(
                           color: ColorConstant.primaryColor.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                           child: Center(
                             child: Image.asset(
                               AssetsConstant.playIcon,
@@ -82,88 +85,108 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                   Positioned(
                     top: 15,
                     right: 10,
-                    child: widget.isFav
-                        ? GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _homeController.doRemoveBlog(
-                                    callback: () {
-                                      if (widget.isFav) {
-                                        _homeController.doGetFavBlogData();
-                                      }
-                                    },
-                                    blogId: widget.blogData.id ?? "");
-                              });
-                            },
-                            child: Container(
-                              width: 38,
-                              height: 38,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: ColorConstant.blackColor
-                                      .withOpacity(0.50)),
-                              child: Center(
-                                child: widget.blogData.isFavourite ?? true
-                                    ? const Icon(
-                                        CupertinoIcons.heart_fill,
-                                        color: Colors.red,
-                                      )
-                                    : Image.asset(
-                                        AssetsConstant.likeBlank,
-                                        height: 20,
-                                        width: 20,
-                                        color: ColorConstant.whiteColor,
-                                      ),
-                              ),
-                            ),
-                          )
-                        : GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                widget.blogData.isFavourite =
-                                    !(widget.blogData.isFavourite ?? false);
-                                if (widget.blogData.isFavourite ?? false) {
-                                  _homeController.doAddFavBlog(
-                                      callback: () {},
-                                      blogId: widget.blogData.id ?? "");
-                                } else {
-                                  _homeController.doRemoveBlog(
-                                      callback: () {
-                                        _homeController.doGetBlogData(
-                                          lat: double.parse(
-                                              SharedPrefs.readStringValue(
-                                                  PrefConstants.latitude)),
-                                          lng: double.parse(
-                                              SharedPrefs.readStringValue(
-                                                  PrefConstants.longitude)),
-                                        );
-                                      },
-                                      blogId: widget.blogData.id ?? "");
-                                }
-                              });
-                            },
-                            child: Container(
-                              width: 38,
-                              height: 38,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: ColorConstant.blackColor
-                                      .withOpacity(0.50)),
-                              child: Center(
-                                child: widget.blogData.isFavourite ?? false
-                                    ? const Icon(
-                                        CupertinoIcons.heart_fill,
-                                        color: Colors.red,
-                                      )
-                                    : Image.asset(
-                                        AssetsConstant.likeBlank,
-                                        height: 20,
-                                        width: 20,
-                                        color: ColorConstant.whiteColor,
-                                      ),
-                              ),
+                    left: 10,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                              color: ColorConstant.blackColor.withOpacity(0.5),
+                              borderRadius: BorderRadius.circular(6)),
+                          child: Center(
+                            child: Text(
+                              "By ${widget.blogData.artist?.salon?.name ?? ""}",
+                              style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.whiteColor,
+                                  fontSize: 11),
                             ),
                           ),
+                        ),
+                        widget.isFav
+                            ? GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _homeController.doRemoveBlog(
+                                        callback: () {
+                                          if (widget.isFav) {
+                                            _homeController.doGetFavBlogData();
+                                          }
+                                        },
+                                        blogId: widget.blogData.id ?? "");
+                                  });
+                                },
+                                child: Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: ColorConstant.blackColor
+                                          .withOpacity(0.50)),
+                                  child: Center(
+                                    child: widget.blogData.isFavourite ?? true
+                                        ? const Icon(
+                                            CupertinoIcons.heart_fill,
+                                            color: Colors.red,
+                                          )
+                                        : Image.asset(
+                                            AssetsConstant.likeBlank,
+                                            height: 20,
+                                            width: 20,
+                                            color: ColorConstant.whiteColor,
+                                          ),
+                                  ),
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    widget.blogData.isFavourite =
+                                        !(widget.blogData.isFavourite ?? false);
+                                    if (widget.blogData.isFavourite ?? false) {
+                                      _homeController.doAddFavBlog(
+                                          callback: () {},
+                                          blogId: widget.blogData.id ?? "");
+                                    } else {
+                                      _homeController.doRemoveBlog(
+                                          callback: () {
+                                            _homeController.doGetBlogData(
+                                              lat: double.parse(
+                                                  SharedPrefs.readStringValue(
+                                                      PrefConstants.latitude)),
+                                              lng: double.parse(
+                                                  SharedPrefs.readStringValue(
+                                                      PrefConstants.longitude)),
+                                            );
+                                          },
+                                          blogId: widget.blogData.id ?? "");
+                                    }
+                                  });
+                                },
+                                child: Container(
+                                  width: 38,
+                                  height: 38,
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: ColorConstant.blackColor
+                                          .withOpacity(0.50)),
+                                  child: Center(
+                                    child: widget.blogData.isFavourite ?? false
+                                        ? const Icon(
+                                            CupertinoIcons.heart_fill,
+                                            color: Colors.red,
+                                          )
+                                        : Image.asset(
+                                            AssetsConstant.likeBlank,
+                                            height: 20,
+                                            width: 20,
+                                            color: ColorConstant.whiteColor,
+                                          ),
+                                  ),
+                                ),
+                              ),
+                      ],
+                    ),
                   )
                 ],
               ),
@@ -173,7 +196,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.blackColor, fontSize: 16),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -225,7 +248,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                   )
                 ],
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 5),
             ],
           ),
         ),

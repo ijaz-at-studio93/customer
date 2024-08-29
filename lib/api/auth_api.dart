@@ -11,8 +11,8 @@ import 'dio_client.dart';
 
 
 class AuthAPI {
-  /*--------------------- CheckMobileNumberIsRegister  Or Not --------------------- */ static Future<
-          bool>
+  /*--------------------- CheckMobileNumberIsRegister  Or Not --------------------- */
+  static Future<bool>
       doCheckMobileNumberIsRegister(
           {required String mobileNo, required String countryCode}) async {
     final response = await DioClient.client.post(

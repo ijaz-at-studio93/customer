@@ -8,6 +8,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
+import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart' as fp;
@@ -21,7 +22,7 @@ class GoogleMapGetLocation extends StatefulWidget {
 }
 
 class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
-  late GoogleMapController mapController;
+/*  late GoogleMapController mapController;
   LatLng? initialPosition;
   List<LatLng> postcodeLocations = [];
   final List<Marker> _marker = <Marker>[];
@@ -46,7 +47,35 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
   void dispose() {
     super.dispose();
     _searchMapLocation.clear();
+  }*/
+
+
+
+
+  final _authController = Get.find<AuthController>();
+
+  GoogleMapController? _controller;
+  LatLng _initialPosition = const LatLng(0.0, 0.0);
+  bool _locationLoaded = false;
+  final List<Marker> _marker = <Marker>[];
+
+  final _searchMapLocation = TextEditingController();
+  ValueNotifier<bool> close = ValueNotifier(false);
+
+  final places =
+  fp.FlutterGooglePlacesSdk('AIzaSyCfT7gdH9_FxaRT90cxexYlxgUGsXOEo_Q');
+  ValueNotifier<List<fp.AutocompletePrediction>> locationData =
+  ValueNotifier([]);
+
+  @override
+  void initState() {
+    super.initState();
+    _setInitialLocation();
   }
+
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -71,22 +100,11 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                widget.callback.call();
-                Get.back();
-              },
-              icon: const Icon(
-                Icons.check_circle_rounded,
-                color: ColorConstant.blackColor,
-              ))
-        ],
       ),
-      body: Stack(
+      body:  _locationLoaded ?  Stack(
         clipBehavior: Clip.none,
         children: [
-          GoogleMap(
+   /*       GoogleMap(
             myLocationButtonEnabled: false,
             myLocationEnabled: true,
             zoomControlsEnabled: false,
@@ -96,7 +114,6 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
               setState(() {
                 mapController = controller;
               });
-              _moveToInitialPosition();
             },
             onTap: (latLng) async {
               List<Placemark> placeMarks = await placemarkFromCoordinates(
@@ -128,7 +145,47 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
             markers: Set<Marker>.of(
               _marker,
             ),
+          ),*/
+
+          GoogleMap(
+            initialCameraPosition: CameraPosition(
+              target: _initialPosition,
+              zoom: 14.0,
+            ),
+            onMapCreated: (GoogleMapController controller) {
+              _controller = controller;
+            },
+            onTap: (latLng) async {
+              _marker.clear();
+              List<Placemark> placeMarks =
+              await placemarkFromCoordinates(
+                  latLng.latitude, latLng.longitude);
+              Placemark place = placeMarks[0];
+              _marker.add(Marker(
+                markerId: const MarkerId('current_Postion23'),
+                position: LatLng(latLng.latitude, latLng.longitude),
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueViolet,
+                ),
+              ));
+
+              _authController.userCity = "${place.locality}";
+              _authController.userCurrentLocation =
+              "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+
+              SharedPrefs.writeValue(
+                  PrefConstants.longitude, latLng.longitude.toString());
+              SharedPrefs.writeValue(
+                  PrefConstants.latitude, latLng.latitude.toString());
+              setState(() {});
+            },
+            markers: Set<Marker>.of(
+              _marker,
+            ),
+            myLocationEnabled: true,
+            myLocationButtonEnabled: true,
           ),
+
           Positioned(
             child: Column(
               children: [
@@ -138,7 +195,7 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                    borderRadius: BorderRadius.circular(5)
                   ),
                   alignment: Alignment.center,
-                   margin: const EdgeInsets.only(left: 10, right: 10, top: 25),
+                   margin: const EdgeInsets.only(left: 10, right: 10, top: 55),
                   // height: 48,
                   child: TextField(
                     controller: _searchMapLocation,
@@ -177,7 +234,9 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                                         locationData.value = [];
                                         close.value = false;
                                         close.notifyListeners();
-                                        getCurrentLatLng();
+                                        setState(() {
+                                          _setInitialLocation();
+                                        });
                                       },
                                       child: const Icon(
                                         CupertinoIcons.xmark_circle,
@@ -260,10 +319,13 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                                           _authController.googleMapProgress =
                                               false;
 
-                                          mapController.animateCamera(
-                                              CameraUpdate.newLatLng(LatLng(
-                                                  location[0].latitude,
-                                                  location[0].longitude)));
+                                          _controller?.animateCamera(
+                                              CameraUpdate.newLatLng(
+                                                  LatLng(
+                                                      location[0]
+                                                          .latitude,
+                                                      location[0]
+                                                          .longitude)));
                                         });
                                       }
                                     },
@@ -313,18 +375,81 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
             ),
           ),
         ],
-      ),
+      ) : const ProgressBarView(),
     );
   }
 
-  /*---------  Move Camera For Google Map ----------*/
-  void _moveToInitialPosition() {
-    mapController.animateCamera(CameraUpdate.newLatLng(
-        initialPosition ?? const LatLng(22.303894, 70.802162)));
+  /*----------------- Set  init  Location  -----------------*/
+  Future<void> _setInitialLocation() async {
+    await requestPermission();
+    Position position = await getCurrentLocation();
+    setState(() {
+      _initialPosition = LatLng(position.latitude, position.longitude);
+      _locationLoaded = true;
+      _marker.add(Marker(
+        markerId: const MarkerId('current_Postion'),
+        position: LatLng(position.latitude, position.longitude),
+        icon: BitmapDescriptor.defaultMarkerWithHue(
+          BitmapDescriptor.hueViolet,
+        ),
+      ));
+    });
+    List<Placemark> placeMarks =
+    await placemarkFromCoordinates(position.latitude, position.longitude);
+    Placemark place = placeMarks[0];
+
+    _authController.userCity =
+    "${place.locality}";
+    _authController.userCurrentLocation =
+    "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+
+    SharedPrefs.writeValue(
+        PrefConstants.longitude,
+        position.longitude.toString());
+    SharedPrefs.writeValue(
+        PrefConstants.latitude,
+        position.latitude.toString());
+
+   /* _authController.salonAddressLan = position.longitude;
+    _authController.salonAddressLat = position.latitude;
+    _authController.salonCurrentAddress =
+    "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";*/
   }
 
+  /*------------------- Location  Change Liston --------------------*/
+  void _listenToLocationChanges() {
+    Geolocator.getPositionStream().listen((Position position) {
+      _controller?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(position.latitude, position.longitude),
+            zoom: 14.0,
+          ),
+        ),
+      );
+    });
+  }
+
+  /*---------------- Request  Permission  -----------------*/
+  Future<void> requestPermission() async {
+    var status = await Permission.location.request();
+    if (status.isDenied) {
+      await Permission.location.request();
+    } else if (status.isPermanentlyDenied) {
+      showMessage(
+          "Location permissions are permanently denied, we cannot request permissions.");
+    }
+  }
+
+  /*--------------  Get Current Location  -----------------*/
+  Future<Position> getCurrentLocation() async {
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+  }
+
+
   /*------------------------ Get Current Location to Lat Lng ------------------------*/
-  getCurrentLatLng() async {
+  /*getCurrentLatLng() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission;
     if (!serviceEnabled) {
@@ -361,5 +486,5 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
         ),
       ));
     });
-  }
+  }*/
 }

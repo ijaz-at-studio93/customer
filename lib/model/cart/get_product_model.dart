@@ -42,7 +42,7 @@ class Data {
   String? description;
   String? image;
   int? reviewCount;
-  bool? isAdded;
+  bool? isAddedToCart;
 
 
   Data(
@@ -57,7 +57,7 @@ class Data {
         this.description,
         this.image,
         this.reviewCount,
-        this.isAdded
+        this.isAddedToCart
       });
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -72,6 +72,7 @@ class Data {
     description = json['description'];
     image = json['image'];
     reviewCount = json['reviewCount'];
+    isAddedToCart = json['isAddedToCart'];
   }
 
   Map<String, dynamic> toJson() {
@@ -87,6 +88,7 @@ class Data {
     data['description'] = description;
     data['image'] = image;
     data['reviewCount'] = reviewCount;
+    data['isAddedToCart'] = isAddedToCart;
     return data;
   }
 }

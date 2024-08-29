@@ -1,7 +1,10 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/appointment/appointment_booking_page.dart';
 import 'package:salon_customer/page/stylist/widget/selected_fav_artist_card_widget.dart';
@@ -35,8 +38,8 @@ class _SelectingArtistBottomSheetWidgetState
     });
   }
 
-  final box = GetStorage();
-  String artiestId = "";
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +64,8 @@ class _SelectingArtistBottomSheetWidgetState
                 GestureDetector(
                   onTap: () {
                     Navigator.pop(context);
-                    box.remove("artiestId");
+
+                    stylistId.value = "";
                   },
                   child: Container(
                     height: 40,
@@ -119,6 +123,16 @@ class _SelectingArtistBottomSheetWidgetState
                                   0,
                           itemBuilder: (context, index) {
                             return SelectedFavArtistCardWidget(
+                              callback: (){
+
+                                stylistId.value = _homeController
+                                    .getArtiestListData
+                                    .data![index]
+                                    .id ??
+                                    "";
+
+                                widget.callback.call();
+                              },
                              salonId: widget.salonId,
                               artiest: _homeController
                                   .getArtiestListData.data![index],
@@ -145,17 +159,17 @@ class _SelectingArtistBottomSheetWidgetState
                                   if (_homeController.getArtiestListData
                                           .data![index].isSelectArtist ??
                                       false) {
-                                    artiestId = _homeController
+                                    stylistId.value = _homeController
                                             .getArtiestListData
                                             .data![index]
                                             .id ??
                                         "";
-                                    box.write("artiestId", artiestId);
+
                                     widget.callback.call();
 
                                   } else {
-                                    artiestId = "";
-                                    box.remove("artiestId");
+                                    stylistId.value = "";
+
                                   }
                                 });
 

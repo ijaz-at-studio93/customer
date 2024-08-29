@@ -13,13 +13,14 @@ import '../stylist_saloon_details_page.dart';
 
 class SelectedFavArtistCardWidget extends StatelessWidget {
   final VoidCallback onPress;
+  final VoidCallback callback;
   final Artiest artiest;
   final String salonId;
   const SelectedFavArtistCardWidget(
       {super.key,
       required this.onPress,
       required this.artiest,
-      required this.salonId});
+      required this.salonId, required this.callback});
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +137,10 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
           ),
           TextButton(
             onPressed: () {
+              Get.back();
+              callback.call();
               Get.to(() => StylistSaloonDetailsPage(
+                    isViewDetails: true,
                     salonId: salonId,
                     artiestId: artiest.id ?? "",
                   ));

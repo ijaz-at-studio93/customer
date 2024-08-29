@@ -91,7 +91,6 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                                     onPress: () {
                                       Get.to(() =>
                                           SaloonAfterSelectingServicesPage(
-
                                               id: _homeController
                                                       .getSearchSalonModel
                                                       .data?[index]
@@ -174,7 +173,7 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                         color: ColorConstant.blackColor, fontSize: 14),
                     decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: "Search For saloon ..........",
+                        hintText: "Search For saloon Service or stylist",
                         hintStyle: AppTextTheme.medium.copyWith(
                             color: ColorConstant.grayTextColor, fontSize: 13)),
                   ),
