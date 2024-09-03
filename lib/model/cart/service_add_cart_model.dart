@@ -1,3 +1,7 @@
+
+
+import 'package:salon_customer/util/logger.dart';
+
 class ServiceAddCartModel {
   int? statusCode;
   bool? success;
@@ -28,9 +32,11 @@ class ServiceAddCartModel {
 class Data {
   String? cartId;
   String? salonId;
+  double? discountAmount;
+  bool? isDiscountApplied;
   bool? isHomeService;
   List<Items>? items;
-  int? price;
+  double? price;
   List<String>? previewImages;
   List<ServicesAvailableProductList>? servicesAvailableProductList;
   List<ServicesWithProduct>? servicesWithProduct;
@@ -38,17 +44,21 @@ class Data {
   Data(
       {this.cartId,
       this.salonId,
+      this.discountAmount,
+      this.isDiscountApplied,
       this.isHomeService,
       this.items,
       this.price,
       this.previewImages,
       this.servicesAvailableProductList,
-        this.servicesWithProduct
-      });
+      this.servicesWithProduct});
 
   Data.fromJson(Map<String, dynamic> json) {
     cartId = json['cartId'];
     salonId = json['salonId'];
+    discountAmount = double.parse(json['discountAmount'] ==  null ? "0.0": json['discountAmount'].toString());
+    logger.e(discountAmount);
+    isDiscountApplied = json['isDiscountApplied'];
     isHomeService = json['isHomeService'];
     if (json['items'] != null) {
       items = <Items>[];
@@ -56,7 +66,7 @@ class Data {
         items!.add(Items.fromJson(v));
       });
     }
-    price = json['price'];
+    price = double.parse(json['price'] ==  null ? "0.0":json['price'].toString());
     if (json['previewImages'] != null) {
       previewImages = json['previewImages'].cast<String>();
     }
@@ -79,6 +89,8 @@ class Data {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['cartId'] = cartId;
     data['salonId'] = salonId;
+    data['discountAmount'] = discountAmount;
+    data['isDiscountApplied'] = isDiscountApplied;
     data['isHomeService'] = isHomeService;
     if (items != null) {
       data['items'] = items!.map((v) => v.toJson()).toList();
@@ -352,26 +364,26 @@ class ServicesWithProduct {
 
   ServicesWithProduct(
       {this.price,
-        this.rating,
-        this.id,
-        this.createdAt,
-        this.updatedAt,
-        this.description,
-        this.duration,
-        this.gender,
-        this.image,
-        this.name,
-        this.salonId,
-        this.status,
-        this.homeService,
-        this.reviewCount,
-        this.products,
-        this.serviceId,
-        this.totalCost,
-        this.totalServiceCost,
-        this.totalProductCost,
-        this.totalProductCount,
-        this.productsName});
+      this.rating,
+      this.id,
+      this.createdAt,
+      this.updatedAt,
+      this.description,
+      this.duration,
+      this.gender,
+      this.image,
+      this.name,
+      this.salonId,
+      this.status,
+      this.homeService,
+      this.reviewCount,
+      this.products,
+      this.serviceId,
+      this.totalCost,
+      this.totalServiceCost,
+      this.totalProductCost,
+      this.totalProductCount,
+      this.productsName});
 
   ServicesWithProduct.fromJson(Map<String, dynamic> json) {
     price = json['price'];
@@ -391,7 +403,7 @@ class ServicesWithProduct {
     if (json['products'] != null) {
       products = <Product>[];
       json['products'].forEach((v) {
-        products!.add(  Product.fromJson(v));
+        products!.add(Product.fromJson(v));
       });
     }
     serviceId = json['serviceId'];

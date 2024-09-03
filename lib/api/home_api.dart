@@ -26,6 +26,7 @@ import 'package:salon_customer/model/un_available_dates_model.dart';
 import 'package:salon_customer/model/user_booking_qr_code_model.dart';
 import 'package:salon_customer/util/logger.dart';
 import '../model/current_booking_list_model.dart';
+import '../model/promo_code/promocode_model.dart';
 
 class HomeAPI {
   /*---------------------- home category ------------------*/ static Future<
@@ -112,7 +113,7 @@ class HomeAPI {
       "orderDirection": orderBy == "name" ? "ASC" : "DESC",
       "nearest": nearest,
       "fourPlusRating": fourPlusRating,
-      "serviceGender" : serviceGender,
+      "serviceGender": serviceGender,
     });
 
     if (orderBy.isNotEmpty) {
@@ -677,6 +678,53 @@ class HomeAPI {
     final response = await DioClient.client.get("user/salon/$salonId/reviews");
     if (response.isSuccess) {
       return SalonIdReviewsModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*--------------------------  Get PromoCode ----------------------------*/
+  static Future<PromoCodeModel> getPromoCode(
+      {required double lat, required double lng}) async {
+    final response =
+        await DioClient.client.get("user/home/discount-list", queryParameters: {
+      'lat': lat,
+      'lng': lng,
+    });
+    if (response.isSuccess) {
+      return PromoCodeModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*----------------------- Get PromoCode  For ------------------------ */
+  static Future<PromoCodeModel> getPromoCodeList() async {
+    final response =
+        await DioClient.client.get("user/cart/discounts-by-user-cart");
+    if (response.isSuccess) {
+      return PromoCodeModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*----------------------- Apply  PromoCode --------------------*/
+  static Future<bool> applyPromoCode({required Map data}) async {
+    final response =
+        await DioClient.client.put("user/cart/apply-discount", data: data);
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*---------------- Remove PromoCode --------------------*/
+  static Future<bool> promoCodeRemove() async {
+    final response = await DioClient.client.delete("user/cart/remove-discount");
+    if (response.isSuccess) {
+      return true;
     } else {
       throw response.data;
     }

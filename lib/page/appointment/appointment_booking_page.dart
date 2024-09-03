@@ -4,12 +4,14 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/appointment/widget/know_what_you_widget.dart';
 import 'package:salon_customer/page/appointment/widget/popular_service_widget.dart';
+import 'package:salon_customer/page/appointment/widget/promocode_sheet_widget.dart';
 import 'package:salon_customer/page/appointment/your_approval_bottom_sheet.dart';
 import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
@@ -175,7 +177,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                                           index]
                                                                       .id ??
                                                                   "",
-                                                          isHomeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
+                                                          isHomeService: SharedPrefs
+                                                              .readBoolValue(
+                                                                  PrefConstants
+                                                                      .isHomeService),
                                                           callback: () {
                                                             _homeController
                                                                 .doGetCart();
@@ -343,6 +348,178 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                               ),
                             ),
                             const SizedBox(height: 2),
+
+                            /*------------- Apply PromoCode ---------------*/
+                            Dash(
+                              direction: Axis.horizontal,
+                              length: Get.width * 0.88,
+                              dashLength: 2,
+                              dashColor: const Color(0xffCFCFCF),
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 10),
+                                  child: Text(
+                                    "Apply For PromoCode",
+                                    textScaler: const TextScaler.linear(0.90),
+                                    style: AppTextTheme.bold.copyWith(
+                                        fontSize: 17,
+                                        color: ColorConstant.blackColor),
+                                  ),
+                                ),
+                                if (_homeController.getServiceAddCartModel.data
+                                        ?.isDiscountApplied ??
+                                    false)
+                                  GestureDetector(
+                                    onTap: () async {
+                                      _homeController.doRemovePromoCode(
+                                          callback: () {
+                                        _homeController.doGetCart();
+                                      });
+                                    },
+                                    child: Container(
+                                      height: 50,
+                                      width: Get.width,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      decoration: BoxDecoration(
+                                        color: ColorConstant.whiteColor,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: ColorConstant.primaryColor,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Image.asset(
+                                                AssetsConstant.offerIcon,
+                                                width: 25,
+                                                height: 25,
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Text(
+                                                "Remove PromoCode",
+                                                style: AppTextTheme.bold
+                                                    .copyWith(
+                                                        fontSize: 14,
+                                                        color: ColorConstant
+                                                            .blackColor),
+                                              ),
+                                            ],
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              _homeController.doRemovePromoCode(
+                                                  callback: () {
+                                                _homeController.doGetCart();
+                                              });
+                                            },
+                                            child: Container(
+                                              height: 40,
+                                              width: 100,
+                                              decoration: BoxDecoration(
+                                                color: ColorConstant.redBgColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(5),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  "Remove",
+                                                  style: AppTextTheme.medium
+                                                      .copyWith(fontSize: 13),
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  )
+                                else
+                                  GestureDetector(
+                                    onTap: () async {
+                                      String id = await showModalBottomSheet(
+                                          isScrollControlled: true,
+                                          shape: const RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(32),
+                                            topRight: Radius.circular(32),
+                                          )),
+                                          context: context,
+                                          builder: (context) {
+                                            return const PromoCodeSheetWidget();
+                                          });
+
+                                      _homeController.doApplyPromoCode(
+                                          data: {
+                                            "discountId": id,
+                                          },
+                                          callback: () {
+                                            _homeController.doGetCart();
+                                          });
+                                    },
+                                    child: Container(
+                                      height: 50,
+                                      width: Get.width,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      margin: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      decoration: BoxDecoration(
+                                        color: ColorConstant.whiteColor,
+                                        borderRadius: BorderRadius.circular(5),
+                                        border: Border.all(
+                                          color: ColorConstant.primaryColor,
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Image.asset(
+                                                AssetsConstant.offerIcon,
+                                                width: 25,
+                                                height: 25,
+                                              ),
+                                              const SizedBox(width: 10),
+                                              Text(
+                                                "Apply PromoCode",
+                                                style: AppTextTheme.bold
+                                                    .copyWith(
+                                                        fontSize: 14,
+                                                        color: ColorConstant
+                                                            .blackColor),
+                                              ),
+                                            ],
+                                          ),
+                                          const Icon(
+                                            Icons.arrow_forward_ios,
+                                            size: 20,
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 15),
+                            Dash(
+                              direction: Axis.horizontal,
+                              length: Get.width * 0.88,
+                              dashLength: 2,
+                              dashColor: const Color(0xffCFCFCF),
+                            ),
                             /*------------ Know What You are paying For ------------*/
                             Container(
                               width: Get.width,
@@ -479,9 +656,11 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         floatingActionButton: Obx(
           () => _homeController.showProgress
               ? const SizedBox()
-              : _homeController.getServiceAddCartModel.data?.servicesWithProduct?.isEmpty ??
+              : _homeController.getServiceAddCartModel.data?.servicesWithProduct
+                          ?.isEmpty ??
                       false ||
-                          _homeController.getServiceAddCartModel.data?.servicesWithProduct ==
+                          _homeController.getServiceAddCartModel.data
+                                  ?.servicesWithProduct ==
                               null
                   ? const SizedBox()
                   : Container(

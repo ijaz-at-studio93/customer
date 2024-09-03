@@ -77,6 +77,8 @@ class _HomePageState extends State<HomePage> {
                   const SizedBox(height: 10),
                   _ourService(),
                   const SizedBox(height: 15),
+                  _offer(),
+                  const SizedBox(height: 15),
                   _saloonsFoundNear(),
                   _homeController.getHomeSalonList.data?.rows?.isEmpty ?? false
                       ? const NoItemsWidget(
@@ -924,61 +926,90 @@ class _HomePageState extends State<HomePage> {
       child: PageView.builder(
           clipBehavior: Clip.none,
           scrollDirection: Axis.horizontal,
-          itemCount: 20,
+          itemCount: _homeController.getPromoCodeModel.data?.length,
           itemBuilder: (context, index) {
-            return Container(
-              margin: const EdgeInsets.symmetric(horizontal: 15),
-              decoration: BoxDecoration(
-                color: ColorConstant.whiteColor,
-                borderRadius: BorderRadius.circular(8),
-                border: Border(
-                  right: BorderSide(
-                      width: 9,
-                      color: changeTheme(SharedPrefs.readStringValue(
-                              PrefConstants.gender)) ??
-                          Colors.transparent),
-                ),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x0A000000),
-                    blurRadius: 8.20,
-                    offset: Offset(1, 1),
-                    spreadRadius: 0,
-                  )
-                ],
-              ),
-              child: Row(
-                children: [
-                  Image.asset(
-                    AssetsConstant.offer,
-                    height: 78,
-                    width: 78,
-                    fit: BoxFit.cover,
+            return GestureDetector(
+              onTap: () {
+                Get.to(() => SaloonAfterSelectingServicesPage(
+                      id: _homeController
+                              .getPromoCodeModel.data?[index].salon?.id ??
+                          "",
+                      callback: () {
+                        getCurrentLatLng();
+                      },
+                    ));
+              },
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 15),
+                decoration: BoxDecoration(
+                  color: ColorConstant.whiteColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border(
+                    right: BorderSide(
+                        width: 9,
+                        color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender)) ??
+                            Colors.transparent),
                   ),
-                  const Dash(
-                      direction: Axis.vertical,
-                      length: 100,
-                      dashLength: 3,
-                      dashColor: ColorConstant.grayColor),
-                  const SizedBox(width: 17),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        "Flat 30% OFF",
-                        style: AppTextTheme.bold.copyWith(
-                            color: ColorConstant.blackColor, fontSize: 20),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x0A000000),
+                      blurRadius: 8.20,
+                      offset: Offset(1, 1),
+                      spreadRadius: 0,
+                    )
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    CachedNetworkImage(
+                      height: 78,
+                      width: 78,
+                      fit: BoxFit.cover,
+                      imageUrl:
+                          "${APIConstants.image}${_homeController.getPromoCodeModel.data?[index].image}",
+                      placeholder: (context, url) => const Image(
+                        image: AssetImage(AssetsConstant.offer),
+                        height: 78,
+                        width: 78,
+                        fit: BoxFit.cover,
                       ),
-                      const SizedBox(height: 5),
-                      Text(
-                        "Use This Coupon To avail The Offer",
-                        style: AppTextTheme.medium.copyWith(
-                            color: ColorConstant.grayColor, fontSize: 13),
+                      errorWidget: (context, url, error) => const Image(
+                        image: AssetImage(AssetsConstant.offer),
+                        height: 78,
+                        width: 78,
+                        fit: BoxFit.cover,
                       ),
-                    ],
-                  )
-                ],
+                    ),
+                    const Dash(
+                        direction: Axis.vertical,
+                        length: 100,
+                        dashLength: 3,
+                        dashColor: ColorConstant.grayColor),
+                    const SizedBox(width: 17),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          _homeController
+                                  .getPromoCodeModel.data?[index].title ??
+                              "",
+                          style: AppTextTheme.bold.copyWith(
+                              color: ColorConstant.blackColor, fontSize: 20),
+                        ),
+                        const SizedBox(height: 5),
+                        Text(
+                          _homeController
+                                  .getPromoCodeModel.data?[index].description ??
+                              "",
+                          style: AppTextTheme.medium.copyWith(
+                              color: ColorConstant.grayColor, fontSize: 13),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
             );
           }),
@@ -1354,6 +1385,8 @@ class _HomePageState extends State<HomePage> {
         _homeController.doGetHomeCategory(
           gender: selectedGender.value == 0 ? "male" : "female",
         );
+        _homeController.doGetPromoCode(
+            lat: position.latitude, lng: position.longitude);
         _homeController.doGetHomeSalonList(
             serviceGender: selectedGender.value == 0 ? "male" : "female",
             homeService: atHome,
@@ -1395,6 +1428,8 @@ class _HomePageState extends State<HomePage> {
 
       _homeController.doGetMakePackageData();
 
+      _homeController.doGetPromoCode(
+          lat: position.latitude, lng: position.longitude);
       _homeController.doGetHomeSalonList(
           serviceGender: selectedGender.value == 0 ? "male" : "female",
           homeService: atHome,

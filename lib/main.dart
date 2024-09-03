@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -109,7 +108,7 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       title: 'Salon Customer',
       theme: ThemeData(
-        fontFamily: "Satoshi",
+        fontFamily: "Roboto",
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: false,
       ),

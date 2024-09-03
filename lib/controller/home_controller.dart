@@ -1,8 +1,4 @@
-import 'dart:ui';
-import 'package:flutter/animation.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/api/home_api.dart';
@@ -21,6 +17,7 @@ import 'package:salon_customer/model/current_booking_list_model.dart';
 import 'package:salon_customer/model/favourite_salon_list_data_model.dart';
 import 'package:salon_customer/model/home_category_list_model.dart';
 import 'package:salon_customer/model/home_salon_list_model.dart';
+import 'package:salon_customer/model/promo_code/promocode_model.dart';
 import 'package:salon_customer/model/review_list_data_model.dart';
 import 'package:salon_customer/model/review_rating_data_model.dart';
 import 'package:salon_customer/model/salonId_reviews_model.dart';
@@ -31,7 +28,6 @@ import 'package:salon_customer/model/search_model/search_model.dart';
 import 'package:salon_customer/model/un_available_dates_model.dart';
 import 'package:salon_customer/model/user_booking_qr_code_model.dart';
 import 'package:salon_customer/util/logger.dart';
-
 import '../model/artiest_popular_service_model.dart';
 
 class HomeController extends GetxController {
@@ -216,6 +212,16 @@ class HomeController extends GetxController {
       SalonIdReviewsModel().obs;
   SalonIdReviewsModel get getSalonIdReviewsModel => _salonIdReviewsModel.value;
   set setSalonIdReviewsModel(val) => _salonIdReviewsModel.value = val;
+
+  /*--------------- PromoCode Model ------------------*/
+  final Rx<PromoCodeModel> _promoCodeModel = PromoCodeModel().obs;
+  PromoCodeModel get getPromoCodeModel => _promoCodeModel.value;
+  set setPromoCodeModel(val) => _promoCodeModel.value = val;
+
+  /*--------------------  Get  PromoCode List ------------------------*/
+  final Rx<PromoCodeModel> _promoCodeModelList = PromoCodeModel().obs;
+  PromoCodeModel get getPromoCodeModelList => _promoCodeModelList.value;
+  set setPromoCodeModelList(val) => _promoCodeModelList.value = val;
 
   /*-------------  category Id  -----------------*/
   final RxList categoryId = [].obs;
@@ -670,7 +676,7 @@ class HomeController extends GetxController {
 
   /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Cart Part End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
-  /*----------------------------- Do Get Booking History Data List ---------------------*/
+  /*----------------------------- Do Get Booking History Data List -----------------------*/
   doGetBookingHistory() async {
     try {
       _showProgress.value = true;
@@ -1028,6 +1034,60 @@ class HomeController extends GetxController {
       _showProgress.value = true;
       _salonIdReviewsModel.value =
           await HomeAPI.salonIdToReview(salonId: salonId);
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*--------------------------- Get  PromoCode -------------------------*/
+  doGetPromoCode({required double lat, required double lng}) async {
+    try {
+      _showProgress.value = true;
+      _promoCodeModel.value = await HomeAPI.getPromoCode(lat: lat, lng: lng);
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*-------------------  Get PromoCode List  ----------------------*/
+  doGetListPromoCode() async {
+    try {
+      _showProgress.value = true;
+      _promoCodeModelList.value = await HomeAPI.getPromoCodeList();
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*-------------------- Add Apply  PromoCode -----------------*/
+  doApplyPromoCode({required Map data, required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.applyPromoCode(data: data);
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*------------------  Remove PromoCode ----------------*/
+  doRemovePromoCode({required VoidCallback callback}) async {
+    try {
+      _showProgress.value = false;
+      bool result = await HomeAPI.promoCodeRemove();
+      if (result) {
+        callback.call();
+      }
     } catch (e) {
       showError(e);
     } finally {
