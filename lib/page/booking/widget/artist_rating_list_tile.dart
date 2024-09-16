@@ -13,8 +13,9 @@ import 'package:salon_customer/project_specific/text_theme.dart';
 
 class ArtistRatingListTile extends StatefulWidget {
   final String appointmentId;
-  final Artists  artists;
-  const ArtistRatingListTile({super.key, required this.appointmentId, required this.artists});
+  final Artists artists;
+  const ArtistRatingListTile(
+      {super.key, required this.appointmentId, required this.artists});
 
   @override
   State<ArtistRatingListTile> createState() => _ArtistRatingListTileState();
@@ -26,8 +27,7 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
   @override
   void initState() {
     super.initState();
-    _reviewTextEditingController.text =
-        widget.artists.review ?? "";
+    _reviewTextEditingController.text = widget.artists.review ?? "";
     rate = widget.artists.rating ?? 0.0;
   }
 
@@ -60,8 +60,7 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
                     width: 60,
                     height: 60,
                     fit: BoxFit.cover,
-                    imageUrl:
-                        '${APIConstants.image}${widget.artists.image}',
+                    imageUrl: '${APIConstants.image}${widget.artists.image}',
                     placeholder: (context, url) => const Image(
                       image: AssetImage(AssetsConstant.placeHolder),
                       width: 60,
@@ -118,7 +117,6 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
     );
   }
 
-
   final _reviewTextEditingController = TextEditingController();
   double rate = 0.0;
   int selectEmoji = 4;
@@ -156,32 +154,32 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
               emojiList.length,
-                  (index) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectEmoji = index;
-                    });
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(3),
-                        border: Border.all(
-                            width: 2,
-                            color: selectEmoji == index
-                                ? ColorConstant.primaryColor
-                                : Colors.transparent)),
-                    child: Center(
-                      child: Text(
-                        emojiList[index],
-                        style: const TextStyle(fontSize: 30),
+              (index) => Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectEmoji = index;
+                        });
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(3),
+                            border: Border.all(
+                                width: 2,
+                                color: selectEmoji == index
+                                    ? ColorConstant.primaryColor
+                                    : Colors.transparent)),
+                        child: Center(
+                          child: Text(
+                            emojiList[index],
+                            style: const TextStyle(fontSize: 30),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              )),
+                  )),
         ),
         Text(
           "Share Your Opinion",
@@ -199,46 +197,46 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: Get.width * 0.05),
           child: Obx(
-                () => _homeController.gteShowAddProgress
+            () => _homeController.gteShowAddProgress
                 ? const CircularProgressIndicator()
                 : widget.artists.isReviewGiven ?? false
-                ? const SizedBox()
-                : ButtonWidget(
-                buttonTitleText: "Submit",
-                onPress: () {
-                  if (rate == 0.0) {
-                    showMessage("Please Give Yore Rate Opinion");
-                    return;
-                  } else if (_reviewTextEditingController
-                      .text.isEmpty) {
-                    showMessage("Please Enter Your Opinion");
-                    return;
-                  } else {
-                    String review = selectEmoji == 0
-                        ? "😡"
-                        : selectEmoji == 1
-                        ? "😐"
-                        : selectEmoji == 2
-                        ? "😐"
-                        : selectEmoji == 3
-                        ? "😊"
-                        : "😍";
+                    ? const SizedBox()
+                    : ButtonWidget(
+                        buttonTitleText: "Submit",
+                        onPress: () {
+                          if (rate == 0.0) {
+                            showMessage("Please Give Yore Rate Opinion");
+                            return;
+                          } else if (_reviewTextEditingController
+                              .text.isEmpty) {
+                            showMessage("Please Enter Your Opinion");
+                            return;
+                          } else {
+                            String review = selectEmoji == 0
+                                ? "😡"
+                                : selectEmoji == 1
+                                    ? "😐"
+                                    : selectEmoji == 2
+                                        ? "😐"
+                                        : selectEmoji == 3
+                                            ? "😊"
+                                            : "😍";
 
-                    _homeController.doAddArtiestReview(
-                        appointmentId: widget.appointmentId,
-                        rate: rate,
-                        salonArtistId: widget.artists.id ?? "",
-                        review:
-                        review + _reviewTextEditingController.text,
-                        callback: () {
-                          _homeController.doGetReviewDataList(
-                              appointmentId: widget.appointmentId);
-                          _reviewTextEditingController.text =
-                              widget.artists.review ?? "";
-                          rate = widget.artists.rating ?? 0.0;
-                        });
-                  }
-                }),
+                            _homeController.doAddArtiestReview(
+                                appointmentId: widget.appointmentId,
+                                rate: rate,
+                                salonArtistId: widget.artists.id ?? "",
+                                review:
+                                    review + _reviewTextEditingController.text,
+                                callback: () {
+                                  _homeController.doGetReviewDataList(
+                                      appointmentId: widget.appointmentId);
+                                  _reviewTextEditingController.text =
+                                      widget.artists.review ?? "";
+                                  rate = widget.artists.rating ?? 0.0;
+                                });
+                          }
+                        }),
           ),
         ),
         const SizedBox(height: 20),
@@ -277,7 +275,7 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
               child: TextField(
                 readOnly: widget.artists.isReviewGiven ?? false ? true : false,
                 canRequestFocus:
-                widget.artists.isReviewGiven ?? false ? false : true,
+                    widget.artists.isReviewGiven ?? false ? false : true,
                 controller: textEditingController,
                 maxLines: 8,
                 keyboardType: textInputType,

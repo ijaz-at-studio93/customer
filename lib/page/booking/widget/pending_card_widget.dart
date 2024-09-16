@@ -150,24 +150,26 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
             ),
           ),
           const SizedBox(height: 10),
-          GestureDetector(
-            onTap: widget.onPress,
-            child: Container(
-              height: 50,
-              width: Get.width,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: const Color(0xffEAEAEA),
-              ),
-              child: Center(
-                child: Text(
-                  "VIEW",
-                  style: AppTextTheme.bold
-                      .copyWith(color: ColorConstant.blackColor, fontSize: 16),
-                ),
-              ),
-            ),
-          )
+          widget.bookingData.orderStatus == "confirmed"
+              ? GestureDetector(
+                  onTap: widget.onPress,
+                  child: Container(
+                    height: 50,
+                    width: Get.width,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: const Color(0xffEAEAEA),
+                    ),
+                    child: Center(
+                      child: Text(
+                        "VIEW",
+                        style: AppTextTheme.bold.copyWith(
+                            color: ColorConstant.blackColor, fontSize: 16),
+                      ),
+                    ),
+                  ),
+                )
+              : const SizedBox()
         ],
       ),
     );
@@ -187,9 +189,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
       return "";
     } else {
       String dateTimeString = date;
-      // Parse the date string into a DateTime object
       DateTime dateTime = DateTime.parse(dateTimeString);
-      // Format the DateTime object into the desired format
       String formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
 
       return formattedDate;
