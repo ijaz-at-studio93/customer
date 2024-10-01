@@ -16,6 +16,7 @@ import '../project_specific/project_appbar.dart';
 class StylistToUserLocation extends StatefulWidget {
   final double latitude;
   final double longitude;
+
   const StylistToUserLocation(
       {super.key, required this.latitude, required this.longitude});
 
@@ -165,7 +166,7 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
           position: LatLng(widget.latitude, widget.longitude),
           icon: destination));
     });
-  /*  List<Placemark> placeMarks =
+    /*  List<Placemark> placeMarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark place = placeMarks[0];*/
   }
@@ -177,12 +178,13 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
       required double destLng}) async {
     await polylinePoints
         .getRouteBetweenCoordinates(
-      /*'AIzaSyCtufw6RifF95TlQ-JWS-bxfgLREJN3PXs',*/
-      'AIzaSyClfJgsQEwO0zO6io_TuR-TDUsVwGT3ex0',
-      PointLatLng(currentLat, currentLng), //Starting LAT LANG
-      PointLatLng(destLat, destLng), //End LAT LANG
-      travelMode: TravelMode.driving,
-    )
+            /*'AIzaSyCtufw6RifF95TlQ-JWS-bxfgLREJN3PXs',*/
+            request: PolylineRequest(
+                headers: {},
+                origin: PointLatLng(currentLat, currentLng),
+                destination: PointLatLng(destLat, destLng),
+                mode: TravelMode.driving),
+            googleApiKey: "AIzaSyClfJgsQEwO0zO6io_TuR-TDUsVwGT3ex0")
         .then((value) {
       for (var point in value.points) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
