@@ -106,7 +106,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Salon Customer',
+      title: 'Scuts',
       theme: ThemeData(
         fontFamily: "Roboto",
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
