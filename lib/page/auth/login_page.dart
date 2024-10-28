@@ -13,6 +13,7 @@ import 'package:salon_customer/util/SharedPrefs.dart';
 
 class LoginPage extends StatefulWidget {
   final bool splashPage;
+
   const LoginPage({super.key, required this.splashPage});
 
   @override
@@ -80,15 +81,11 @@ class _LoginPageState extends State<LoginPage> {
         children: [
           const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              SizedBox(width: 34, height: 34)
-
-
-            ],
+            children: [SizedBox(width: 34, height: 34)],
           ),
           const SizedBox(height: 35),
           Text(
-            "Login to \nyour Scout Account",
+            "Login to \nyour Scuts Account",
             style: AppTextTheme.bold
                 .copyWith(color: ColorConstant.whiteColor, fontSize: 23),
           ),
@@ -167,6 +164,7 @@ class _LoginPageState extends State<LoginPage> {
 
   /*------------ terms & Condition  ------------------*/
   bool getWhatsappUpdate = false;
+
   _termsCondition() {
     return Column(
       children: [
