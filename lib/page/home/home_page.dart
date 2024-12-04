@@ -22,6 +22,7 @@ import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+
 import '../../constant/variable_constant.dart';
 import '../../util/logger.dart';
 import '../profile/profile_page.dart';
@@ -78,7 +79,9 @@ class _HomePageState extends State<HomePage> {
                   _ourService(),
                   const SizedBox(height: 15),
                   _offer(),
-                  const SizedBox(height: 15),
+                  _homeController.getPromoCodeModel.data?.isEmpty ?? false
+                      ? const SizedBox()
+                      : const SizedBox(height: 15),
                   _saloonsFoundNear(),
                   _homeController.getHomeSalonList.data?.rows?.isEmpty ?? false
                       ? const NoItemsWidget(
@@ -348,12 +351,23 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.only(left: 10),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: Image.asset(
-              AssetsConstant.search,
-              width: 24,
-              height: 24,
-              color: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender)),
+            child: Row(
+              children: [
+                Image.asset(
+                  AssetsConstant.search,
+                  width: 24,
+                  height: 24,
+                  color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)),
+                ),
+                const SizedBox(width: 10),
+                Text(
+                  "Search for Salon, Stylist or Service",
+                  textScaler: const TextScaler.linear(0.85),
+                  style: AppTextTheme.medium
+                      .copyWith(color: ColorConstant.grayColor),
+                )
+              ],
             ),
           ),
         ),
@@ -920,105 +934,111 @@ class _HomePageState extends State<HomePage> {
 
   /*-------------------- Offer -------------------*/
   _offer() {
-    return SizedBox(
-      height: 100,
-      width: Get.width,
-      child: PageView.builder(
-          clipBehavior: Clip.none,
-          scrollDirection: Axis.horizontal,
-          itemCount: _homeController.getPromoCodeModel.data?.length,
-          itemBuilder: (context, index) {
-            return GestureDetector(
-              onTap: () {
-                Get.to(() => SaloonAfterSelectingServicesPage(
-                      id: _homeController
-                              .getPromoCodeModel.data?[index].salon?.id ??
-                          "",
-                      callback: () {
-                        getCurrentLatLng();
-                      },
-                    ));
-              },
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 15),
-                decoration: BoxDecoration(
-                  color: ColorConstant.whiteColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border(
-                    right: BorderSide(
-                        width: 9,
-                        color: changeTheme(SharedPrefs.readStringValue(
-                                PrefConstants.gender)) ??
-                            Colors.transparent),
-                  ),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x0A000000),
-                      blurRadius: 8.20,
-                      offset: Offset(1, 1),
-                      spreadRadius: 0,
-                    )
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    CachedNetworkImage(
-                      height: 78,
-                      width: 78,
-                      fit: BoxFit.cover,
-                      imageUrl:
-                          "${APIConstants.image}${_homeController.getPromoCodeModel.data?[index].image}",
-                      placeholder: (context, url) => const Image(
-                        image: AssetImage(AssetsConstant.offer),
-                        height: 78,
-                        width: 78,
-                        fit: BoxFit.cover,
+    return _homeController.getPromoCodeModel.data?.isEmpty ??
+            false || _homeController.getPromoCodeModel.data == null
+        ? const SizedBox()
+        : SizedBox(
+            height: 100,
+            width: Get.width,
+            child: PageView.builder(
+                clipBehavior: Clip.none,
+                scrollDirection: Axis.horizontal,
+                itemCount: _homeController.getPromoCodeModel.data?.length,
+                itemBuilder: (context, index) {
+                  return GestureDetector(
+                    onTap: () {
+                      Get.to(() => SaloonAfterSelectingServicesPage(
+                            id: _homeController
+                                    .getPromoCodeModel.data?[index].salon?.id ??
+                                "",
+                            callback: () {
+                              getCurrentLatLng();
+                            },
+                          ));
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 15),
+                      decoration: BoxDecoration(
+                        color: ColorConstant.whiteColor,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border(
+                          right: BorderSide(
+                              width: 9,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)) ??
+                                  Colors.transparent),
+                        ),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x0A000000),
+                            blurRadius: 8.20,
+                            offset: Offset(1, 1),
+                            spreadRadius: 0,
+                          )
+                        ],
                       ),
-                      errorWidget: (context, url, error) => const Image(
-                        image: AssetImage(AssetsConstant.offer),
-                        height: 78,
-                        width: 78,
-                        fit: BoxFit.cover,
+                      child: Row(
+                        children: [
+                          CachedNetworkImage(
+                            height: 78,
+                            width: 78,
+                            fit: BoxFit.cover,
+                            imageUrl:
+                                "${APIConstants.image}${_homeController.getPromoCodeModel.data?[index].image}",
+                            placeholder: (context, url) => const Image(
+                              image: AssetImage(AssetsConstant.offer),
+                              height: 78,
+                              width: 78,
+                              fit: BoxFit.cover,
+                            ),
+                            errorWidget: (context, url, error) => const Image(
+                              image: AssetImage(AssetsConstant.offer),
+                              height: 78,
+                              width: 78,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const Dash(
+                              direction: Axis.vertical,
+                              length: 100,
+                              dashLength: 3,
+                              dashColor: ColorConstant.grayColor),
+                          const SizedBox(width: 17),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                _homeController
+                                        .getPromoCodeModel.data?[index].title ??
+                                    "",
+                                style: AppTextTheme.bold.copyWith(
+                                    color: ColorConstant.blackColor,
+                                    fontSize: 20),
+                              ),
+                              const SizedBox(height: 5),
+                              Text(
+                                _homeController.getPromoCodeModel.data?[index]
+                                        .description ??
+                                    "",
+                                style: AppTextTheme.medium.copyWith(
+                                    color: ColorConstant.grayColor,
+                                    fontSize: 13),
+                              ),
+                            ],
+                          )
+                        ],
                       ),
                     ),
-                    const Dash(
-                        direction: Axis.vertical,
-                        length: 100,
-                        dashLength: 3,
-                        dashColor: ColorConstant.grayColor),
-                    const SizedBox(width: 17),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _homeController
-                                  .getPromoCodeModel.data?[index].title ??
-                              "",
-                          style: AppTextTheme.bold.copyWith(
-                              color: ColorConstant.blackColor, fontSize: 20),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          _homeController
-                                  .getPromoCodeModel.data?[index].description ??
-                              "",
-                          style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.grayColor, fontSize: 13),
-                        ),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-            );
-          }),
-    );
+                  );
+                }),
+          );
   }
 
   /*------------ Saloons Found Near ----------- */
   bool atHome = false;
   int select = 0;
+
   _saloonsFoundNear() {
     return Container(
       color: ColorConstant.whiteColor,

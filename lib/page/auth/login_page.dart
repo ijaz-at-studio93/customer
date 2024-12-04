@@ -10,6 +10,7 @@ import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/button_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatefulWidget {
   final bool splashPage;
@@ -42,11 +43,11 @@ class _LoginPageState extends State<LoginPage> {
                     children: [
                       const SizedBox(height: 35),
                       _columWithTextField(),
-                      const SizedBox(height: 35),
+                      const SizedBox(height: 12),
                       _termsCondition(),
                       Padding(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 35),
+                            horizontal: 20, vertical: 30),
                         child: ButtonWidget(
                             color: changeTheme(SharedPrefs.readStringValue(
                                     PrefConstants.gender)) ??
@@ -164,6 +165,7 @@ class _LoginPageState extends State<LoginPage> {
 
   /*------------ terms & Condition  ------------------*/
   bool getWhatsappUpdate = false;
+  bool iAgree = false;
 
   _termsCondition() {
     return Column(
@@ -171,13 +173,47 @@ class _LoginPageState extends State<LoginPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "by clicking , i accept the",
-              style: AppTextTheme.medium
-                  .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
+
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  iAgree = !iAgree;
+                });
+              },
+              child: Row(
+                children: [
+                  Container(
+                    height: 20,
+                    width: 20,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        color: iAgree
+                            ? ColorConstant.primaryColor
+                            : Colors.transparent,
+                        border: Border.all(color: CupertinoColors.black)),
+                    child: Center(
+                      child: Icon(
+                        CupertinoIcons.checkmark_alt,
+                        color: iAgree
+                            ? ColorConstant.whiteColor
+                            : Colors.transparent,
+                        size: 18,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    "By clicking , I accept the",
+                    style: AppTextTheme.medium.copyWith(
+                        fontSize: 14, color: ColorConstant.grayTextColor),
+                  ),
+                ],
+              ),
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                openUrl("https://scuts.in/terms-conditions/");
+              },
               child: Text(
                 "Terms & Condition",
                 style: AppTextTheme.medium.copyWith(
@@ -189,7 +225,7 @@ class _LoginPageState extends State<LoginPage> {
             )
           ],
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 8),
         GestureDetector(
           onTap: () {
             setState(() {
@@ -241,12 +277,21 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Future<void> openUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      throw Exception('Could not launch $url');
+    }
+  }
+
   /*----------- do Login ------------*/
   _doLogin() {
     if (_mobileTextEditingController.text.isEmpty) {
       showMessage("Please enter mobile Number");
     } else if (_mobileTextEditingController.text.length != 10) {
       showMessage("Please enter 10 digit mobile Number");
+    }else if(!iAgree){
+      showMessage("Please select Terms and Conditions to proceed further");
     } else {
       _authController.doCheckMobileNumberRegistration(
           mobileNo: _mobileTextEditingController.text,

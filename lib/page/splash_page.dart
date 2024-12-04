@@ -44,7 +44,7 @@ class _SplashPageState extends State<SplashPage> {
                 changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
             child: Center(
               child: Text(
-                "SALON",
+                "SCUTS",
                 style: AppTextTheme.bold
                     .copyWith(color: ColorConstant.whiteColor, fontSize: 35),
               ),
@@ -225,7 +225,7 @@ class _SplashPageState extends State<SplashPage> {
   /*----------------- Open PlayStore -------------*/
   void _launchURL() async {
     const url =
-        'https://play.google.com/store/apps/details?id=com.ananta.scout';
+        'https://play.google.com/store/apps/details?id=com.ananta.scuts';
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     } else {

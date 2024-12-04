@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "9001451192",
-    "project_id": "salon-534a7",
-    "storage_bucket": "salon-534a7.appspot.com"
+    "project_number": "664897641321",
+    "project_id": "scuts-3ede2",
+    "storage_bucket": "scuts-3ede2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:9001451192:android:8836c1686be55ed370fe4d",
+        "mobilesdk_app_id": "1:664897641321:android:e7f891474d9e7daeabfbf8",
         "android_client_info": {
           "package_name": "com.ananta.saloon"
         }
@@ -15,7 +15,10 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCGQSFK-wIwU452TaX8jtvmAR5yD-mQlPU"
+          "current_key": "AIzaSyATecmTI6WWH24gR6wCR4IooVH77VCnSgc"
+        },
+        {
+          "current_key": "AIzaSyBJn72lGPmXstohMuVgK--GHAqHSpMrJgg"
         }
       ],
       "services": {
@@ -26,15 +29,18 @@
     },
     {
       "client_info": {
-        "mobilesdk_app_id": "1:9001451192:android:b378fec7894f8aea70fe4d",
+        "mobilesdk_app_id": "1:664897641321:android:9b1a9041288412b2abfbf8",
         "android_client_info": {
-          "package_name": "com.ananta.scout"
+          "package_name": "com.ananta.scuts"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCGQSFK-wIwU452TaX8jtvmAR5yD-mQlPU"
+          "current_key": "AIzaSyATecmTI6WWH24gR6wCR4IooVH77VCnSgc"
+        },
+        {
+          "current_key": "AIzaSyBJn72lGPmXstohMuVgK--GHAqHSpMrJgg"
         }
       ],
       "services": {

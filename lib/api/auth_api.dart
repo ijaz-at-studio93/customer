@@ -13,8 +13,8 @@ import 'dio_client.dart';
 class AuthAPI {
   /*--------------------- CheckMobileNumberIsRegister  Or Not --------------------- */
   static Future<bool>
-      doCheckMobileNumberIsRegister(
-          {required String mobileNo, required String countryCode}) async {
+  doCheckMobileNumberIsRegister(
+      {required String mobileNo, required String countryCode}) async {
     final response = await DioClient.client.post(
         'auth/user/send/verification-code',
         data: {'mobile': mobileNo, 'countryCode': countryCode});
@@ -49,13 +49,11 @@ class AuthAPI {
   }
 
 /*--------------------- signup --------------------- */
-  static Future<String> signUp(
-      {required String mobileNO,
-      required String name,
-      required String cc,
-      required String gender,
-      required String email}) async {
-
+  static Future<String> signUp({required String mobileNO,
+    required String name,
+    required String cc,
+    required String gender,
+    required String email}) async {
     Map<String, dynamic> mapData = {
       "mobile": mobileNO,
       "name": name,
@@ -71,7 +69,7 @@ class AuthAPI {
     }
 
     final response =
-        await DioClient.client.post('auth/user/signup', data: mapData);
+    await DioClient.client.post('auth/user/signup', data: mapData);
     if (response.statusCode == 200) {
       return response.data['message'];
     } else if (response.statusCode == 409 || !response.data['success']) {
@@ -95,11 +93,9 @@ class AuthAPI {
   }
 
   /*--------------- Verify OTP ------------*/
-  static Future<UserResponseModel> login(
-      {required String mobile,
-      required String cc,
-      required String verificationCode}) async {
-
+  static Future<UserResponseModel> login({required String mobile,
+    required String cc,
+    required String verificationCode}) async {
     final response = await DioClient.client
         .post('auth/user/login/mobile-verification-code', data: {
       "mobile": mobile,
@@ -136,10 +132,9 @@ class AuthAPI {
   }
 
   /*=================  Verify OTP ================*/
-  static Future<OtpVerifyModel> otpVerify(
-      {required String mobileNo,
-      required String cc,
-      required String verificationCode}) async {
+  static Future<OtpVerifyModel> otpVerify({required String mobileNo,
+    required String cc,
+    required String verificationCode}) async {
     final response = await DioClient.client
         .post("auth/user/verify/verification-code", data: {
       "mobile": mobileNo,
@@ -156,13 +151,12 @@ class AuthAPI {
 
   /*--------------- Edit Profile --------------*/
   /*--------------- Verify OTP ------------*/
-  static Future<UserResponseModel> editProFile(
-      {required String name,
-      required String email,
-      required String mobile,
-      required String cc,
-      required String verificationCode,
-      required File image}) async {
+  static Future<UserResponseModel> editProFile({required String name,
+    required String email,
+    required String mobile,
+    required String cc,
+    required String verificationCode,
+    required File image}) async {
     final formData = FormData.fromMap({
       "name": name,
       "email": email,
@@ -176,14 +170,14 @@ class AuthAPI {
 
     if (image.path.isNotEmpty) {
       final mimeTypeData =
-          lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
+      lookupMimeType(image.path, headerBytes: [0xFF, 0xD8])?.split('/');
       final multipartFile = await MultipartFile.fromFile(image.path,
           contentType: MediaType(mimeTypeData![0], mimeTypeData[1]));
       formData.files.add(MapEntry('image', multipartFile));
     }
 
     final response =
-        await DioClient.client.patch('user/profile', data: formData);
+    await DioClient.client.patch('user/profile', data: formData);
     if (response.statusCode == 200) {
       return UserResponseModel.fromJson(response.data);
     } else if (response.statusCode == 400) {

@@ -33,7 +33,7 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
   ValueNotifier<bool> close = ValueNotifier(false);
 
   final places =
-      fp.FlutterGooglePlacesSdk('AIzaSyCfT7gdH9_FxaRT90cxexYlxgUGsXOEo_Q');
+      fp.FlutterGooglePlacesSdk('AIzaSyBJn72lGPmXstohMuVgK--GHAqHSpMrJgg');
   ValueNotifier<List<fp.AutocompletePrediction>> locationData =
       ValueNotifier([]);
 

@@ -8,6 +8,7 @@ import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
 import 'package:salon_customer/page/profile/add_address_page.dart';
 import 'package:salon_customer/page/profile/edit_profile_page.dart';
+import 'package:salon_customer/page/profile/faq_page.dart';
 import 'package:salon_customer/page/profile/favourite_salon_page.dart';
 import 'package:salon_customer/page/profile/review_rating_page.dart';
 import 'package:salon_customer/project_specific/ProgressContainerView.dart';
@@ -19,6 +20,7 @@ import 'fav_blog_page.dart';
 
 class ProfilePage extends StatefulWidget {
   final VoidCallback callback;
+
   const ProfilePage({super.key, required this.callback});
 
   @override
@@ -131,7 +133,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   _listTitleWidget(
                       image: AssetsConstant.faq,
                       name: "FAQ’s & Support",
-                      onPress: () {}),
+                      onPress: () {
+                        Get.to(() => const FaqPage());
+                      }),
                   const Divider(
                       color: ColorConstant.garyDividerColor,
                       indent: 20,
