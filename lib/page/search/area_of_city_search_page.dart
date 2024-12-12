@@ -173,7 +173,7 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                         color: ColorConstant.blackColor, fontSize: 14),
                     decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: "Search For saloon Service or stylist",
+                        hintText: "Search for salon or service",
                         hintStyle: AppTextTheme.medium.copyWith(
                             color: ColorConstant.grayTextColor, fontSize: 13)),
                   ),

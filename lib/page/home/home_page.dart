@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
@@ -358,11 +359,12 @@ class _HomePageState extends State<HomePage> {
                   width: 24,
                   height: 24,
                   color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)),
+                    SharedPrefs.readStringValue(PrefConstants.gender),
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  "Search for Salon, Stylist or Service",
+                  "Search for salon or service",
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.medium
                       .copyWith(color: ColorConstant.grayColor),
@@ -1116,39 +1118,28 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: Get.width * 0.3,
-                      height: 40,
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                              color: ColorConstant.grayBorderColor, width: 1)),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Image.asset(
-                            AssetsConstant.filter,
-                            height: 14,
-                            width: 14,
-                          ),
-                          DropdownButton(
+                    Stack(
+                      children: [
+                        DropdownButtonHideUnderline(
+                          child: DropdownButton2<String>(
+                            isExpanded: true,
+                            items: items
+                                .map((String item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      alignment: Alignment.center,
+                                      child: Text(
+                                        item,
+                                        style: AppTextTheme.medium.copyWith(
+                                            color: ColorConstant.blackColor,
+                                            fontSize: 13),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ))
+                                .toList(),
                             value: dropdownvalue,
-                            underline: const SizedBox(),
-                            icon: const SizedBox(),
-                            items: items.map((String items) {
-                              return DropdownMenuItem(
-                                value: items,
-                                child: Text(items,
-                                    style: AppTextTheme.medium.copyWith(
-                                        color: ColorConstant.blackColor,
-                                        fontSize: 13)),
-                              );
-                            }).toList(),
-                            onChanged: (String? newValue) {
+                            onChanged: (value) {
                               setState(() {
-                                dropdownvalue = newValue ?? "";
-
+                                dropdownvalue = value ?? "";
                                 _homeController.doGetHomeSalonList(
                                     serviceGender: selectedGender.value == 0
                                         ? "male"
@@ -1171,14 +1162,48 @@ class _HomePageState extends State<HomePage> {
                                     fourPlusRating: false);
                               });
                             },
+                            buttonStyleData: ButtonStyleData(
+                              height: 40,
+                              width: 160,
+                              padding:
+                                  const EdgeInsets.only(left: 14, right: 14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: Colors.black26,
+                                ),
+                                color: Colors.white,
+                              ),
+                            ),
+                            iconStyleData: const IconStyleData(
+                              icon: Icon(
+                                Icons.arrow_forward_ios_outlined,
+                              ),
+                              iconSize: 14,
+                              iconEnabledColor: ColorConstant.blackColor,
+                              iconDisabledColor: ColorConstant.blackColor,
+                            ),
+                            dropdownStyleData: DropdownStyleData(
+                              maxHeight: 200,
+                              width: 200,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                color: ColorConstant.whiteColor,
+                              ),
+                              offset: const Offset(-20, 0),
+                            ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              height: 40,
+                            ),
                           ),
-                          Image.asset(
-                            AssetsConstant.arrowDown,
-                            height: 10,
-                            width: 10,
-                          ),
-                        ],
-                      ),
+                        ),
+                        Positioned(
+                          left: 10,
+                          top: 12,
+                          child: Image.asset(AssetsConstant.filter,
+                              height: 14, width: 14),
+                        ),
+                      ],
                     ),
                     const SizedBox(width: 6),
                     Row(

@@ -7,6 +7,7 @@ import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/model/home_category_list_model.dart';
 import 'package:salon_customer/page/home/widget/dilaog_menu_list_widget.dart';
 import 'package:salon_customer/project_specific/button_widget.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 
 
@@ -28,12 +29,21 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: Get.width,
-            decoration: BoxDecoration(
-              color: ColorConstant.whiteColor,
-              borderRadius: BorderRadius.circular(12),
-            ),
+          widget.categoryListData.data?.isEmpty ?? false
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                  child: Text(
+                    "No service available yet",
+                    style: AppTextTheme.medium.copyWith(
+                        color: ColorConstant.blackColor, fontSize: 16),
+                  ),
+                )
+              : Container(
+                  width: Get.width,
+                  decoration: BoxDecoration(
+                    color: ColorConstant.whiteColor,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
             child: GridView.builder(
               shrinkWrap: true,
               padding: const EdgeInsets.all(20),
@@ -91,9 +101,13 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
                   )
                 : GestureDetector(
                     onTap: () {
-                      widget.callback.call();
-                      _homeController.categoryId.clear();
-                      Get.back();
+                      if (widget.categoryListData.data?.isEmpty ?? false) {
+                        Get.back();
+                      } else {
+                        widget.callback.call();
+                        _homeController.categoryId.clear();
+                        Get.back();
+                      }
                     },
                     child: Container(
                       width: 48,

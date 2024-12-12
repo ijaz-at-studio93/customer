@@ -50,59 +50,59 @@ class _AboutAppPageState extends State<AboutAppPage> {
             children: [
               const SizedBox(height: 10),
               Text(
-                "SALON is your one-stop shop for premium salon services in the comfort of your home. We bring the salon experience to you, allowing you to schedule appointments for various beauty treatments at your convenience.",
+                "Welcome to Scuts, your one-stop destination for effortless salon booking and personalized grooming experiences!",
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.blackColor, fontSize: 16),
               ),
               const SizedBox(height: 10),
               Text(
-                "1. Convenience & Choice",
+                "We understand that choosing the right salon or stylist can be overwhelming. That’s why we created Scuts – a platform designed to connect you with trusted salons and expert stylists in your area. Whether you’re looking for a quick haircut, a relaxing spa day, or specialized hair and skin treatments, Scuts makes it simple to find and book the services you need.",
+                style: AppTextTheme.medium
+                    .copyWith(color: ColorConstant.blackColor, fontSize: 16),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                "Our app offers:",
                 style: AppTextTheme.bold
                     .copyWith(color: ColorConstant.blackColor, fontSize: 18),
               ),
               const SizedBox(height: 10),
               Text(
-                "With our user-friendly app, you can browse a wide range of services, select a skilled professional, and book an appointment in just a few taps. Whether you need a haircut, a relaxing massage, or a fresh mani-pedi, SALON has you covered.",
+                "-Stylist Profiles: Get to know your stylist before booking.",
+                style: AppTextTheme.medium
+                    .copyWith(color: ColorConstant.blackColor, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "-Personalized Insights: Receive tips and blogs tailored to your hair and skin needs.",
+                style: AppTextTheme.medium
+                    .copyWith(color: ColorConstant.blackColor, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "-Transparent Reviews: Read ratings and feedback from real customers.",
+                style: AppTextTheme.medium
+                    .copyWith(color: ColorConstant.blackColor, fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "-Easy Scheduling: Book appointments with just a few taps.",
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.blackColor, fontSize: 16),
               ),
               const SizedBox(height: 10),
               Text(
-                "2. Quality You Can Trust",
-                style: AppTextTheme.bold
-                    .copyWith(color: ColorConstant.blackColor, fontSize: 18),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                "We partner with only the most experienced and qualified beauty professionals. Our commitment to high standards ensures you receive a professional and consistent service every time.",
+                "At Scuts, we’re on a mission to empower unorganized salons by enhancing their visibility and helping them deliver better customer experiences. Together, let’s make salon visits convenient, enjoyable, and stress-free.",
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.blackColor, fontSize: 16),
               ),
               const SizedBox(height: 10),
               Text(
-                "3. Your Time, Your Comfort",
-                style: AppTextTheme.bold
-                    .copyWith(color: ColorConstant.blackColor, fontSize: 18),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                "Skip the salon wait times and traffic hassles! SALON allows you to relax and enjoy your treatments in the comfort of your home, on your schedule.",
+                "Discover your next favorite stylist with Scuts!",
                 style: AppTextTheme.medium
                     .copyWith(color: ColorConstant.blackColor, fontSize: 16),
               ),
               const SizedBox(height: 10),
-              Text(
-                "4. Our Vision",
-                style: AppTextTheme.bold
-                    .copyWith(color: ColorConstant.blackColor, fontSize: 18),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                "We are passionate about making self-care accessible and convenient for everyone. We strive to empower beauty professionals and elevate the in-home salon experience.",
-                style: AppTextTheme.medium
-                    .copyWith(color: ColorConstant.blackColor, fontSize: 16),
-              ),
-              const SizedBox(height: 15),
               Center(
                 child: Text(
                   "Vision $version",
