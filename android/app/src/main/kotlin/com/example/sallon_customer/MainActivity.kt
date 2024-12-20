@@ -1,4 +1,4 @@
-package com.ananta.scuts
+package com.anantax.scuts
 
 import io.flutter.embedding.android.FlutterActivity
 

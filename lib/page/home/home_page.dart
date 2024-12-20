@@ -27,7 +27,7 @@ import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/variable_constant.dart';
 import '../../util/logger.dart';
 import '../profile/profile_page.dart';
-import '../search/area_of_city_search_page.dart';
+import '../search/search_for_salon_or_service_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -45,7 +45,39 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    getCurrentLatLng();
+    if (SharedPrefs.readBoolValue(PrefConstants.isFirstTime) == true) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        _authController.userCity =
+            SharedPrefs.readStringValue(PrefConstants.userCity);
+        _authController.userCurrentLocation =
+            SharedPrefs.readStringValue(PrefConstants.address);
+
+        _homeController.doGetHomeCategory(
+          gender: selectedGender.value == 0 ? "male" : "female",
+        );
+        _homeController.doGetMakePackageData();
+        _homeController.doGetPromoCode(
+            lat: double.parse(
+                SharedPrefs.readStringValue(PrefConstants.latitude)),
+            lng: double.parse(
+                SharedPrefs.readStringValue(PrefConstants.longitude)));
+        _homeController.doGetHomeSalonList(
+            serviceGender: selectedGender.value == 0 ? "male" : "female",
+            homeService: atHome,
+            offset: 1,
+            size: 50,
+            lat: double.parse(
+                SharedPrefs.readStringValue(PrefConstants.latitude)),
+            lng: double.parse(
+                SharedPrefs.readStringValue(PrefConstants.longitude)),
+            orderBy: "",
+            nearest: false,
+            fourPlusRating: false);
+      });
+    } else {
+      getCurrentLatLng();
+    }
+
     if (SharedPrefs.readBoolValue(PrefConstants.isHomeService)) {
       atHome = true;
     } else {
@@ -105,7 +137,36 @@ class _HomePageState extends State<HomePage> {
                                               ?.rows?[index].id ??
                                           "",
                                       callback: () {
-                                        getCurrentLatLng();
+                                        _homeController.doGetHomeCategory(
+                                          gender: selectedGender.value == 0
+                                              ? "male"
+                                              : "female",
+                                        );
+                                        _homeController.doGetMakePackageData();
+                                        _homeController.doGetPromoCode(
+                                            lat: double.parse(
+                                                SharedPrefs.readStringValue(
+                                                    PrefConstants.latitude)),
+                                            lng: double.parse(
+                                                SharedPrefs.readStringValue(
+                                                    PrefConstants.longitude)));
+                                        _homeController.doGetHomeSalonList(
+                                            serviceGender:
+                                                selectedGender.value == 0
+                                                    ? "male"
+                                                    : "female",
+                                            homeService: atHome,
+                                            offset: 1,
+                                            size: 50,
+                                            lat: double.parse(
+                                                SharedPrefs.readStringValue(
+                                                    PrefConstants.latitude)),
+                                            lng: double.parse(
+                                                SharedPrefs.readStringValue(
+                                                    PrefConstants.longitude)),
+                                            orderBy: "",
+                                            nearest: false,
+                                            fourPlusRating: false);
                                       },
                                     ));
                               },
@@ -137,6 +198,19 @@ class _HomePageState extends State<HomePage> {
                     _homeController.doGetHomeCategory(
                       gender: "male",
                     );
+
+                    _homeController.doGetHomeSalonList(
+                        serviceGender: "male",
+                        homeService: atHome,
+                        offset: 1,
+                        size: 50,
+                        lat: double.parse(SharedPrefs.readStringValue(
+                            PrefConstants.latitude)),
+                        lng: double.parse(SharedPrefs.readStringValue(
+                            PrefConstants.longitude)),
+                        orderBy: "",
+                        nearest: false,
+                        fourPlusRating: false);
                   });
                 },
                 child: Container(
@@ -184,6 +258,18 @@ class _HomePageState extends State<HomePage> {
                     _homeController.doGetHomeCategory(
                       gender: "female",
                     );
+                    _homeController.doGetHomeSalonList(
+                        serviceGender: "female",
+                        homeService: atHome,
+                        offset: 1,
+                        size: 50,
+                        lat: double.parse(SharedPrefs.readStringValue(
+                            PrefConstants.latitude)),
+                        lng: double.parse(SharedPrefs.readStringValue(
+                            PrefConstants.longitude)),
+                        orderBy: "",
+                        nearest: false,
+                        fourPlusRating: false);
                   });
                 },
                 child: Container(
@@ -256,48 +342,73 @@ class _HomePageState extends State<HomePage> {
                     },
                   ));
             },
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Image.asset(
-                  AssetsConstant.location,
-                  width: 35,
-                  height: 35,
-                  color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)),
-                ),
-                const SizedBox(width: 8),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      _authController.userCity,
-                      style: AppTextTheme.bold.copyWith(
-                          color: ColorConstant.blackColor, fontSize: 18),
-                    ),
-                    const SizedBox(height: 3),
-                    _homeController.showProgress
-                        ? const SizedBox()
-                        : SizedBox(
-                            width: Get.width * 0.6,
-                            child: Text(
-                              _authController.userCurrentLocation,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.grayColor, fontSize: 12),
+            child: Container(
+              color: Colors.transparent,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset(
+                    AssetsConstant.location,
+                    width: 35,
+                    height: 35,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        _authController.userCity,
+                        style: AppTextTheme.bold.copyWith(
+                            color: ColorConstant.blackColor, fontSize: 18),
+                      ),
+                      const SizedBox(height: 3),
+                      _homeController.showProgress
+                          ? const SizedBox()
+                          : SizedBox(
+                              width: Get.width * 0.6,
+                              child: Text(
+                                _authController.userCurrentLocation,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextTheme.medium.copyWith(
+                                    color: ColorConstant.grayColor,
+                                    fontSize: 12),
+                              ),
                             ),
-                          ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
           GestureDetector(
             onTap: () {
               Get.to(() => ProfilePage(
                     callback: () {
-                      getCurrentLatLng();
+                      _homeController.doGetHomeCategory(
+                        gender: selectedGender.value == 0 ? "male" : "female",
+                      );
+                      _homeController.doGetMakePackageData();
+                      _homeController.doGetPromoCode(
+                          lat: double.parse(SharedPrefs.readStringValue(
+                              PrefConstants.latitude)),
+                          lng: double.parse(SharedPrefs.readStringValue(
+                              PrefConstants.longitude)));
+                      _homeController.doGetHomeSalonList(
+                          serviceGender:
+                              selectedGender.value == 0 ? "male" : "female",
+                          homeService: atHome,
+                          offset: 1,
+                          size: 50,
+                          lat: double.parse(SharedPrefs.readStringValue(
+                              PrefConstants.latitude)),
+                          lng: double.parse(SharedPrefs.readStringValue(
+                              PrefConstants.longitude)),
+                          orderBy: "",
+                          nearest: false,
+                          fourPlusRating: false);
                     },
                   ));
             },
@@ -328,7 +439,7 @@ class _HomePageState extends State<HomePage> {
   _searchWidget() {
     return GestureDetector(
       onTap: () {
-        Get.to(() => const AreaOfCitySearchPage());
+        Get.to(() => const SearchForSalonService());
       },
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -954,7 +1065,31 @@ class _HomePageState extends State<HomePage> {
                                     .getPromoCodeModel.data?[index].salon?.id ??
                                 "",
                             callback: () {
-                              getCurrentLatLng();
+                              _homeController.doGetHomeCategory(
+                                gender: selectedGender.value == 0
+                                    ? "male"
+                                    : "female",
+                              );
+                              _homeController.doGetMakePackageData();
+                              _homeController.doGetPromoCode(
+                                  lat: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.latitude)),
+                                  lng: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.longitude)));
+                              _homeController.doGetHomeSalonList(
+                                  serviceGender: selectedGender.value == 0
+                                      ? "male"
+                                      : "female",
+                                  homeService: atHome,
+                                  offset: 1,
+                                  size: 50,
+                                  lat: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.latitude)),
+                                  lng: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.longitude)),
+                                  orderBy: "",
+                                  nearest: false,
+                                  fourPlusRating: false);
                             },
                           ));
                     },
@@ -1426,6 +1561,9 @@ class _HomePageState extends State<HomePage> {
       _authController.userCity = "${place.locality}";
       _authController.userCurrentLocation =
           "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+      SharedPrefs.writeValue(
+          PrefConstants.address, _authController.userCurrentLocation);
+      SharedPrefs.writeValue(PrefConstants.userCity, _authController.userCity);
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         _homeController.doGetHomeCategory(
           gender: selectedGender.value == 0 ? "male" : "female",
@@ -1442,6 +1580,7 @@ class _HomePageState extends State<HomePage> {
             orderBy: "",
             nearest: false,
             fourPlusRating: false);
+        SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
       });
     }).onPermanentlyDeniedCallback(() async {
       openAppSettings();
@@ -1466,11 +1605,17 @@ class _HomePageState extends State<HomePage> {
       SharedPrefs.writeValue(
           PrefConstants.latitude, position.latitude.toString());
 
+      SharedPrefs.writeValue(PrefConstants.userCity, _authController.userCity);
+      SharedPrefs.writeValue(
+          PrefConstants.address, _authController.userCurrentLocation);
+
       Placemark place = placeMarks[0];
       _authController.userCity = "${place.locality}";
       _authController.userCurrentLocation =
           "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
-
+      SharedPrefs.writeValue(
+          PrefConstants.address, _authController.userCurrentLocation);
+      SharedPrefs.writeValue(PrefConstants.userCity, _authController.userCity);
       _homeController.doGetMakePackageData();
 
       _homeController.doGetPromoCode(
@@ -1485,6 +1630,7 @@ class _HomePageState extends State<HomePage> {
           orderBy: "",
           nearest: false,
           fourPlusRating: false);
+      SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
     }
   }
 }

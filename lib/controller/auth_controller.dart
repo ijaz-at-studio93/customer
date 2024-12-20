@@ -292,7 +292,7 @@ class AuthController extends GetxController {
   resetApp() async {
     await SharedPrefs.writeValue(PrefConstants.gender, "0");
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, false);
-    await SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
+    await SharedPrefs.writeValue(PrefConstants.isFirstTime, false);
     Get.offAll(() => const LoginPage(splashPage: false));
   }
 }

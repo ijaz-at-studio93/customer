@@ -12,6 +12,7 @@ import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/app_conctant.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../project_specific/button_widget.dart';
 
 class SplashPage extends StatefulWidget {
@@ -225,7 +226,7 @@ class _SplashPageState extends State<SplashPage> {
   /*----------------- Open PlayStore -------------*/
   void _launchURL() async {
     const url =
-        'https://play.google.com/store/apps/details?id=com.ananta.scuts';
+        'https://play.google.com/store/apps/details?id=com.anantax.scuts';
     if (await canLaunchUrl(Uri.parse(url))) {
       await launchUrl(Uri.parse(url));
     } else {

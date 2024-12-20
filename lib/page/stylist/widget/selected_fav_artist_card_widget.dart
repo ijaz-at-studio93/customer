@@ -8,6 +8,7 @@ import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/model/artiest_list_model.dart';
 import 'package:salon_customer/project_specific/remove_button_widget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+
 import '../../../project_specific/text_theme.dart';
 import '../stylist_saloon_details_page.dart';
 
@@ -43,19 +44,19 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
                 child: CachedNetworkImage(
                   width: Get.width,
                   height: 135,
-                  fit: BoxFit.cover,
+                  fit: BoxFit.contain,
                   imageUrl: '${APIConstants.image}${artiest.profileImage}',
                   placeholder: (context, url) => Image(
                     image: const AssetImage(AssetsConstant.placeHolder),
                     width: Get.width,
                     height: 135,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                   ),
                   errorWidget: (context, url, error) => Image(
                     image: const AssetImage(AssetsConstant.placeHolder),
                     width: Get.width,
                     height: 135,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                   ),
                 ),
               ),
@@ -108,7 +109,7 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           GestureDetector(
             onTap: onPress,
             child: artiest.isSelectArtist ?? false
@@ -147,9 +148,9 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
             },
             child: Text(
               "View Profile",
-              style: AppTextTheme.medium.copyWith(
-                  fontSize: 13,
-                  color: ColorConstant.grayTextColor,
+              style: AppTextTheme.bold.copyWith(
+                  fontSize: 14,
+                  color: ColorConstant.primaryColor,
                   decoration: TextDecoration.underline),
             ),
           ),

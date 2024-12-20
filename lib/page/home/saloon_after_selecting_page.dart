@@ -23,6 +23,7 @@ import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/stylist_to_user_location.dart';
 import 'package:share_plus/share_plus.dart';
+
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
 import '../appointment/appointment_booking_page.dart';
@@ -540,7 +541,8 @@ class _SaloonAfterSelectingServicesPageState
                   buttonWidget(
                     imageUrl: AssetsConstant.shareIcon,
                     onPress: () {
-                      Share.share("https://play.google.com/store/apps");
+                      Share.share(
+                          "https://play.google.com/store/apps/details?id=com.anantax.scuts");
                     },
                     h: 18,
                     w: 18,
@@ -653,7 +655,6 @@ class _SaloonAfterSelectingServicesPageState
                   ],
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Icon(
                       Icons.star,
@@ -662,7 +663,7 @@ class _SaloonAfterSelectingServicesPageState
                     ),
                     const SizedBox(width: 5),
                     SizedBox(
-                      width: Get.width * 0.1,
+                      width: Get.width * 0.05,
                       child: Text(
                         _homeController
                                 .homeSalonDetailsData.data?.averageArtistRatings
@@ -674,7 +675,6 @@ class _SaloonAfterSelectingServicesPageState
                             fontSize: 11, color: ColorConstant.yellowColor),
                       ),
                     ),
-                    const SizedBox(width: 5),
                     Text(
                       'Average Stylist Rating',
                       style: AppTextTheme.medium.copyWith(

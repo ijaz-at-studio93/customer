@@ -52,7 +52,7 @@
             android:resource="@color/colorPrimary" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBJn72lGPmXstohMuVgK--GHAqHSpMrJgg" />
+            android:value="AIzaSyATecmTI6WWH24gR6wCR4IooVH77VCnSgc" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility?hl=en and

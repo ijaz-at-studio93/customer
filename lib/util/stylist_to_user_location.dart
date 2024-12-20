@@ -1,13 +1,15 @@
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
+import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/util/logger.dart';
+
 import '../api/dio_client.dart';
 import '../constant/assetsconstant.dart';
 import '../constant/color_constant.dart';
@@ -41,6 +43,9 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
     return BitmapDescriptor.fromBytes(imageData!);
   }
 
+  GoogleMapController? _controller;
+  LatLng _initialPosition = const LatLng(0.0, 0.0);
+  bool _locationLoaded = false;
   PolylinePoints polylinePoints = PolylinePoints();
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
@@ -53,7 +58,7 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
   @override
   void initState() {
     super.initState();
-    getCurrentLatLng();
+    _setInitialLocation();
   }
 
   @override
@@ -81,9 +86,10 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
         nameOfScreen: "Address",
         isBackIcon: true,
       ),
-      body: GoogleMap(
-        myLocationButtonEnabled: false,
-        myLocationEnabled: true,
+      body: _locationLoaded
+          ? GoogleMap(
+              myLocationButtonEnabled: false,
+              myLocationEnabled: true,
         zoomControlsEnabled: false,
         mapType: MapType.normal,
         tiltGesturesEnabled: true,
@@ -94,14 +100,15 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
           _moveToInitialPosition();
         },
         initialCameraPosition: CameraPosition(
-          target: initialPosition ?? const LatLng(22.303894, 70.802162),
-          zoom: 12.0,
-        ),
-        polylines: Set<Polyline>.of(polylines.values),
+                target: _initialPosition,
+                zoom: 12.0,
+              ),
+              polylines: Set<Polyline>.of(polylines.values),
         markers: Set<Marker>.of(
           _marker,
         ),
-      ),
+            )
+          : const ProgressBarView(),
     );
   }
 
@@ -112,7 +119,7 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
   }
 
   /*========================= Current location lat lng =========================*/
-  getCurrentLatLng() async {
+/*  getCurrentLatLng() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission;
     if (!serviceEnabled) {
@@ -166,9 +173,62 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
           position: LatLng(widget.latitude, widget.longitude),
           icon: destination));
     });
-    /*  List<Placemark> placeMarks =
+
+  }*/
+
+  /*----------------- Set  init  Location  -----------------*/
+  Future<void> _setInitialLocation() async {
+    await requestPermission();
+    Position position = await getCurrentLocation();
+    setState(() {
+      _initialPosition = LatLng(position.latitude, position.longitude);
+      _locationLoaded = true;
+      makeLines(
+          currentLat: position.latitude,
+          currentLng: position.longitude,
+          destLat: widget.latitude,
+          destLng: widget.longitude);
+    });
+    List<Placemark> placeMarks =
         await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placeMarks[0];*/
+    Placemark place = placeMarks[0];
+
+    logger.d(
+        "DATA ${position.latitude} AND ${position.longitude} AND lat  ${widget.latitude} AND  long ${widget.longitude}");
+
+    final current = await getBitmapDescriptorFromAssetBytes(
+        AssetsConstant.avatarDesign, 70);
+    final destination =
+        await getBitmapDescriptorFromAssetBytes(AssetsConstant.salonIcon, 70);
+
+    setState(() {
+      _marker.add(Marker(
+          markerId: const MarkerId('1'),
+          position: LatLng(position.latitude, position.longitude),
+          icon: current));
+
+      _marker.add(Marker(
+          markerId: const MarkerId('2'),
+          position: LatLng(widget.latitude, widget.longitude),
+          icon: destination));
+    });
+  }
+
+  /*---------------- Request  Permission  -----------------*/
+  Future<void> requestPermission() async {
+    var status = await Permission.location.request();
+    if (status.isDenied) {
+      await Permission.location.request();
+    } else if (status.isPermanentlyDenied) {
+      showMessage(
+          "Location permissions are permanently denied, we cannot request permissions.");
+    }
+  }
+
+  /*--------------  Get Current Location  -----------------*/
+  Future<Position> getCurrentLocation() async {
+    return await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
   }
 
   void makeLines(
@@ -178,7 +238,6 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
       required double destLng}) async {
     await polylinePoints
         .getRouteBetweenCoordinates(
-            /*'AIzaSyCtufw6RifF95TlQ-JWS-bxfgLREJN3PXs',*/
             request: PolylineRequest(
                 headers: {},
                 origin: PointLatLng(currentLat, currentLng),

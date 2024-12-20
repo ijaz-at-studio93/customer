@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart' as fp;
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -11,7 +12,6 @@ import 'package:salon_customer/controller/auth_controller.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-import 'package:flutter_google_places_sdk/flutter_google_places_sdk.dart' as fp;
 
 class GoogleMapGetLocation extends StatefulWidget {
   final VoidCallback callback;
@@ -33,9 +33,14 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
   ValueNotifier<bool> close = ValueNotifier(false);
 
   final places =
-      fp.FlutterGooglePlacesSdk('AIzaSyBJn72lGPmXstohMuVgK--GHAqHSpMrJgg');
+      fp.FlutterGooglePlacesSdk('AIzaSyATecmTI6WWH24gR6wCR4IooVH77VCnSgc');
   ValueNotifier<List<fp.AutocompletePrediction>> locationData =
       ValueNotifier([]);
+
+  String address = "";
+  String city = "";
+  double lat = 0.0;
+  double lng = 0.0;
 
   @override
   void initState() {
@@ -53,13 +58,31 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
         leading: IconButton(
           onPressed: () {
             Get.back();
-            widget.callback.call();
           },
           icon: const Icon(
             Icons.arrow_back_ios,
             color: ColorConstant.blackColor,
           ),
         ),
+        actions: [
+          IconButton(
+              onPressed: () {
+                _authController.userCity = city;
+                _authController.userCurrentLocation = address;
+                SharedPrefs.writeValue(
+                    PrefConstants.userCity, _authController.userCity);
+                SharedPrefs.writeValue(
+                    PrefConstants.address, _authController.userCurrentLocation);
+                SharedPrefs.writeValue(PrefConstants.longitude, lng.toString());
+                SharedPrefs.writeValue(PrefConstants.latitude, lat.toString());
+                widget.callback.call();
+                Get.back();
+              },
+              icon: const Icon(
+                Icons.check_circle,
+                color: ColorConstant.blackColor,
+              ))
+        ],
         centerTitle: true,
         title: Text(
           "Set Address",
@@ -214,22 +237,11 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                                                   ),
                                                 ));
                                               });
-                                              _authController.userCity =
-                                                  "${place.locality}";
-                                              _authController
-                                                      .userCurrentLocation =
-                                                  "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
-
-                                              SharedPrefs.writeValue(
-                                                  PrefConstants.longitude,
-                                                  location[0]
-                                                      .longitude
-                                                      .toString());
-                                              SharedPrefs.writeValue(
-                                                  PrefConstants.latitude,
-                                                  location[0]
-                                                      .latitude
-                                                      .toString());
+                                              city = "${place.locality}";
+                                              address =
+                                                  "${place.street}, ${place.subLocality}, ${place.locality},${place.thoroughfare}, ${place.subThoroughfare} , ${place.administrativeArea} ${place.postalCode}, ${place.country}";
+                                              lat = location[0].latitude;
+                                              lng = location[0].longitude;
 
                                               _marker.add(Marker(
                                                 markerId: const MarkerId('new'),
@@ -336,14 +348,11 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
         await placemarkFromCoordinates(position.latitude, position.longitude);
     Placemark place = placeMarks[0];
 
-    _authController.userCity = "${place.locality}";
-    _authController.userCurrentLocation =
-        "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
-
-    SharedPrefs.writeValue(
-        PrefConstants.longitude, position.longitude.toString());
-    SharedPrefs.writeValue(
-        PrefConstants.latitude, position.latitude.toString());
+    city = "${place.locality}";
+    address =
+        "${place.street}, ${place.subLocality}, ${place.locality},${place.thoroughfare}, ${place.subThoroughfare} , ${place.administrativeArea} ${place.postalCode}, ${place.country}";
+    lat = position.latitude;
+    lng = position.longitude;
   }
 
   /*------------------- Location  Change Liston --------------------*/

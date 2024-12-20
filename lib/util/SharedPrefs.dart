@@ -41,6 +41,8 @@ class PrefConstants {
   static const String userId = "userId";
   static const String isSelectedGender = "isSelectedGender";
   static const String gender = "gender";
+  static const String userCity = "city";
+  static const String address = "address";
   static const String isHomeService = "homeService";
   static const String latitude = "latitude";
   static const String longitude = "longitude";

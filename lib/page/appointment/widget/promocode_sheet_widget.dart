@@ -5,6 +5,7 @@ import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/appointment/widget/promocode_list_tile.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
 
 class PromoCodeSheetWidget extends StatefulWidget {
   const PromoCodeSheetWidget({super.key});
@@ -59,10 +60,14 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
             child: Obx(
               () => _homeController.showProgress
                   ? const ProgressBarView()
-                  : ListView.builder(
-                      itemCount:
-                          _homeController.getPromoCodeModelList.data?.length,
-                      shrinkWrap: true,
+                  : _homeController.getPromoCodeModelList.data?.isEmpty ?? false
+                      ? const NoItemsWidget(
+                          text: "Promo code not available there",
+                        )
+                      : ListView.builder(
+                          itemCount: _homeController
+                              .getPromoCodeModelList.data?.length,
+                          shrinkWrap: true,
                       itemBuilder: (context, i) {
                         return PromoCodeListTile(
                           promoCode:

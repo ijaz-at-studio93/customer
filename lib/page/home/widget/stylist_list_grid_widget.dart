@@ -53,7 +53,7 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                   child: CachedNetworkImage(
                     width: Get.width,
                     height: 135,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fitHeight,
                     imageUrl:
                         "${APIConstants.image}${widget.salonArtiestListModel.profileImage}",
                     placeholder: (context, url) => Image(

@@ -44,7 +44,7 @@ class FavSalon {
   String? createdAt;
   String? updatedAt;
   int? reviewCount;
-  bool? homeService;
+  String? homeService;
   bool? isFavourite;
 
   FavSalon(

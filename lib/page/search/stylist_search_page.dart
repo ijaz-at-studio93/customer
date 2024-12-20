@@ -6,6 +6,7 @@ import 'package:salon_customer/page/search/widget/stylist_list_tile_widget.dart'
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
+
 import '../../constant/assetsconstant.dart';
 import '../../constant/color_constant.dart';
 import '../stylist/stylist_saloon_details_page.dart';
@@ -59,9 +60,7 @@ class _StylistSearchPageState extends State<StylistSearchPage> {
                     ? const ProgressBarView()
                     : _homeController.getArtistSearchModel.data?.isEmpty ??
                             false
-                        ? const NoItemsWidget(
-                            text: "Search Artiest Not Found",
-                          )
+                        ? const NoItemsWidget(text: "Search artist not found")
                         : ListView.separated(
                             separatorBuilder: (context, index) {
                               return Column(

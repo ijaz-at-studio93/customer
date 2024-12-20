@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
@@ -19,6 +18,7 @@ class OverviewListTileWidget extends StatefulWidget {
   final VoidCallback onTap;
   final VoidCallback addButtonTap;
   final bool isSelect;
+
   const OverviewListTileWidget(
       {super.key,
       required this.onTap,

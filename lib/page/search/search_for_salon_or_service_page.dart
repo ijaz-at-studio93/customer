@@ -6,19 +6,20 @@ import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/home/saloon_after_selecting_page.dart';
 import 'package:salon_customer/page/search/widget/location_title_widget.dart';
+import 'package:salon_customer/page/search/widget/service_list_tile.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 
-class AreaOfCitySearchPage extends StatefulWidget {
-  const AreaOfCitySearchPage({super.key});
+class SearchForSalonService extends StatefulWidget {
+  const SearchForSalonService({super.key});
 
   @override
-  State<AreaOfCitySearchPage> createState() => _AreaOfCitySearchPageState();
+  State<SearchForSalonService> createState() => _SearchForSalonServiceState();
 }
 
-class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
+class _SearchForSalonServiceState extends State<SearchForSalonService> {
   /*------------- Controller -------------*/
   final _searchTextEditingController = TextEditingController();
   final _homeController = Get.find<HomeController>();
@@ -57,12 +58,12 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                     ? const ProgressBarView()
                     : _homeController.getSearchSalonModel.data == null
                         ? const NoItemsWidget(
-                            text: "Search Your Favourite Salon.",
+                            text: "Search For Salon Or Service.",
                           )
                         : _homeController.getSearchSalonModel.data?.isEmpty ??
                                 false
                             ? const NoItemsWidget(
-                                text: "No Search Result Found.",
+                                text: "No any search result found.",
                               )
                             : ListView.separated(
                                 separatorBuilder: (context, index) {
@@ -85,12 +86,68 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 5),
                                 itemBuilder: (context, index) {
-                                  return LocationTileWidget(
-                                    salonListData: _homeController
-                                        .getSearchSalonModel.data![index],
-                                    onPress: () {
-                                      Get.to(() =>
-                                          SaloonAfterSelectingServicesPage(
+                                  return _homeController.getSearchSalonModel
+                                              .data?[index].isService ??
+                                          false
+                                      ? ServiceListTile(
+                                          onPress: () {
+                                            Get.to(() =>
+                                                SaloonAfterSelectingServicesPage(
+                                                    id: _homeController
+                                                            .getSearchSalonModel
+                                                            .data?[index]
+                                                            .service
+                                                            ?.salon
+                                                            ?.id ??
+                                                        "",
+                                                    callback: () {}));
+                                          },
+                                          description: _homeController
+                                                  .getSearchSalonModel
+                                                  .data?[index]
+                                                  .service
+                                                  ?.description ??
+                                              "",
+                                          image: _homeController
+                                                  .getSearchSalonModel
+                                                  .data?[index]
+                                                  .service
+                                                  ?.image ??
+                                              "",
+                                          price: _homeController
+                                                  .getSearchSalonModel
+                                                  .data?[index]
+                                                  .service
+                                                  ?.price
+                                                  .toString() ??
+                                              "",
+                                          name: _homeController
+                                                  .getSearchSalonModel
+                                                  .data?[index]
+                                                  .service
+                                                  ?.name ??
+                                              "",
+                                          duration: _homeController
+                                                  .getSearchSalonModel
+                                                  .data?[index]
+                                                  .service
+                                                  ?.duration
+                                                  .toString() ??
+                                              "",
+                                          rating: _homeController
+                                                  .getSearchSalonModel
+                                                  .data?[index]
+                                                  .salon
+                                                  ?.rating
+                                                  .toString() ??
+                                              "",
+                                        )
+                                      : LocationTileWidget(
+                                          salonListData: _homeController
+                                              .getSearchSalonModel.data![index],
+                                          onPress: () {
+                                            Get.to(() =>
+                                                SaloonAfterSelectingServicesPage(
                                               id: _homeController
                                                       .getSearchSalonModel
                                                       .data?[index]
@@ -101,7 +158,7 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
                                     },
                                   );
                                 })),
-          )
+          ),
         ],
       ),
     );
@@ -184,34 +241,6 @@ class _AreaOfCitySearchPageState extends State<AreaOfCitySearchPage> {
           /*_yourCurrentLocationRow(onTap: () {}),*/
           const SizedBox(height: 12),
         ],
-      ),
-    );
-  }
-
-  /*----------------------- Your Current Location ----------------*/
-  _yourCurrentLocationRow({required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        color: ColorConstant.whiteColor,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset(
-              AssetsConstant.location,
-              height: 17,
-              width: 17,
-            ),
-            Text(
-              "YOUR CURRENT LOCATION",
-              style: AppTextTheme.bold.copyWith(
-                  color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
-                      ColorConstant.primaryColor,
-                  fontSize: 16),
-            )
-          ],
-        ),
       ),
     );
   }

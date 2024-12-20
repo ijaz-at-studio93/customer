@@ -162,7 +162,7 @@ class _FavSalonCardWidgetState extends State<FavSalonCardWidget> {
                           ),
                         ),
                         const SizedBox(height: 5),
-                        if (widget.favSalon.homeService ?? false)
+                        if (widget.favSalon.homeService == "salon")
                           Row(
                             children: [
                               Icon(Icons.home,

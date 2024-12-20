@@ -34,15 +34,19 @@ class SalonData {
   bool? isArtist;
   bool? isService;
   bool? isSalon;
-  SalonListData? salon;
+  Service? service;
+  Salon? salon;
 
-  SalonData({this.isArtist, this.isService, this.isSalon, this.salon});
+  SalonData(
+      {this.isArtist, this.isService, this.isSalon, this.service, this.salon});
 
   SalonData.fromJson(Map<String, dynamic> json) {
     isArtist = json['isArtist'];
     isService = json['isService'];
     isSalon = json['isSalon'];
-    salon = json['salon'] != null ? SalonListData.fromJson(json['salon']) : null;
+    service =
+        json['service'] != null ? Service.fromJson(json['service']) : null;
+    salon = json['salon'] != null ? Salon.fromJson(json['salon']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -50,6 +54,9 @@ class SalonData {
     data['isArtist'] = isArtist;
     data['isService'] = isService;
     data['isSalon'] = isSalon;
+    if (service != null) {
+      data['service'] = service!.toJson();
+    }
     if (salon != null) {
       data['salon'] = salon!.toJson();
     }
@@ -57,39 +64,94 @@ class SalonData {
   }
 }
 
-class SalonListData {
-  String? address;
+class Service {
+  int? price;
   String? id;
-  String? image;
   String? name;
-  double? rating;
-  int? reviewCount;
+  String? description;
+  String? image;
+  int? duration;
+  Salon? salon;
 
-  SalonListData(
-      {this.address,
-        this.id,
-        this.image,
-        this.name,
-        this.rating,
-        this.reviewCount});
+  Service(
+      {this.price,
+      this.id,
+      this.name,
+      this.description,
+      this.image,
+      this.duration,
+      this.salon});
 
-  SalonListData.fromJson(Map<String, dynamic> json) {
-    address = json['address'];
+  Service.fromJson(Map<String, dynamic> json) {
+    price = json['price'];
     id = json['id'];
-    image = json['image'];
     name = json['name'];
-    rating = double.parse(json['rating'].toString());
-    reviewCount = json['reviewCount'];
+    description = json['description'];
+    image = json['image'];
+    duration = json['duration'];
+    salon = json['salon'] != null ? Salon.fromJson(json['salon']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
-    data['address'] = address;
+    data['price'] = price;
     data['id'] = id;
-    data['image'] = image;
     data['name'] = name;
+    data['description'] = description;
+    data['image'] = image;
+    data['duration'] = duration;
+    if (salon != null) {
+      data['salon'] = salon!.toJson();
+    }
+    return data;
+  }
+}
+
+class Salon {
+  int? rating;
+  String? id;
+  String? name;
+  String? address;
+  int? reviewCount;
+  int? distance;
+  String? image;
+  String? homeService;
+  String? serviceGender;
+
+  Salon(
+      {this.rating,
+      this.id,
+      this.name,
+      this.address,
+      this.reviewCount,
+      this.distance,
+      this.image,
+      this.homeService,
+      this.serviceGender});
+
+  Salon.fromJson(Map<String, dynamic> json) {
+    rating = json['rating'];
+    id = json['id'];
+    name = json['name'];
+    address = json['address'];
+    reviewCount = json['reviewCount'];
+    distance = json['distance'];
+    image = json['image'];
+    homeService = json['homeService'];
+    serviceGender = json['serviceGender'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['rating'] = rating;
+    data['id'] = id;
+    data['name'] = name;
+    data['address'] = address;
     data['reviewCount'] = reviewCount;
+    data['distance'] = distance;
+    data['image'] = image;
+    data['homeService'] = homeService;
+    data['serviceGender'] = serviceGender;
     return data;
   }
 }
