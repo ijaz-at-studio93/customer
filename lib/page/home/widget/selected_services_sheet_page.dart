@@ -9,6 +9,8 @@ import 'package:salon_customer/page/home/widget/add_product_sheet_widget.dart';
 import 'package:salon_customer/page/home/widget/selected_service_list_tile_widget.dart';
 import 'package:salon_customer/page/stylist/selecting_artist_bottom_sheet.dart';
 import 'package:salon_customer/project_specific/ProgressContainerView.dart';
+import 'package:salon_customer/util/NoItemsWidget.dart';
+
 import '../../../constant/api_constant.dart';
 import '../../../constant/variable_constant.dart';
 import '../../../controller/home_controller.dart';
@@ -82,8 +84,13 @@ class _SelectedServiceSheetPageState extends State<SelectedServiceSheetPage> {
                     ),
                   ),
                   Expanded(
-                    child: ListView.builder(
-                      shrinkWrap: true,
+                    child: _homeController.getServiceAddCartModel.data
+                                ?.servicesWithProduct?.isEmpty ??
+                            false || _homeController.getServiceAddCartModel.data
+                                ?.servicesWithProduct ==  null
+                        ? const NoItemsWidget(text: "No Any Selected Service")
+                        : ListView.builder(
+                            shrinkWrap: true,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 15),
                       itemCount: _homeController.getServiceAddCartModel.data

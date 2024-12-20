@@ -18,6 +18,7 @@ import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/logger.dart';
+
 import '../../api/dio_client.dart';
 import '../home/widget/add_product_sheet_widget.dart';
 import '../profile/add_address_page.dart';
@@ -617,6 +618,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                         .serviceId ??
                                                     "",
                                                 callback: () {
+                                                  _homeController
+                                                      .doGetPopularServiceByYourStylist(
+                                                          stylistId:
+                                                              widget.artiestId);
                                                   _homeController
                                                       .doGetSalonDetailsService(
                                                           salonId: _homeController
