@@ -93,16 +93,13 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
         zoomControlsEnabled: false,
         mapType: MapType.normal,
         tiltGesturesEnabled: true,
-        onMapCreated: (controller) {
-          setState(() {
-            mapController = controller;
-          });
-          _moveToInitialPosition();
-        },
         initialCameraPosition: CameraPosition(
                 target: _initialPosition,
                 zoom: 12.0,
               ),
+              onMapCreated: (GoogleMapController controller) {
+                _controller = controller;
+              },
               polylines: Set<Polyline>.of(polylines.values),
         markers: Set<Marker>.of(
           _marker,
@@ -110,12 +107,6 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
             )
           : const ProgressBarView(),
     );
-  }
-
-  /*---------  Move Camera For Google Map ----------*/
-  void _moveToInitialPosition() {
-    mapController.animateCamera(CameraUpdate.newLatLng(
-        initialPosition ?? const LatLng(22.303894, 70.802162)));
   }
 
   /*========================= Current location lat lng =========================*/

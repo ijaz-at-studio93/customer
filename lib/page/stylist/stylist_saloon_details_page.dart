@@ -16,6 +16,7 @@ import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:share_plus/share_plus.dart';
+
 import '../../constant/assetsconstant.dart';
 import '../appointment/appointment_booking_page.dart';
 import '../home/widget/add_product_sheet_widget.dart';
@@ -816,16 +817,19 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
               ),
               Row(
                 children: [
-                  buttonWidget(
+            /*      buttonWidget(
                     imageUrl: AssetsConstant.iconSearch,
                     onPress: () {
                       Get.to(() => StylistSearchPage(
+                            salonName: _homeController
+                                    .homeSalonDetailsData.data?.name ??
+                                "",
                             salonId: stylistId.value,
                           ));
                     },
                     h: 24,
                     w: 24,
-                  ),
+                  ),*/
                   const SizedBox(width: 15),
                   buttonWidget(
                     imageUrl: AssetsConstant.shareIcon,
@@ -835,13 +839,13 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                     h: 18,
                     w: 18,
                   ),
-                  const SizedBox(width: 15),
+                  /*  const SizedBox(width: 15),
                   buttonWidget(
                     imageUrl: AssetsConstant.likeBlank,
                     onPress: () {},
                     h: 20,
                     w: 20,
-                  ),
+                  ),*/
                 ],
               )
             ],

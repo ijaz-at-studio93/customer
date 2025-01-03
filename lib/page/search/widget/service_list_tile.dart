@@ -14,6 +14,7 @@ import '../../../util/SharedPrefs.dart';
 class ServiceListTile extends StatelessWidget {
   final String price;
   final String name;
+  final String salonName;
   final String description;
   final String image;
   final String rating;
@@ -26,7 +27,9 @@ class ServiceListTile extends StatelessWidget {
       required this.description,
       required this.image,
       required this.duration,
-      required this.rating, required this.onPress});
+      required this.rating,
+      required this.onPress,
+      required this.salonName});
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +87,13 @@ class ServiceListTile extends StatelessWidget {
                           .copyWith(color: ColorConstant.grayColor, fontSize: 16),
                     ),
                   ],
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  "By : $salonName",
+                  textScaler: const TextScaler.linear(0.85),
+                  style: AppTextTheme.bold
+                      .copyWith(color: ColorConstant.blackColor, fontSize: 18),
                 ),
                 const SizedBox(height: 5),
                 Dash(

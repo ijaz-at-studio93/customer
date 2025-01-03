@@ -531,6 +531,7 @@ class _SaloonAfterSelectingServicesPageState
                     imageUrl: AssetsConstant.iconSearch,
                     onPress: () {
                       Get.to(() => StylistSearchPage(
+                            salonName: _homeController.homeSalonDetailsData.data?.name ?? "",
                             salonId: widget.id,
                           ));
                     },

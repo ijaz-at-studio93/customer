@@ -17,7 +17,6 @@ import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-import 'package:salon_customer/util/logger.dart';
 
 import '../../api/dio_client.dart';
 import '../home/widget/add_product_sheet_widget.dart';
@@ -720,49 +719,107 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                   showMessage(
                                       "This Date No Available Any Slot Please Select Next Date");
                                 } else {
-                                  logger.d(_homeController
-                                      .getOrderIdModel.data?.razorpayKey);
-                                  logger.d(_homeController
-                                      .getOrderIdModel.data?.orderId);
-
-                                  var options = {
-                                    'key': _homeController.getOrderIdModel.data
-                                            ?.razorpayKey ??
-                                        "",
-                                    'amount': _homeController
-                                            .getServiceAddCartModel
-                                            .data
-                                            ?.price ??
-                                        0 * 100,
-                                    'name': 'Salon',
-                                    'timeout': 60,
-                                    "order_id": _homeController
-                                            .getOrderIdModel.data?.orderId ??
-                                        "",
-                                    'description': 'Booking Appointment',
-                                    'retry': {'enabled': true, 'max_count': 1},
-                                    'send_sms_hash': true,
-                                    'prefill': {
-                                      'contact': _authController
-                                              .userResponseModel
-                                              .data
-                                              ?.userData
+                                  if (SharedPrefs.readBoolValue(
+                                      PrefConstants.isHomeService)) {
+                                    if (userServiceAddressIdSelect == "") {
+                                      Get.to(() =>
+                                          const AddAddressPage(isSelect: true));
+                                    } else {
+                                      var options = {
+                                        'key': _homeController.getOrderIdModel
+                                                .data?.razorpayKey ??
+                                            "",
+                                        'amount': _homeController
+                                                .getServiceAddCartModel
+                                                .data
+                                                ?.price ??
+                                            0 * 100,
+                                        'name': 'Salon',
+                                        'timeout': 60,
+                                        "order_id": _homeController
+                                                .getOrderIdModel
+                                                .data
+                                                ?.orderId ??
+                                            "",
+                                        'description': 'Booking Appointment',
+                                        'retry': {
+                                          'enabled': true,
+                                          'max_count': 1
+                                        },
+                                        'send_sms_hash': true,
+                                        'prefill': {
+                                          'contact': _authController
+                                                  .userResponseModel
+                                                  .data
+                                                  ?.userData
                                               ?.mobile ??
-                                          "",
-                                      'email': _authController.userResponseModel
-                                              .data?.userData?.mobile ??
-                                          ""
-                                    },
-                                    'external': {}
-                                  };
-                                  razorpay.on(Razorpay.EVENT_PAYMENT_ERROR,
-                                      handlePaymentErrorResponse);
-                                  razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
-                                      handlePaymentSuccessResponse);
-                                  razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET,
-                                      handleExternalWalletSelected);
+                                              "",
+                                          'email': _authController
+                                                  .userResponseModel
+                                                  .data
+                                                  ?.userData
+                                                  ?.mobile ??
+                                              ""
+                                        },
+                                        'external': {}
+                                      };
+                                      razorpay.on(Razorpay.EVENT_PAYMENT_ERROR,
+                                          handlePaymentErrorResponse);
+                                      razorpay.on(
+                                          Razorpay.EVENT_PAYMENT_SUCCESS,
+                                          handlePaymentSuccessResponse);
+                                      razorpay.on(
+                                          Razorpay.EVENT_EXTERNAL_WALLET,
+                                          handleExternalWalletSelected);
 
-                                  razorpay.open(options);
+                                      razorpay.open(options);
+                                    }
+                                  } else {
+                                    var options = {
+                                      'key': _homeController.getOrderIdModel
+                                              .data?.razorpayKey ??
+                                          "",
+                                      'amount': _homeController
+                                              .getServiceAddCartModel
+                                              .data
+                                              ?.price ??
+                                          0 * 100,
+                                      'name': 'Salon',
+                                      'timeout': 60,
+                                      "order_id": _homeController
+                                              .getOrderIdModel.data?.orderId ??
+                                          "",
+                                      'description': 'Booking Appointment',
+                                      'retry': {
+                                        'enabled': true,
+                                        'max_count': 1
+                                      },
+                                      'send_sms_hash': true,
+                                      'prefill': {
+                                        'contact': _authController
+                                                .userResponseModel
+                                                .data
+                                                ?.userData
+                                                ?.mobile ??
+                                            "",
+                                        'email': _authController
+                                                .userResponseModel
+                                                .data
+                                                ?.userData
+                                                ?.mobile ??
+                                            ""
+                                      },
+                                      'external': {}
+                                    };
+                                    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR,
+                                        handlePaymentErrorResponse);
+                                    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
+                                        handlePaymentSuccessResponse);
+                                    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET,
+                                        handleExternalWalletSelected);
+
+                                    razorpay.open(options);
+                                  }
                                 }
                               }
                             },
@@ -833,7 +890,6 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   /*---------------  On Payment Success Method ------------ */
   void handlePaymentSuccessResponse(PaymentSuccessResponse response) {
     showMessage("Payment Successful");
-
     if (selectTime == "") {
       selectTime =
           _homeController.getAvailabilitiesTimeSlotModelData.data?[0].time ??
@@ -916,41 +972,35 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       DateTime dateTime = DateTime.parse(correctedDateTime);
       String isoDateTime = dateTime.toIso8601String();
 
-      if (_homeController.getServiceAddCartModel.data?.isHomeService ?? false) {
-        if (userServiceAddressIdSelect == "") {
-          Get.to(() => const AddAddressPage(
-                isSelect: true,
-              ));
-        } else {
-          _homeController.doCreateBooking(
-              userAddressId: userServiceAddressIdSelect,
-              isHomeService:
-                  _homeController.getServiceAddCartModel.data?.isHomeService ??
-                      false,
-              salonArtistId: widget.artiestId,
-              startAt: isoDateTime,
-              callback: () {
-                stylistId.value = "";
-                stylistId.notifyListeners();
-                showModalBottomSheet(
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(32),
-                      topRight: Radius.circular(32),
-                    )),
-                    context: context,
-                    builder: (context) {
-                      return YourApprovalBottomSheet(
-                        salonAppointmentId: _homeController
-                                .getCreateBookingAppointmentModel
-                                .data
-                                ?.salonAppointmentId ??
-                            "",
-                      );
-                    });
-              });
-        }
+      if (SharedPrefs.readBoolValue(PrefConstants.isHomeService)) {
+        _homeController.doCreateBooking(
+            userAddressId: userServiceAddressIdSelect,
+            isHomeService:
+                _homeController.getServiceAddCartModel.data?.isHomeService ??
+                    false,
+            salonArtistId: widget.artiestId,
+            startAt: isoDateTime,
+            callback: () {
+              stylistId.value = "";
+              stylistId.notifyListeners();
+              showModalBottomSheet(
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(32),
+                    topRight: Radius.circular(32),
+                  )),
+                  context: context,
+                  builder: (context) {
+                    return YourApprovalBottomSheet(
+                      salonAppointmentId: _homeController
+                              .getCreateBookingAppointmentModel
+                              .data
+                              ?.salonAppointmentId ??
+                          "",
+                    );
+                  });
+            });
       } else {
         stylistId.value = "";
         _homeController.doCreateBooking(

@@ -351,10 +351,13 @@ class HomeAPI {
   /*------------------ Add cart Product ---------------------*/
   static Future<ServiceAddCartModel> addProductCart(
       {required String productId,
-      required String productSelectedServiceId}) async {
+      required String productSelectedServiceId,
+      required  bool isHomeService
+      }) async {
     final response = await DioClient.client.put("user/cart/add", data: {
       "productId": productId,
-      "productSelectedServiceId": productSelectedServiceId
+      "productSelectedServiceId": productSelectedServiceId,
+      "isHomeService" : isHomeService
     });
     if (response.isSuccess) {
       return ServiceAddCartModel.fromJson(response.data);

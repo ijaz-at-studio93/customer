@@ -8,6 +8,7 @@ import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+
 import 'custom_list_tile_widget.dart';
 
 class AddProductSheetWidget extends StatefulWidget {
@@ -180,6 +181,10 @@ class _AddProductSheetWidgetState extends State<AddProductSheetWidget> {
                                           "",
                                       isAdd: () {
                                         _homeController.doAddProductCart(
+                                            isHomeService:
+                                                SharedPrefs.readBoolValue(
+                                                    PrefConstants
+                                                        .isHomeService),
                                             productSelectedServiceId:
                                                 widget.serviceId,
                                             productId: _homeController

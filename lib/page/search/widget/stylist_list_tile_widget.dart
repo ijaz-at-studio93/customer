@@ -12,13 +12,14 @@ class StylistListTileWidget extends StatelessWidget {
   final String name;
   final double rating;
   final int review;
+  final String salonName;
   const StylistListTileWidget(
       {super.key,
       required this.onPress,
       required this.image,
       required this.name,
       required this.rating,
-      required this.review});
+      required this.review, required this.salonName});
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +59,14 @@ class StylistListTileWidget extends StatelessWidget {
                     .copyWith(fontSize: 19, color: ColorConstant.blackColor),
               ),
               const SizedBox(height: 5),
+              Text(
+                "By : $salonName",
+                textScaler: const TextScaler.linear(0.85),
+                style: AppTextTheme.bold
+                    .copyWith(color: ColorConstant.blackColor, fontSize: 18),
+              ),
+              const SizedBox(height: 5),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

@@ -13,10 +13,10 @@ import '../stylist/stylist_saloon_details_page.dart';
 
 class StylistSearchPage extends StatefulWidget {
   final String salonId;
-
+  final  String salonName;
   const StylistSearchPage({
     super.key,
-    required this.salonId,
+    required this.salonId, required this.salonName,
   });
 
   @override
@@ -25,6 +25,7 @@ class StylistSearchPage extends StatefulWidget {
 
 class _StylistSearchPageState extends State<StylistSearchPage> {
   final _homeController = Get.find<HomeController>();
+
 
   @override
   void initState() {
@@ -83,6 +84,7 @@ class _StylistSearchPageState extends State<StylistSearchPage> {
                                 vertical: 10, horizontal: 20),
                             itemBuilder: (context, index) {
                               return StylistListTileWidget(
+                                salonName: widget.salonName,
                                 image: _homeController.getArtistSearchModel
                                         .data?[index].item?.profileImage ??
                                     "",

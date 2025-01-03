@@ -7,10 +7,13 @@ import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/home/saloon_after_selecting_page.dart';
 import 'package:salon_customer/page/search/widget/location_title_widget.dart';
 import 'package:salon_customer/page/search/widget/service_list_tile.dart';
+import 'package:salon_customer/page/search/widget/stylist_list_tile_widget.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+
+import '../stylist/stylist_saloon_details_page.dart';
 
 class SearchForSalonService extends StatefulWidget {
   const SearchForSalonService({super.key});
@@ -102,6 +105,13 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                                                         "",
                                                     callback: () {}));
                                           },
+                                          salonName: _homeController
+                                                  .getSearchSalonModel
+                                                  .data?[index]
+                                                  .service
+                                                  ?.salon
+                                                  ?.name ??
+                                              "",
                                           description: _homeController
                                                   .getSearchSalonModel
                                                   .data?[index]
@@ -142,18 +152,72 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                                                   .toString() ??
                                               "",
                                         )
-                                      : LocationTileWidget(
-                                          salonListData: _homeController
-                                              .getSearchSalonModel.data![index],
-                                          onPress: () {
-                                            Get.to(() =>
-                                                SaloonAfterSelectingServicesPage(
-                                              id: _homeController
+                                      : _homeController.getSearchSalonModel
+                                                  .data?[index].isArtist ??
+                                              false
+                                          ? StylistListTileWidget(
+                                              salonName: _homeController
                                                       .getSearchSalonModel
                                                       .data?[index]
-                                                      .salon
-                                                      ?.id ??
+                                                      .artist?.salon?.name ??
                                                   "",
+                                              image: _homeController
+                                                      .getSearchSalonModel
+                                                      .data?[index]
+                                                      .artist
+                                                      ?.profileImage ??
+                                                  "",
+                                              name: _homeController
+                                                      .getSearchSalonModel
+                                                      .data?[index]
+                                                      .artist
+                                                      ?.name ??
+                                                  "",
+                                              rating: _homeController
+                                                      .getSearchSalonModel
+                                                      .data?[index]
+                                                      .artist
+                                                      ?.rating ??
+                                                  0.0,
+                                              review: _homeController
+                                                      .getSearchSalonModel
+                                                      .data?[index]
+                                                      .artist
+                                                      ?.reviewCount ??
+                                                  0,
+                                              onPress: () {
+                                                Get.to(() =>
+                                                    StylistSaloonDetailsPage(
+                                                      isViewDetails: false,
+                                                      salonId: _homeController
+                                                              .getSearchSalonModel
+                                                              .data?[index]
+                                                              .artist
+                                                              ?.salon
+                                                              ?.id ??
+                                                          "",
+                                                      artiestId: _homeController
+                                                              .getSearchSalonModel
+                                                              .data?[index]
+                                                              .artist
+                                                              ?.id ??
+                                                          "",
+                                                    ));
+                                              },
+                                            )
+                                          : LocationTileWidget(
+                                              salonListData: _homeController
+                                                  .getSearchSalonModel
+                                                  .data![index],
+                                              onPress: () {
+                                                Get.to(() =>
+                                                    SaloonAfterSelectingServicesPage(
+                                                        id: _homeController
+                                                                .getSearchSalonModel
+                                                                .data?[index]
+                                                                .salon
+                                                                ?.id ??
+                                                            "",
                                               callback: () {}));
                                     },
                                   );
@@ -230,7 +294,7 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                         color: ColorConstant.blackColor, fontSize: 14),
                     decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: "Search for salon or service",
+                        hintText: "Search for salon or service or stylist",
                         hintStyle: AppTextTheme.medium.copyWith(
                             color: ColorConstant.grayTextColor, fontSize: 13)),
                   ),

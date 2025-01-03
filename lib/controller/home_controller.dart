@@ -636,12 +636,15 @@ class HomeController extends GetxController {
   doAddProductCart(
       {required String productId,
       required String productSelectedServiceId,
+      required bool  isHomeService,
       required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       _serviceAddCartModel.value = await HomeAPI.addProductCart(
           productId: productId,
-          productSelectedServiceId: productSelectedServiceId);
+          productSelectedServiceId: productSelectedServiceId,
+          isHomeService: isHomeService
+      );
       if (_serviceAddCartModel.value.success ?? false) {
         callback.call();
       }

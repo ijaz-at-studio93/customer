@@ -475,7 +475,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(width: 10),
                 Text(
-                  "Search for salon or service",
+                  "Search for salon or service or stylist",
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.medium
                       .copyWith(color: ColorConstant.grayColor),
