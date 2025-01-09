@@ -70,10 +70,41 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                           shrinkWrap: true,
                       itemBuilder: (context, i) {
                         return PromoCodeListTile(
-                          promoCode:
-                              _homeController.getPromoCodeModelList.data![i],
-                          onTapApplyBtn: () {
-                            Get.back(
+                              id: _homeController
+                                      .getPromoCodeModelList.data?[i].id ??
+                                  "",
+                              image: _homeController
+                                      .getPromoCodeModelList.data?[i].image ??
+                                  "",
+                              title: _homeController
+                                      .getPromoCodeModelList.data?[i].title ??
+                                  "",
+                              description: _homeController.getPromoCodeModelList
+                                      .data?[i].description ??
+                                  "",
+                              type: _homeController
+                                      .getPromoCodeModelList.data?[i].type ??
+                                  "",
+                              amount: _homeController
+                                      .getPromoCodeModelList.data?[i].amount ??
+                                  0,
+                              code: _homeController
+                                      .getPromoCodeModelList.data?[i].code ??
+                                  "",
+                              endsAt: _homeController
+                                      .getPromoCodeModelList.data?[i].endsAt ??
+                                  "",
+                              maxDiscount: _homeController.getPromoCodeModelList
+                                      .data?[i].maxDiscount ??
+                                  "",
+                              minOrder: _homeController.getPromoCodeModelList
+                                      .data?[i].minOrder ??
+                                  "",
+                              startsAt: _homeController.getPromoCodeModelList
+                                      .data?[i].startsAt ??
+                                  "",
+                              onTapApplyBtn: () {
+                                Get.back(
                                 result: _homeController
                                         .getPromoCodeModelList.data?[i].id ??
                                     "");

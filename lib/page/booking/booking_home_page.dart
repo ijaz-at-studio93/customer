@@ -73,6 +73,11 @@ class _BookingHomePageState extends State<BookingHomePage> {
                                         horizontal: 20, vertical: 5),
                                     child: PendingCardWidget(
                                       onPress: () {
+                                        print(_homeController
+                                            .getCurrentBookingListModel
+                                            .data?[index]
+                                            .appointmentId ??
+                                            "");
                                         Get.to(() => QRCodePage(
                                             appointmentId: _homeController
                                                     .getCurrentBookingListModel

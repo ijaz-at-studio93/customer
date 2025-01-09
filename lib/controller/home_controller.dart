@@ -234,6 +234,9 @@ class HomeController extends GetxController {
           await HomeAPI.homeCategoryList(gender: gender);
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("GetHomeCategory $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -246,6 +249,9 @@ class HomeController extends GetxController {
       _getLastMakeYourOwnPackage.value = await HomeAPI.makePackageDataGet();
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("GetMakePackageData $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -258,6 +264,9 @@ class HomeController extends GetxController {
       _serviceProductModel.value = await HomeAPI.getServiceProduct(serviceId);
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("GetProductData $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -277,6 +286,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("AddPackageOneData $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -295,6 +307,9 @@ class HomeController extends GetxController {
         callback.call();
       }
     } catch (e) {
+      if (kDebugMode) {
+        print("Remove Package Data $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -347,7 +362,9 @@ class HomeController extends GetxController {
           await HomeAPI.getSalonDetail(salonId: salonId, lng: lng, lat: lat);
     } catch (e) {
       showError(e);
-      logger.d("DO Get Artiest List Data ${e.toString()}");
+      if (kDebugMode) {
+        print("GetHomeSalonDetails $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -361,7 +378,10 @@ class HomeController extends GetxController {
           await HomeAPI.getSalonDetailsCategoryServiceList(salonId: salonId);
     } catch (e) {
       showError(e);
-      logger.d("DO Get Artiest List Data ${e.toString()}");
+      if (kDebugMode) {
+        print("DO Get Artiest List Data $e");
+      }
+
     } finally {
       _showProgress.value = false;
     }
@@ -393,7 +413,9 @@ class HomeController extends GetxController {
           orderBy: orderBy);
     } catch (e) {
       showError(e);
-      logger.d("Do Get Home Salon List ${e.toString()}");
+      if (kDebugMode) {
+        print("Do Get Home Salon List $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -407,7 +429,10 @@ class HomeController extends GetxController {
           await HomeAPI.salonDetailsArtiest(salonId: salonId);
     } catch (e) {
       showError(e);
-      logger.d("Do Get Salon Artiest ${e.toString()}");
+      if (kDebugMode) {
+        print("Do Get Salon Artiest $e");
+      }
+
     } finally {
       _showProgress.value = false;
     }
@@ -420,7 +445,10 @@ class HomeController extends GetxController {
       _artiestListData.value = await HomeAPI.getArtiest();
     } catch (e) {
       showError(e);
-      logger.d("DO Get Artiest List Data ${e.toString()}");
+      if (kDebugMode) {
+        print("DO Get Artiest List Data $e");
+      }
+
     } finally {
       _showProgress.value = false;
     }
@@ -442,7 +470,10 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
-      logger.d("UnAvailableDatesListData ${e.toString()}");
+      if (kDebugMode) {
+        print("UnAvailableDatesListData $e");
+      }
+
     } finally {
       _showProgress.value = false;
     }
@@ -458,7 +489,9 @@ class HomeController extends GetxController {
               artiestId: artiestId, date: date);
     } catch (e) {
       showError(e);
-      logger.d("availabilities Time  Slot ${e.toString()}");
+      if (kDebugMode) {
+        print("Availabilities Time  Slot $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -486,7 +519,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
-      logger.d("Create Booking  ForCustomer ${e.toString()}");
+      if (kDebugMode) {
+        print("Create Booking  ForCustomer $e");
+      }
     } finally {
       _showBookingProgress.value = false;
     }
@@ -500,7 +535,9 @@ class HomeController extends GetxController {
           await HomeAPI.userBookingQrCodeDetails(appointmentId: appointmentId);
     } catch (e) {
       showError(e);
-      logger.d("QR Code Model ${e.toString()}");
+      if (kDebugMode) {
+        print("QR Code $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -513,7 +550,9 @@ class HomeController extends GetxController {
       _currentBookingListModel.value = await HomeAPI.currentBookingList();
     } catch (e) {
       showError(e);
-      logger.d("Current Booking List  Data ${e.toString()}");
+      if (kDebugMode) {
+        print("Current Booking List  Data $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -527,7 +566,9 @@ class HomeController extends GetxController {
       print(result);
     } catch (e) {
       showError(e);
-      logger.d("Favourite Salon ${e.toString()}");
+      if (kDebugMode) {
+        print("Favourite Salon $e");
+      }
     } finally {
       _showAddProgress.value = false;
     }
@@ -544,7 +585,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
-      logger.d("Remove  Favourite Salon  ${e.toString()}");
+      if (kDebugMode) {
+        print("Remove Favourite Salon$e");
+      }
     } finally {
       _showAddProgress.value = false;
     }
@@ -557,7 +600,9 @@ class HomeController extends GetxController {
       _favSalonList.value = await HomeAPI.getFavouriteSalon();
     } catch (e) {
       showError(e);
-      logger.d("Fav Salon List  ${e.toString()}");
+      if (kDebugMode) {
+        print("Fav Salon List $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -578,7 +623,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
-      logger.d("Add Cart  ${e}");
+      if (kDebugMode) {
+        print("Add Cart $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -596,7 +643,10 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
-      logger.d("Remove Cart  ${e.toString()}");
+      if (kDebugMode) {
+        print("Remove Cart $e");
+      }
+
     } finally {
       _showProgress.value = false;
     }
@@ -609,7 +659,9 @@ class HomeController extends GetxController {
       _serviceAddCartModel.value = await HomeAPI.getUserCart();
     } catch (e) {
       showError(e);
-      logger.d("Get Cart ${e.toString()}");
+      if (kDebugMode) {
+        print("Get Cart $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -625,7 +677,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
-      logger.d("Clear Cart  ${e.toString()}");
+      if (kDebugMode) {
+        print("Clear Cart $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -650,7 +704,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
-      logger.d("Add Cart  ${e.toString()}");
+      if (kDebugMode) {
+        print("Add Cart $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -671,7 +727,10 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
-      logger.d("Add Cart  ${e.toString()}");
+      if (kDebugMode) {
+        print("Remove Product Cart $e");
+      }
+
     } finally {
       _showProgress.value = false;
     }
@@ -686,6 +745,9 @@ class HomeController extends GetxController {
       _bookingHistoryListModel.value = await HomeAPI.bookingHistory();
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Get Booking History $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -698,6 +760,9 @@ class HomeController extends GetxController {
       _orderIdModel.value = await HomeAPI.orderIdGet();
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Get Order Id $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -715,6 +780,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Upload Port Folio $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -728,6 +796,9 @@ class HomeController extends GetxController {
           await HomeAPI.reviewListDataGet(appointmentId: appointmentId);
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Get Review Data List $e");
+      }
       logger.d(e);
     } finally {
       _showProgress.value = false;
@@ -755,6 +826,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Add Service Review$e");
+      }
     } finally {
       _showAddProgress.value = false;
     }
@@ -780,6 +854,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Add Product Review $e");
+      }
     } finally {
       _showAddProgress.value = false;
     }
@@ -805,6 +882,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Add Artiest Review $e");
+      }
     } finally {
       _showAddProgress.value = false;
     }
@@ -818,7 +898,9 @@ class HomeController extends GetxController {
           await HomeAPI.getArtiestPortfolio(artistId: artistId);
     } catch (e) {
       showError(e);
-      logger.d(e);
+      if (kDebugMode) {
+        print("Get Artiest Portfolio1 $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -831,7 +913,9 @@ class HomeController extends GetxController {
       _blogDataModel.value = await HomeAPI.getBlogData(lat: lat, lng: lng);
     } catch (e) {
       showError(e);
-      logger.d(e);
+      if (kDebugMode) {
+        print("Get Blog Data$e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -847,6 +931,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Add Fav Blog  $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -862,6 +949,9 @@ class HomeController extends GetxController {
       }
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Remove Blog  $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -874,6 +964,9 @@ class HomeController extends GetxController {
       _favBlogDataModel.value = await HomeAPI.getFavBlogData();
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Get Fav Blog Data $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -886,6 +979,9 @@ class HomeController extends GetxController {
       _reviewRatingUserModel.value = await HomeAPI.getReviewRating();
     } catch (e) {
       showError(e);
+      if (kDebugMode) {
+        print("Do Review $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -900,7 +996,9 @@ class HomeController extends GetxController {
           await HomeAPI.searchForSalon(query: query, lat: lat, lng: lng);
     } catch (e) {
       showError(e);
-      logger.d("Search  Data  Error $e");
+      if (kDebugMode) {
+        print("Search Data Error $e");
+      }
     } finally {
       _showProgress.value = false;
     }
@@ -926,6 +1024,9 @@ class HomeController extends GetxController {
         callback.call();
       }
     } catch (e) {
+      if (kDebugMode) {
+        print("Get Saved Address $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -954,6 +1055,9 @@ class HomeController extends GetxController {
         callback.call();
       }
     } catch (e) {
+      if (kDebugMode) {
+        print("Get Saved Edit Address $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -966,6 +1070,9 @@ class HomeController extends GetxController {
       _showProgress.value = true;
       _saveAddressModel.value = await HomeAPI.getSaveAddressUser();
     } catch (e) {
+      if (kDebugMode) {
+        print("Get Saved Address $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -979,6 +1086,9 @@ class HomeController extends GetxController {
       _artistSearchModel.value =
           await HomeAPI.searchArtiest(salonId: salonId, q: q);
     } catch (e) {
+      if (kDebugMode) {
+        print("Get Search Artiest $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -995,6 +1105,9 @@ class HomeController extends GetxController {
         callback.call();
       }
     } catch (e) {
+      if (kDebugMode) {
+        print("Delete Address $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -1008,6 +1121,9 @@ class HomeController extends GetxController {
       _artistPopularServicesModel.value =
           await HomeAPI.getPopularServiceByYourStylist(stylistId);
     } catch (e) {
+      if (kDebugMode) {
+        print("Get Popular Service $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -1025,6 +1141,9 @@ class HomeController extends GetxController {
         }
       }
     } catch (e) {
+      if (kDebugMode) {
+        print("Add View For Blog Section $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -1038,6 +1157,9 @@ class HomeController extends GetxController {
       _salonIdReviewsModel.value =
           await HomeAPI.salonIdToReview(salonId: salonId);
     } catch (e) {
+      if (kDebugMode) {
+        print("Get Salon Review $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -1050,6 +1172,9 @@ class HomeController extends GetxController {
       _showProgress.value = true;
       _promoCodeModel.value = await HomeAPI.getPromoCode(lat: lat, lng: lng);
     } catch (e) {
+      if (kDebugMode) {
+        print("GET PROMO-CODE $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -1062,6 +1187,9 @@ class HomeController extends GetxController {
       _showProgress.value = true;
       _promoCodeModelList.value = await HomeAPI.getPromoCodeList();
     } catch (e) {
+      if (kDebugMode) {
+        print("GetListPromoCode $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -1077,6 +1205,9 @@ class HomeController extends GetxController {
         callback.call();
       }
     } catch (e) {
+      if (kDebugMode) {
+        print("doApplyPromoCode $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;
@@ -1092,6 +1223,9 @@ class HomeController extends GetxController {
         callback.call();
       }
     } catch (e) {
+      if (kDebugMode) {
+        print("doRemovePromoCode $e");
+      }
       showError(e);
     } finally {
       _showProgress.value = false;

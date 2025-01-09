@@ -6,9 +6,23 @@ import '../../../constant/assetsconstant.dart';
 
 class PromoCodeListTile extends StatelessWidget {
   final VoidCallback onTapApplyBtn;
-  final PromoCode promoCode;
+
+
+  final  int amount;
+  final  String maxDiscount;
+  final String minOrder;
+  final String id;
+  final String title;
+  final String description;
+  final String image;
+  final String startsAt;
+  final String endsAt;
+  final String code;
+  final String type;
+
+
   const PromoCodeListTile(
-      {super.key, required this.onTapApplyBtn, required this.promoCode});
+      {super.key, required this.onTapApplyBtn, required this.amount, required this.maxDiscount, required this.minOrder, required this.id, required this.title, required this.description, required this.image, required this.startsAt, required this.endsAt, required this.code, required this.type,  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +48,11 @@ class PromoCodeListTile extends StatelessWidget {
                       color: Colors.orange,
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    child: promoCode.type == "percentage"
-                        ? Text('Up To ${promoCode.amount}% OFF',
+                    child: type == "percentage"
+                        ? Text('Up To $amount% OFF',
                             style: AppTextTheme.bold
                                 .copyWith(color: ColorConstant.whiteColor))
-                        : Text('Up To ${promoCode.amount} OFF',
+                        : Text('Up To $amount OFF',
                             style: AppTextTheme.bold
                                 .copyWith(color: ColorConstant.whiteColor)),
                   ),
@@ -66,19 +80,19 @@ class PromoCodeListTile extends StatelessWidget {
                     height: 25,
                   ),
                   const SizedBox(width: 10),
-                  Text(promoCode.title ?? "",
+                  Text(title ?? "",
                       style: AppTextTheme.bold.copyWith(
                           fontSize: 16, color: ColorConstant.blackColor)),
                 ],
               ),
               const SizedBox(height: 10),
-              Text(promoCode.description ?? '',
+              Text(description ?? '',
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.medium
                       .copyWith(color: ColorConstant.blackColor)),
               const SizedBox(height: 10),
               Text(
-                promoCode.code ?? '',
+                code ?? '',
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(color: ColorConstant.primaryColor),
