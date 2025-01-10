@@ -143,6 +143,8 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                                   setState(() {
                                     widget.blogData.isFavourite =
                                         !(widget.blogData.isFavourite ?? false);
+
+
                                     if (widget.blogData.isFavourite ?? false) {
                                       _homeController.doAddFavBlog(
                                           callback: () {},

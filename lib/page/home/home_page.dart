@@ -57,6 +57,11 @@ class _HomePageState extends State<HomePage> {
         );
         _homeController.doGetMakePackageData();
         _homeController.doGetPromoCode(
+            fourPlusRating: false,
+            homeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
+            nearest: false,
+            orderBy: "",
+            serviceGender: selectedGender.value == 0 ? "male" : "female",
             lat: double.parse(
                 SharedPrefs.readStringValue(PrefConstants.latitude)),
             lng: double.parse(
@@ -143,13 +148,26 @@ class _HomePageState extends State<HomePage> {
                                               : "female",
                                         );
                                         _homeController.doGetMakePackageData();
+
                                         _homeController.doGetPromoCode(
+                                            fourPlusRating: false,
+                                            homeService:
+                                                SharedPrefs.readBoolValue(
+                                                    PrefConstants
+                                                        .isHomeService),
+                                            nearest: false,
+                                            orderBy: "",
+                                            serviceGender:
+                                                selectedGender.value == 0
+                                                    ? "male"
+                                                    : "female",
                                             lat: double.parse(
                                                 SharedPrefs.readStringValue(
                                                     PrefConstants.latitude)),
                                             lng: double.parse(
                                                 SharedPrefs.readStringValue(
                                                     PrefConstants.longitude)));
+
                                         _homeController.doGetHomeSalonList(
                                             serviceGender:
                                                 selectedGender.value == 0
@@ -392,10 +410,18 @@ class _HomePageState extends State<HomePage> {
                       );
                       _homeController.doGetMakePackageData();
                       _homeController.doGetPromoCode(
+                          fourPlusRating: false,
+                          homeService: SharedPrefs.readBoolValue(
+                              PrefConstants.isHomeService),
+                          nearest: false,
+                          orderBy: "",
+                          serviceGender:
+                              selectedGender.value == 0 ? "male" : "female",
                           lat: double.parse(SharedPrefs.readStringValue(
                               PrefConstants.latitude)),
                           lng: double.parse(SharedPrefs.readStringValue(
                               PrefConstants.longitude)));
+
                       _homeController.doGetHomeSalonList(
                           serviceGender:
                               selectedGender.value == 0 ? "male" : "female",
@@ -1071,11 +1097,21 @@ class _HomePageState extends State<HomePage> {
                                     : "female",
                               );
                               _homeController.doGetMakePackageData();
+
                               _homeController.doGetPromoCode(
+                                  fourPlusRating: false,
+                                  homeService: SharedPrefs.readBoolValue(
+                                      PrefConstants.isHomeService),
+                                  nearest: false,
+                                  orderBy: "",
+                                  serviceGender: selectedGender.value == 0
+                                      ? "male"
+                                      : "female",
                                   lat: double.parse(SharedPrefs.readStringValue(
                                       PrefConstants.latitude)),
                                   lng: double.parse(SharedPrefs.readStringValue(
                                       PrefConstants.longitude)));
+
                               _homeController.doGetHomeSalonList(
                                   serviceGender: selectedGender.value == 0
                                       ? "male"
@@ -1235,6 +1271,24 @@ class _HomePageState extends State<HomePage> {
                                   orderBy: "",
                                   nearest: false,
                                   fourPlusRating: false);
+
+                              _homeController.doGetPromoCode(
+                                  fourPlusRating: false,
+                                  homeService: SharedPrefs.readBoolValue(
+                                      PrefConstants.isHomeService),
+                                  nearest: false,
+                                  orderBy: dropdownvalue == "Sort By"
+                                      ? ""
+                                      : dropdownvalue == "Newest"
+                                          ? "createdAt"
+                                          : "name",
+                                  serviceGender: selectedGender.value == 0
+                                      ? "male"
+                                      : "female",
+                                  lat: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.latitude)),
+                                  lng: double.parse(SharedPrefs.readStringValue(
+                                      PrefConstants.longitude)));
                             });
                           },
                         ),
@@ -1275,6 +1329,27 @@ class _HomePageState extends State<HomePage> {
                             onChanged: (value) {
                               setState(() {
                                 dropdownvalue = value ?? "";
+
+                                _homeController.doGetPromoCode(
+                                    fourPlusRating: false,
+                                    homeService: SharedPrefs.readBoolValue(
+                                        PrefConstants.isHomeService),
+                                    nearest: false,
+                                    orderBy: dropdownvalue == "Sort By"
+                                        ? ""
+                                        : dropdownvalue == "Newest"
+                                            ? "createdAt"
+                                            : "name",
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)));
+
                                 _homeController.doGetHomeSalonList(
                                     serviceGender: selectedGender.value == 0
                                         ? "male"
@@ -1368,6 +1443,26 @@ class _HomePageState extends State<HomePage> {
                                             : "name",
                                     nearest: true,
                                     fourPlusRating: false);
+
+                                _homeController.doGetPromoCode(
+                                    fourPlusRating: false,
+                                    homeService: SharedPrefs.readBoolValue(
+                                        PrefConstants.isHomeService),
+                                    nearest: true,
+                                    orderBy: dropdownvalue == "Sort By"
+                                        ? ""
+                                        : dropdownvalue == "Newest"
+                                            ? "createdAt"
+                                            : "name",
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)));
                               } else {
                                 select = 0;
                                 _homeController.doGetHomeSalonList(
@@ -1390,6 +1485,26 @@ class _HomePageState extends State<HomePage> {
                                             : "name",
                                     nearest: false,
                                     fourPlusRating: false);
+
+                                _homeController.doGetPromoCode(
+                                    fourPlusRating: false,
+                                    homeService: SharedPrefs.readBoolValue(
+                                        PrefConstants.isHomeService),
+                                    nearest: false,
+                                    orderBy: dropdownvalue == "Sort By"
+                                        ? ""
+                                        : dropdownvalue == "Newest"
+                                            ? "createdAt"
+                                            : "name",
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)));
                               }
                             });
                           },
@@ -1444,6 +1559,26 @@ class _HomePageState extends State<HomePage> {
                                             : "name",
                                     nearest: false,
                                     fourPlusRating: true);
+
+                                _homeController.doGetPromoCode(
+                                    fourPlusRating: true,
+                                    homeService: SharedPrefs.readBoolValue(
+                                        PrefConstants.isHomeService),
+                                    nearest: false,
+                                    orderBy: dropdownvalue == "Sort By"
+                                        ? ""
+                                        : dropdownvalue == "Newest"
+                                            ? "createdAt"
+                                            : "name",
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)));
                               } else {
                                 select = 0;
                                 _homeController.doGetHomeSalonList(
@@ -1466,6 +1601,26 @@ class _HomePageState extends State<HomePage> {
                                             : "name",
                                     nearest: false,
                                     fourPlusRating: false);
+
+                                _homeController.doGetPromoCode(
+                                    fourPlusRating: false,
+                                    homeService: SharedPrefs.readBoolValue(
+                                        PrefConstants.isHomeService),
+                                    nearest: false,
+                                    orderBy: dropdownvalue == "Sort By"
+                                        ? ""
+                                        : dropdownvalue == "Newest"
+                                            ? "createdAt"
+                                            : "name",
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)));
                               }
                             });
                           },
@@ -1568,8 +1723,18 @@ class _HomePageState extends State<HomePage> {
         _homeController.doGetHomeCategory(
           gender: selectedGender.value == 0 ? "male" : "female",
         );
+
         _homeController.doGetPromoCode(
-            lat: position.latitude, lng: position.longitude);
+            fourPlusRating: false,
+            homeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
+            nearest: false,
+            orderBy: "",
+            serviceGender: selectedGender.value == 0 ? "male" : "female",
+            lat: double.parse(
+                SharedPrefs.readStringValue(PrefConstants.latitude)),
+            lng: double.parse(
+                SharedPrefs.readStringValue(PrefConstants.longitude)));
+
         _homeController.doGetHomeSalonList(
             serviceGender: selectedGender.value == 0 ? "male" : "female",
             homeService: atHome,
@@ -1619,7 +1784,16 @@ class _HomePageState extends State<HomePage> {
       _homeController.doGetMakePackageData();
 
       _homeController.doGetPromoCode(
-          lat: position.latitude, lng: position.longitude);
+          fourPlusRating: false,
+          homeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
+          nearest: false,
+          orderBy: "",
+          serviceGender: selectedGender.value == 0 ? "male" : "female",
+          lat:
+              double.parse(SharedPrefs.readStringValue(PrefConstants.latitude)),
+          lng: double.parse(
+              SharedPrefs.readStringValue(PrefConstants.longitude)));
+
       _homeController.doGetHomeSalonList(
           serviceGender: selectedGender.value == 0 ? "male" : "female",
           homeService: atHome,

@@ -24,6 +24,7 @@ import '../profile/add_address_page.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
   final String artiestId;
+
   const AppointmentBookingPage({super.key, required this.artiestId});
 
   @override
@@ -33,6 +34,7 @@ class AppointmentBookingPage extends StatefulWidget {
 class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   final _homeController = Get.find<HomeController>();
   final _authController = Get.find<AuthController>();
+
   @override
   void initState() {
     super.initState();
@@ -752,7 +754,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                   .userResponseModel
                                                   .data
                                                   ?.userData
-                                              ?.mobile ??
+                                                  ?.mobile ??
                                               "",
                                           'email': _authController
                                                   .userResponseModel

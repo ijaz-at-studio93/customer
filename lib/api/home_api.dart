@@ -25,6 +25,7 @@ import 'package:salon_customer/model/search_model/search_model.dart';
 import 'package:salon_customer/model/un_available_dates_model.dart';
 import 'package:salon_customer/model/user_booking_qr_code_model.dart';
 import 'package:salon_customer/util/logger.dart';
+
 import '../model/current_booking_list_model.dart';
 import '../model/promo_code/promocode_model.dart';
 
@@ -688,11 +689,23 @@ class HomeAPI {
 
   /*--------------------------  Get PromoCode ----------------------------*/
   static Future<PromoCodeModel> getPromoCode(
-      {required double lat, required double lng}) async {
+      {required double lat,
+      required double lng,
+      required String orderBy,
+      required String serviceGender,
+      required bool nearest,
+      required bool fourPlusRating,
+      required bool homeService}) async {
     final response =
         await DioClient.client.get("user/home/discount-list", queryParameters: {
       'lat': lat,
       'lng': lng,
+      "distanceRadius": 50000,
+      "homeService": homeService,
+      "orderDirection": orderBy == "name" ? "ASC" : "DESC",
+      "nearest": nearest,
+      "fourPlusRating": fourPlusRating,
+      "serviceGender": serviceGender,
     });
     if (response.isSuccess) {
       return PromoCodeModel.fromJson(response.data);

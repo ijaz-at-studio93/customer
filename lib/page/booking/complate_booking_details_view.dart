@@ -7,6 +7,7 @@ import 'package:salon_customer/page/booking/widget/product_rating_list_tile.dart
 import 'package:salon_customer/page/booking/widget/service_rating_list_tile.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
+
 import '../../project_specific/progressbar_view.dart';
 import 'widget/artist_rating_list_tile.dart';
 
@@ -64,35 +65,62 @@ class _CompleteBookingDetailsViewState
                   child: _homeController.showProgress
                       ? const ProgressBarView()
                       : overall == "0"
-                          ? _homeController.getReviewDataListModel.data
-                                      ?.services?.isEmpty ??
+                          ? _homeController.getReviewDataListModel.data?.artists
+                                      ?.isEmpty ??
                                   false
                               ? const NoItemsWidget(
-                                  text: "No Any Service Data Found")
+                                  text: "No Any Artists Found")
                               : ListView.builder(
                                   padding: EdgeInsets.zero,
                                   shrinkWrap: true,
                                   itemCount: _homeController
                                           .getReviewDataListModel
                                           .data
-                                          ?.services
+                                          ?.artists
                                           ?.length ??
                                       0,
                                   itemBuilder: (context, i) {
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 5),
-                                      child: ServiceRatingListTile(
-                                        appointmentId: widget.appointmentId,
-                                        servicesModel: _homeController
+                                      child: ArtistRatingListTile(
+                                        artists: _homeController
                                             .getReviewDataListModel
                                             .data!
-                                            .services![i],
+                                            .artists![i],
+                                        appointmentId: widget.appointmentId,
                                       ),
                                     );
                                   })
                           : overall == "1"
                               ? _homeController.getReviewDataListModel.data
+                                          ?.services?.isEmpty ??
+                                      false
+                                  ? const NoItemsWidget(
+                                      text: "No Any Service Data Found")
+                                  : ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      itemCount: _homeController
+                                              .getReviewDataListModel
+                                              .data
+                                              ?.services
+                                              ?.length ??
+                                          0,
+                                      itemBuilder: (context, i) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 5),
+                                          child: ServiceRatingListTile(
+                                            appointmentId: widget.appointmentId,
+                                            servicesModel: _homeController
+                                                .getReviewDataListModel
+                                                .data!
+                                                .services![i],
+                                          ),
+                                        );
+                                      })
+                              : _homeController.getReviewDataListModel.data
                                           ?.products?.isEmpty ??
                                       false
                                   ? const NoItemsWidget(
@@ -116,33 +144,6 @@ class _CompleteBookingDetailsViewState
                                                 .getReviewDataListModel
                                                 .data!
                                                 .products![i],
-                                          ),
-                                        );
-                                      })
-                              : _homeController.getReviewDataListModel.data
-                                          ?.artists?.isEmpty ??
-                                      false
-                                  ? const NoItemsWidget(
-                                      text: "No Any Artists Found")
-                                  : ListView.builder(
-                                      padding: EdgeInsets.zero,
-                                      shrinkWrap: true,
-                                      itemCount: _homeController
-                                              .getReviewDataListModel
-                                              .data
-                                              ?.artists
-                                              ?.length ??
-                                          0,
-                                      itemBuilder: (context, i) {
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 5),
-                                          child: ArtistRatingListTile(
-                                            artists: _homeController
-                                                .getReviewDataListModel
-                                                .data!
-                                                .artists![i],
-                                            appointmentId: widget.appointmentId,
                                           ),
                                         );
                                       })),
@@ -171,7 +172,7 @@ class _CompleteBookingDetailsViewState
               height: Get.height * 0.06,
               child: Center(
                 child: Text(
-                  "Service",
+                  "Stylist", //   "Salon",
                   style: AppTextTheme.medium.copyWith(
                       fontSize: 16,
                       color: overall == "0"
@@ -181,7 +182,8 @@ class _CompleteBookingDetailsViewState
               ),
             ),
             "1": Text(
-              "Product",
+              /*"Product",*/
+              "Salon",
               style: AppTextTheme.medium.copyWith(
                   fontSize: 16,
                   color: overall == "1"
@@ -189,7 +191,8 @@ class _CompleteBookingDetailsViewState
                       : ColorConstant.grayTextColor),
             ),
             "2": Text(
-              "Artist",
+              // "Stylist",
+              "Product",
               style: AppTextTheme.medium.copyWith(
                   fontSize: 16,
                   color: overall == "2"

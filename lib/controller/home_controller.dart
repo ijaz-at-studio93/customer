@@ -1167,10 +1167,18 @@ class HomeController extends GetxController {
   }
 
   /*--------------------------- Get  PromoCode -------------------------*/
-  doGetPromoCode({required double lat, required double lng}) async {
+  doGetPromoCode({required double lat, required double lng,
+
+    required String orderBy,
+    required String serviceGender,
+    required bool nearest,
+    required bool fourPlusRating,
+    required bool homeService}) async {
     try {
       _showProgress.value = true;
-      _promoCodeModel.value = await HomeAPI.getPromoCode(lat: lat, lng: lng);
+      _promoCodeModel.value = await HomeAPI.getPromoCode(lat: lat, lng: lng,
+      fourPlusRating:fourPlusRating,homeService:homeService ,nearest:nearest ,orderBy: orderBy,serviceGender:serviceGender
+      );
     } catch (e) {
       if (kDebugMode) {
         print("GET PROMO-CODE $e");
