@@ -60,7 +60,7 @@ class PromoCode {
 
   PromoCode.fromJson(Map<String, dynamic> json) {
     amount = json['amount'];
-    maxDiscount = json['maxDiscount'];
+    maxDiscount = json['maxDiscount'].toString();
     minOrder = json['minOrder'].toString();
     id = json['id'];
     title = json['title'];

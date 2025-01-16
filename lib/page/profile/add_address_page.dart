@@ -8,6 +8,7 @@ import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/get_location_page.dart';
+
 import 'widget/saved_address_widget.dart';
 
 class AddAddressPage extends StatefulWidget {
@@ -47,7 +48,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
         ),
         centerTitle: true,
         title: Text(
-          "Add Address",
+          widget.isSelect ? "Select Home Address" : "Add Address",
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),

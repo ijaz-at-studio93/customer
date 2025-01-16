@@ -139,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(width: 12),
                 SizedBox(
-                  width: Get.width * 0.72,
+                  width: Get.width * 0.7,
                   child: TextField(
                     controller: _mobileTextEditingController,
                     keyboardType: TextInputType.phone,

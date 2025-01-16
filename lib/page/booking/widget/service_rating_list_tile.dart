@@ -99,7 +99,7 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
                         ),
                         const SizedBox(width: 5),
                         SizedBox(
-                          width: Get.width * 0.5,
+                          width: Get.width * 0.4,
                           child: Text(
                             maxLines: 3,
                             widget.servicesModel.salonAddress ?? "",

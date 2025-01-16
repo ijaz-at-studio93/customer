@@ -1129,79 +1129,109 @@ class _HomePageState extends State<HomePage> {
                             },
                           ));
                     },
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 15),
-                      decoration: BoxDecoration(
-                        color: ColorConstant.whiteColor,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border(
-                          right: BorderSide(
-                              width: 9,
-                              color: changeTheme(SharedPrefs.readStringValue(
-                                      PrefConstants.gender)) ??
-                                  Colors.transparent),
-                        ),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x0A000000),
-                            blurRadius: 8.20,
-                            offset: Offset(1, 1),
-                            spreadRadius: 0,
-                          )
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          CachedNetworkImage(
-                            height: 78,
-                            width: 78,
-                            fit: BoxFit.cover,
-                            imageUrl:
-                                "${APIConstants.image}${_homeController.getPromoCodeModel.data?[index].image}",
-                            placeholder: (context, url) => const Image(
-                              image: AssetImage(AssetsConstant.offer),
-                              height: 78,
-                              width: 78,
-                              fit: BoxFit.cover,
+                    child: Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 15),
+                          decoration: BoxDecoration(
+                            color: ColorConstant.whiteColor,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border(
+                              right: BorderSide(
+                                  width: 9,
+                                  color: changeTheme(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.gender)) ??
+                                      Colors.transparent),
                             ),
-                            errorWidget: (context, url, error) => const Image(
-                              image: AssetImage(AssetsConstant.offer),
-                              height: 78,
-                              width: 78,
-                              fit: BoxFit.cover,
-                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x0A000000),
+                                blurRadius: 8.20,
+                                offset: Offset(1, 1),
+                                spreadRadius: 0,
+                              )
+                            ],
                           ),
-                          const Dash(
-                              direction: Axis.vertical,
-                              length: 100,
-                              dashLength: 3,
-                              dashColor: ColorConstant.grayColor),
-                          const SizedBox(width: 17),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
+                          child: Row(
                             children: [
-                              Text(
-                                _homeController
-                                        .getPromoCodeModel.data?[index].title ??
-                                    "",
-                                style: AppTextTheme.bold.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 20),
+                              CachedNetworkImage(
+                                height: 78,
+                                width: 78,
+                                fit: BoxFit.cover,
+                                imageUrl:
+                                    "${APIConstants.image}${_homeController.getPromoCodeModel.data?[index].image}",
+                                placeholder: (context, url) => const Image(
+                                  image: AssetImage(AssetsConstant.offer),
+                                  height: 78,
+                                  width: 78,
+                                  fit: BoxFit.cover,
+                                ),
+                                errorWidget: (context, url, error) =>
+                                    const Image(
+                                  image: AssetImage(AssetsConstant.offer),
+                                  height: 78,
+                                  width: 78,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
-                              const SizedBox(height: 5),
-                              Text(
-                                _homeController.getPromoCodeModel.data?[index]
-                                        .description ??
-                                    "",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.grayColor,
-                                    fontSize: 13),
+                              const Dash(
+                                  direction: Axis.vertical,
+                                  length: 100,
+                                  dashLength: 3,
+                                  dashColor: ColorConstant.grayColor),
+                              const SizedBox(width: 17),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    _homeController.getPromoCodeModel
+                                            .data?[index].title ??
+                                        "",
+                                    style: AppTextTheme.bold.copyWith(
+                                        color: ColorConstant.blackColor,
+                                        fontSize: 20),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _homeController.getPromoCodeModel
+                                                .data?[index].type ==
+                                            "percentage"
+                                        ? "${_homeController.getPromoCodeModel.data?[index].amount} % Off"
+                                        : "₹ ${_homeController.getPromoCodeModel.data?[index].amount} Off",
+                                    style: AppTextTheme.bold.copyWith(
+                                        color: ColorConstant.blackColor,
+                                        fontSize: 15),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "Above - ${_homeController.getPromoCodeModel.data?[index].minOrder ?? ""}",
+                                    style: AppTextTheme.medium.copyWith(
+                                        color: ColorConstant.blackColor,
+                                        fontSize: 13),
+                                  ),
+                                  const SizedBox(height: 2),
+                                ],
                               ),
                             ],
-                          )
-                        ],
-                      ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 2,
+                          right: 30,
+                          child: SizedBox(
+                            child: Text(
+                              "By - ${_homeController.getPromoCodeModel.data?[index].salon?.name ?? ""}",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.grayColor, fontSize: 13),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 }),
