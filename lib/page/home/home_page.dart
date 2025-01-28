@@ -23,7 +23,6 @@ import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-
 import '../../constant/variable_constant.dart';
 import '../../util/logger.dart';
 import '../profile/profile_page.dart';
@@ -78,6 +77,9 @@ class _HomePageState extends State<HomePage> {
             orderBy: "",
             nearest: false,
             fourPlusRating: false);
+        if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
+          SharedPrefs.writeValue(PrefConstants.gender, "0");
+        }
       });
     } else {
       getCurrentLatLng();
@@ -333,130 +335,132 @@ class _HomePageState extends State<HomePage> {
 
   /*--------------  Header Widget ----------------*/
   _headerWidget() {
-    return Container(
-      color: ColorConstant.whiteColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GestureDetector(
-            onTap: () {
-              Get.to(() => GoogleMapGetLocation(
-                    callback: () {
-                      _homeController.doGetHomeSalonList(
-                          serviceGender:
-                              selectedGender.value == 0 ? "male" : "female",
-                          homeService: atHome,
-                          offset: 1,
-                          size: 50,
-                          lat: double.parse(SharedPrefs.readStringValue(
-                              PrefConstants.latitude)),
-                          lng: double.parse(SharedPrefs.readStringValue(
-                              PrefConstants.longitude)),
-                          orderBy: "",
-                          nearest: false,
-                          fourPlusRating: false);
-                    },
-                  ));
-            },
-            child: Container(
-              color: Colors.transparent,
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Image.asset(
-                    AssetsConstant.location,
-                    width: 35,
-                    height: 35,
-                    color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),
-                  ),
-                  const SizedBox(width: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _authController.userCity,
-                        style: AppTextTheme.bold.copyWith(
-                            color: ColorConstant.blackColor, fontSize: 18),
-                      ),
-                      const SizedBox(height: 3),
-                      _homeController.showProgress
-                          ? const SizedBox()
-                          : SizedBox(
-                              width: Get.width * 0.6,
-                              child: Text(
-                                _authController.userCurrentLocation,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.grayColor,
-                                    fontSize: 12),
+    return Obx(
+      () => Container(
+        color: ColorConstant.whiteColor,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                Get.to(() => GoogleMapGetLocation(
+                      callback: () {
+                        _homeController.doGetHomeSalonList(
+                            serviceGender:
+                                selectedGender.value == 0 ? "male" : "female",
+                            homeService: atHome,
+                            offset: 1,
+                            size: 50,
+                            lat: double.parse(SharedPrefs.readStringValue(
+                                PrefConstants.latitude)),
+                            lng: double.parse(SharedPrefs.readStringValue(
+                                PrefConstants.longitude)),
+                            orderBy: "",
+                            nearest: false,
+                            fourPlusRating: false);
+                      },
+                    ));
+              },
+              child: Container(
+                color: Colors.transparent,
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.asset(
+                      AssetsConstant.location,
+                      width: 35,
+                      height: 35,
+                      color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
+                    ),
+                    const SizedBox(width: 8),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          _authController.userCity,
+                          style: AppTextTheme.bold.copyWith(
+                              color: ColorConstant.blackColor, fontSize: 18),
+                        ),
+                        const SizedBox(height: 3),
+                        _homeController.showProgress
+                            ? const SizedBox()
+                            : SizedBox(
+                                width: Get.width * 0.6,
+                                child: Text(
+                                  _authController.userCurrentLocation,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppTextTheme.medium.copyWith(
+                                      color: ColorConstant.grayColor,
+                                      fontSize: 12),
+                                ),
                               ),
-                            ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          GestureDetector(
-            onTap: () {
-              Get.to(() => ProfilePage(
-                    callback: () {
-                      _homeController.doGetHomeCategory(
-                        gender: selectedGender.value == 0 ? "male" : "female",
-                      );
-                      _homeController.doGetMakePackageData();
-                      _homeController.doGetPromoCode(
-                          fourPlusRating: false,
-                          homeService: SharedPrefs.readBoolValue(
-                              PrefConstants.isHomeService),
-                          nearest: false,
-                          orderBy: "",
-                          serviceGender:
-                              selectedGender.value == 0 ? "male" : "female",
-                          lat: double.parse(SharedPrefs.readStringValue(
-                              PrefConstants.latitude)),
-                          lng: double.parse(SharedPrefs.readStringValue(
-                              PrefConstants.longitude)));
+            GestureDetector(
+              onTap: () {
+                Get.to(() => ProfilePage(
+                      callback: () {
+                        _homeController.doGetHomeCategory(
+                          gender: selectedGender.value == 0 ? "male" : "female",
+                        );
+                        _homeController.doGetMakePackageData();
+                        _homeController.doGetPromoCode(
+                            fourPlusRating: false,
+                            homeService: SharedPrefs.readBoolValue(
+                                PrefConstants.isHomeService),
+                            nearest: false,
+                            orderBy: "",
+                            serviceGender:
+                                selectedGender.value == 0 ? "male" : "female",
+                            lat: double.parse(SharedPrefs.readStringValue(
+                                PrefConstants.latitude)),
+                            lng: double.parse(SharedPrefs.readStringValue(
+                                PrefConstants.longitude)));
 
-                      _homeController.doGetHomeSalonList(
-                          serviceGender:
-                              selectedGender.value == 0 ? "male" : "female",
-                          homeService: atHome,
-                          offset: 1,
-                          size: 50,
-                          lat: double.parse(SharedPrefs.readStringValue(
-                              PrefConstants.latitude)),
-                          lng: double.parse(SharedPrefs.readStringValue(
-                              PrefConstants.longitude)),
-                          orderBy: "",
-                          nearest: false,
-                          fourPlusRating: false);
-                    },
-                  ));
-            },
-            child: Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender))),
-              child: Center(
-                child: Text(
-                    _authController.userResponseModel.data?.userData?.name
-                            ?.substring(0, 1)
-                            .toUpperCase() ??
-                        "",
-                    style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.whiteColor, fontSize: 18)),
+                        _homeController.doGetHomeSalonList(
+                            serviceGender:
+                                selectedGender.value == 0 ? "male" : "female",
+                            homeService: atHome,
+                            offset: 1,
+                            size: 50,
+                            lat: double.parse(SharedPrefs.readStringValue(
+                                PrefConstants.latitude)),
+                            lng: double.parse(SharedPrefs.readStringValue(
+                                PrefConstants.longitude)),
+                            orderBy: "",
+                            nearest: false,
+                            fourPlusRating: false);
+                      },
+                    ));
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender))),
+                child: Center(
+                  child: Text(
+                      _authController.userResponseModel.data?.userData?.name
+                              ?.substring(0, 1)
+                              .toUpperCase() ??
+                          "",
+                      style: AppTextTheme.bold.copyWith(
+                          color: ColorConstant.whiteColor, fontSize: 18)),
+                ),
               ),
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -602,51 +606,148 @@ class _HomePageState extends State<HomePage> {
           ),
           SizedBox(
             height: 150,
-            child: _homeController
-                        .getLastMakeYourOwnPackageModel.data?.isEmpty ??
-                    false
-                ? Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) {
-                                return MenuDialogWidget(
-                                  categoryListData: _homeController
-                                      .homeCategoryListResponseModel,
-                                  callback: () {
-                                    List<String> storeServiceId = [];
-                                    setState(() {
-                                      for (int i = 0;
-                                          i <
-                                              _homeController
-                                                  .homeCategoryListResponseModel
-                                                  .data!
-                                                  .length;
-                                          i++) {
-                                        if (_homeController
-                                                .homeCategoryListResponseModel
-                                                .data?[i]
-                                                .isSelectCategory ??
-                                            false) {
-                                          storeServiceId.add(_homeController
+            child: Obx(
+              () => _homeController
+                          .getLastMakeYourOwnPackageModel.data?.isEmpty ??
+                      false
+                  ? Row(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return MenuDialogWidget(
+                                    categoryListData: _homeController
+                                        .homeCategoryListResponseModel,
+                                    callback: () {
+                                      List<String> storeServiceId = [];
+                                      setState(() {
+                                        for (int i = 0;
+                                            i <
+                                                _homeController
+                                                    .homeCategoryListResponseModel
+                                                    .data!
+                                                    .length;
+                                            i++) {
+                                          if (_homeController
                                                   .homeCategoryListResponseModel
                                                   .data?[i]
-                                                  .id ??
-                                              "");
+                                                  .isSelectCategory ??
+                                              false) {
+                                            storeServiceId.add(_homeController
+                                                    .homeCategoryListResponseModel
+                                                    .data?[i]
+                                                    .id ??
+                                                "");
+                                          }
                                         }
-                                      }
-                                    });
+                                      });
 
-                                    if (storeServiceId.isNotEmpty) {
-                                      _homeController.doAddPackageOneData(
-                                          serviceCategoryIds: storeServiceId,
-                                          callback: () {
-                                            _homeController
-                                                .doGetMakePackageData();
-                                          });
-                                    }
+                                      if (storeServiceId.isNotEmpty) {
+                                        _homeController.doAddPackageOneData(
+                                            serviceCategoryIds: storeServiceId,
+                                            callback: () {
+                                              _homeController
+                                                  .doGetMakePackageData();
+                                            });
+                                      }
+                                      _homeController.doGetHomeSalonList(
+                                          serviceGender:
+                                              selectedGender.value == 0
+                                                  ? "male"
+                                                  : "female",
+                                          homeService: atHome,
+                                          offset: 1,
+                                          size: 50,
+                                          lat: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.latitude)),
+                                          lng: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.longitude)),
+                                          orderBy: "",
+                                          nearest: false,
+                                          fourPlusRating: false);
+                                    },
+                                  );
+                                });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.only(left: 10),
+                            child: Column(
+                              children: [
+                                Container(
+                                    width: 70,
+                                    height: 70,
+                                    clipBehavior: Clip.antiAlias,
+                                    decoration: ShapeDecoration(
+                                      gradient: RadialGradient(
+                                        center: const Alignment(0.57, 0.07),
+                                        radius: 0.90,
+                                        colors: selectedGender.value == 1
+                                            ? [
+                                                const Color(0xFFFFCAF9),
+                                                Colors.white
+                                              ]
+                                            : [
+                                                const Color(0xFFE1D5FF),
+                                                Colors.white
+                                              ],
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(64),
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Image.asset(
+                                        AssetsConstant.makePackageImage,
+                                        width: 40,
+                                        height: 40,
+                                        color: changeTheme(
+                                            SharedPrefs.readStringValue(
+                                                PrefConstants.gender)),
+                                      ),
+                                    )),
+                                const SizedBox(height: 10),
+                                Text(
+                                  "Make Your \n Package",
+                                  style: AppTextTheme.medium.copyWith(
+                                      color: ColorConstant.blackColor,
+                                      fontSize: 13),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _homeController
+                                      .homeCategoryListResponseModel
+                                      .data
+                                      ?.length ??
+                                  0,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    List<String> storeServiceId = [];
+                                    var id = _homeController
+                                        .homeCategoryListResponseModel
+                                        .data?[index]
+                                        .id;
+
+                                    storeServiceId.add(id ?? "");
+
+                                    _homeController.doAddPackageOneData(
+                                        serviceCategoryIds: storeServiceId,
+                                        callback: () {
+                                          _homeController
+                                              .doGetMakePackageData();
+                                        });
+
                                     _homeController.doGetHomeSalonList(
                                         serviceGender: selectedGender.value == 0
                                             ? "male"
@@ -664,17 +765,285 @@ class _HomePageState extends State<HomePage> {
                                         nearest: false,
                                         fourPlusRating: false);
                                   },
+                                  child: Column(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(100),
+                                        child: CachedNetworkImage(
+                                          height: 70,
+                                          width: 70,
+                                          fit: BoxFit.cover,
+                                          imageUrl: SharedPrefs.readStringValue(
+                                                      PrefConstants.gender) ==
+                                                  "0"
+                                              ? "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageMale}"
+                                              : "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageFemale}",
+                                          placeholder: (context, url) =>
+                                              const Image(
+                                            image: AssetImage(
+                                                AssetsConstant.placeHolder),
+                                            height: 70,
+                                            width: 70,
+                                            fit: BoxFit.cover,
+                                          ),
+                                          errorWidget: (context, url, error) =>
+                                              const Image(
+                                            image: AssetImage(
+                                                AssetsConstant.placeHolder),
+                                            height: 70,
+                                            width: 70,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      SizedBox(
+                                        width: Get.width * 0.25,
+                                        child: Text(
+                                          _homeController
+                                                  .homeCategoryListResponseModel
+                                                  .data?[index]
+                                                  .name ??
+                                              "",
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          style: AppTextTheme.medium.copyWith(
+                                              fontSize: 13,
+                                              color: ColorConstant.blackColor),
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 );
-                              });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Column(
-                            children: [
-                              Container(
-                                  width: 70,
+                              }),
+                        ),
+                      ],
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              scrollDirection: Axis.horizontal,
+                              itemCount: _homeController
+                                      .getLastMakeYourOwnPackageModel
+                                      .data
+                                      ?.length ??
+                                  0,
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    var id = _homeController
+                                        .getLastMakeYourOwnPackageModel
+                                        .data?[index]
+                                        .id;
+
+                                    for (int i = 0;
+                                        i <
+                                            _homeController
+                                                .homeCategoryListResponseModel
+                                                .data!
+                                                .length;
+                                        i++) {
+                                      if (id ==
+                                          _homeController
+                                              .homeCategoryListResponseModel
+                                              .data?[i]
+                                              .id) {
+                                        _homeController
+                                            .homeCategoryListResponseModel
+                                            .data?[i]
+                                            .isSelectCategory = false;
+                                      }
+                                    }
+
+                                    List<String> storeServiceId = [];
+                                    storeServiceId.add(_homeController
+                                            .getLastMakeYourOwnPackageModel
+                                            .data?[index]
+                                            .id ??
+                                        "");
+                                    _homeController.doRemovePackageData(
+                                        serviceCategoryIds: storeServiceId,
+                                        callback: () {
+                                          _homeController
+                                              .doGetMakePackageData();
+                                        });
+                                    _homeController.doGetHomeSalonList(
+                                        serviceGender: selectedGender.value == 0
+                                            ? "male"
+                                            : "female",
+                                        homeService: atHome,
+                                        offset: 1,
+                                        size: 50,
+                                        lat: double.parse(
+                                            SharedPrefs.readStringValue(
+                                                PrefConstants.latitude)),
+                                        lng: double.parse(
+                                            SharedPrefs.readStringValue(
+                                                PrefConstants.longitude)),
+                                        orderBy: "",
+                                        nearest: false,
+                                        fourPlusRating: false);
+                                  },
+                                  child: Column(
+                                    children: [
+                                      Stack(
+                                        clipBehavior: Clip.none,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            child: CachedNetworkImage(
+                                              height: 70,
+                                              width: 70,
+                                              fit: BoxFit.cover,
+                                              imageUrl: SharedPrefs
+                                                          .readStringValue(
+                                                              PrefConstants
+                                                                  .gender) ==
+                                                      "0"
+                                                  ? "${APIConstants.image}${_homeController.getLastMakeYourOwnPackageModel.data?[index].imageMale}"
+                                                  : "${APIConstants.image}${_homeController.getLastMakeYourOwnPackageModel.data?[index].imageFemale}",
+                                              placeholder: (context, url) =>
+                                                  const Image(
+                                                image: AssetImage(
+                                                    AssetsConstant.placeHolder),
+                                                height: 70,
+                                                width: 70,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      const Image(
+                                                image: AssetImage(
+                                                    AssetsConstant.placeHolder),
+                                                height: 70,
+                                                width: 70,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            right: -5,
+                                            top: -1,
+                                            child: Container(
+                                              height: 20,
+                                              width: 20,
+                                              decoration: BoxDecoration(
+                                                  color: changeTheme(SharedPrefs
+                                                      .readStringValue(
+                                                          PrefConstants
+                                                              .gender)),
+                                                  shape: BoxShape.circle),
+                                              child: Center(
+                                                child: Image.asset(
+                                                  AssetsConstant.xMark,
+                                                  color:
+                                                      ColorConstant.whiteColor,
+                                                  width: 10,
+                                                  height: 10,
+                                                ),
+                                              ),
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      SizedBox(
+                                        width: Get.width * 0.25,
+                                        child: Text(
+                                          _homeController
+                                                  .getLastMakeYourOwnPackageModel
+                                                  .data?[index]
+                                                  .name ??
+                                              "",
+                                          textAlign: TextAlign.center,
+                                          maxLines: 2,
+                                          style: AppTextTheme.medium.copyWith(
+                                              fontSize: 13,
+                                              color: ColorConstant.blackColor),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }),
+                        ),
+                        if (_homeController
+                                .getLastMakeYourOwnPackageModel.data?.last !=
+                            null)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 10),
+                            child: GestureDetector(
+                              onTap: () {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return MenuDialogWidget(
+                                        categoryListData: _homeController
+                                            .homeCategoryListResponseModel,
+                                        callback: () {
+                                          List<String> storeServiceId = [];
+                                          setState(() {
+                                            for (int i = 0;
+                                                i <
+                                                    _homeController
+                                                        .homeCategoryListResponseModel
+                                                        .data!
+                                                        .length;
+                                                i++) {
+                                              if (_homeController
+                                                      .homeCategoryListResponseModel
+                                                      .data?[i]
+                                                      .isSelectCategory ??
+                                                  false) {
+                                                storeServiceId.add(_homeController
+                                                        .homeCategoryListResponseModel
+                                                        .data?[i]
+                                                        .id ??
+                                                    "");
+                                              }
+                                            }
+                                          });
+
+                                          if (storeServiceId.isNotEmpty) {
+                                            _homeController.doAddPackageOneData(
+                                                serviceCategoryIds:
+                                                    storeServiceId,
+                                                callback: () {
+                                                  _homeController
+                                                      .doGetMakePackageData();
+                                                });
+                                          }
+                                          _homeController.doGetHomeSalonList(
+                                              serviceGender:
+                                                  selectedGender.value == 0
+                                                      ? "male"
+                                                      : "female",
+                                              homeService: atHome,
+                                              offset: 1,
+                                              size: 50,
+                                              lat: double.parse(
+                                                  SharedPrefs.readStringValue(
+                                                      PrefConstants.latitude)),
+                                              lng: double.parse(
+                                                  SharedPrefs.readStringValue(
+                                                      PrefConstants.longitude)),
+                                              orderBy: "",
+                                              nearest: false,
+                                              fourPlusRating: false);
+                                        },
+                                      );
+                                    });
+                              },
+                              child: Container(
                                   height: 70,
-                                  clipBehavior: Clip.antiAlias,
+                                  width: 70,
+                                  clipBehavior: Clip.none,
                                   decoration: ShapeDecoration(
                                     gradient: RadialGradient(
                                       center: const Alignment(0.57, 0.07),
@@ -695,376 +1064,19 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   child: Center(
                                     child: Image.asset(
-                                      AssetsConstant.makePackageImage,
-                                      width: 40,
-                                      height: 40,
+                                      AssetsConstant.addPackageImage,
+                                      width: 30,
+                                      height: 30,
                                       color: changeTheme(
                                           SharedPrefs.readStringValue(
                                               PrefConstants.gender)),
                                     ),
                                   )),
-                              const SizedBox(height: 10),
-                              Text(
-                                "Make Your \n Package",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 13),
-                              )
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        child: ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _homeController
-                                    .homeCategoryListResponseModel
-                                    .data
-                                    ?.length ??
-                                0,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  List<String> storeServiceId = [];
-                                  var id = _homeController
-                                      .homeCategoryListResponseModel
-                                      .data?[index]
-                                      .id;
-
-                                  storeServiceId.add(id ?? "");
-
-                                  _homeController.doAddPackageOneData(
-                                      serviceCategoryIds: storeServiceId,
-                                      callback: () {
-                                        _homeController.doGetMakePackageData();
-                                      });
-
-                                  _homeController.doGetHomeSalonList(
-                                      serviceGender: selectedGender.value == 0
-                                          ? "male"
-                                          : "female",
-                                      homeService: atHome,
-                                      offset: 1,
-                                      size: 50,
-                                      lat: double.parse(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.latitude)),
-                                      lng: double.parse(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.longitude)),
-                                      orderBy: "",
-                                      nearest: false,
-                                      fourPlusRating: false);
-                                },
-                                child: Column(
-                                  children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(100),
-                                      child: CachedNetworkImage(
-                                        height: 70,
-                                        width: 70,
-                                        fit: BoxFit.cover,
-                                        imageUrl: SharedPrefs.readStringValue(
-                                                    PrefConstants.gender) ==
-                                                "0"
-                                            ? "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageMale}"
-                                            : "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageFemale}",
-                                        placeholder: (context, url) =>
-                                            const Image(
-                                          image: AssetImage(
-                                              AssetsConstant.placeHolder),
-                                          height: 70,
-                                          width: 70,
-                                          fit: BoxFit.cover,
-                                        ),
-                                        errorWidget: (context, url, error) =>
-                                            const Image(
-                                          image: AssetImage(
-                                              AssetsConstant.placeHolder),
-                                          height: 70,
-                                          width: 70,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    SizedBox(
-                                      width: Get.width * 0.25,
-                                      child: Text(
-                                        _homeController
-                                                .homeCategoryListResponseModel
-                                                .data?[index]
-                                                .name ??
-                                            "",
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        style: AppTextTheme.medium.copyWith(
-                                            fontSize: 13,
-                                            color: ColorConstant.blackColor),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
-                            }),
-                      ),
-                    ],
-                  )
-                : Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            scrollDirection: Axis.horizontal,
-                            itemCount: _homeController
-                                    .getLastMakeYourOwnPackageModel
-                                    .data
-                                    ?.length ??
-                                0,
-                            shrinkWrap: true,
-                            itemBuilder: (context, index) {
-                              return GestureDetector(
-                                onTap: () {
-                                  var id = _homeController
-                                      .getLastMakeYourOwnPackageModel
-                                      .data?[index]
-                                      .id;
-
-                                  for (int i = 0;
-                                      i <
-                                          _homeController
-                                              .homeCategoryListResponseModel
-                                              .data!
-                                              .length;
-                                      i++) {
-                                    if (id ==
-                                        _homeController
-                                            .homeCategoryListResponseModel
-                                            .data?[i]
-                                            .id) {
-                                      _homeController
-                                          .homeCategoryListResponseModel
-                                          .data?[i]
-                                          .isSelectCategory = false;
-                                    }
-                                  }
-
-                                  List<String> storeServiceId = [];
-                                  storeServiceId.add(_homeController
-                                          .getLastMakeYourOwnPackageModel
-                                          .data?[index]
-                                          .id ??
-                                      "");
-                                  _homeController.doRemovePackageData(
-                                      serviceCategoryIds: storeServiceId,
-                                      callback: () {
-                                        _homeController.doGetMakePackageData();
-                                      });
-                                  _homeController.doGetHomeSalonList(
-                                      serviceGender: selectedGender.value == 0
-                                          ? "male"
-                                          : "female",
-                                      homeService: atHome,
-                                      offset: 1,
-                                      size: 50,
-                                      lat: double.parse(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.latitude)),
-                                      lng: double.parse(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.longitude)),
-                                      orderBy: "",
-                                      nearest: false,
-                                      fourPlusRating: false);
-                                },
-                                child: Column(
-                                  children: [
-                                    Stack(
-                                      clipBehavior: Clip.none,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius:
-                                              BorderRadius.circular(100),
-                                          child: CachedNetworkImage(
-                                            height: 70,
-                                            width: 70,
-                                            fit: BoxFit.cover,
-                                            imageUrl: SharedPrefs
-                                                        .readStringValue(
-                                                            PrefConstants
-                                                                .gender) ==
-                                                    "0"
-                                                ? "${APIConstants.image}${_homeController.getLastMakeYourOwnPackageModel.data?[index].imageMale}"
-                                                : "${APIConstants.image}${_homeController.getLastMakeYourOwnPackageModel.data?[index].imageFemale}",
-                                            placeholder: (context, url) =>
-                                                const Image(
-                                              image: AssetImage(
-                                                  AssetsConstant.placeHolder),
-                                              height: 70,
-                                              width: 70,
-                                              fit: BoxFit.cover,
-                                            ),
-                                            errorWidget:
-                                                (context, url, error) =>
-                                                    const Image(
-                                              image: AssetImage(
-                                                  AssetsConstant.placeHolder),
-                                              height: 70,
-                                              width: 70,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          right: -5,
-                                          top: -1,
-                                          child: Container(
-                                            height: 20,
-                                            width: 20,
-                                            decoration: BoxDecoration(
-                                                color: changeTheme(
-                                                    SharedPrefs.readStringValue(
-                                                        PrefConstants.gender)),
-                                                shape: BoxShape.circle),
-                                            child: Center(
-                                              child: Image.asset(
-                                                AssetsConstant.xMark,
-                                                color: ColorConstant.whiteColor,
-                                                width: 10,
-                                                height: 10,
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                    const SizedBox(height: 12),
-                                    SizedBox(
-                                      width: Get.width * 0.25,
-                                      child: Text(
-                                        _homeController
-                                                .getLastMakeYourOwnPackageModel
-                                                .data?[index]
-                                                .name ??
-                                            "",
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        style: AppTextTheme.medium.copyWith(
-                                            fontSize: 13,
-                                            color: ColorConstant.blackColor),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              );
-                            }),
-                      ),
-                      if (_homeController
-                              .getLastMakeYourOwnPackageModel.data?.last !=
-                          null)
-                        Padding(
-                          padding: const EdgeInsets.only(right: 10),
-                          child: GestureDetector(
-                            onTap: () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return MenuDialogWidget(
-                                      categoryListData: _homeController
-                                          .homeCategoryListResponseModel,
-                                      callback: () {
-                                        List<String> storeServiceId = [];
-                                        setState(() {
-                                          for (int i = 0;
-                                              i <
-                                                  _homeController
-                                                      .homeCategoryListResponseModel
-                                                      .data!
-                                                      .length;
-                                              i++) {
-                                            if (_homeController
-                                                    .homeCategoryListResponseModel
-                                                    .data?[i]
-                                                    .isSelectCategory ??
-                                                false) {
-                                              storeServiceId.add(_homeController
-                                                      .homeCategoryListResponseModel
-                                                      .data?[i]
-                                                      .id ??
-                                                  "");
-                                            }
-                                          }
-                                        });
-
-                                        if (storeServiceId.isNotEmpty) {
-                                          _homeController.doAddPackageOneData(
-                                              serviceCategoryIds:
-                                                  storeServiceId,
-                                              callback: () {
-                                                _homeController
-                                                    .doGetMakePackageData();
-                                              });
-                                        }
-                                        _homeController.doGetHomeSalonList(
-                                            serviceGender:
-                                                selectedGender.value == 0
-                                                    ? "male"
-                                                    : "female",
-                                            homeService: atHome,
-                                            offset: 1,
-                                            size: 50,
-                                            lat: double.parse(
-                                                SharedPrefs.readStringValue(
-                                                    PrefConstants.latitude)),
-                                            lng: double.parse(
-                                                SharedPrefs.readStringValue(
-                                                    PrefConstants.longitude)),
-                                            orderBy: "",
-                                            nearest: false,
-                                            fourPlusRating: false);
-                                      },
-                                    );
-                                  });
-                            },
-                            child: Container(
-                                height: 70,
-                                width: 70,
-                                clipBehavior: Clip.none,
-                                decoration: ShapeDecoration(
-                                  gradient: RadialGradient(
-                                    center: const Alignment(0.57, 0.07),
-                                    radius: 0.90,
-                                    colors: selectedGender.value == 1
-                                        ? [
-                                            const Color(0xFFFFCAF9),
-                                            Colors.white
-                                          ]
-                                        : [
-                                            const Color(0xFFE1D5FF),
-                                            Colors.white
-                                          ],
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(64),
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Image.asset(
-                                    AssetsConstant.addPackageImage,
-                                    width: 30,
-                                    height: 30,
-                                    color: changeTheme(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.gender)),
-                                  ),
-                                )),
-                          ),
-                        ),
-                    ],
-                  ),
+                      ],
+                    ),
+            ),
           )
         ],
       ),
@@ -1076,165 +1088,172 @@ class _HomePageState extends State<HomePage> {
     return _homeController.getPromoCodeModel.data?.isEmpty ??
             false || _homeController.getPromoCodeModel.data == null
         ? const SizedBox()
-        : SizedBox(
-            height: 100,
-            width: Get.width,
-            child: PageView.builder(
-                clipBehavior: Clip.none,
-                scrollDirection: Axis.horizontal,
-                itemCount: _homeController.getPromoCodeModel.data?.length,
-                itemBuilder: (context, index) {
-                  return GestureDetector(
-                    onTap: () {
-                      Get.to(() => SaloonAfterSelectingServicesPage(
-                            id: _homeController
-                                    .getPromoCodeModel.data?[index].salon?.id ??
-                                "",
-                            callback: () {
-                              _homeController.doGetHomeCategory(
-                                gender: selectedGender.value == 0
-                                    ? "male"
-                                    : "female",
-                              );
-                              _homeController.doGetMakePackageData();
-
-                              _homeController.doGetPromoCode(
-                                  fourPlusRating: false,
-                                  homeService: SharedPrefs.readBoolValue(
-                                      PrefConstants.isHomeService),
-                                  nearest: false,
-                                  orderBy: "",
-                                  serviceGender: selectedGender.value == 0
+        : Obx(
+            () => SizedBox(
+              height: 100,
+              width: Get.width,
+              child: PageView.builder(
+                  clipBehavior: Clip.none,
+                  scrollDirection: Axis.horizontal,
+                  itemCount: _homeController.getPromoCodeModel.data?.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Get.to(() => SaloonAfterSelectingServicesPage(
+                              id: _homeController.getPromoCodeModel.data?[index]
+                                      .salon?.id ??
+                                  "",
+                              callback: () {
+                                _homeController.doGetHomeCategory(
+                                  gender: selectedGender.value == 0
                                       ? "male"
                                       : "female",
-                                  lat: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.latitude)),
-                                  lng: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.longitude)));
+                                );
+                                _homeController.doGetMakePackageData();
 
-                              _homeController.doGetHomeSalonList(
-                                  serviceGender: selectedGender.value == 0
-                                      ? "male"
-                                      : "female",
-                                  homeService: atHome,
-                                  offset: 1,
-                                  size: 50,
-                                  lat: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.latitude)),
-                                  lng: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.longitude)),
-                                  orderBy: "",
-                                  nearest: false,
-                                  fourPlusRating: false);
-                            },
-                          ));
-                    },
-                    child: Stack(
-                      alignment: Alignment.bottomRight,
-                      children: [
-                        Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 15),
-                          decoration: BoxDecoration(
-                            color: ColorConstant.whiteColor,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border(
-                              right: BorderSide(
-                                  width: 9,
-                                  color: changeTheme(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.gender)) ??
-                                      Colors.transparent),
+                                _homeController.doGetPromoCode(
+                                    fourPlusRating: false,
+                                    homeService: SharedPrefs.readBoolValue(
+                                        PrefConstants.isHomeService),
+                                    nearest: false,
+                                    orderBy: "",
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)));
+
+                                _homeController.doGetHomeSalonList(
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    homeService: atHome,
+                                    offset: 1,
+                                    size: 50,
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)),
+                                    orderBy: "",
+                                    nearest: false,
+                                    fourPlusRating: false);
+                              },
+                            ));
+                      },
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 15),
+                            decoration: BoxDecoration(
+                              color: ColorConstant.whiteColor,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border(
+                                right: BorderSide(
+                                    width: 9,
+                                    color: changeTheme(
+                                            SharedPrefs.readStringValue(
+                                                PrefConstants.gender)) ??
+                                        Colors.transparent),
+                              ),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Color(0x0A000000),
+                                  blurRadius: 8.20,
+                                  offset: Offset(1, 1),
+                                  spreadRadius: 0,
+                                )
+                              ],
                             ),
-                            boxShadow: const [
-                              BoxShadow(
-                                color: Color(0x0A000000),
-                                blurRadius: 8.20,
-                                offset: Offset(1, 1),
-                                spreadRadius: 0,
-                              )
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              CachedNetworkImage(
-                                height: 78,
-                                width: 78,
-                                fit: BoxFit.cover,
-                                imageUrl:
-                                    "${APIConstants.image}${_homeController.getPromoCodeModel.data?[index].image}",
-                                placeholder: (context, url) => const Image(
-                                  image: AssetImage(AssetsConstant.offer),
+                            child: Row(
+                              children: [
+                                CachedNetworkImage(
                                   height: 78,
                                   width: 78,
                                   fit: BoxFit.cover,
+                                  imageUrl:
+                                      "${APIConstants.image}${_homeController.getPromoCodeModel.data?[index].image}",
+                                  placeholder: (context, url) => const Image(
+                                    image: AssetImage(AssetsConstant.offer),
+                                    height: 78,
+                                    width: 78,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      const Image(
+                                    image: AssetImage(AssetsConstant.offer),
+                                    height: 78,
+                                    width: 78,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                                errorWidget: (context, url, error) =>
-                                    const Image(
-                                  image: AssetImage(AssetsConstant.offer),
-                                  height: 78,
-                                  width: 78,
-                                  fit: BoxFit.cover,
+                                const Dash(
+                                    direction: Axis.vertical,
+                                    length: 100,
+                                    dashLength: 3,
+                                    dashColor: ColorConstant.grayColor),
+                                const SizedBox(width: 17),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      _homeController.getPromoCodeModel
+                                              .data?[index].title ??
+                                          "",
+                                      style: AppTextTheme.bold.copyWith(
+                                          color: ColorConstant.blackColor,
+                                          fontSize: 20),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      _homeController.getPromoCodeModel
+                                                  .data?[index].type ==
+                                              "percentage"
+                                          ? "${_homeController.getPromoCodeModel.data?[index].amount} % Off"
+                                          : "₹ ${_homeController.getPromoCodeModel.data?[index].amount} Off",
+                                      style: AppTextTheme.bold.copyWith(
+                                          color: ColorConstant.blackColor,
+                                          fontSize: 15),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      "Above - ${_homeController.getPromoCodeModel.data?[index].minOrder ?? ""}",
+                                      style: AppTextTheme.medium.copyWith(
+                                          color: ColorConstant.blackColor,
+                                          fontSize: 13),
+                                    ),
+                                    const SizedBox(height: 2),
+                                  ],
                                 ),
-                              ),
-                              const Dash(
-                                  direction: Axis.vertical,
-                                  length: 100,
-                                  dashLength: 3,
-                                  dashColor: ColorConstant.grayColor),
-                              const SizedBox(width: 17),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    _homeController.getPromoCodeModel
-                                            .data?[index].title ??
-                                        "",
-                                    style: AppTextTheme.bold.copyWith(
-                                        color: ColorConstant.blackColor,
-                                        fontSize: 20),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    _homeController.getPromoCodeModel
-                                                .data?[index].type ==
-                                            "percentage"
-                                        ? "${_homeController.getPromoCodeModel.data?[index].amount} % Off"
-                                        : "₹ ${_homeController.getPromoCodeModel.data?[index].amount} Off",
-                                    style: AppTextTheme.bold.copyWith(
-                                        color: ColorConstant.blackColor,
-                                        fontSize: 15),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    "Above - ${_homeController.getPromoCodeModel.data?[index].minOrder ?? ""}",
-                                    style: AppTextTheme.medium.copyWith(
-                                        color: ColorConstant.blackColor,
-                                        fontSize: 13),
-                                  ),
-                                  const SizedBox(height: 2),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 2,
-                          right: 30,
-                          child: SizedBox(
-                            child: Text(
-                              "By - ${_homeController.getPromoCodeModel.data?[index].salon?.name ?? ""}",
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.grayColor, fontSize: 13),
+                              ],
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+                          Positioned(
+                            bottom: 2,
+                            right: 30,
+                            child: SizedBox(
+                              child: Text(
+                                "By - ${_homeController.getPromoCodeModel.data?[index].salon?.name ?? ""}",
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppTextTheme.medium.copyWith(
+                                    color: ColorConstant.grayColor,
+                                    fontSize: 13),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+            ),
           );
   }
 
@@ -1243,122 +1262,68 @@ class _HomePageState extends State<HomePage> {
   int select = 0;
 
   _saloonsFoundNear() {
-    return Container(
-      color: ColorConstant.whiteColor,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "${_homeController.getHomeSalonList.data?.rows?.length ?? 0} Salons Found Near You",
-                  textScaler: const TextScaler.linear(0.90),
-                  style: AppTextTheme.bold
-                      .copyWith(fontSize: 17, color: ColorConstant.blackColor),
-                ),
-                const SizedBox(width: 5),
-                Container(
-                  height: 50,
-                  color: ColorConstant.whiteColor,
-                  child: Row(
-                    children: [
-                      Text(
-                        "Home Service",
-                        style: AppTextTheme.bold.copyWith(
-                            color: changeTheme(SharedPrefs.readStringValue(
-                                PrefConstants.gender)),
-                            fontSize: 13),
-                      ),
-                      SizedBox(
-                        height: 30,
-                        child: CupertinoSwitch(
-                          value: atHome,
-                          activeColor: changeTheme(SharedPrefs.readStringValue(
-                              PrefConstants.gender)),
-                          onChanged: (bool value) {
-                            setState(() {
-                              atHome = value;
-                              if (atHome) {
-                                SharedPrefs.writeValue(
-                                    PrefConstants.isHomeService, true);
-                              } else {
-                                SharedPrefs.writeValue(
-                                    PrefConstants.isHomeService, false);
-                              }
-                              _homeController.doGetHomeSalonList(
-                                  serviceGender: selectedGender.value == 0
-                                      ? "male"
-                                      : "female",
-                                  homeService: atHome,
-                                  offset: 1,
-                                  size: 50,
-                                  lat: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.latitude)),
-                                  lng: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.longitude)),
-                                  orderBy: "",
-                                  nearest: false,
-                                  fourPlusRating: false);
-
-                              _homeController.doGetPromoCode(
-                                  fourPlusRating: false,
-                                  homeService: SharedPrefs.readBoolValue(
-                                      PrefConstants.isHomeService),
-                                  nearest: false,
-                                  orderBy: dropdownvalue == "Sort By"
-                                      ? ""
-                                      : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : "name",
-                                  serviceGender: selectedGender.value == 0
-                                      ? "male"
-                                      : "female",
-                                  lat: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.latitude)),
-                                  lng: double.parse(SharedPrefs.readStringValue(
-                                      PrefConstants.longitude)));
-                            });
-                          },
-                        ),
-                      ),
-                    ],
+    return Obx(
+      () => Container(
+        color: ColorConstant.whiteColor,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    "${_homeController.getHomeSalonList.data?.rows?.length ?? 0} Salons Found Near You",
+                    textScaler: const TextScaler.linear(0.90),
+                    style: AppTextTheme.bold.copyWith(
+                        fontSize: 17, color: ColorConstant.blackColor),
                   ),
-                )
-              ],
-            ),
-          ),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: SizedBox(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Stack(
+                  const SizedBox(width: 5),
+                  Container(
+                    height: 50,
+                    color: ColorConstant.whiteColor,
+                    child: Row(
                       children: [
-                        DropdownButtonHideUnderline(
-                          child: DropdownButton2<String>(
-                            isExpanded: true,
-                            items: items
-                                .map((String item) => DropdownMenuItem<String>(
-                                      value: item,
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        item,
-                                        style: AppTextTheme.medium.copyWith(
-                                            color: ColorConstant.blackColor,
-                                            fontSize: 13),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ))
-                                .toList(),
-                            value: dropdownvalue,
-                            onChanged: (value) {
+                        Text(
+                          "Home Service",
+                          style: AppTextTheme.bold.copyWith(
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)),
+                              fontSize: 13),
+                        ),
+                        SizedBox(
+                          height: 30,
+                          child: CupertinoSwitch(
+                            value: atHome,
+                            activeColor: changeTheme(
+                                SharedPrefs.readStringValue(
+                                    PrefConstants.gender)),
+                            onChanged: (bool value) {
                               setState(() {
-                                dropdownvalue = value ?? "";
+                                atHome = value;
+                                if (atHome) {
+                                  SharedPrefs.writeValue(
+                                      PrefConstants.isHomeService, true);
+                                } else {
+                                  SharedPrefs.writeValue(
+                                      PrefConstants.isHomeService, false);
+                                }
+                                _homeController.doGetHomeSalonList(
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
+                                    homeService: atHome,
+                                    offset: 1,
+                                    size: 50,
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)),
+                                    orderBy: "",
+                                    nearest: false,
+                                    fourPlusRating: false);
 
                                 _homeController.doGetPromoCode(
                                     fourPlusRating: false,
@@ -1379,346 +1344,408 @@ class _HomePageState extends State<HomePage> {
                                     lng: double.parse(
                                         SharedPrefs.readStringValue(
                                             PrefConstants.longitude)));
-
-                                _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    homeService: atHome,
-                                    offset: 1,
-                                    size: 50,
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : "name",
-                                    nearest: false,
-                                    fourPlusRating: false);
                               });
                             },
-                            buttonStyleData: ButtonStyleData(
-                              height: 40,
-                              width: 160,
-                              padding:
-                                  const EdgeInsets.only(left: 14, right: 14),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: Colors.black26,
-                                ),
-                                color: Colors.white,
-                              ),
-                            ),
-                            iconStyleData: const IconStyleData(
-                              icon: Icon(
-                                Icons.arrow_forward_ios_outlined,
-                              ),
-                              iconSize: 14,
-                              iconEnabledColor: ColorConstant.blackColor,
-                              iconDisabledColor: ColorConstant.blackColor,
-                            ),
-                            dropdownStyleData: DropdownStyleData(
-                              maxHeight: 200,
-                              width: 200,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                color: ColorConstant.whiteColor,
-                              ),
-                              offset: const Offset(-20, 0),
-                            ),
-                            menuItemStyleData: const MenuItemStyleData(
-                              height: 40,
-                            ),
                           ),
-                        ),
-                        Positioned(
-                          left: 10,
-                          top: 12,
-                          child: Image.asset(AssetsConstant.filter,
-                              height: 14, width: 14),
                         ),
                       ],
                     ),
-                    const SizedBox(width: 6),
-                    Row(
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              if (select == 0 || select == 2) {
-                                select = 1;
-                                _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    homeService: atHome,
-                                    offset: 1,
-                                    size: 50,
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : "name",
-                                    nearest: true,
-                                    fourPlusRating: false);
+                  )
+                ],
+              ),
+            ),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: SizedBox(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Stack(
+                        children: [
+                          DropdownButtonHideUnderline(
+                            child: DropdownButton2<String>(
+                              isExpanded: true,
+                              items: items
+                                  .map((String item) =>
+                                      DropdownMenuItem<String>(
+                                        value: item,
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          item,
+                                          style: AppTextTheme.medium.copyWith(
+                                              color: ColorConstant.blackColor,
+                                              fontSize: 13),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ))
+                                  .toList(),
+                              value: dropdownvalue,
+                              onChanged: (value) {
+                                setState(() {
+                                  dropdownvalue = value ?? "";
 
-                                _homeController.doGetPromoCode(
-                                    fourPlusRating: false,
-                                    homeService: SharedPrefs.readBoolValue(
-                                        PrefConstants.isHomeService),
-                                    nearest: true,
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : "name",
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)));
-                              } else {
-                                select = 0;
-                                _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    homeService: atHome,
-                                    offset: 1,
-                                    size: 50,
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : "name",
-                                    nearest: false,
-                                    fourPlusRating: false);
+                                  _homeController.doGetPromoCode(
+                                      fourPlusRating: false,
+                                      homeService: SharedPrefs.readBoolValue(
+                                          PrefConstants.isHomeService),
+                                      nearest: false,
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)));
 
-                                _homeController.doGetPromoCode(
-                                    fourPlusRating: false,
-                                    homeService: SharedPrefs.readBoolValue(
-                                        PrefConstants.isHomeService),
-                                    nearest: false,
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : "name",
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)));
-                              }
-                            });
-                          },
-                          child: Container(
-                            width: Get.width * 0.25,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: select == 1
-                                  ? changeTheme(SharedPrefs.readStringValue(
-                                      PrefConstants.gender))
-                                  : ColorConstant.whiteColor,
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(
-                                  color: ColorConstant.grayBorderColor,
-                                  width: 1),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Nearest",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: select == 1
-                                        ? ColorConstant.whiteColor
-                                        : ColorConstant.blackColor,
-                                    fontSize: 13),
+                                  _homeController.doGetHomeSalonList(
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      homeService: atHome,
+                                      offset: 1,
+                                      size: 50,
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)),
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      nearest: false,
+                                      fourPlusRating: false);
+                                });
+                              },
+                              buttonStyleData: ButtonStyleData(
+                                height: 40,
+                                width: 160,
+                                padding:
+                                    const EdgeInsets.only(left: 14, right: 14),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(
+                                    color: Colors.black26,
+                                  ),
+                                  color: Colors.white,
+                                ),
+                              ),
+                              iconStyleData: const IconStyleData(
+                                icon: Icon(
+                                  Icons.arrow_forward_ios_outlined,
+                                ),
+                                iconSize: 14,
+                                iconEnabledColor: ColorConstant.blackColor,
+                                iconDisabledColor: ColorConstant.blackColor,
+                              ),
+                              dropdownStyleData: DropdownStyleData(
+                                maxHeight: 200,
+                                width: 200,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(14),
+                                  color: ColorConstant.whiteColor,
+                                ),
+                                offset: const Offset(-20, 0),
+                              ),
+                              menuItemStyleData: const MenuItemStyleData(
+                                height: 40,
                               ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 4),
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              if (select == 0 || select == 1) {
-                                select = 2;
-                                _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    homeService: atHome,
-                                    offset: 1,
-                                    size: 50,
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : "name",
-                                    nearest: false,
-                                    fourPlusRating: true);
+                          Positioned(
+                            left: 10,
+                            top: 12,
+                            child: Image.asset(AssetsConstant.filter,
+                                height: 14, width: 14),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 6),
+                      Row(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (select == 0 || select == 2) {
+                                  select = 1;
+                                  _homeController.doGetHomeSalonList(
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      homeService: atHome,
+                                      offset: 1,
+                                      size: 50,
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)),
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      nearest: true,
+                                      fourPlusRating: false);
 
-                                _homeController.doGetPromoCode(
-                                    fourPlusRating: true,
-                                    homeService: SharedPrefs.readBoolValue(
-                                        PrefConstants.isHomeService),
-                                    nearest: false,
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : "name",
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)));
-                              } else {
-                                select = 0;
-                                _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    homeService: atHome,
-                                    offset: 1,
-                                    size: 50,
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : "name",
-                                    nearest: false,
-                                    fourPlusRating: false);
+                                  _homeController.doGetPromoCode(
+                                      fourPlusRating: false,
+                                      homeService: SharedPrefs.readBoolValue(
+                                          PrefConstants.isHomeService),
+                                      nearest: true,
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)));
+                                } else {
+                                  select = 0;
+                                  _homeController.doGetHomeSalonList(
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      homeService: atHome,
+                                      offset: 1,
+                                      size: 50,
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)),
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      nearest: false,
+                                      fourPlusRating: false);
 
-                                _homeController.doGetPromoCode(
-                                    fourPlusRating: false,
-                                    homeService: SharedPrefs.readBoolValue(
-                                        PrefConstants.isHomeService),
-                                    nearest: false,
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : "name",
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)));
-                              }
-                            });
-                          },
-                          child: Container(
-                            width: Get.width * 0.25,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(6),
-                              color: select == 2
-                                  ? changeTheme(SharedPrefs.readStringValue(
-                                      PrefConstants.gender))
-                                  : ColorConstant.whiteColor,
-                              border: Border.all(
-                                  color: ColorConstant.grayBorderColor,
-                                  width: 1),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Rating 4.0+",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: select == 2
-                                        ? ColorConstant.whiteColor
-                                        : ColorConstant.blackColor,
-                                    fontSize: 13),
+                                  _homeController.doGetPromoCode(
+                                      fourPlusRating: false,
+                                      homeService: SharedPrefs.readBoolValue(
+                                          PrefConstants.isHomeService),
+                                      nearest: false,
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)));
+                                }
+                              });
+                            },
+                            child: Container(
+                              width: Get.width * 0.25,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: select == 1
+                                    ? changeTheme(SharedPrefs.readStringValue(
+                                        PrefConstants.gender))
+                                    : ColorConstant.whiteColor,
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                    color: ColorConstant.grayBorderColor,
+                                    width: 1),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Nearest",
+                                  style: AppTextTheme.medium.copyWith(
+                                      color: select == 1
+                                          ? ColorConstant.whiteColor
+                                          : ColorConstant.blackColor,
+                                      fontSize: 13),
+                                ),
                               ),
                             ),
                           ),
-                        ), /*const SizedBox(width: 4),
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              select = 3;
-                            });
-                          },
-                          child: Container(
-                            width: Get.width * 0.25,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(6),
-                              color: select == 3
-                                  ? changeTheme(SharedPrefs.readStringValue(
-                                      PrefConstants.gender))
-                                  : ColorConstant.whiteColor,
-                              border: Border.all(
-                                  color: ColorConstant.grayBorderColor,
-                                  width: 1),
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Great Offers",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: select == 3
-                                        ? ColorConstant.whiteColor
-                                        : ColorConstant.blackColor,
-                                    fontSize: 13),
+                          const SizedBox(width: 4),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                if (select == 0 || select == 1) {
+                                  select = 2;
+                                  _homeController.doGetHomeSalonList(
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      homeService: atHome,
+                                      offset: 1,
+                                      size: 50,
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)),
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      nearest: false,
+                                      fourPlusRating: true);
+
+                                  _homeController.doGetPromoCode(
+                                      fourPlusRating: true,
+                                      homeService: SharedPrefs.readBoolValue(
+                                          PrefConstants.isHomeService),
+                                      nearest: false,
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)));
+                                } else {
+                                  select = 0;
+                                  _homeController.doGetHomeSalonList(
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      homeService: atHome,
+                                      offset: 1,
+                                      size: 50,
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)),
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      nearest: false,
+                                      fourPlusRating: false);
+
+                                  _homeController.doGetPromoCode(
+                                      fourPlusRating: false,
+                                      homeService: SharedPrefs.readBoolValue(
+                                          PrefConstants.isHomeService),
+                                      nearest: false,
+                                      orderBy: dropdownvalue == "Sort By"
+                                          ? ""
+                                          : dropdownvalue == "Newest"
+                                              ? "createdAt"
+                                              : "name",
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)));
+                                }
+                              });
+                            },
+                            child: Container(
+                              width: Get.width * 0.25,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6),
+                                color: select == 2
+                                    ? changeTheme(SharedPrefs.readStringValue(
+                                        PrefConstants.gender))
+                                    : ColorConstant.whiteColor,
+                                border: Border.all(
+                                    color: ColorConstant.grayBorderColor,
+                                    width: 1),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Rating 4.0+",
+                                  style: AppTextTheme.medium.copyWith(
+                                      color: select == 2
+                                          ? ColorConstant.whiteColor
+                                          : ColorConstant.blackColor,
+                                      fontSize: 13),
+                                ),
                               ),
                             ),
-                          ),
-                        ),*/
-                      ],
-                    )
-                  ],
+                          ), /*const SizedBox(width: 4),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                select = 3;
+                              });
+                            },
+                            child: Container(
+                              width: Get.width * 0.25,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6),
+                                color: select == 3
+                                    ? changeTheme(SharedPrefs.readStringValue(
+                                        PrefConstants.gender))
+                                    : ColorConstant.whiteColor,
+                                border: Border.all(
+                                    color: ColorConstant.grayBorderColor,
+                                    width: 1),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  "Great Offers",
+                                  style: AppTextTheme.medium.copyWith(
+                                      color: select == 3
+                                          ? ColorConstant.whiteColor
+                                          : ColorConstant.blackColor,
+                                      fontSize: 13),
+                                ),
+                              ),
+                            ),
+                          ),*/
+                        ],
+                      )
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(height: 5),
-        ],
+            const SizedBox(height: 5),
+          ],
+        ),
       ),
     );
   }
@@ -1729,6 +1756,9 @@ class _HomePageState extends State<HomePage> {
 
   /*--------------------- Current location lat lng --------------------- */
   getCurrentLatLng() async {
+    if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
+      SharedPrefs.writeValue(PrefConstants.gender, "0");
+    }
     await Permission.location.onDeniedCallback(() async {
       await Permission.location.request();
       showMessage("Location services are disabled.");
@@ -1749,34 +1779,33 @@ class _HomePageState extends State<HomePage> {
       SharedPrefs.writeValue(
           PrefConstants.address, _authController.userCurrentLocation);
       SharedPrefs.writeValue(PrefConstants.userCity, _authController.userCity);
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-        _homeController.doGetHomeCategory(
-          gender: selectedGender.value == 0 ? "male" : "female",
-        );
+      _homeController.doGetMakePackageData();
+      _homeController.doGetHomeCategory(
+        gender: selectedGender.value == 0 ? "male" : "female",
+      );
 
-        _homeController.doGetPromoCode(
-            fourPlusRating: false,
-            homeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
-            nearest: false,
-            orderBy: "",
-            serviceGender: selectedGender.value == 0 ? "male" : "female",
-            lat: double.parse(
-                SharedPrefs.readStringValue(PrefConstants.latitude)),
-            lng: double.parse(
-                SharedPrefs.readStringValue(PrefConstants.longitude)));
+      _homeController.doGetPromoCode(
+          fourPlusRating: false,
+          homeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
+          nearest: false,
+          orderBy: "",
+          serviceGender: selectedGender.value == 0 ? "male" : "female",
+          lat:
+              double.parse(SharedPrefs.readStringValue(PrefConstants.latitude)),
+          lng: double.parse(
+              SharedPrefs.readStringValue(PrefConstants.longitude)));
 
-        _homeController.doGetHomeSalonList(
-            serviceGender: selectedGender.value == 0 ? "male" : "female",
-            homeService: atHome,
-            offset: 1,
-            size: 50,
-            lat: position.latitude,
-            lng: position.longitude,
-            orderBy: "",
-            nearest: false,
-            fourPlusRating: false);
-        SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
-      });
+      _homeController.doGetHomeSalonList(
+          serviceGender: selectedGender.value == 0 ? "male" : "female",
+          homeService: atHome,
+          offset: 1,
+          size: 50,
+          lat: position.latitude,
+          lng: position.longitude,
+          orderBy: "",
+          nearest: false,
+          fourPlusRating: false);
+      SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
     }).onPermanentlyDeniedCallback(() async {
       openAppSettings();
       OpenSettings.openLocationSourceSetting();
@@ -1811,7 +1840,11 @@ class _HomePageState extends State<HomePage> {
       SharedPrefs.writeValue(
           PrefConstants.address, _authController.userCurrentLocation);
       SharedPrefs.writeValue(PrefConstants.userCity, _authController.userCity);
+
       _homeController.doGetMakePackageData();
+      _homeController.doGetHomeCategory(
+        gender: selectedGender.value == 0 ? "male" : "female",
+      );
 
       _homeController.doGetPromoCode(
           fourPlusRating: false,

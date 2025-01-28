@@ -34,7 +34,7 @@ class DialogMenuListWidget extends StatelessWidget {
                   width: 70,
                   // Horoscope image
                   fit: BoxFit.cover,
-                  imageUrl: SharedPrefs.readStringValue(PrefConstants.gender) ==
+                  imageUrl:  SharedPrefs.readStringValue(PrefConstants.gender) ==
                           "0"
                       ? "${APIConstants.image}${categoryListData.imageMale}"
                       : "${APIConstants.image}${categoryListData.imageFemale}",
