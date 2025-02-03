@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/model/current_booking_list_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../../constant/color_constant.dart';
 
 class PendingCardWidget extends StatefulWidget {
   final BookingData bookingData;
   final VoidCallback onPress;
+
   const PendingCardWidget(
       {super.key, required this.onPress, required this.bookingData});
 
@@ -151,6 +154,15 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
             ),
           ),
           const SizedBox(height: 10),
+          widget.bookingData.orderStatus != "confirmed"
+              ? Text(
+                  "Awaiting acceptance from stylist",
+                  style: AppTextTheme.bold.copyWith(
+                      fontSize: 18,
+                      color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender))),
+                )
+              : const SizedBox(),
           widget.bookingData.orderStatus == "confirmed"
               ? GestureDetector(
                   onTap: widget.onPress,

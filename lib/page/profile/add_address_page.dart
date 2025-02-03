@@ -63,7 +63,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                 child: Container(
                   height: 1,
                   width: Get.width,
-                  color: ColorConstant.primaryColor,
+                  color: changeTheme(SharedPrefs.readStringValue(
+                      PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
                 ),
               ),
               Text(
@@ -75,7 +77,9 @@ class _AddAddressPageState extends State<AddAddressPage> {
                 child: Container(
                   height: 1,
                   width: Get.width,
-                  color: ColorConstant.primaryColor,
+                  color: changeTheme(SharedPrefs.readStringValue(
+                      PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
                 ),
               ),
             ],
@@ -142,12 +146,16 @@ class _AddAddressPageState extends State<AddAddressPage> {
           children: [
             Row(
               children: [
-                const Icon(Icons.add, color: ColorConstant.primaryColor),
+                  Icon(Icons.add, color: changeTheme(SharedPrefs.readStringValue(
+                    PrefConstants.gender)) ??
+                    ColorConstant.primaryColor,),
                 const SizedBox(width: 10),
                 Text(
                   "Add Address",
                   style: AppTextTheme.medium
-                      .copyWith(color: ColorConstant.primaryColor),
+                      .copyWith(color: changeTheme(SharedPrefs.readStringValue(
+                      PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,),
                 ),
               ],
             ),

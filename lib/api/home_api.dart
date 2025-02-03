@@ -135,12 +135,14 @@ class HomeAPI {
     required String salonId,
     required String lat,
     required String lng,
+    required String serviceGender,
   }) async {
-    final response = await DioClient.client
-        .get("user/salon/$salonId/details", queryParameters: {
-      "lat": lat,
-      "lng": lng,
-    });
+    final response = await DioClient.client.get("user/salon/$salonId/details",
+        queryParameters: {
+          "lat": lat,
+          "lng": lng,
+          "serviceGender": serviceGender
+        });
     if (response.isSuccess) {
       return HomeSalonDetailsModel.fromJson(response.data);
     } else {
@@ -353,12 +355,11 @@ class HomeAPI {
   static Future<ServiceAddCartModel> addProductCart(
       {required String productId,
       required String productSelectedServiceId,
-      required  bool isHomeService
-      }) async {
+      required bool isHomeService}) async {
     final response = await DioClient.client.put("user/cart/add", data: {
       "productId": productId,
       "productSelectedServiceId": productSelectedServiceId,
-      "isHomeService" : isHomeService
+      "isHomeService": isHomeService
     });
     if (response.isSuccess) {
       return ServiceAddCartModel.fromJson(response.data);
@@ -492,7 +493,7 @@ class HomeAPI {
   static Future<BlogDataModel> getBlogData(
       {required double lat, required double lng}) async {
     final response = await DioClient.client.get("user/blog/list",
-        queryParameters: {"lat": lat, "lng": lng, "distanceRadius": 10000});
+        queryParameters: {"lat": lat, "lng": lng, "distanceRadius": 100000000});
     if (response.isSuccess) {
       return BlogDataModel.fromJson(response.data);
     } else {
@@ -739,6 +740,17 @@ class HomeAPI {
   /*---------------- Remove PromoCode --------------------*/
   static Future<bool> promoCodeRemove() async {
     final response = await DioClient.client.delete("user/cart/remove-discount");
+    if (response.isSuccess) {
+      return true;
+    } else {
+      throw response.data;
+    }
+  }
+
+  /*----------------------  Delete Package ---------------------*/
+  static Future<bool> deletePackage() async {
+    final response =
+        await DioClient.client.delete("user/home/make-your-own-package");
     if (response.isSuccess) {
       return true;
     } else {

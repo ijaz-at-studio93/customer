@@ -404,6 +404,11 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                             children: [
                                               Image.asset(
                                                 AssetsConstant.offerIcon,
+                                                color: changeTheme(SharedPrefs
+                                                        .readStringValue(
+                                                            PrefConstants
+                                                                .gender)) ??
+                                                    ColorConstant.primaryColor,
                                                 width: 25,
                                                 height: 25,
                                               ),
@@ -492,6 +497,11 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                               Image.asset(
                                                 AssetsConstant.offerIcon,
                                                 width: 25,
+                                                color: changeTheme(SharedPrefs
+                                                        .readStringValue(
+                                                            PrefConstants
+                                                                .gender)) ??
+                                                    ColorConstant.primaryColor,
                                                 height: 25,
                                               ),
                                               const SizedBox(width: 10),
@@ -1055,7 +1065,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         margin: const EdgeInsets.only(right: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? ColorConstant.primaryColor
+              ? changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                  ColorConstant.primaryColor
               : ColorConstant.whiteColor,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(color: ColorConstant.grayBorderColor, width: 1),
@@ -1073,6 +1085,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       ),
     );
   }
+
+  final Rx<bool> _isMonthChange = false.obs;
+
+  bool get isDialogShow => _isMonthChange.value;
 
   /*---------------  Date Calender Time ------------*/
   EasyDateTimeLine _customBackgroundExample() {
@@ -1096,7 +1112,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     }).toList();
 
     return EasyDateTimeLine(
+      key: ValueKey(selectDate),
+      // Force rebuild when selectDate changes
       onMonthChange: (val) {
+        selectDate = "";
         String inputString = val.toString();
         RegExp regExp = RegExp(r'\d+');
         Iterable<RegExpMatch> matches = regExp.allMatches(inputString);
@@ -1105,21 +1124,27 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         String finalDate =
             "$year-${result.length == 1 ? '0$result' : result}-01";
 
-        selectDate = finalDate;
+        // Update selectDate to the first day of the new month
+        setState(() {
+          selectDate = finalDate;
+        });
+
         _homeController.doGetUnAvailableDatesListData(
-            artiestId: widget.artiestId,
-            date: finalDate,
-            callback: () {
-              _homeController.doGetAvailabilitiesTimeSlot(
-                artiestId: widget.artiestId,
-                date: finalDate,
-              );
-            });
+          artiestId: widget.artiestId,
+          date: finalDate,
+          callback: () {
+            _homeController.doGetAvailabilitiesTimeSlot(
+              artiestId: widget.artiestId,
+              date: finalDate,
+            );
+          },
+        );
       },
       initialDate:
           selectDate == "" ? DateTime.now() : DateTime.parse(selectDate),
       onDateChange: (selectedDate) {
         //`selectedDate` the new date selected.
+        selectDate = "";
         String formatDate = DateFormat("yyyy-MM-dd").format(selectedDate);
         selectDate = formatDate;
         _homeController.doGetAvailabilitiesTimeSlot(
@@ -1148,7 +1173,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     );
   }
 
-  /*-------------- convert AM PM Date Time --------------------*/
+  /*-------------- Convert AM PM Date Time --------------------*/
   String convertTimesToAmPmString(String timeSlot) {
     DateTime time = DateFormat("HH:mm").parse(timeSlot);
     String convertTimeSlot = DateFormat("hh:mm a").format(time);

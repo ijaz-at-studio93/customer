@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/appointment/widget/promocode_list_tile.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 class PromoCodeSheetWidget extends StatefulWidget {
   const PromoCodeSheetWidget({super.key});
@@ -42,9 +44,11 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
           Container(
             height: 50,
             width: Get.width,
-            decoration: const BoxDecoration(
-              color: ColorConstant.primaryColor,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                  ColorConstant.primaryColor,
+              borderRadius: const BorderRadius.only(
                 topRight: Radius.circular(16),
                 topLeft: Radius.circular(16),
               ),
@@ -68,8 +72,8 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                           itemCount: _homeController
                               .getPromoCodeModelList.data?.length,
                           shrinkWrap: true,
-                      itemBuilder: (context, i) {
-                        return PromoCodeListTile(
+                          itemBuilder: (context, i) {
+                            return PromoCodeListTile(
                               id: _homeController
                                       .getPromoCodeModelList.data?[i].id ??
                                   "",
@@ -105,12 +109,14 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                                   "",
                               onTapApplyBtn: () {
                                 Get.back(
-                                result: _homeController
-                                        .getPromoCodeModelList.data?[i].id ??
-                                    "");
-                          },
-                        );
-                      }),
+                                    result: _homeController
+                                            .getPromoCodeModelList
+                                            .data?[i]
+                                            .id ??
+                                        "");
+                              },
+                            );
+                          }),
             ),
           ),
         ],

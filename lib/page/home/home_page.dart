@@ -117,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                   _searchWidget(),
                   const SizedBox(height: 10),
                   _ourService(),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 10),
                   _offer(),
                   _homeController.getPromoCodeModel.data?.isEmpty ?? false
                       ? const SizedBox()
@@ -211,6 +211,15 @@ class _HomePageState extends State<HomePage> {
               child: InkWell(
                 onTap: () {
                   setState(() {
+                    _homeController.doDeletePackage(
+                      callback: () {
+                        _homeController.doGetHomeCategory(
+                          gender: selectedGender.value == 0 ? "male" : "female",
+                        );
+                        _homeController.doGetMakePackageData();
+                      },
+                    );
+
                     selectedGender.value = 0;
                     SharedPrefs.writeValue(
                         PrefConstants.isSelectedGender, true);
@@ -271,6 +280,14 @@ class _HomePageState extends State<HomePage> {
               child: InkWell(
                 onTap: () {
                   setState(() {
+                    _homeController.doDeletePackage(
+                      callback: () {
+                        _homeController.doGetHomeCategory(
+                          gender: selectedGender.value == 0 ? "male" : "female",
+                        );
+                        _homeController.doGetMakePackageData();
+                      },
+                    );
                     selectedGender.value = 1;
                     SharedPrefs.writeValue(
                         PrefConstants.isSelectedGender, true);
@@ -605,7 +622,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           SizedBox(
-            height: 150,
+            height: 118,
             child: Obx(
               () => _homeController
                           .getLastMakeYourOwnPackageModel.data?.isEmpty ??

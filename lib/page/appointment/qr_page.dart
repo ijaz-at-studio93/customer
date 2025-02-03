@@ -17,10 +17,12 @@ import '../bottom_navigation_bar.dart';
 
 class QRCodePage extends StatefulWidget {
   final String appointmentId;
+  final bool isBooking;
 
   const QRCodePage({
     super.key,
     required this.appointmentId,
+    required this.isBooking,
   });
 
   @override
@@ -54,7 +56,11 @@ class _QRCodePageState extends State<QRCodePage> {
         elevation: 0.0,
         leading: IconButton(
             onPressed: () {
-              Get.offAll(() => const BottomNavBarPage());
+              if (widget.isBooking) {
+                Get.offAll(() => const BottomNavBarPage());
+              } else {
+                Get.back();
+              }
             },
             icon: const Icon(Icons.arrow_back)),
       ),
@@ -260,9 +266,7 @@ class _QRCodePageState extends State<QRCodePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          _launchPhone(
-              _homeController.getUserBookingQrCodeModel.data?.salon?.mobile ??
-                  "");
+          _launchPhone("8897090838");
         },
         backgroundColor: ColorConstant.removeStroke,
         child: Image.asset(

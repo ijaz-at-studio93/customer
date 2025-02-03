@@ -65,7 +65,7 @@ class FavSalon {
         this.isFavourite});
 
   FavSalon.fromJson(Map<String, dynamic> json) {
-    rating = json['rating'] == 0 ? 0.0 : json['rating'];
+    rating = double.parse(json['rating'].toString());
     id = json['id'];
     name = json['name'];
     description = json['description'];

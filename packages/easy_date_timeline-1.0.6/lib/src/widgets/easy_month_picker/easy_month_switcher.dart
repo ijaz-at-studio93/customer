@@ -32,6 +32,7 @@ class EasyMonthSwitcher extends StatefulWidget {
 class _EasyMonthSwitcherState extends State<EasyMonthSwitcher> {
   List<EasyMonth> _yearMonths = [];
   int _currentMonth = 0;
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +41,7 @@ class _EasyMonthSwitcherState extends State<EasyMonthSwitcher> {
   }
 
   bool get _isLastMonth => _currentMonth == _yearMonths.length - 1;
+
   bool get _isFirstMonth => _currentMonth == 0;
 
   @override
@@ -78,6 +80,7 @@ class _EasyMonthSwitcherState extends State<EasyMonthSwitcher> {
           Flexible(
             child: IconButton(
               onPressed: () {
+
                 if (_isLastMonth) {
                   return;
                 }

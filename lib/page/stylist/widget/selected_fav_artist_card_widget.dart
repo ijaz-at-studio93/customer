@@ -150,7 +150,9 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
               "View Profile",
               style: AppTextTheme.bold.copyWith(
                   fontSize: 14,
-                  color: ColorConstant.primaryColor,
+                  color: changeTheme(SharedPrefs.readStringValue(
+                      PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
                   decoration: TextDecoration.underline),
             ),
           ),

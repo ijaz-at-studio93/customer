@@ -73,12 +73,8 @@ class _BookingHomePageState extends State<BookingHomePage> {
                                         horizontal: 20, vertical: 5),
                                     child: PendingCardWidget(
                                       onPress: () {
-                                        print(_homeController
-                                            .getCurrentBookingListModel
-                                            .data?[index]
-                                            .appointmentId ??
-                                            "");
                                         Get.to(() => QRCodePage(
+                                            isBooking: false,
                                             appointmentId: _homeController
                                                     .getCurrentBookingListModel
                                                     .data?[index]
@@ -95,7 +91,8 @@ class _BookingHomePageState extends State<BookingHomePage> {
                                     .getBookingHistoryListModel.data?.isEmpty ??
                                 false
                             ? const NoItemsWidget(
-                                text: "There are no completed bookings available.",
+                                text:
+                                    "There are no completed bookings available.",
                               )
                             : ListView.builder(
                                 shrinkWrap: true,
@@ -141,8 +138,9 @@ class _BookingHomePageState extends State<BookingHomePage> {
       width: Get.width,
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: CupertinoSlidingSegmentedControl(
-          backgroundColor: changeTheme(
-              SharedPrefs.readStringValue(PrefConstants.gender)) ?? Colors.transparent,
+          backgroundColor:
+              changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                  Colors.transparent,
           padding: const EdgeInsets.all(6),
           groupValue: bookingOverView,
           thumbColor: ColorConstant.whiteColor,

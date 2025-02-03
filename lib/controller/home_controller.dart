@@ -33,194 +33,258 @@ import '../model/artiest_popular_service_model.dart';
 class HomeController extends GetxController {
   /*>>>>>>>>>>>>>>>>>>>> Loader <<<<<<<<<<<<<<<<<<<<<*/
   final Rx<bool> _showProgress = false.obs;
+
   bool get showProgress => _showProgress.value;
+
   set setShowProgress(val) => _showProgress.value = val;
 
   final Rx<bool> _showAddProgress = false.obs;
+
   bool get gteShowAddProgress => _showAddProgress.value;
+
   set setShowAddProgress(val) => _showAddProgress.value = val;
 
   /*----------------- Show Booking Progress ------------*/
   final Rx<bool> _showBookingProgress = false.obs;
+
   bool get showBookingProgress => _showBookingProgress.value;
+
   set setShowBookingProgress(val) => _showBookingProgress.value = val;
 
   /*------------------------- category All Data Get Home Category ----------------*/
   final Rx<HomeCategoryListModel> _homeCategoryListModel =
       HomeCategoryListModel().obs;
+
   HomeCategoryListModel get homeCategoryListResponseModel =>
       _homeCategoryListModel.value;
+
   set setCategory(val) => _homeCategoryListModel.value = val;
 
   /*------------------ Add  Category  Make Package Data get ---------*/
   final Rx<HomeCategoryListModel> _getLastMakeYourOwnPackage =
       HomeCategoryListModel().obs;
+
   HomeCategoryListModel get getLastMakeYourOwnPackageModel =>
       _getLastMakeYourOwnPackage.value;
+
   set getLastMakeYourOwnPackageModel(val) =>
       _getLastMakeYourOwnPackage.value = val;
 
   /*------------------ Store Salon Details  Data ------------*/
   final Rx<HomeSalonDetailsModel> _homeSalonDetailsData =
       HomeSalonDetailsModel().obs;
+
   HomeSalonDetailsModel get homeSalonDetailsData => _homeSalonDetailsData.value;
+
   set setSalonDetails(val) => _homeSalonDetailsData.value = val;
 
   /*----------------------  Store Data Salon Details Service Data -----------------*/
   final Rx<CategoryServicesListModel> _salonDetailsListData =
       CategoryServicesListModel().obs;
+
   CategoryServicesListModel get salonDetailsListData =>
       _salonDetailsListData.value;
+
   set setSalonDetailsListData(val) => _salonDetailsListData.value = val;
 
   /*-----------------  Home Salon List Widget Get -------------------*/
   final Rx<HomeSalonModel> _homeSalonList = HomeSalonModel().obs;
+
   HomeSalonModel get getHomeSalonList => _homeSalonList.value;
+
   set setHomeSalonList(val) => _homeSalonList.value = val;
 
 /*--------------------  Fav Salon  List  Model  Data Get -------------------*/
   final Rx<FavouriteSalonModel> _favSalonList = FavouriteSalonModel().obs;
+
   FavouriteSalonModel get getFavSalonList => _favSalonList.value;
+
   set setFavSalonList(val) => _favSalonList.value = val;
 
   /*--------------------- Salon artiest -------------*/
   final Rx<SalonDetailsArtiestModel> _salonDetailsArtiestData =
       SalonDetailsArtiestModel().obs;
+
   SalonDetailsArtiestModel get getSalonDetailsArtiestData =>
       _salonDetailsArtiestData.value;
+
   set setSalonDetailsArtiestData(val) => _salonDetailsArtiestData.value = val;
 
   /*----------------  Booking Create Data Store ---------------*/
   final Rx<CreateBookingAppointmentModel> _createBookingAppointmentModel =
       CreateBookingAppointmentModel().obs;
+
   CreateBookingAppointmentModel get getCreateBookingAppointmentModel =>
       _createBookingAppointmentModel.value;
+
   set setCreateBookingAppointmentModel(val) =>
       _createBookingAppointmentModel.value = val;
 
   /*----------------  Booking Qr Code Generate  Store Data ------------------*/
   final Rx<UserBookingQrCodeModel> _userBookingQrCodeModel =
       UserBookingQrCodeModel().obs;
+
   UserBookingQrCodeModel get getUserBookingQrCodeModel =>
       _userBookingQrCodeModel.value;
+
   set setUserBookingQrCodeModel(val) => _userBookingQrCodeModel.value = val;
 
   /*-----------------------Get Artiest -------------------*/
   final Rx<ArtistListModel> _artiestListData = ArtistListModel().obs;
+
   ArtistListModel get getArtiestListData => _artiestListData.value;
+
   set setArtiestListData(val) => _artiestListData.value = val;
 
   /*----------------------- Get AvailableDates -------------------- */
   final Rx<UnAvailableDatesModel> _unAvailableDatesListData =
       UnAvailableDatesModel().obs;
+
   UnAvailableDatesModel get getUnAvailableDatesListData =>
       _unAvailableDatesListData.value;
+
   set setUnAvailableDatesListData(val) => _unAvailableDatesListData.value = val;
 
   /*------------------------------- Get  Time Slot -----------------------------*/
   final Rx<AvailabilitiesTimeSlotModel> _availabilitiesTimeSlotModelData =
       AvailabilitiesTimeSlotModel().obs;
+
   AvailabilitiesTimeSlotModel get getAvailabilitiesTimeSlotModelData =>
       _availabilitiesTimeSlotModelData.value;
+
   set setAvailabilitiesTimeSlotModelData(val) =>
       _availabilitiesTimeSlotModelData.value = val;
 
   /*------------------------- Get Current Booking List Model --------------------*/
   final Rx<CurrentBookingListModel> _currentBookingListModel =
       CurrentBookingListModel().obs;
+
   CurrentBookingListModel get getCurrentBookingListModel =>
       _currentBookingListModel.value;
+
   set setCurrentBookingListModel(val) => _currentBookingListModel.value = val;
 
   /*-------------------  Booking History List Model --------------------*/
   final Rx<BookingHistoryListModel> _bookingHistoryListModel =
       BookingHistoryListModel().obs;
+
   BookingHistoryListModel get getBookingHistoryListModel =>
       _bookingHistoryListModel.value;
+
   set setBookingHistoryListModel(val) => _bookingHistoryListModel.value = val;
 
   /*------------------- Review Data List API Get Model ----------------*/
   final Rx<ReviewListModel> _reviewDataListModel = ReviewListModel().obs;
+
   ReviewListModel get getReviewDataListModel => _reviewDataListModel.value;
+
   set setReviewDataListModel(val) => _reviewDataListModel.value = val;
 
   /*------------------- ArtiestPortfolio --------------------*/
   final Rx<ArtiestPortfolio> _artiestDetailsModel = ArtiestPortfolio().obs;
+
   ArtiestPortfolio get getArtiestDetailsModel => _artiestDetailsModel.value;
+
   set setArtiestDetailsModel(val) => _artiestDetailsModel.value = val;
 
   /*>>>>>>>>>>>>>>>>>>>>>>>>>> CART PART <<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
   /*---------------- Add Cart -------------------*/
   final Rx<ServiceAddCartModel> _serviceAddCartModel =
       ServiceAddCartModel().obs;
+
   ServiceAddCartModel get getServiceAddCartModel => _serviceAddCartModel.value;
+
   set setServiceAddCartModel(val) => _serviceAddCartModel.value = val;
 
   /*--------------- Product  List Data Get  -------------*/
   final Rx<ServiceProductModel> _serviceProductModel =
       ServiceProductModel().obs;
+
   ServiceProductModel get getServiceProductModel => _serviceProductModel.value;
+
   set setServiceProductModel(val) => _serviceProductModel.value = val;
 
   /*--------------------  BlogDataModel  -----------------*/
   final Rx<BlogDataModel> _blogDataModel = BlogDataModel().obs;
+
   BlogDataModel get getBlogDataModel => _blogDataModel.value;
+
   set setBlogDataModel(val) => _blogDataModel.value = val;
 
   /*----------------- Fav Blog Data ----------------------*/
   final Rx<BlogDataModel> _favBlogDataModel = BlogDataModel().obs;
+
   BlogDataModel get getFavBlogDataModel => _favBlogDataModel.value;
+
   set getFavBlogDataModel(val) => _favBlogDataModel.value = val;
 
   /*--------------------  Rating  & Review Model  -----------------*/
   final Rx<ReviewRatingUserModel> _reviewRatingUserModel =
       ReviewRatingUserModel().obs;
+
   ReviewRatingUserModel get getReviewRatingUserModel =>
       _reviewRatingUserModel.value;
+
   set setReviewRatingUserModel(val) => _reviewRatingUserModel.value = val;
 
   /*-------------- Search  Model  -------------------------*/
   final Rx<SearchSalonModel> _searchSalonModel = SearchSalonModel().obs;
+
   SearchSalonModel get getSearchSalonModel => _searchSalonModel.value;
+
   set setSearchSalonModel(val) => _searchSalonModel.value = val;
 
   /*-------------- Save Address Model  -------------------------*/
   final Rx<SaveAddressModel> _saveAddressModel = SaveAddressModel().obs;
+
   SaveAddressModel get getSaveAddressModel => _saveAddressModel.value;
+
   set setSaveAddressModel(val) => _saveAddressModel.value = val;
 
   /*----------------  Artiest  Search ---------------*/
   final Rx<ArtistSearchModel> _artistSearchModel = ArtistSearchModel().obs;
+
   ArtistSearchModel get getArtistSearchModel => _artistSearchModel.value;
+
   set setArtistSearchModel(val) => _artistSearchModel.value = val;
 
   /*--------------  get  Order Id -----------*/
   final Rx<OrderIdModel> _orderIdModel = OrderIdModel().obs;
+
   OrderIdModel get getOrderIdModel => _orderIdModel.value;
+
   set setOrderIdModel(val) => _orderIdModel.value = val;
 
   /*------------------- Artiest  Popular Service -------------*/
   final Rx<ArtistPopularServicesModel> _artistPopularServicesModel =
       ArtistPopularServicesModel().obs;
+
   ArtistPopularServicesModel get getArtistPopularServicesModel =>
       _artistPopularServicesModel.value;
+
   set setArtistPopularServicesModel(val) =>
       _artistPopularServicesModel.value = val;
 
   /*------------------------ Salon Review For Customer ----------------*/
   final Rx<SalonIdReviewsModel> _salonIdReviewsModel =
       SalonIdReviewsModel().obs;
+
   SalonIdReviewsModel get getSalonIdReviewsModel => _salonIdReviewsModel.value;
+
   set setSalonIdReviewsModel(val) => _salonIdReviewsModel.value = val;
 
   /*--------------- PromoCode Model ------------------*/
   final Rx<PromoCodeModel> _promoCodeModel = PromoCodeModel().obs;
+
   PromoCodeModel get getPromoCodeModel => _promoCodeModel.value;
+
   set setPromoCodeModel(val) => _promoCodeModel.value = val;
 
   /*--------------------  Get  PromoCode List ------------------------*/
   final Rx<PromoCodeModel> _promoCodeModelList = PromoCodeModel().obs;
+
   PromoCodeModel get getPromoCodeModelList => _promoCodeModelList.value;
+
   set setPromoCodeModelList(val) => _promoCodeModelList.value = val;
 
   /*-------------  category Id  -----------------*/
@@ -355,11 +419,12 @@ class HomeController extends GetxController {
     required String salonId,
     required String lat,
     required String lng,
+    required String serviceGender,
   }) async {
     try {
       _showProgress.value = true;
-      _homeSalonDetailsData.value =
-          await HomeAPI.getSalonDetail(salonId: salonId, lng: lng, lat: lat);
+      _homeSalonDetailsData.value = await HomeAPI.getSalonDetail(
+          salonId: salonId, lng: lng, lat: lat, serviceGender: serviceGender);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -381,7 +446,6 @@ class HomeController extends GetxController {
       if (kDebugMode) {
         print("DO Get Artiest List Data $e");
       }
-
     } finally {
       _showProgress.value = false;
     }
@@ -432,7 +496,6 @@ class HomeController extends GetxController {
       if (kDebugMode) {
         print("Do Get Salon Artiest $e");
       }
-
     } finally {
       _showProgress.value = false;
     }
@@ -448,7 +511,6 @@ class HomeController extends GetxController {
       if (kDebugMode) {
         print("DO Get Artiest List Data $e");
       }
-
     } finally {
       _showProgress.value = false;
     }
@@ -473,7 +535,6 @@ class HomeController extends GetxController {
       if (kDebugMode) {
         print("UnAvailableDatesListData $e");
       }
-
     } finally {
       _showProgress.value = false;
     }
@@ -646,7 +707,6 @@ class HomeController extends GetxController {
       if (kDebugMode) {
         print("Remove Cart $e");
       }
-
     } finally {
       _showProgress.value = false;
     }
@@ -690,15 +750,14 @@ class HomeController extends GetxController {
   doAddProductCart(
       {required String productId,
       required String productSelectedServiceId,
-      required bool  isHomeService,
+      required bool isHomeService,
       required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       _serviceAddCartModel.value = await HomeAPI.addProductCart(
           productId: productId,
           productSelectedServiceId: productSelectedServiceId,
-          isHomeService: isHomeService
-      );
+          isHomeService: isHomeService);
       if (_serviceAddCartModel.value.success ?? false) {
         callback.call();
       }
@@ -730,7 +789,6 @@ class HomeController extends GetxController {
       if (kDebugMode) {
         print("Remove Product Cart $e");
       }
-
     } finally {
       _showProgress.value = false;
     }
@@ -1167,18 +1225,24 @@ class HomeController extends GetxController {
   }
 
   /*--------------------------- Get  PromoCode -------------------------*/
-  doGetPromoCode({required double lat, required double lng,
-
-    required String orderBy,
-    required String serviceGender,
-    required bool nearest,
-    required bool fourPlusRating,
-    required bool homeService}) async {
+  doGetPromoCode(
+      {required double lat,
+      required double lng,
+      required String orderBy,
+      required String serviceGender,
+      required bool nearest,
+      required bool fourPlusRating,
+      required bool homeService}) async {
     try {
       _showProgress.value = true;
-      _promoCodeModel.value = await HomeAPI.getPromoCode(lat: lat, lng: lng,
-      fourPlusRating:fourPlusRating,homeService:homeService ,nearest:nearest ,orderBy: orderBy,serviceGender:serviceGender
-      );
+      _promoCodeModel.value = await HomeAPI.getPromoCode(
+          lat: lat,
+          lng: lng,
+          fourPlusRating: fourPlusRating,
+          homeService: homeService,
+          nearest: nearest,
+          orderBy: orderBy,
+          serviceGender: serviceGender);
     } catch (e) {
       if (kDebugMode) {
         print("GET PROMO-CODE $e");
@@ -1239,4 +1303,27 @@ class HomeController extends GetxController {
       _showProgress.value = false;
     }
   }
+
+  /*------------------  Delete package ------------------------*/
+  doDeletePackage({required VoidCallback callback}) async {
+    try {
+      _showProgress.value = false;
+      bool result = await HomeAPI.deletePackage();
+      if (result) {
+        callback.call();
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("delete package  $e");
+      }
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*-------------------------  -------------------------*/
+
+
+
 }

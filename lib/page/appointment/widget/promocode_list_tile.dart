@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/model/promo_code/promocode_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../../constant/assetsconstant.dart';
 
 class PromoCodeListTile extends StatelessWidget {
@@ -59,9 +61,11 @@ class PromoCodeListTile extends StatelessWidget {
                   GestureDetector(
                     onTap: onTapApplyBtn,
                     child: Container(
-                      padding: const EdgeInsets.all(8),
+                      padding:  EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: ColorConstant.primaryColor,
+                        color: changeTheme(SharedPrefs.readStringValue(
+                            PrefConstants.gender)) ??
+                            ColorConstant.primaryColor,
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Text('APPLY',
@@ -78,6 +82,9 @@ class PromoCodeListTile extends StatelessWidget {
                     AssetsConstant.offerIcon,
                     width: 25,
                     height: 25,
+                    color: changeTheme(SharedPrefs.readStringValue(
+                        PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
                   ),
                   const SizedBox(width: 10),
                   Text(title ?? "",
@@ -95,7 +102,9 @@ class PromoCodeListTile extends StatelessWidget {
                 code ?? '',
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
-                    .copyWith(color: ColorConstant.primaryColor),
+                    .copyWith(color: changeTheme(SharedPrefs.readStringValue(
+                    PrefConstants.gender)) ??
+                    ColorConstant.primaryColor),
               ),
             ],
           ),

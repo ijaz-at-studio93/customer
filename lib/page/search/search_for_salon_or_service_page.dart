@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
@@ -26,12 +28,30 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
   /*------------- Controller -------------*/
   final _searchTextEditingController = TextEditingController();
   final _homeController = Get.find<HomeController>();
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _homeController.getSearchSalonModel.data = null;
     _homeController.update();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) {
+      _debounce!.cancel();
+    }
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _homeController.doSalonSearch(
+          query: _searchTextEditingController.text,
+          lat: SharedPrefs.readStringValue(PrefConstants.latitude),
+          lng: SharedPrefs.readStringValue(PrefConstants.longitude));
+    });
   }
 
   @override
@@ -159,7 +179,9 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                                               salonName: _homeController
                                                       .getSearchSalonModel
                                                       .data?[index]
-                                                      .artist?.salon?.name ??
+                                                      .artist
+                                                      ?.salon
+                                                      ?.name ??
                                                   "",
                                               image: _homeController
                                                       .getSearchSalonModel
@@ -218,9 +240,9 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                                                                 .salon
                                                                 ?.id ??
                                                             "",
-                                              callback: () {}));
-                                    },
-                                  );
+                                                        callback: () {}));
+                                              },
+                                            );
                                 })),
           ),
         ],
@@ -273,21 +295,24 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                   width: Get.width * 0.8,
                   child: TextField(
                     controller: _searchTextEditingController,
-                    textInputAction: TextInputAction.search,
-                    onEditingComplete: () {
-                      if (_searchTextEditingController.text.isNotEmpty) {
-                        FocusManager.instance.primaryFocus?.unfocus();
-                        _homeController.doSalonSearch(
-                            query: _searchTextEditingController.text,
-                            lat: SharedPrefs.readStringValue(
-                                PrefConstants.latitude),
-                            lng: SharedPrefs.readStringValue(
-                                PrefConstants.longitude));
+                    textInputAction: TextInputAction.done,
+                    onChanged: (value) {
+                      if (value.isNotEmpty) {
+                        _onSearchChanged();
                       } else {
+                        setState(() {});
+                        _homeController.getSearchSalonModel.data = null;
+                        _homeController.update();
+                      }
+                    },
+                    onEditingComplete: () {
+                      if (_searchTextEditingController.text.isEmpty) {
                         FocusManager.instance.primaryFocus?.unfocus();
                         setState(() {});
                         _homeController.getSearchSalonModel.data = null;
                         _homeController.update();
+                      } else {
+                        FocusManager.instance.primaryFocus?.unfocus();
                       }
                     },
                     style: AppTextTheme.medium.copyWith(

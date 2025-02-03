@@ -33,6 +33,7 @@ class SaloonAfterSelectingServicesPage extends StatefulWidget {
   final String id;
 
   final VoidCallback callback;
+
   const SaloonAfterSelectingServicesPage({
     super.key,
     required this.id,
@@ -50,12 +51,17 @@ class _SaloonAfterSelectingServicesPageState
 
   bool loading = false;
   final box = GetStorage();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doGetHomeSalonDetails(
           salonId: widget.id,
+          serviceGender:
+              SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                  ? "male"
+                  : "female",
           lat: SharedPrefs.readStringValue(PrefConstants.latitude),
           lng: SharedPrefs.readStringValue(PrefConstants.longitude));
       _homeController.doGetSalonDetailsService(salonId: widget.id);
@@ -531,7 +537,9 @@ class _SaloonAfterSelectingServicesPageState
                     imageUrl: AssetsConstant.iconSearch,
                     onPress: () {
                       Get.to(() => StylistSearchPage(
-                            salonName: _homeController.homeSalonDetailsData.data?.name ?? "",
+                            salonName: _homeController
+                                    .homeSalonDetailsData.data?.name ??
+                                "",
                             salonId: widget.id,
                           ));
                     },
@@ -1086,6 +1094,10 @@ class _SaloonAfterSelectingServicesPageState
                                                                     callback:
                                                                         () {
                                                               _homeController.doGetHomeSalonDetails(
+                                                                  serviceGender:
+                                                                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                      ? "male"
+                                                                      : "female",
                                                                   salonId:
                                                                       widget.id,
                                                                   lat: SharedPrefs
@@ -1394,6 +1406,10 @@ class _SaloonAfterSelectingServicesPageState
                                                               .doClearCart(
                                                                   callback: () {
                                                             _homeController.doGetHomeSalonDetails(
+                                                                serviceGender:
+                                                                SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                    ? "male"
+                                                                    : "female",
                                                                 salonId:
                                                                     widget.id,
                                                                 lat: SharedPrefs

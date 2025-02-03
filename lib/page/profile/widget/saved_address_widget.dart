@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/model/save_address_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/get_location_page.dart';
 
 import '../../../project_specific/remove_and_add_service_dialog.dart';
@@ -12,7 +14,9 @@ import '../../../project_specific/remove_and_add_service_dialog.dart';
 class SavedAddressWidget extends StatefulWidget {
   final SaveAddressList saveAddressList;
   final VoidCallback onPress;
-  const SavedAddressWidget({super.key, required this.saveAddressList, required this.onPress});
+
+  const SavedAddressWidget(
+      {super.key, required this.saveAddressList, required this.onPress});
 
   @override
   State<SavedAddressWidget> createState() => _SavedAddressWidgetState();
@@ -36,7 +40,12 @@ class _SavedAddressWidgetState extends State<SavedAddressWidget> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(CupertinoIcons.home, color: ColorConstant.primaryColor),
+            Icon(
+              CupertinoIcons.home,
+              color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                  ColorConstant.primaryColor,
+            ),
             const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,8 +59,8 @@ class _SavedAddressWidgetState extends State<SavedAddressWidget> {
                   width: Get.width * 0.75,
                   child: Text(
                     widget.saveAddressList.address ?? "",
-                    style: AppTextTheme.medium
-                        .copyWith(color: ColorConstant.blackColor, fontSize: 12),
+                    style: AppTextTheme.medium.copyWith(
+                        color: ColorConstant.blackColor, fontSize: 12),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -70,7 +79,8 @@ class _SavedAddressWidgetState extends State<SavedAddressWidget> {
                             child: Text(
                               widget.saveAddressList.directions ?? "",
                               style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.blackColor, fontSize: 12),
+                                  color: ColorConstant.blackColor,
+                                  fontSize: 12),
                             ),
                           ),
                         ],

@@ -199,7 +199,7 @@ class _FaqPageState extends State<FaqPage> {
                         _openDialer();
                       },
                       child: Text(
-                        "+91 94404 67103",
+                        "+91 88970 90838",
                         style: AppTextTheme.medium
                             .copyWith(color: ColorConstant.primaryColor),
                       ))
@@ -230,7 +230,7 @@ class _FaqPageState extends State<FaqPage> {
   void _openDialer() async {
     final Uri phoneUri = Uri(
       scheme: 'tel',
-      path: '94404 67103', // Replace with the phone number you want to dial
+      path: '88970 90838', // Replace with the phone number you want to dial
     );
 
     if (await canLaunchUrl(phoneUri)) {

@@ -3,10 +3,12 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 class ReviewAndRatingPage extends StatefulWidget {
   const ReviewAndRatingPage({super.key});
@@ -118,9 +120,11 @@ class _ReviewAndRatingPageState extends State<ReviewAndRatingPage> {
             itemCount: 5,
             itemSize: 25.0,
             ignoreGestures: true,
-            itemBuilder: (context, _) => const Icon(
+            itemBuilder: (context, _) =>   Icon(
               Icons.star,
-              color: ColorConstant.primaryColor,
+              color: changeTheme(SharedPrefs.readStringValue(
+                  PrefConstants.gender)) ??
+                  ColorConstant.primaryColor,
               size: 25,
             ),
             onRatingUpdate: (rating) {},

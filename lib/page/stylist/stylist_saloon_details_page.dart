@@ -46,9 +46,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    if (widget.isViewDetails) {
-      stylistId.value = widget.artiestId;
-    }
+
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doGetArtiestPortfolio(artistId: widget.artiestId);
       _homeController.doGetCart();

@@ -12,6 +12,7 @@ import '../../project_specific/text_theme.dart';
 
 class YourApprovalBottomSheet extends StatefulWidget {
   final String salonAppointmentId;
+
   const YourApprovalBottomSheet({super.key, required this.salonAppointmentId});
 
   @override
@@ -22,6 +23,7 @@ class YourApprovalBottomSheet extends StatefulWidget {
 class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
   int yourApproval = 1;
   final _homeController = Get.find<HomeController>();
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -187,6 +189,7 @@ class _YourApprovalBottomSheetState extends State<YourApprovalBottomSheet> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => QRCodePage(
+                              isBooking: true,
                               appointmentId: widget.salonAppointmentId)));
                 }),
           ),

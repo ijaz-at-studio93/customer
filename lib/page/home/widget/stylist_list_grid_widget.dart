@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/model/salon_details_artiest.dart';
-import 'package:salon_customer/project_specific/remove_button_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import '../../../constant/api_constant.dart';
 import '../../../constant/variable_constant.dart';
@@ -170,7 +169,8 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                 "View Profile",
                 style: AppTextTheme.medium.copyWith(
                     fontSize: 13,
-                    color: ColorConstant.grayTextColor,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
                     decoration: TextDecoration.underline),
               ),
             ),

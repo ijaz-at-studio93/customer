@@ -95,6 +95,9 @@ class SelectedServiceListTileWidget extends StatelessWidget {
                         Image.asset(
                           AssetsConstant.editIcon,
                           height: 15,
+                          color: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender)) ??
+                              ColorConstant.primaryColor,
                           width: 15,
                         ),
                         const SizedBox(width: 8),
