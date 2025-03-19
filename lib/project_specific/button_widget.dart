@@ -1,7 +1,9 @@
 import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 class ButtonWidget extends StatelessWidget {
   final String buttonTitleText;
@@ -22,7 +24,7 @@ class ButtonWidget extends StatelessWidget {
         height: 45,
         width: Get.width,
         decoration: BoxDecoration(
-          color: color,
+          color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ?? color,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Center(

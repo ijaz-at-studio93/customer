@@ -48,6 +48,9 @@ class AssetsConstant {
   static const String makePackageImage = "assets/images/make_package.png";
   static const String addPackageImage = "assets/images/add_icon_for_package.png";
   static const String emptySalonImage = "assets/images/Empty_salon.png";
+  static const String oneImage = "assets/images/1.JPG";
+  static const String twoImage = "assets/images/2.JPG";
+  static const String threeImage = "assets/images/3.JPG";
 
 
 }

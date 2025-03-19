@@ -8,10 +8,12 @@ import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
 import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/button_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/pick_image.dart';
 import 'package:salon_customer/util/simple_text_field.dart';
 
@@ -117,12 +119,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 fit: BoxFit.cover,
                               ),
                       ),
-                      const Positioned(
+                        Positioned(
                           bottom: 10,
                           right: 2,
                           child: Icon(
                             CupertinoIcons.pencil_circle_fill,
-                            color: ColorConstant.primaryColor,
+                            color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender)),
                           ))
                     ],
                   ),

@@ -154,6 +154,10 @@ class _SelectedServiceSheetPageState extends State<SelectedServiceSheetPage> {
                                   callback: () {
                                     _homeController.doGetCart();
                                     _homeController.doGetSalonDetailsService(
+                                        serviceGender:
+                                        SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                            ? "male"
+                                            : "female",
                                         salonId: widget.salonId);
                                   });
                             },

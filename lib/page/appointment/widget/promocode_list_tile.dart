@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
-import 'package:salon_customer/model/promo_code/promocode_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../../constant/assetsconstant.dart';
@@ -87,19 +86,19 @@ class PromoCodeListTile extends StatelessWidget {
                         ColorConstant.primaryColor,
                   ),
                   const SizedBox(width: 10),
-                  Text(title ?? "",
+                  Text(title,
                       style: AppTextTheme.bold.copyWith(
                           fontSize: 16, color: ColorConstant.blackColor)),
                 ],
               ),
               const SizedBox(height: 10),
-              Text(description ?? '',
+              Text(description,
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.medium
                       .copyWith(color: ColorConstant.blackColor)),
               const SizedBox(height: 10),
               Text(
-                code ?? '',
+                code,
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(color: changeTheme(SharedPrefs.readStringValue(

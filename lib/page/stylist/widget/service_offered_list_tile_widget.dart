@@ -21,6 +21,7 @@ class ServiceOfferListTileWidget extends StatelessWidget {
   final String description;
   final bool isSelect;
   final VoidCallback addButtonTap;
+
   const ServiceOfferListTileWidget(
       {super.key,
       required this.name,
@@ -117,12 +118,12 @@ class ServiceOfferListTileWidget extends StatelessWidget {
               ),
             ],
           ),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              GestureDetector(
-                onTap: addButtonTap,
-                child: ClipRRect(
+          GestureDetector(
+            onTap: addButtonTap,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: CachedNetworkImage(
                     width: 123,
@@ -143,21 +144,21 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-              Positioned(
-                bottom: -18,
-                left: 8,
-                right: 8,
-                child: isSelect
-                    ? RemoveButtonWidget(onPress: addButtonTap)
-                    : AddButtonWidget(
-                        onPress: addButtonTap,
-                        color: changeTheme(SharedPrefs.readStringValue(
-                                PrefConstants.gender)) ??
-                            ColorConstant.primaryColor,
-                      ),
-              )
-            ],
+                Positioned(
+                  bottom: -18,
+                  left: 8,
+                  right: 8,
+                  child: isSelect
+                      ? RemoveButtonWidget(onPress: addButtonTap)
+                      : AddButtonWidget(
+                          onPress: addButtonTap,
+                          color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)) ??
+                              ColorConstant.primaryColor,
+                        ),
+                )
+              ],
+            ),
           )
         ],
       ),

@@ -16,17 +16,17 @@ import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:share_plus/share_plus.dart';
-
 import '../../constant/assetsconstant.dart';
+import '../../project_specific/remove_and_add_service_dialog.dart';
 import '../appointment/appointment_booking_page.dart';
 import '../home/widget/add_product_sheet_widget.dart';
 import '../home/widget/selected_services_sheet_page.dart';
-import '../search/stylist_search_page.dart';
 
 class StylistSaloonDetailsPage extends StatefulWidget {
   final String artiestId;
   final String salonId;
   final bool isViewDetails;
+
   const StylistSaloonDetailsPage(
       {super.key,
       required this.artiestId,
@@ -42,11 +42,11 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
     with SingleTickerProviderStateMixin {
   final _homeController = Get.find<HomeController>();
   final box = GetStorage();
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doGetArtiestPortfolio(artistId: widget.artiestId);
       _homeController.doGetCart();
@@ -176,76 +176,285 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                                                   .isAddedToCart ??
                                               false,
                                           addButtonTap: () async {
-                                            _homeController
-                                                .getArtiestDetailsModel
-                                                .data
-                                                ?.categorizedServiceList?[index]
-                                                .services?[i]
-                                                .isAddedToCart = !(_homeController
-                                                    .getArtiestDetailsModel
-                                                    .data
-                                                    ?.categorizedServiceList?[
-                                                        index]
-                                                    .services?[i]
-                                                    .isAddedToCart ??
-                                                false);
+                                            if (stylistId.value.isEmpty) {
+                                              _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .isAddedToCart = !(_homeController
+                                                      .getArtiestDetailsModel
+                                                      .data
+                                                      ?.categorizedServiceList?[
+                                                          index]
+                                                      .services?[i]
+                                                      .isAddedToCart ??
+                                                  false);
 
-                                            if (_homeController
+                                              if (_homeController
+                                                      .getArtiestDetailsModel
+                                                      .data
+                                                      ?.categorizedServiceList?[
+                                                          index]
+                                                      .services?[i]
+                                                      .isAddedToCart ??
+                                                  false) {
+                                                showModalBottomSheet(
+                                                    context: context,
+                                                    isScrollControlled: true,
+                                                    shape:
+                                                        const RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .only(
+                                                      topLeft:
+                                                          Radius.circular(32),
+                                                      topRight:
+                                                          Radius.circular(32),
+                                                    )),
+                                                    builder: (context) {
+                                                      return AddProductSheetWidget(
+                                                        price: _homeController
+                                                                .getArtiestDetailsModel
+                                                                .data
+                                                                ?.categorizedServiceList?[
+                                                                    index]
+                                                                .services?[i]
+                                                                .price ??
+                                                            0,
+                                                        rating: _homeController
+                                                                .getArtiestDetailsModel
+                                                                .data
+                                                                ?.categorizedServiceList?[
+                                                                    index]
+                                                                .services?[i]
+                                                                .rating ??
+                                                            0.0,
+                                                        review: _homeController
+                                                                .getArtiestDetailsModel
+                                                                .data
+                                                                ?.categorizedServiceList?[
+                                                                    index]
+                                                                .services?[i]
+                                                                .reviewCount
+                                                                ?.toInt() ??
+                                                            0,
+                                                        nameOfService: _homeController
+                                                                .getArtiestDetailsModel
+                                                                .data
+                                                                ?.categorizedServiceList?[
+                                                                    index]
+                                                                .services?[i]
+                                                                .name ??
+                                                            "",
+                                                        serviceId: _homeController
+                                                                .getArtiestDetailsModel
+                                                                .data
+                                                                ?.categorizedServiceList?[
+                                                                    index]
+                                                                .services?[i]
+                                                                .id ??
+                                                            "",
+                                                      );
+                                                    });
+                                                _homeController.doAddCart(
+                                                    salonServiceId: _homeController
+                                                            .getArtiestDetailsModel
+                                                            .data
+                                                            ?.categorizedServiceList?[
+                                                                index]
+                                                            .services?[i]
+                                                            .id ??
+                                                        "",
+                                                    isHomeService: SharedPrefs
+                                                        .readBoolValue(
+                                                            PrefConstants
+                                                                .isHomeService),
+                                                    callback: () {
+                                                      stylistId.value =
+                                                          widget.artiestId;
+                                                      _homeController
+                                                          .doGetCart();
+                                                      _homeController.doGetSalonDetailsService(
+                                                          serviceGender:
+                                                              SharedPrefs.readStringValue(
+                                                                          PrefConstants
+                                                                              .gender) ==
+                                                                      "0"
+                                                                  ? "male"
+                                                                  : "female",
+                                                          salonId:
+                                                              widget.salonId);
+
+                                                      showModalBottomSheet(
+                                                          context: context,
+                                                          isScrollControlled:
+                                                              true,
+                                                          shape:
+                                                              const RoundedRectangleBorder(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .only(
+                                                            topLeft:
+                                                                Radius.circular(
+                                                                    32),
+                                                            topRight:
+                                                                Radius.circular(
+                                                                    32),
+                                                          )),
+                                                          builder: (context) {
+                                                            return AddProductSheetWidget(
+                                                              price: _homeController
+                                                                      .getArtiestDetailsModel
+                                                                      .data
+                                                                      ?.categorizedServiceList?[
+                                                                          index]
+                                                                      .services?[
+                                                                          i]
+                                                                      .price ??
+                                                                  0,
+                                                              rating: _homeController
+                                                                      .getArtiestDetailsModel
+                                                                      .data
+                                                                      ?.categorizedServiceList?[
+                                                                          index]
+                                                                      .services?[
+                                                                          i]
+                                                                      .rating ??
+                                                                  0.0,
+                                                              review: _homeController
+                                                                      .getArtiestDetailsModel
+                                                                      .data
+                                                                      ?.categorizedServiceList?[
+                                                                          index]
+                                                                      .services?[
+                                                                          i]
+                                                                      .reviewCount
+                                                                      ?.toInt() ??
+                                                                  0,
+                                                              nameOfService: _homeController
+                                                                      .getArtiestDetailsModel
+                                                                      .data
+                                                                      ?.categorizedServiceList?[
+                                                                          index]
+                                                                      .services?[
+                                                                          i]
+                                                                      .name ??
+                                                                  "",
+                                                              serviceId: _homeController
+                                                                      .getArtiestDetailsModel
+                                                                      .data
+                                                                      ?.categorizedServiceList?[
+                                                                          index]
+                                                                      .services?[
+                                                                          i]
+                                                                      .id ??
+                                                                  "",
+                                                            );
+                                                          });
+                                                    });
+                                              } else {
+                                                _homeController.doRemoveCart(
+                                                    salonServiceId: _homeController
+                                                            .getArtiestDetailsModel
+                                                            .data
+                                                            ?.categorizedServiceList?[
+                                                                index]
+                                                            .services?[i]
+                                                            .id ??
+                                                        "",
+                                                    callback: () {
+                                                      _homeController
+                                                          .doGetCart();
+                                                    });
+                                              }
+                                            } else {
+                                              if (stylistId.value ==
+                                                  widget.artiestId) {
+                                                _homeController
                                                     .getArtiestDetailsModel
                                                     .data
                                                     ?.categorizedServiceList?[
                                                         index]
                                                     .services?[i]
-                                                    .isAddedToCart ??
-                                                false) {
-                                              showModalBottomSheet(
-                                                  context: context,
-                                                  isScrollControlled: true,
-                                                  shape:
-                                                      const RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius.only(
-                                                    topLeft:
-                                                        Radius.circular(32),
-                                                    topRight:
-                                                        Radius.circular(32),
-                                                  )),
-                                                  builder: (context) {
-                                                    return AddProductSheetWidget(
-                                                      price: _homeController
-                                                              .getArtiestDetailsModel
-                                                              .data
-                                                              ?.categorizedServiceList?[
-                                                                  index]
-                                                              .services?[i]
-                                                              .price ??
-                                                          0,
-                                                      rating: _homeController
-                                                              .getArtiestDetailsModel
-                                                              .data
-                                                              ?.categorizedServiceList?[
-                                                                  index]
-                                                              .services?[i]
-                                                              .rating ??
-                                                          0.0,
-                                                      review: _homeController
-                                                              .getArtiestDetailsModel
-                                                              .data
-                                                              ?.categorizedServiceList?[
-                                                                  index]
-                                                              .services?[i]
-                                                              .reviewCount
-                                                              ?.toInt() ??
-                                                          0,
-                                                      nameOfService: _homeController
-                                                              .getArtiestDetailsModel
-                                                              .data
-                                                              ?.categorizedServiceList?[
-                                                                  index]
-                                                              .services?[i]
-                                                              .name ??
-                                                          "",
-                                                      serviceId: _homeController
+                                                    .isAddedToCart = !(_homeController
+                                                        .getArtiestDetailsModel
+                                                        .data
+                                                        ?.categorizedServiceList?[
+                                                            index]
+                                                        .services?[i]
+                                                        .isAddedToCart ??
+                                                    false);
+
+                                                if (_homeController
+                                                        .getArtiestDetailsModel
+                                                        .data
+                                                        ?.categorizedServiceList?[
+                                                            index]
+                                                        .services?[i]
+                                                        .isAddedToCart ??
+                                                    false) {
+                                                  showModalBottomSheet(
+                                                      context: context,
+                                                      isScrollControlled: true,
+                                                      shape:
+                                                          const RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .only(
+                                                        topLeft:
+                                                            Radius.circular(32),
+                                                        topRight:
+                                                            Radius.circular(32),
+                                                      )),
+                                                      builder: (context) {
+                                                        return AddProductSheetWidget(
+                                                          price: _homeController
+                                                                  .getArtiestDetailsModel
+                                                                  .data
+                                                                  ?.categorizedServiceList?[
+                                                                      index]
+                                                                  .services?[i]
+                                                                  .price ??
+                                                              0,
+                                                          rating: _homeController
+                                                                  .getArtiestDetailsModel
+                                                                  .data
+                                                                  ?.categorizedServiceList?[
+                                                                      index]
+                                                                  .services?[i]
+                                                                  .rating ??
+                                                              0.0,
+                                                          review: _homeController
+                                                                  .getArtiestDetailsModel
+                                                                  .data
+                                                                  ?.categorizedServiceList?[
+                                                                      index]
+                                                                  .services?[i]
+                                                                  .reviewCount
+                                                                  ?.toInt() ??
+                                                              0,
+                                                          nameOfService: _homeController
+                                                                  .getArtiestDetailsModel
+                                                                  .data
+                                                                  ?.categorizedServiceList?[
+                                                                      index]
+                                                                  .services?[i]
+                                                                  .name ??
+                                                              "",
+                                                          serviceId: _homeController
+                                                                  .getArtiestDetailsModel
+                                                                  .data
+                                                                  ?.categorizedServiceList?[
+                                                                      index]
+                                                                  .services?[i]
+                                                                  .id ??
+                                                              "",
+                                                        );
+                                                      });
+                                                  _homeController.doAddCart(
+                                                      salonServiceId: _homeController
                                                               .getArtiestDetailsModel
                                                               .data
                                                               ?.categorizedServiceList?[
@@ -253,107 +462,132 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                                                               .services?[i]
                                                               .id ??
                                                           "",
-                                                    );
-                                                  });
-                                              _homeController.doAddCart(
-                                                  salonServiceId: _homeController
-                                                          .getArtiestDetailsModel
-                                                          .data
-                                                          ?.categorizedServiceList?[
-                                                              index]
-                                                          .services?[i]
-                                                          .id ??
-                                                      "",
-                                                  isHomeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
-                                                  callback: () {
-                                                    stylistId.value =
-                                                        widget.artiestId;
-                                                    _homeController.doGetCart();
-                                                    _homeController
-                                                        .doGetSalonDetailsService(
-                                                            salonId:
-                                                                widget.salonId);
+                                                      isHomeService: SharedPrefs
+                                                          .readBoolValue(
+                                                              PrefConstants
+                                                                  .isHomeService),
+                                                      callback: () {
+                                                        stylistId.value =
+                                                            widget.artiestId;
+                                                        _homeController
+                                                            .doGetCart();
+                                                        _homeController
+                                                            .doGetSalonDetailsService(
+                                                                serviceGender:
+                                                                    SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                            "0"
+                                                                        ? "male"
+                                                                        : "female",
+                                                                salonId: widget
+                                                                    .salonId);
 
-                                                    /* showModalBottomSheet(
-                                                        context: context,
-                                                        isScrollControlled:
-                                                            true,
-                                                        shape:
-                                                            const RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .only(
-                                                          topLeft:
-                                                              Radius.circular(
-                                                                  32),
-                                                          topRight:
-                                                              Radius.circular(
-                                                                  32),
-                                                        )),
-                                                        builder: (context) {
-                                                          return AddProductSheetWidget(
-                                                            price: _homeController
-                                                                    .getArtiestDetailsModel
-                                                                    .data
-                                                                    ?.categorizedServiceList?[
-                                                                        index]
-                                                                    .services?[
-                                                                        i]
-                                                                    .price ??
-                                                                0,
-                                                            rating: _homeController
-                                                                    .getArtiestDetailsModel
-                                                                    .data
-                                                                    ?.categorizedServiceList?[
-                                                                        index]
-                                                                    .services?[
-                                                                        i]
-                                                                    .rating ??
-                                                                0.0,
-                                                            review: _homeController
-                                                                    .getArtiestDetailsModel
-                                                                    .data
-                                                                    ?.categorizedServiceList?[
-                                                                        index]
-                                                                    .services?[
-                                                                        i]
-                                                                    .reviewCount
-                                                                    ?.toInt() ??
-                                                                0,
-                                                            nameOfService: _homeController
-                                                                    .getArtiestDetailsModel
-                                                                    .data
-                                                                    ?.categorizedServiceList?[
-                                                                        index]
-                                                                    .services?[
-                                                                        i]
-                                                                    .name ??
-                                                                "",
-                                                            serviceId: _homeController
-                                                                    .getArtiestDetailsModel
-                                                                    .data
-                                                                    ?.categorizedServiceList?[
-                                                                        index]
-                                                                    .services?[
-                                                                        i]
-                                                                    .id ??
-                                                                "",
-                                                          );
-                                                        });*/
-                                                  });
-                                            } else {
-                                              _homeController.doRemoveCart(
-                                                  salonServiceId: _homeController
-                                                          .getArtiestDetailsModel
-                                                          .data
-                                                          ?.categorizedServiceList?[
-                                                              index]
-                                                          .services?[i]
-                                                          .id ??
-                                                      "",
-                                                  callback: () {
-                                                    _homeController.doGetCart();
-                                                  });
+                                                        showModalBottomSheet(
+                                                            context: context,
+                                                            isScrollControlled:
+                                                                true,
+                                                            shape:
+                                                                const RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius
+                                                                            .only(
+                                                              topLeft: Radius
+                                                                  .circular(32),
+                                                              topRight: Radius
+                                                                  .circular(32),
+                                                            )),
+                                                            builder: (context) {
+                                                              return AddProductSheetWidget(
+                                                                price: _homeController
+                                                                        .getArtiestDetailsModel
+                                                                        .data
+                                                                        ?.categorizedServiceList?[
+                                                                            index]
+                                                                        .services?[
+                                                                            i]
+                                                                        .price ??
+                                                                    0,
+                                                                rating: _homeController
+                                                                        .getArtiestDetailsModel
+                                                                        .data
+                                                                        ?.categorizedServiceList?[
+                                                                            index]
+                                                                        .services?[
+                                                                            i]
+                                                                        .rating ??
+                                                                    0.0,
+                                                                review: _homeController
+                                                                        .getArtiestDetailsModel
+                                                                        .data
+                                                                        ?.categorizedServiceList?[
+                                                                            index]
+                                                                        .services?[
+                                                                            i]
+                                                                        .reviewCount
+                                                                        ?.toInt() ??
+                                                                    0,
+                                                                nameOfService: _homeController
+                                                                        .getArtiestDetailsModel
+                                                                        .data
+                                                                        ?.categorizedServiceList?[
+                                                                            index]
+                                                                        .services?[
+                                                                            i]
+                                                                        .name ??
+                                                                    "",
+                                                                serviceId: _homeController
+                                                                        .getArtiestDetailsModel
+                                                                        .data
+                                                                        ?.categorizedServiceList?[
+                                                                            index]
+                                                                        .services?[
+                                                                            i]
+                                                                        .id ??
+                                                                    "",
+                                                              );
+                                                            });
+                                                      });
+                                                } else {
+                                                  _homeController.doRemoveCart(
+                                                      salonServiceId: _homeController
+                                                              .getArtiestDetailsModel
+                                                              .data
+                                                              ?.categorizedServiceList?[
+                                                                  index]
+                                                              .services?[i]
+                                                              .id ??
+                                                          "",
+                                                      callback: () {
+                                                        _homeController
+                                                            .doGetCart();
+                                                      });
+                                                }
+                                              } else {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return RemoveAndAddServiceDialog(
+                                                          noPress: () {
+                                                        Get.back();
+                                                      }, yesPress: () {
+                                                        setState(() {
+                                                          _homeController
+                                                              .doClearCart(
+                                                                  callback: () {
+                                                            _homeController
+                                                                .doGetArtiestPortfolio(
+                                                                    artistId: widget
+                                                                        .artiestId);
+                                                            _homeController
+                                                                .doGetCart();
+                                                            serviceId = "";
+                                                            stylistId.value =
+                                                                "";
+                                                            Get.back();
+                                                          });
+                                                        });
+                                                      });
+                                                    });
+                                              }
                                             }
                                           },
                                         );
@@ -377,10 +611,12 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Obx(
-        () => _homeController.getServiceAddCartModel.data?.servicesWithProduct?.isEmpty ??
-            false ||
-                _homeController.getServiceAddCartModel.data?.servicesWithProduct ==
-                    null
+        () => _homeController.getServiceAddCartModel.data?.servicesWithProduct
+                    ?.isEmpty ??
+                false ||
+                    _homeController
+                            .getServiceAddCartModel.data?.servicesWithProduct ==
+                        null
             ? const SizedBox()
             : Stack(
                 alignment: Alignment.center,
@@ -815,7 +1051,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
               ),
               Row(
                 children: [
-            /*      buttonWidget(
+                  /*      buttonWidget(
                     imageUrl: AssetsConstant.iconSearch,
                     onPress: () {
                       Get.to(() => StylistSearchPage(
@@ -970,6 +1206,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
 
   /*------------- Tab Bar View ------------*/
   int isSelectedTab = 0;
+
   _tabBarView() {
     return TabBar(
       labelPadding: EdgeInsets.zero,

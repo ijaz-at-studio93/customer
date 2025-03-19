@@ -64,7 +64,12 @@ class _SaloonAfterSelectingServicesPageState
                   : "female",
           lat: SharedPrefs.readStringValue(PrefConstants.latitude),
           lng: SharedPrefs.readStringValue(PrefConstants.longitude));
-      _homeController.doGetSalonDetailsService(salonId: widget.id);
+      _homeController.doGetSalonDetailsService(
+        salonId: widget.id,
+        serviceGender: SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+            ? "male"
+            : "female",
+      );
       _homeController.doGetSalonArtiestListData(salonId: widget.id);
       _homeController.doGetCart();
     });
@@ -782,7 +787,7 @@ class _SaloonAfterSelectingServicesPageState
                   Row(
                     children: [
                       Text(
-                        "Mon-Sat •${_homeController.homeSalonDetailsData.data?.startTiming == null ? "NA" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.startTiming ?? "")} ${_homeController.homeSalonDetailsData.data?.endTiming == null ? "NA" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.endTiming ?? "")}",
+                        "Mon-Sat •${_homeController.homeSalonDetailsData.data?.startTiming == null ? "" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.startTiming ?? "")} ${_homeController.homeSalonDetailsData.data?.endTiming == null ? "" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.endTiming ?? "")}",
                         textScaler: const TextScaler.linear(0.85),
                         style: AppTextTheme.medium.copyWith(
                             color: ColorConstant.blackColor, fontSize: 15),
@@ -1095,9 +1100,10 @@ class _SaloonAfterSelectingServicesPageState
                                                                         () {
                                                               _homeController.doGetHomeSalonDetails(
                                                                   serviceGender:
-                                                                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                                                                      ? "male"
-                                                                      : "female",
+                                                                      SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                              "0"
+                                                                          ? "male"
+                                                                          : "female",
                                                                   salonId:
                                                                       widget.id,
                                                                   lat: SharedPrefs
@@ -1110,6 +1116,10 @@ class _SaloonAfterSelectingServicesPageState
                                                                               .longitude));
                                                               _homeController
                                                                   .doGetSalonDetailsService(
+                                                                  serviceGender:
+                                                                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                      ? "male"
+                                                                      : "female",
                                                                       salonId:
                                                                           widget
                                                                               .id);
@@ -1132,6 +1142,10 @@ class _SaloonAfterSelectingServicesPageState
                                                               }
                                                               _homeController
                                                                   .doGetSalonDetailsService(
+                                                                  serviceGender:
+                                                                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                      ? "male"
+                                                                      : "female",
                                                                       salonId:
                                                                           widget
                                                                               .id);
@@ -1197,6 +1211,10 @@ class _SaloonAfterSelectingServicesPageState
                                                             }
                                                             _homeController
                                                                 .doGetSalonDetailsService(
+                                                                serviceGender:
+                                                                SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                    ? "male"
+                                                                    : "female",
                                                                     salonId:
                                                                         widget
                                                                             .id);
@@ -1282,6 +1300,10 @@ class _SaloonAfterSelectingServicesPageState
                                                                 }
                                                                 _homeController
                                                                     .doGetSalonDetailsService(
+                                                                    serviceGender:
+                                                                    SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                        ? "male"
+                                                                        : "female",
                                                                         salonId:
                                                                             widget.id);
                                                               });
@@ -1407,9 +1429,10 @@ class _SaloonAfterSelectingServicesPageState
                                                                   callback: () {
                                                             _homeController.doGetHomeSalonDetails(
                                                                 serviceGender:
-                                                                SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                                                                    ? "male"
-                                                                    : "female",
+                                                                    SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                            "0"
+                                                                        ? "male"
+                                                                        : "female",
                                                                 salonId:
                                                                     widget.id,
                                                                 lat: SharedPrefs
@@ -1422,6 +1445,10 @@ class _SaloonAfterSelectingServicesPageState
                                                                             .longitude));
                                                             _homeController
                                                                 .doGetSalonDetailsService(
+                                                                serviceGender:
+                                                                SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                    ? "male"
+                                                                    : "female",
                                                                     salonId:
                                                                         widget
                                                                             .id);
@@ -1444,6 +1471,10 @@ class _SaloonAfterSelectingServicesPageState
                                                             }
                                                             _homeController
                                                                 .doGetSalonDetailsService(
+                                                                serviceGender:
+                                                                SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                    ? "male"
+                                                                    : "female",
                                                                     salonId:
                                                                         widget
                                                                             .id);
@@ -1508,6 +1539,10 @@ class _SaloonAfterSelectingServicesPageState
                                                           }
                                                           _homeController
                                                               .doGetSalonDetailsService(
+                                                              serviceGender:
+                                                              SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                  ? "male"
+                                                                  : "female",
                                                                   salonId:
                                                                       widget
                                                                           .id);
@@ -1597,6 +1632,10 @@ class _SaloonAfterSelectingServicesPageState
                                                               }
                                                               _homeController
                                                                   .doGetSalonDetailsService(
+                                                                  serviceGender:
+                                                                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                      ? "male"
+                                                                      : "female",
                                                                       salonId:
                                                                           widget
                                                                               .id);

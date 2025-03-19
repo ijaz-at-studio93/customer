@@ -62,7 +62,7 @@ class _GetLocationPageState extends State<GetLocationPage> {
   Future<BitmapDescriptor> getBitmapDescriptorFromAssetBytes(
       String path, int width) async {
     final Uint8List? imageData = await getBytesFromAsset(path, width);
-    return BitmapDescriptor.fromBytes(imageData!);
+    return BitmapDescriptor.bytes(imageData!);
   }
 
   final _authController = Get.find<AuthController>();

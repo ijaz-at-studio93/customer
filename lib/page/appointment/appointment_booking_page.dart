@@ -12,12 +12,11 @@ import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/appointment/widget/know_what_you_widget.dart';
 import 'package:salon_customer/page/appointment/widget/popular_service_widget.dart';
 import 'package:salon_customer/page/appointment/widget/promocode_sheet_widget.dart';
-import 'package:salon_customer/page/appointment/your_approval_bottom_sheet.dart';
+import 'package:salon_customer/page/appointment/your_approval_page.dart';
 import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-
 import '../../api/dio_client.dart';
 import '../home/widget/add_product_sheet_widget.dart';
 import '../profile/add_address_page.dart';
@@ -633,13 +632,19 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                       .doGetPopularServiceByYourStylist(
                                                           stylistId:
                                                               widget.artiestId);
-                                                  _homeController
-                                                      .doGetSalonDetailsService(
-                                                          salonId: _homeController
-                                                                  .getServiceAddCartModel
-                                                                  .data
-                                                                  ?.salonId ??
-                                                              "");
+                                                  _homeController.doGetSalonDetailsService(
+                                                      serviceGender: SharedPrefs
+                                                                  .readStringValue(
+                                                                      PrefConstants
+                                                                          .gender) ==
+                                                              "0"
+                                                          ? "male"
+                                                          : "female",
+                                                      salonId: _homeController
+                                                              .getServiceAddCartModel
+                                                              .data
+                                                              ?.salonId ??
+                                                          "");
                                                   _homeController.doGetCart();
                                                   if (_homeController
                                                           .getServiceAddCartModel
@@ -928,23 +933,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               callback: () {
                 stylistId.value = "";
                 stylistId.notifyListeners();
-                showModalBottomSheet(
-                    isScrollControlled: true,
-                    shape: const RoundedRectangleBorder(
-                        borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(32),
-                      topRight: Radius.circular(32),
-                    )),
-                    context: context,
-                    builder: (context) {
-                      return YourApprovalBottomSheet(
-                        salonAppointmentId: _homeController
-                                .getCreateBookingAppointmentModel
-                                .data
-                                ?.salonAppointmentId ??
-                            "",
-                      );
-                    });
+
+                Get.to(() => YourApprovalPage(
+                      salonAppointmentId: _homeController
+                              .getCreateBookingAppointmentModel
+                              .data
+                              ?.salonAppointmentId ??
+                          "",
+                    ));
               });
         }
       } else {
@@ -958,23 +954,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             callback: () {
               stylistId.value = "";
               stylistId.notifyListeners();
-              showModalBottomSheet(
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                  )),
-                  context: context,
-                  builder: (context) {
-                    return YourApprovalBottomSheet(
-                      salonAppointmentId: _homeController
-                              .getCreateBookingAppointmentModel
-                              .data
-                              ?.salonAppointmentId ??
-                          "",
-                    );
-                  });
+
+              Get.to(() => YourApprovalPage(
+                    salonAppointmentId: _homeController
+                            .getCreateBookingAppointmentModel
+                            .data
+                            ?.salonAppointmentId ??
+                        "",
+                  ));
             });
       }
     } else {
@@ -995,23 +982,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             callback: () {
               stylistId.value = "";
               stylistId.notifyListeners();
-              showModalBottomSheet(
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                  )),
-                  context: context,
-                  builder: (context) {
-                    return YourApprovalBottomSheet(
-                      salonAppointmentId: _homeController
-                              .getCreateBookingAppointmentModel
-                              .data
-                              ?.salonAppointmentId ??
-                          "",
-                    );
-                  });
+
+              Get.to(() => YourApprovalPage(
+                    salonAppointmentId: _homeController
+                            .getCreateBookingAppointmentModel
+                            .data
+                            ?.salonAppointmentId ??
+                        "",
+                  ));
             });
       } else {
         stylistId.value = "";
@@ -1023,23 +1001,13 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
             salonArtistId: widget.artiestId,
             startAt: isoDateTime,
             callback: () {
-              showModalBottomSheet(
-                  isScrollControlled: true,
-                  shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(32),
-                    topRight: Radius.circular(32),
-                  )),
-                  context: context,
-                  builder: (context) {
-                    return YourApprovalBottomSheet(
-                      salonAppointmentId: _homeController
-                              .getCreateBookingAppointmentModel
-                              .data
-                              ?.salonAppointmentId ??
-                          "",
-                    );
-                  });
+              Get.to(() => YourApprovalPage(
+                    salonAppointmentId: _homeController
+                            .getCreateBookingAppointmentModel
+                            .data
+                            ?.salonAppointmentId ??
+                        "",
+                  ));
             });
       }
     }

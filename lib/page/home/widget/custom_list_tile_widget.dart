@@ -55,9 +55,11 @@ class CustomListTileWidget extends StatelessWidget {
             const SizedBox(height: 5),
             Row(
               children: [
-                const Icon(
+                  Icon(
                   Icons.star,
-                  color: ColorConstant.primaryColor,
+                  color: changeTheme(SharedPrefs.readStringValue(
+                      PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
                   size: 20,
                 ),
                 const SizedBox(width: 5),

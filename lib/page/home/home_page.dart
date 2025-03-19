@@ -590,9 +590,6 @@ class _HomePageState extends State<HomePage> {
                                       serviceCategoryIds: storeServiceId,
                                       callback: () {
                                         _homeController.doGetMakePackageData();
-                                      });
-                                }
-
                                 _homeController.doGetHomeSalonList(
                                     serviceGender: selectedGender.value == 0
                                         ? "male"
@@ -609,6 +606,9 @@ class _HomePageState extends State<HomePage> {
                                     orderBy: "",
                                     nearest: false,
                                     fourPlusRating: false);
+                                      });
+                                }
+
                               },
                             );
                           });
@@ -667,8 +667,6 @@ class _HomePageState extends State<HomePage> {
                                             callback: () {
                                               _homeController
                                                   .doGetMakePackageData();
-                                            });
-                                      }
                                       _homeController.doGetHomeSalonList(
                                           serviceGender:
                                               selectedGender.value == 0
@@ -686,6 +684,8 @@ class _HomePageState extends State<HomePage> {
                                           orderBy: "",
                                           nearest: false,
                                           fourPlusRating: false);
+                                            });
+                                      }
                                     },
                                   );
                                 });
@@ -763,8 +763,6 @@ class _HomePageState extends State<HomePage> {
                                         callback: () {
                                           _homeController
                                               .doGetMakePackageData();
-                                        });
-
                                     _homeController.doGetHomeSalonList(
                                         serviceGender: selectedGender.value == 0
                                             ? "male"
@@ -781,6 +779,8 @@ class _HomePageState extends State<HomePage> {
                                         orderBy: "",
                                         nearest: false,
                                         fourPlusRating: false);
+                                        });
+
                                   },
                                   child: Column(
                                     children: [
@@ -1261,7 +1261,10 @@ class _HomePageState extends State<HomePage> {
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.grayColor,
+                                    color: changeTheme(
+                                            SharedPrefs.readStringValue(
+                                                PrefConstants.gender)) ??
+                                        Colors.transparent,
                                     fontSize: 13),
                               ),
                             ),

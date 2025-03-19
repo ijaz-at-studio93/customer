@@ -10,6 +10,7 @@ import '../../project_specific/text_theme.dart';
 
 class SalonRatingPage extends StatefulWidget {
   final String salonId;
+
   const SalonRatingPage({super.key, required this.salonId});
 
   @override
@@ -62,20 +63,30 @@ class _SalonRatingPageState extends State<SalonRatingPage> {
                         _homeController.getSalonIdReviewsModel.data?.length ??
                             0,
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
-                        child: _listTileWidget(
-                            rate: _homeController.getSalonIdReviewsModel
-                                    .data?[index].rating ??
-                                0.0,
-                            title: _homeController.getSalonIdReviewsModel
-                                    .data?[index].review ??
-                                "",
-                            userName: _homeController.getSalonIdReviewsModel
-                                    .data?[index].user?.name ??
-                                ""),
-                      );
+                      return (_homeController.getSalonIdReviewsModel
+                                      .data?[index].isArtist ==
+                                  false &&
+                              _homeController.getSalonIdReviewsModel
+                                      .data?[index].isServices ==
+                                  false)
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              child: _listTileWidget(
+                                  rate: _homeController.getSalonIdReviewsModel
+                                          .data?[index].rating ??
+                                      0.0,
+                                  title: _homeController.getSalonIdReviewsModel
+                                          .data?[index].review ??
+                                      "",
+                                  userName: _homeController
+                                          .getSalonIdReviewsModel
+                                          .data?[index]
+                                          .user
+                                          ?.name ??
+                                      ""),
+                            )
+                          : const SizedBox();
                     }),
       ),
     );

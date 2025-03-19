@@ -130,7 +130,31 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              Text(
+                "Order Status : ",
+                style: AppTextTheme.medium
+                    .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
+              ),
+              const SizedBox(height: 5),
+              Text(
+                widget.bookingData.orderStatus == "salon_artist_rejected"
+                    ? "Rejected"
+                    : widget.bookingData.orderStatus ?? "",
+                textScaler: const TextScaler.linear(0.85),
+                style: AppTextTheme.bold.copyWith(
+                    fontSize: 16,
+                    color: widget.bookingData.orderStatus ==
+                        "salon_artist_rejected"
+                        ? ColorConstant.redBgColor
+                        : changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender))),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
           Text(
             "Service",
             style: AppTextTheme.medium

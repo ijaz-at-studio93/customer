@@ -9,7 +9,7 @@ class PermissionDialog extends StatelessWidget {
   final String? title;
   final String? desc;
 
-  const PermissionDialog({Key? key, this.title, this.desc}) : super(key: key);
+  const PermissionDialog({super.key, this.title, this.desc});
 
   @override
   Widget build(BuildContext context) {

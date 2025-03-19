@@ -4,15 +4,17 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 
 import 'package:salon_customer/project_specific/text_theme.dart';
-
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 import '../../../model/booking_history_list_model.dart';
 
 class CompleteAndRejectWidget extends StatefulWidget {
   final HistoryList historyList;
   final VoidCallback onPress;
+
   const CompleteAndRejectWidget(
       {super.key, required this.historyList, required this.onPress});
 
@@ -120,7 +122,8 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                     color: widget.historyList.orderStatus ==
                             "salon_artist_rejected"
                         ? ColorConstant.redBgColor
-                        : ColorConstant.primaryColor),
+                        : changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender))),
               ),
             ],
           ),
@@ -170,18 +173,17 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
             runSpacing: 4.0, // gap between lines
             children: List.generate(
               widget.historyList.items?.length ?? 0,
-                  (index) => widget.historyList.items?[index].isService ?? false
+              (index) => widget.historyList.items?[index].isService ?? false
                   ? Text(
-                index == 0
-                    ? "${ widget.historyList.items?[index].service?.name ?? ""}"
-                    : " •  ${ widget.historyList.items?[index].service?.name ?? ""}",
-                style: AppTextTheme.medium.copyWith(
-                    color: ColorConstant.grayTextColor, fontSize: 13),
-              )
+                      index == 0
+                          ? "${widget.historyList.items?[index].service?.name ?? ""}"
+                          : " •  ${widget.historyList.items?[index].service?.name ?? ""}",
+                      style: AppTextTheme.medium.copyWith(
+                          color: ColorConstant.grayTextColor, fontSize: 13),
+                    )
                   : const SizedBox(),
             ),
           ),
-
           const SizedBox(height: 10),
           widget.historyList.orderStatus == "salon_artist_rejected"
               ? const SizedBox()

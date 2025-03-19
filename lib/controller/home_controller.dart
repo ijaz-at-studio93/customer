@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/api/home_api.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/model/artiest_list_model.dart';
 import 'package:salon_customer/model/artiest_portfolio_model.dart';
 import 'package:salon_customer/model/artist_search_model.dart';
@@ -436,11 +437,15 @@ class HomeController extends GetxController {
   }
 
   /*------------------- Get Salon Details Service ---------------- */
-  doGetSalonDetailsService({required String salonId}) async {
+  doGetSalonDetailsService({
+    required String salonId,
+    required String serviceGender,
+  }) async {
     try {
       _showProgress.value = true;
       _salonDetailsListData.value =
-          await HomeAPI.getSalonDetailsCategoryServiceList(salonId: salonId);
+          await HomeAPI.getSalonDetailsCategoryServiceList(
+              salonId: salonId, serviceGender: serviceGender);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -624,7 +629,6 @@ class HomeController extends GetxController {
     try {
       _showAddProgress.value = true;
       bool result = await HomeAPI.addFavouriteSalon(salonId: salonId);
-      print(result);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -683,7 +687,7 @@ class HomeController extends GetxController {
         callback.call();
       }
     } catch (e) {
-      showError(e);
+      /* showError(e);*/
       if (kDebugMode) {
         print("Add Cart $e");
       }
@@ -717,6 +721,9 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _serviceAddCartModel.value = await HomeAPI.getUserCart();
+      if (_serviceAddCartModel.value.data?.items?.isEmpty ?? false) {
+        stylistId.value = "";
+      }
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -764,7 +771,7 @@ class HomeController extends GetxController {
     } catch (e) {
       showError(e);
       if (kDebugMode) {
-        print("Add Cart $e");
+        print("Add Cart product $e");
       }
     } finally {
       _showProgress.value = false;
@@ -1322,8 +1329,5 @@ class HomeController extends GetxController {
     }
   }
 
-  /*-------------------------  -------------------------*/
-
-
-
+/*-------------------------  -------------------------*/
 }

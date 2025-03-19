@@ -25,7 +25,6 @@ import 'package:salon_customer/model/search_model/search_model.dart';
 import 'package:salon_customer/model/un_available_dates_model.dart';
 import 'package:salon_customer/model/user_booking_qr_code_model.dart';
 import 'package:salon_customer/util/logger.dart';
-
 import '../model/current_booking_list_model.dart';
 import '../model/promo_code/promocode_model.dart';
 
@@ -152,9 +151,13 @@ class HomeAPI {
 
   /*---------------- Salon  Details Category service  List ----------------*/
   static Future<CategoryServicesListModel> getSalonDetailsCategoryServiceList(
-      {required String salonId}) async {
+      {required String salonId,required String serviceGender}) async {
     final response = await DioClient.client
-        .get("user/salon/$salonId/category/services-with-selected-categories");
+        .get("user/salon/$salonId/category/services-with-selected-categories",
+    queryParameters: {
+      "serviceGender": serviceGender
+    }
+    );
     if (response.isSuccess) {
       return CategoryServicesListModel.fromJson(response.data);
     } else {

@@ -52,7 +52,8 @@ class _QRCodePageState extends State<QRCodePage> {
           changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
               ColorConstant.primaryColor,
       appBar: AppBar(
-        backgroundColor: ColorConstant.primaryColor,
+        backgroundColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
+            ColorConstant.primaryColor,
         elevation: 0.0,
         leading: IconButton(
             onPressed: () {
