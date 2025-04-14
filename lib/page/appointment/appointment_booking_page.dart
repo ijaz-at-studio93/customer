@@ -713,11 +713,19 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                     fontSize: 13,
                                     color: ColorConstant.grayTextColor),
                               ),
+                              const SizedBox(height: 2),
                               Text(
                                 "₹${_homeController.getServiceAddCartModel.data?.price ?? ""}",
                                 style: AppTextTheme.bold.copyWith(
                                     fontSize: 19,
                                     color: ColorConstant.blackColor),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                "GST is included",
+                                style: AppTextTheme.regular.copyWith(
+                                    color: ColorConstant.blackColor,
+                                    fontSize: 12),
                               )
                             ],
                           ),

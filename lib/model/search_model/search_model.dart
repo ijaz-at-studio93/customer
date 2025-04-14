@@ -1,3 +1,4 @@
+
 class SearchSalonModel {
   int? statusCode;
   bool? success;
@@ -127,7 +128,7 @@ class Artist {
 }
 
 class Salon {
-  int? rating;
+  String? rating;
   String? id;
   String? name;
   String? address;
@@ -149,7 +150,7 @@ class Salon {
         this.serviceGender});
 
   Salon.fromJson(Map<String, dynamic> json) {
-    rating = json['rating'];
+    rating = json['rating'].toString();
     id = json['id'];
     name = json['name'];
     address = json['address'];

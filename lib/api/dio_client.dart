@@ -55,7 +55,7 @@ class DioClient {
             (Response<dynamic> resp, ResponseInterceptorHandler handler) async {
           try {
             if (resp.statusCode == 401 || resp.statusCode == 400) {
-              /*Get.find<AuthController>().resetApp();*/
+              Get.find<AuthController>().resetApp();
             }
             if (resp.statusCode == 500 || resp.statusCode == 502) {
               showMessage("Internal Server Error Bad Gateway");

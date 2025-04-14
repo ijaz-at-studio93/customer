@@ -371,7 +371,7 @@ class HomeAPI {
     }
   }
 
-  /*------------------  Remove  Cart Product ---------------------*/
+  /*------------------  Remove Cart Product ---------------------*/
   static Future<bool> removeProductCart(
       {required String productId,
       required String productSelectedServiceId}) async {
@@ -549,6 +549,8 @@ class HomeAPI {
   /*--------------------- Search -------------------------- */
   static Future<SearchSalonModel> searchForSalon(
       {required String query, required String lat, required String lng}) async {
+    if(query.isEmpty){
+      return SearchSalonModel();}
     final response = await DioClient.client.get("user/home/search",
         queryParameters: {
           "q": query,

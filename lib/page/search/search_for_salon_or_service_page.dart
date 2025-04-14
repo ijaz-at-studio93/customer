@@ -297,12 +297,19 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                     controller: _searchTextEditingController,
                     textInputAction: TextInputAction.done,
                     onChanged: (value) {
-                      if (value.isNotEmpty) {
-                        _onSearchChanged();
-                      } else {
+                      if (value.trim().isEmpty) {
+                        _searchTextEditingController.text =
+                            value.trim(); // Remove leading spaces
+                        _searchTextEditingController.selection =
+                            TextSelection.fromPosition(
+                          TextPosition(
+                              offset: _searchTextEditingController.text.length),
+                        );
                         setState(() {});
                         _homeController.getSearchSalonModel.data = null;
                         _homeController.update();
+                      } else {
+                        _onSearchChanged();
                       }
                     },
                     onEditingComplete: () {

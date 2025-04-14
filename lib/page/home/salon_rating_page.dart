@@ -64,11 +64,8 @@ class _SalonRatingPageState extends State<SalonRatingPage> {
                             0,
                     itemBuilder: (context, index) {
                       return (_homeController.getSalonIdReviewsModel
-                                      .data?[index].isArtist ==
-                                  false &&
-                              _homeController.getSalonIdReviewsModel
-                                      .data?[index].isServices ==
-                                  false)
+                                  .data?[index].isServices ==
+                              true)
                           ? Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 10, vertical: 10),

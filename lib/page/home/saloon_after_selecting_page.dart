@@ -23,7 +23,6 @@ import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/stylist_to_user_location.dart';
 import 'package:share_plus/share_plus.dart';
-
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
 import '../appointment/appointment_booking_page.dart';
@@ -137,75 +136,26 @@ class _SaloonAfterSelectingServicesPageState
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                _homeController.getServiceAddCartModel.data
-                                            ?.previewImages?.isEmpty ??
-                                        false
-                                    ? const SizedBox()
-                                    : Row(
-                                        children: [
-                                          _homeController
-                                                      .getServiceAddCartModel
-                                                      .data
-                                                      ?.previewImages
-                                                      ?.length ==
-                                                  1
-                                              ? Row(
-                                                  children: [
-                                                    for (int i = 0; i < 1; i++)
-                                                      Align(
-                                                        widthFactor: 0.8,
-                                                        child: ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      100),
-                                                          child:
-                                                              CachedNetworkImage(
-                                                            fit: BoxFit.cover,
-                                                            width: 30,
-                                                            height: 30,
-                                                            imageUrl:
-                                                                "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
-                                                            placeholder:
-                                                                (context,
-                                                                        url) =>
-                                                                    const Image(
-                                                              image: AssetImage(
-                                                                  AssetsConstant
-                                                                      .placeHolder),
-                                                              fit: BoxFit.cover,
-                                                              width: 30,
-                                                              height: 30,
-                                                            ),
-                                                            errorWidget:
-                                                                (context, url,
-                                                                        error) =>
-                                                                    const Image(
-                                                              image: AssetImage(
-                                                                  AssetsConstant
-                                                                      .placeHolder),
-                                                              fit: BoxFit.cover,
-                                                              width: 30,
-                                                              height: 30,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      )
-                                                  ],
-                                                )
-                                              : _homeController
+                                Row(
+                                  children: [
+                                    _homeController.getServiceAddCartModel.data
+                                                ?.previewImages?.isEmpty ??
+                                            false
+                                        ? const SizedBox()
+                                        : Row(
+                                            children: [
+                                              _homeController
                                                           .getServiceAddCartModel
                                                           .data
                                                           ?.previewImages
                                                           ?.length ==
-                                                      2
+                                                      1
                                                   ? Row(
                                                       children: [
-                                                        for (int i = 0;
-                                                            i < 2;
-                                                            i++)
+                                                        for (int i = 0; i < 1; i++)
                                                           Align(
                                                             widthFactor: 0.8,
                                                             child: ClipRRect(
@@ -215,32 +165,30 @@ class _SaloonAfterSelectingServicesPageState
                                                                           100),
                                                               child:
                                                                   CachedNetworkImage(
-                                                                fit: BoxFit
-                                                                    .cover,
+                                                                fit: BoxFit.cover,
                                                                 width: 30,
                                                                 height: 30,
                                                                 imageUrl:
                                                                     "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
-                                                                placeholder: (context,
-                                                                        url) =>
-                                                                    const Image(
+                                                                placeholder:
+                                                                    (context,
+                                                                            url) =>
+                                                                        const Image(
                                                                   image: AssetImage(
                                                                       AssetsConstant
                                                                           .placeHolder),
-                                                                  fit: BoxFit
-                                                                      .cover,
+                                                                  fit: BoxFit.cover,
                                                                   width: 30,
                                                                   height: 30,
                                                                 ),
-                                                                errorWidget: (context,
-                                                                        url,
-                                                                        error) =>
-                                                                    const Image(
+                                                                errorWidget:
+                                                                    (context, url,
+                                                                            error) =>
+                                                                        const Image(
                                                                   image: AssetImage(
                                                                       AssetsConstant
                                                                           .placeHolder),
-                                                                  fit: BoxFit
-                                                                      .cover,
+                                                                  fit: BoxFit.cover,
                                                                   width: 30,
                                                                   height: 30,
                                                                 ),
@@ -249,140 +197,204 @@ class _SaloonAfterSelectingServicesPageState
                                                           )
                                                       ],
                                                     )
-                                                  : Row(
-                                                      children: [
-                                                        for (int i = 0;
-                                                            i < 2;
-                                                            i++)
-                                                          Align(
-                                                            widthFactor: 0.7,
-                                                            child: ClipRRect(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          100),
-                                                              child:
-                                                                  CachedNetworkImage(
-                                                                fit: BoxFit
-                                                                    .cover,
-                                                                width: 35,
-                                                                height: 35,
-                                                                imageUrl:
-                                                                    "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
-                                                                placeholder: (context,
-                                                                        url) =>
-                                                                    const Image(
-                                                                  image: AssetImage(
-                                                                      AssetsConstant
-                                                                          .placeHolder),
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                  width: 35,
-                                                                  height: 35,
+                                                  : _homeController
+                                                              .getServiceAddCartModel
+                                                              .data
+                                                              ?.previewImages
+                                                              ?.length ==
+                                                          2
+                                                      ? Row(
+                                                          children: [
+                                                            for (int i = 0;
+                                                                i < 2;
+                                                                i++)
+                                                              Align(
+                                                                widthFactor: 0.8,
+                                                                child: ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              100),
+                                                                  child:
+                                                                      CachedNetworkImage(
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                    width: 30,
+                                                                    height: 30,
+                                                                    imageUrl:
+                                                                        "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
+                                                                    placeholder: (context,
+                                                                            url) =>
+                                                                        const Image(
+                                                                      image: AssetImage(
+                                                                          AssetsConstant
+                                                                              .placeHolder),
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      width: 30,
+                                                                      height: 30,
+                                                                    ),
+                                                                    errorWidget: (context,
+                                                                            url,
+                                                                            error) =>
+                                                                        const Image(
+                                                                      image: AssetImage(
+                                                                          AssetsConstant
+                                                                              .placeHolder),
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      width: 30,
+                                                                      height: 30,
+                                                                    ),
+                                                                  ),
                                                                 ),
-                                                                errorWidget: (context,
-                                                                        url,
-                                                                        error) =>
-                                                                    const Image(
-                                                                  image: AssetImage(
-                                                                      AssetsConstant
-                                                                          .placeHolder),
-                                                                  fit: BoxFit
-                                                                      .cover,
-                                                                  width: 35,
-                                                                  height: 35,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        const SizedBox(
-                                                            width: 2),
-                                                        Container(
-                                                          width: 33,
-                                                          height: 33,
-                                                          decoration: const BoxDecoration(
-                                                              color: ColorConstant
-                                                                  .primaryColor,
-                                                              shape: BoxShape
-                                                                  .circle),
-                                                          child: Center(
-                                                            child: Text(
-                                                              _homeController
-                                                                      .getServiceAddCartModel
-                                                                      .data
-                                                                      ?.previewImages
-                                                                      ?.length
-                                                                      .toString() ??
-                                                                  "",
-                                                              style:
-                                                                  AppTextTheme
-                                                                      .medium
-                                                                      .copyWith(
-                                                                color: ColorConstant
-                                                                    .whiteColor,
-                                                              ),
-                                                            ),
-                                                          ),
+                                                              )
+                                                          ],
                                                         )
-                                                      ],
-                                                    ),
-                                        ],
-                                      ),
-                                const SizedBox(width: 15),
-                                GestureDetector(
-                                  onTap: () {
-                                    showModalBottomSheet(
-                                        isScrollControlled: true,
-                                        shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.only(
-                                          topLeft: Radius.circular(32),
-                                          topRight: Radius.circular(32),
-                                        )),
-                                        context: context,
-                                        builder: (context) {
-                                          return SelectedServiceSheetPage(
-                                            salonId: widget.id,
-                                            artiestId: stylistId.value,
-                                            serviceId: serviceId,
-                                          );
-                                        });
-                                  },
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          Text(
-                                            "${_homeController.getServiceAddCartModel.data?.items?.length} Added",
-                                            style: AppTextTheme.bold.copyWith(
-                                                fontSize: 13,
-                                                color: ColorConstant
-                                                    .grayTextColor),
+                                                      : Row(
+                                                          children: [
+                                                            for (int i = 0;
+                                                                i < 2;
+                                                                i++)
+                                                              Align(
+                                                                widthFactor: 0.7,
+                                                                child: ClipRRect(
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              100),
+                                                                  child:
+                                                                      CachedNetworkImage(
+                                                                    fit: BoxFit
+                                                                        .cover,
+                                                                    width: 35,
+                                                                    height: 35,
+                                                                    imageUrl:
+                                                                        "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
+                                                                    placeholder: (context,
+                                                                            url) =>
+                                                                        const Image(
+                                                                      image: AssetImage(
+                                                                          AssetsConstant
+                                                                              .placeHolder),
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      width: 35,
+                                                                      height: 35,
+                                                                    ),
+                                                                    errorWidget: (context,
+                                                                            url,
+                                                                            error) =>
+                                                                        const Image(
+                                                                      image: AssetImage(
+                                                                          AssetsConstant
+                                                                              .placeHolder),
+                                                                      fit: BoxFit
+                                                                          .cover,
+                                                                      width: 35,
+                                                                      height: 35,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            const SizedBox(
+                                                                width: 2),
+                                                            Container(
+                                                              width: 33,
+                                                              height: 33,
+                                                              decoration: const BoxDecoration(
+                                                                  color: ColorConstant
+                                                                      .primaryColor,
+                                                                  shape: BoxShape
+                                                                      .circle),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  _homeController
+                                                                          .getServiceAddCartModel
+                                                                          .data
+                                                                          ?.previewImages
+                                                                          ?.length
+                                                                          .toString() ??
+                                                                      "",
+                                                                  style:
+                                                                      AppTextTheme
+                                                                          .medium
+                                                                          .copyWith(
+                                                                    color: ColorConstant
+                                                                        .whiteColor,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            )
+                                                          ],
+                                                        ),
+                                            ],
                                           ),
-                                          const SizedBox(width: 2),
-                                          Image.asset(
-                                            AssetsConstant.arrowUpIcon,
-                                            height: 8,
-                                            width: 11,
-                                            color: changeTheme(
-                                                SharedPrefs.readStringValue(
-                                                    PrefConstants.gender)),
+                                    const SizedBox(width: 15),
+                                    GestureDetector(
+                                      onTap: () {
+                                        showModalBottomSheet(
+                                            isScrollControlled: true,
+                                            shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.only(
+                                              topLeft: Radius.circular(32),
+                                              topRight: Radius.circular(32),
+                                            )),
+                                            context: context,
+                                            builder: (context) {
+                                              return SelectedServiceSheetPage(
+                                                salonId: widget.id,
+                                                artiestId: stylistId.value,
+                                                serviceId: serviceId,
+                                              );
+                                            });
+                                      },
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "${_homeController.getServiceAddCartModel.data?.items?.length} Added",
+                                                style: AppTextTheme.bold.copyWith(
+                                                    fontSize: 13,
+                                                    color: ColorConstant
+                                                        .grayTextColor),
+                                              ),
+                                              const SizedBox(width: 2),
+                                              Image.asset(
+                                                AssetsConstant.arrowUpIcon,
+                                                height: 8,
+                                                width: 11,
+                                                color: changeTheme(
+                                                    SharedPrefs.readStringValue(
+                                                        PrefConstants.gender)),
+                                              )
+                                            ],
+                                          ),
+                                          Text(
+                                            "₹${_homeController.getServiceAddCartModel.data?.price ?? ""}",
+                                            style: AppTextTheme.bold.copyWith(
+                                                fontSize: 19,
+                                                color: ColorConstant.blackColor),
                                           )
                                         ],
                                       ),
-                                      Text(
-                                        "₹${_homeController.getServiceAddCartModel.data?.price ?? ""}",
-                                        style: AppTextTheme.bold.copyWith(
-                                            fontSize: 19,
-                                            color: ColorConstant.blackColor),
-                                      )
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "GST is included",
+                                  style: AppTextTheme.regular.copyWith(
+                                      color: ColorConstant.blackColor,
+                                      fontSize: 12),
+                                )
                               ],
                             ),
+
                             GestureDetector(
                               onTap: () {
                                 if (stylistId.value != "") {
