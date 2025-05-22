@@ -90,7 +90,7 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 8),
               child: Text(
                 widget.subTitle,
                 style: AppTextTheme.medium
@@ -101,9 +101,10 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
                 ? const SizedBox()
                 : Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 20),
-                    child: TextButton(
-                      onPressed: () {
+                        horizontal: 20,vertical: 5),
+                    child: GestureDetector(
+                      onTap:
+                       () {
                         _launchURL(widget.externalLink);
                       },
                       child: Text(
@@ -113,7 +114,7 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
                       ),
                     )),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 20,),
               child: ReadMoreText(
                 widget.body,
                 trimMode: TrimMode.Line,

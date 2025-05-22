@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
@@ -51,14 +53,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       _homeController.doGetUnAvailableDatesListData(
           artiestId: widget.artiestId,
           date: formatDate,
-          callback: () {
-            _homeController.doGetCart();
-            _homeController.doGetAvailabilitiesTimeSlot(
-              artiestId: widget.artiestId,
-              date: formatDate,
-            );
-            _homeController.doGetOrderId();
-          });
+          callback: () {});
+
+      _homeController.doGetCart();
+      _homeController.doGetAvailabilitiesTimeSlot(
+        artiestId: widget.artiestId,
+        date: formatDate,
+      );
+      _homeController.doGetOrderId();
     });
   }
 
@@ -731,6 +733,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                           ),
                           GestureDetector(
                             onTap: () {
+
+                              log("Razor pay KEY  :::: => ${ _homeController.getOrderIdModel.data?.razorpayKey ?? ""}");
                               if (_homeController.getServiceAddCartModel.data
                                       ?.items?.isEmpty ??
                                   false) {

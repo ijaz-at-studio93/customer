@@ -6,6 +6,8 @@ import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/model/current_booking_list_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 import '../../../constant/color_constant.dart';
 
 class PendingCardWidget extends StatefulWidget {
@@ -179,12 +181,63 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
           ),
           const SizedBox(height: 10),
           widget.bookingData.orderStatus != "confirmed"
-              ? Text(
-                  "Awaiting acceptance from stylist",
-                  style: AppTextTheme.bold.copyWith(
-                      fontSize: 18,
-                      color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender))),
+              ? Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Awaiting acceptance from stylist",
+                      style: AppTextTheme.bold.copyWith(
+                          fontSize: 18,
+                          color: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender))),
+                    ),
+                    SizedBox(height: 10),
+                    Column(
+                      children: [
+                        Text(
+                          "To cancel appointment, please drop whatsapp message on ",
+                          style: AppTextTheme.regular.copyWith(
+                              fontSize: 14,
+                              height: 1.2,
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender))),
+                        ),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                launchWhatsApp("8897090838");
+                              },
+                              child: Text(
+                                "+91 8897090838 / ",
+                                style: AppTextTheme.bold.copyWith(
+                                    fontSize: 14,
+                                    height: 1.2,
+                                    color: changeTheme(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.gender))),
+                              ),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                launchWhatsApp("9347882037");
+                              },
+                              child: Text(
+                                "+91 9347882037",
+                                style: AppTextTheme.bold.copyWith(
+                                    fontSize: 14,
+                                    height: 1.2,
+                                    color: changeTheme(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.gender))),
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ],
                 )
               : const SizedBox(),
           widget.bookingData.orderStatus == "confirmed"
@@ -211,7 +264,15 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
       ),
     );
   }
+  Future<void> launchWhatsApp(String phone) async {
+    final whatsappUrl = Uri.parse("https://wa.me/$phone");
 
+    if (await canLaunchUrl(whatsappUrl)) {
+      await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+    } else {
+      throw "Could not launch WhatsApp";
+    }
+  }
   /*---------------- convertTime ------------*/
   String convertDate({required String date}) {
     String dateTimeString = date;

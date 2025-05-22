@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -45,6 +47,9 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
                         widget.artiestPortfolio.data?.reviews?.length ?? 0,
                     itemBuilder: (context, index) {
                       return _listTileWidget(
+                        review: widget.artiestPortfolio.data?.reviews?[index]
+                            .createdAt ??
+                            "",
                           rate: widget.artiestPortfolio.data?.reviews?[index]
                                   .rating ??
                               0.0,
@@ -63,7 +68,7 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
 
   /*----------------- ReviewAndRating List Tile Widget  --------------*/
   _listTileWidget(
-      {required double rate, required String title, required String userName}) {
+      {required double rate, required String title, required String userName,required String review}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -93,7 +98,7 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
             minRating: 1,
             direction: Axis.horizontal,
             allowHalfRating: true,
-            itemCount: 5,
+            itemCount: rate.toInt(),
             itemSize: 25.0,
             ignoreGestures: true,
             itemBuilder: (context, _) => const Icon(
@@ -110,7 +115,7 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
           child: Row(
             children: [
               Text(
-                "$userName • Posted On ${widget.artiestPortfolio.data?.createdAt == "" || widget.artiestPortfolio.data?.createdAt == null ? "" : convertDate(widget.artiestPortfolio.data?.createdAt ?? "")}",
+                "$userName • Posted On ${convertDate(review)}",
                 style: AppTextTheme.medium
                     .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
               ),
@@ -126,7 +131,7 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
     DateTime dateTime = DateTime.parse(dateString);
 
     // Format the DateTime object to the desired format
-    String formattedDate = DateFormat('dd MMMM yyyy').format(dateTime);
+    String formattedDate = DateFormat('d MMM y').format(dateTime);
 
     return formattedDate;
   }
