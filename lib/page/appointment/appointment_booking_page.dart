@@ -19,6 +19,7 @@ import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+
 import '../../api/dio_client.dart';
 import '../home/widget/add_product_sheet_widget.dart';
 import '../profile/add_address_page.dart';
@@ -51,9 +52,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         lng: double.parse(SharedPrefs.readStringValue(PrefConstants.longitude)),
       );
       _homeController.doGetUnAvailableDatesListData(
-          artiestId: widget.artiestId,
-          date: formatDate,
-          callback: () {});
+          artiestId: widget.artiestId, date: formatDate, callback: () {});
 
       _homeController.doGetCart();
       _homeController.doGetAvailabilitiesTimeSlot(
@@ -733,8 +732,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-
-                              log("Razor pay KEY  :::: => ${ _homeController.getOrderIdModel.data?.razorpayKey ?? ""}");
+                              log("Razor pay KEY  :::: => ${_homeController.getOrderIdModel.data?.razorpayKey ?? ""}");
                               if (_homeController.getServiceAddCartModel.data
                                       ?.items?.isEmpty ??
                                   false) {

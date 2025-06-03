@@ -1382,7 +1382,7 @@ class _SaloonAfterSelectingServicesPageState
                                         separatorBuilder: (context, index) {
                                           return Container(
                                             margin: const EdgeInsets.only(
-                                                top: 20, bottom: 20),
+                                                top: 30, bottom: 20),
                                             height: 1,
                                             width: Get.width,
                                             color: ColorConstant.dividerColor,

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import '../constant/color_constant.dart';
 
@@ -42,13 +43,18 @@ class _RemoveButtonWidgetState extends State<RemoveButtonWidget> {
                   )
                 ],
               )
-            : Center(
+            : Container(
+              color: Colors.transparent,
+              height: 39,
+              width: 110,
+              child: Center(
                 child: Text(
                   'Remove',
                   style: AppTextTheme.medium.copyWith(
                       fontSize: 13, color: ColorConstant.removeStroke),
                 ),
               ),
+            ),
       ),
     );
   }

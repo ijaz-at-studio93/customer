@@ -14,7 +14,7 @@ class AddButtonWidget extends StatefulWidget {
 class _AddButtonWidgetState extends State<AddButtonWidget> {
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: widget.onPress,
       child: Container(
         height: 39,
@@ -24,11 +24,16 @@ class _AddButtonWidgetState extends State<AddButtonWidget> {
           color: ColorConstant.pinkBgColor,
           border: Border.all(color: widget.color),
         ),
-        child: Center(
-          child: Text(
-            "Add",
-            style: AppTextTheme.medium
-                .copyWith(fontSize: 13, color: widget.color),
+        child: Container(
+          color: Colors.transparent,
+          height: 39,
+          width: 110,
+          child: Center(
+            child: Text(
+              "Add",
+              style: AppTextTheme.medium
+                  .copyWith(fontSize: 13, color: widget.color),
+            ),
           ),
         ),
       ),

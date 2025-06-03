@@ -54,7 +54,7 @@ class DioClient {
         }, onResponse:
             (Response<dynamic> resp, ResponseInterceptorHandler handler) async {
           try {
-            if (resp.statusCode == 401 || resp.statusCode == 400) {
+            if (resp.statusCode == 401) {
               Get.find<AuthController>().resetApp();
             }
             if (resp.statusCode == 500 || resp.statusCode == 502) {

@@ -37,7 +37,7 @@ class ServiceOfferListTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16,),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -156,7 +156,8 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                                   PrefConstants.gender)) ??
                               ColorConstant.primaryColor,
                         ),
-                )
+                ),
+
               ],
             ),
           )
