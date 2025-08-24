@@ -90,7 +90,7 @@ class PushNotificationService {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
     var androidSettings = const AndroidInitializationSettings(
-      '@mipmap/notification_icon',
+      '@drawable/customer_notification',
     );
     var iOSSettings = const DarwinInitializationSettings(
       requestSoundPermission: false,

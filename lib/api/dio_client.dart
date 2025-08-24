@@ -59,7 +59,6 @@ class DioClient {
             }
             if (resp.statusCode == 500 || resp.statusCode == 502) {
               showMessage("Internal Server Error Bad Gateway");
-              Get.find<AuthController>().resetApp();
             }
           } catch (e) {
             return handler.next(resp);

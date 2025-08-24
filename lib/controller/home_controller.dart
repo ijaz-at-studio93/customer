@@ -716,21 +716,23 @@ class HomeController extends GetxController {
     }
   }
 
+  final RxBool _skipNextGetCart = false.obs;
   /*---------------- Get Cart ---------------*/
-  doGetCart() async {
+  doGetCart({bool useGlobalLoader = true}) async {
+    // keep your one-shot skip if you added it
+    if (_skipNextGetCart.value) { _skipNextGetCart.value = false; return; }
+
     try {
-      _showProgress.value = true;
+      if (useGlobalLoader) _showProgress.value = true;          // changed
       _serviceAddCartModel.value = await HomeAPI.getUserCart();
       if (_serviceAddCartModel.value.data?.items?.isEmpty ?? false) {
         stylistId.value = "";
       }
     } catch (e) {
       showError(e);
-      if (kDebugMode) {
-        print("Get Cart $e");
-      }
+      if (kDebugMode) print("Get Cart $e");
     } finally {
-      _showProgress.value = false;
+      if (useGlobalLoader) _showProgress.value = false;         // changed
     }
   }
 
@@ -819,17 +821,21 @@ class HomeController extends GetxController {
   }
 
   /*-------------  Get Order Id Model ---------------*/
-  doGetOrderId() async {
+  final RxBool _skipNextGetOrderId = false.obs;
+
+  doGetOrderId({bool useGlobalLoader = true}) async {
+    if (_skipNextGetOrderId.value) {
+      _skipNextGetOrderId.value = false;
+      return;
+    }
     try {
-      _showProgress.value = true;
+      if (useGlobalLoader) _showProgress.value = true;
       _orderIdModel.value = await HomeAPI.orderIdGet();
     } catch (e) {
       showError(e);
-      if (kDebugMode) {
-        print("Get Order Id $e");
-      }
+      if (kDebugMode) print("Get Order Id $e");
     } finally {
-      _showProgress.value = false;
+      if (useGlobalLoader) _showProgress.value = false;
     }
   }
 
@@ -1278,18 +1284,25 @@ class HomeController extends GetxController {
   /*-------------------- Add Apply  PromoCode -----------------*/
   doApplyPromoCode({required Map data, required VoidCallback callback}) async {
     try {
-      _showProgress.value = true;
-      bool result = await HomeAPI.applyPromoCode(data: data);
-      if (result) {
-        callback.call();
-      }
+      _showProgress.value = true; // one loader for the whole sequence
+
+      final bool ok = await HomeAPI.applyPromoCode(data: data);
+      if (!ok) return;
+
+      // Fetch both without toggling the loader again
+      await doGetCart(useGlobalLoader: false);
+      await doGetOrderId(useGlobalLoader: false);
+
+      // Make the page's immediate doGetCart() a no-op if you added the guard earlier
+      _skipNextGetCart.value = true;
+      _skipNextGetOrderId.value  = true;
+
+      callback.call();
     } catch (e) {
-      if (kDebugMode) {
-        print("doApplyPromoCode $e");
-      }
+      if (kDebugMode) print("doApplyPromoCode $e");
       showError(e);
     } finally {
-      _showProgress.value = false;
+      _showProgress.value = false; // end the single loader
     }
   }
 
@@ -1329,5 +1342,65 @@ class HomeController extends GetxController {
     }
   }
 
+  Future<StandardResponse> cancelBooking({
+    required String bookingId,
+    required String artistId,
+    required String status,
+    required VoidCallback callback,
+  }) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.approveBooking(
+          bookingId: bookingId,
+          artistId: artistId,
+          status: status);
+
+      if (result) {
+        callback.call();
+        return StandardResponse(success: true, message: "Cancelled successfully");
+      } else {
+        return StandardResponse(success: false, message: "Failed to cancel");
+      }
+    } catch (e) {
+      showError(e);
+      return StandardResponse(success: false, message: e.toString());
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  Future<StandardResponse> reScheduledBooking({
+    required String appointmentId,
+    required String newTime,
+    required VoidCallback callback,
+  }) async {
+    try {
+      _showProgress.value = true;
+      bool result = await HomeAPI.reScheduleBooking(
+          appointmentId: appointmentId,
+          newTime: newTime);
+
+      if (result) {
+        callback.call();
+        return StandardResponse(success: true, message: "Re scheduled successfully");
+      } else {
+        return StandardResponse(success: false, message: "Failed to re schedule");
+      }
+    } catch (e) {
+      showError(e);
+      return StandardResponse(success: false, message: e.toString());
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
 /*-------------------------  -------------------------*/
 }
+
+class StandardResponse {
+  final bool success;
+  final String? message;
+
+  StandardResponse({required this.success, this.message});
+}
+

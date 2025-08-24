@@ -24,6 +24,7 @@ import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/variable_constant.dart';
+import '../../util/call_wrapper.dart';
 import '../../util/logger.dart';
 import '../profile/profile_page.dart';
 import '../search/search_for_salon_or_service_page.dart';
@@ -35,13 +36,15 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<HomePage> {
+  static const homeListKey = PageStorageKey<String>('home_main_list');
   /*-------------------  Controller ----------------------*/
 
   final _authController = Get.find<AuthController>();
   final _homeController = Get.find<HomeController>();
 
   @override
+  bool get wantKeepAlive => true;
   void initState() {
     super.initState();
     if (SharedPrefs.readBoolValue(PrefConstants.isFirstTime) == true) {
@@ -103,13 +106,16 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    super.build(context);
+    return CallWrapper(
+        child: Scaffold(
       appBar: statusBarTheme(context),
       backgroundColor: ColorConstant.bgColor,
       body: Obx(
         () => _homeController.showProgress
             ? const ProgressBarView()
             : ListView(
+                key: _HomePageState.homeListKey,
                 shrinkWrap: true,
                 children: [
                   _headerWidget(),
@@ -138,58 +144,83 @@ class _HomePageState extends State<HomePage> {
                             return SaloonCardWidget(
                               homeSalonModel: _homeController
                                   .getHomeSalonList.data!.rows![index],
-                              onPress: () {
-                                Get.to(() => SaloonAfterSelectingServicesPage(
-                                      id: _homeController.getHomeSalonList.data
-                                              ?.rows?[index].id ??
-                                          "",
-                                      callback: () {
-                                        _homeController.doGetHomeCategory(
-                                          gender: selectedGender.value == 0
-                                              ? "male"
-                                              : "female",
-                                        );
-                                        _homeController.doGetMakePackageData();
+                              // Old code of coming back and loading everything
+                              // onPress: () {
+                              //   Get.to(() => SaloonAfterSelectingServicesPage(
+                              //         id: _homeController.getHomeSalonList.data
+                              //                 ?.rows?[index].id ??
+                              //             "",
+                              //         callback: () {
+                              //           _homeController.doGetHomeCategory(
+                              //             gender: selectedGender.value == 0
+                              //                 ? "male"
+                              //                 : "female",
+                              //           );
+                              //           _homeController.doGetMakePackageData();
+                              //
+                              //           _homeController.doGetPromoCode(
+                              //               fourPlusRating: false,
+                              //               homeService:
+                              //                   SharedPrefs.readBoolValue(
+                              //                       PrefConstants
+                              //                           .isHomeService),
+                              //               nearest: false,
+                              //               orderBy: "",
+                              //               serviceGender:
+                              //                   selectedGender.value == 0
+                              //                       ? "male"
+                              //                       : "female",
+                              //               lat: double.parse(
+                              //                   SharedPrefs.readStringValue(
+                              //                       PrefConstants.latitude)),
+                              //               lng: double.parse(
+                              //                   SharedPrefs.readStringValue(
+                              //                       PrefConstants.longitude)));
+                              //
+                              //           _homeController.doGetHomeSalonList(
+                              //               serviceGender:
+                              //                   selectedGender.value == 0
+                              //                       ? "male"
+                              //                       : "female",
+                              //               homeService: atHome,
+                              //               offset: 1,
+                              //               size: 50,
+                              //               lat: double.parse(
+                              //                   SharedPrefs.readStringValue(
+                              //                       PrefConstants.latitude)),
+                              //               lng: double.parse(
+                              //                   SharedPrefs.readStringValue(
+                              //                       PrefConstants.longitude)),
+                              //               orderBy: "",
+                              //               nearest: false,
+                              //               fourPlusRating: false);
+                              //         },
+                              //       ));
+                              // },
 
-                                        _homeController.doGetPromoCode(
-                                            fourPlusRating: false,
-                                            homeService:
-                                                SharedPrefs.readBoolValue(
-                                                    PrefConstants
-                                                        .isHomeService),
-                                            nearest: false,
-                                            orderBy: "",
-                                            serviceGender:
-                                                selectedGender.value == 0
-                                                    ? "male"
-                                                    : "female",
-                                            lat: double.parse(
-                                                SharedPrefs.readStringValue(
-                                                    PrefConstants.latitude)),
-                                            lng: double.parse(
-                                                SharedPrefs.readStringValue(
-                                                    PrefConstants.longitude)));
+                              // new code
+                              onPress: () async {
+                                final changed = await Get.to(() => SaloonAfterSelectingServicesPage(
+                                  id: _homeController.getHomeSalonList.data?.rows?[index].id ?? "",
+                                  callback: () {}, // ✅ satisfy the required param
+                                ));
 
-                                        _homeController.doGetHomeSalonList(
-                                            serviceGender:
-                                                selectedGender.value == 0
-                                                    ? "male"
-                                                    : "female",
-                                            homeService: atHome,
-                                            offset: 1,
-                                            size: 50,
-                                            lat: double.parse(
-                                                SharedPrefs.readStringValue(
-                                                    PrefConstants.latitude)),
-                                            lng: double.parse(
-                                                SharedPrefs.readStringValue(
-                                                    PrefConstants.longitude)),
-                                            orderBy: "",
-                                            nearest: false,
-                                            fourPlusRating: false);
-                                      },
-                                    ));
+                                if (changed == true) {
+                                  _homeController.doGetHomeSalonList(
+                                    serviceGender: selectedGender.value == 0 ? "male" : "female",
+                                    homeService: atHome,
+                                    offset: 1,
+                                    size: 50,
+                                    lat: double.parse(SharedPrefs.readStringValue(PrefConstants.latitude)),
+                                    lng: double.parse(SharedPrefs.readStringValue(PrefConstants.longitude)),
+                                    orderBy: "",
+                                    nearest: false,
+                                    fourPlusRating: false,
+                                    // silent: true,
+                                  );
+                                }
                               },
+
                               isFav: false,
                             );
                           })
@@ -347,7 +378,7 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   /*--------------  Header Widget ----------------*/
@@ -1354,7 +1385,9 @@ class _HomePageState extends State<HomePage> {
                                         ? ""
                                         : dropdownvalue == "Newest"
                                             ? "createdAt"
-                                            : "name",
+                                            : dropdownvalue == "Price"
+                                                ? "serviceStartingPrice"
+                                                : "name",
                                     serviceGender: selectedGender.value == 0
                                         ? "male"
                                         : "female",
@@ -1415,7 +1448,9 @@ class _HomePageState extends State<HomePage> {
                                           ? ""
                                           : dropdownvalue == "Newest"
                                               ? "createdAt"
-                                              : "name",
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       serviceGender: selectedGender.value == 0
                                           ? "male"
                                           : "female",
@@ -1442,8 +1477,10 @@ class _HomePageState extends State<HomePage> {
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                              ? "createdAt"
-                                              : "name",
+                                          ? "createdAt"
+                                          : dropdownvalue == "Price"
+                                          ? "serviceStartingPrice"
+                                          : "name",
                                       nearest: false,
                                       fourPlusRating: false);
                                 });
@@ -1515,8 +1552,10 @@ class _HomePageState extends State<HomePage> {
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                              ? "createdAt"
-                                              : "name",
+                                          ? "createdAt"
+                                          : dropdownvalue == "Price"
+                                          ? "serviceStartingPrice"
+                                          : "name",
                                       nearest: true,
                                       fourPlusRating: false);
 
@@ -1528,8 +1567,10 @@ class _HomePageState extends State<HomePage> {
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                              ? "createdAt"
-                                              : "name",
+                                          ? "createdAt"
+                                          : dropdownvalue == "Price"
+                                          ? "serviceStartingPrice"
+                                          : "name",
                                       serviceGender: selectedGender.value == 0
                                           ? "male"
                                           : "female",
@@ -1557,8 +1598,10 @@ class _HomePageState extends State<HomePage> {
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                              ? "createdAt"
-                                              : "name",
+                                          ? "createdAt"
+                                          : dropdownvalue == "Price"
+                                          ? "serviceStartingPrice"
+                                          : "name",
                                       nearest: false,
                                       fourPlusRating: false);
 
@@ -1570,8 +1613,10 @@ class _HomePageState extends State<HomePage> {
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                              ? "createdAt"
-                                              : "name",
+                                          ? "createdAt"
+                                          : dropdownvalue == "Price"
+                                          ? "serviceStartingPrice"
+                                          : "name",
                                       serviceGender: selectedGender.value == 0
                                           ? "male"
                                           : "female",
@@ -1631,8 +1676,10 @@ class _HomePageState extends State<HomePage> {
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                              ? "createdAt"
-                                              : "name",
+                                          ? "createdAt"
+                                          : dropdownvalue == "Price"
+                                          ? "serviceStartingPrice"
+                                          : "name",
                                       nearest: false,
                                       fourPlusRating: true);
 
@@ -1644,8 +1691,10 @@ class _HomePageState extends State<HomePage> {
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                              ? "createdAt"
-                                              : "name",
+                                          ? "createdAt"
+                                          : dropdownvalue == "Price"
+                                          ? "serviceStartingPrice"
+                                          : "name",
                                       serviceGender: selectedGender.value == 0
                                           ? "male"
                                           : "female",
@@ -1673,8 +1722,10 @@ class _HomePageState extends State<HomePage> {
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                              ? "createdAt"
-                                              : "name",
+                                          ? "createdAt"
+                                          : dropdownvalue == "Price"
+                                          ? "serviceStartingPrice"
+                                          : "name",
                                       nearest: false,
                                       fourPlusRating: false);
 
@@ -1686,8 +1737,10 @@ class _HomePageState extends State<HomePage> {
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                              ? "createdAt"
-                                              : "name",
+                                          ? "createdAt"
+                                          : dropdownvalue == "Price"
+                                          ? "serviceStartingPrice"
+                                          : "name",
                                       serviceGender: selectedGender.value == 0
                                           ? "male"
                                           : "female",
@@ -1772,7 +1825,7 @@ class _HomePageState extends State<HomePage> {
 
   /*------------------ DropDown  ------------*/
   String dropdownvalue = 'Sort By';
-  var items = ['Sort By', 'Newest', 'Name'];
+  var items = ['Sort By', 'Newest', 'Name', 'Price'];
 
   /*--------------------- Current location lat lng --------------------- */
   getCurrentLatLng() async {

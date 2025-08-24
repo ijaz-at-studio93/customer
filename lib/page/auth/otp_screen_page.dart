@@ -176,7 +176,11 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
                       SharedPrefs.readStringValue(PrefConstants.gender)) ??
                   ColorConstant.primaryColor,
             ),
-            onCompleted: (val) {},
+            //onCompleted: (val) {},
+            onCompleted: (val) {
+              _otpTextEditingController.text = val;
+              doOtp(); // auto submit
+            },
           ),
           const SizedBox(height: 25),
           Row(

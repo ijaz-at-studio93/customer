@@ -185,6 +185,17 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
             ),
           ),
           const SizedBox(height: 10),
+          Text(
+            'Hope you liked the service! Tap the VIEW button below to leave your valuable feedback.',
+            style: AppTextTheme.medium.copyWith(
+              fontSize: 16,
+              color: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender)),
+            ),
+            textAlign: TextAlign.center,
+          ),
+
+          const SizedBox(height: 10),
           widget.historyList.orderStatus == "salon_artist_rejected"
               ? const SizedBox()
               : GestureDetector(

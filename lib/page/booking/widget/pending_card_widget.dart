@@ -13,9 +13,10 @@ import '../../../constant/color_constant.dart';
 class PendingCardWidget extends StatefulWidget {
   final BookingData bookingData;
   final VoidCallback onPress;
+  final VoidCallback onReSchedule;
 
   const PendingCardWidget(
-      {super.key, required this.onPress, required this.bookingData});
+      {super.key, required this.onPress, required this.onReSchedule, required this.bookingData});
 
   @override
   State<PendingCardWidget> createState() => _PendingCardWidgetState();
@@ -142,14 +143,17 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                widget.bookingData.orderStatus == "salon_artist_rejected"
+                widget.bookingData.orderStatus == "salon_artist_rejected" || widget.bookingData.orderStatus == "salon_rejected"
                     ? "Rejected"
+                    : widget.bookingData.orderStatus == "user_cancelled"
+                    ? "Cancelled"
                     : widget.bookingData.orderStatus ?? "",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold.copyWith(
                     fontSize: 16,
-                    color: widget.bookingData.orderStatus ==
-                        "salon_artist_rejected"
+                    color: widget.bookingData.orderStatus == "salon_artist_rejected" ||
+                        widget.bookingData.orderStatus == "salon_rejected" ||
+                        widget.bookingData.orderStatus == "user_cancelled"
                         ? ColorConstant.redBgColor
                         : changeTheme(
                         SharedPrefs.readStringValue(PrefConstants.gender))),
@@ -180,86 +184,145 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
             ),
           ),
           const SizedBox(height: 10),
-          widget.bookingData.orderStatus != "confirmed"
+          widget.bookingData.orderStatus != "completed"
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "Awaiting acceptance from stylist",
+                      widget.bookingData.orderStatus == "pending"
+                          ? "Your anticipation matters. Awaiting salon's happy news."
+                          : widget.bookingData.orderStatus == "confirmed"
+                          ? "So thrilled! Your appointment is now a reality."
+                          : widget.bookingData.orderStatus == "salon_rejected" ||
+                          widget.bookingData.orderStatus == "salon_artist_rejected"
+                          ? "Heartfelt apologies. Salon couldn't confirm this time."
+                          : widget.bookingData.orderStatus == "user_cancelled"
+                          ? "We understand. You've successfully changed your plans."
+                          : "Awaiting acceptance from stylist", // Default if status is unknown or needs a generic phrase
                       style: AppTextTheme.bold.copyWith(
                           fontSize: 18,
-                          color: changeTheme(SharedPrefs.readStringValue(
-                              PrefConstants.gender))),
+                          color: widget.bookingData.orderStatus == "salon_rejected" ||
+                              widget.bookingData.orderStatus == "salon_artist_rejected" ||
+                              widget.bookingData.orderStatus == "user_cancelled"
+                              ? ColorConstant.redBgColor // Apply red for rejected/cancelled
+                              : changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender))),
                     ),
-                    SizedBox(height: 10),
-                    Column(
-                      children: [
-                        Text(
-                          "To cancel appointment, please drop whatsapp message on ",
-                          style: AppTextTheme.regular.copyWith(
-                              fontSize: 14,
-                              height: 1.2,
-                              color: changeTheme(SharedPrefs.readStringValue(
-                                  PrefConstants.gender))),
-                        ),
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () {
-                                launchWhatsApp("8897090838");
-                              },
-                              child: Text(
-                                "+91 8897090838 / ",
-                                style: AppTextTheme.bold.copyWith(
-                                    fontSize: 14,
-                                    height: 1.2,
-                                    color: changeTheme(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.gender))),
-                              ),
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                launchWhatsApp("9347882037");
-                              },
-                              child: Text(
-                                "+91 9347882037",
-                                style: AppTextTheme.bold.copyWith(
-                                    fontSize: 14,
-                                    height: 1.2,
-                                    color: changeTheme(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.gender))),
-                              ),
-                            ),
-                          ],
-                        )
-                      ],
-                    ),
+                    // SizedBox(height: 10),
+                    // Column(
+                    //   children: [
+                    //     Text(
+                    //       "To cancel appointment, please drop whatsapp message on ",
+                    //       style: AppTextTheme.regular.copyWith(
+                    //           fontSize: 14,
+                    //           height: 1.2,
+                    //           color: changeTheme(SharedPrefs.readStringValue(
+                    //               PrefConstants.gender))),
+                    //     ),
+                    //     const SizedBox(height: 2),
+                    //     Row(
+                    //       children: [
+                    //         GestureDetector(
+                    //           onTap: () {
+                    //             launchWhatsApp("9347882037");
+                    //           },
+                    //           child: Text(
+                    //             "+91 9347882037 / ",
+                    //             style: AppTextTheme.bold.copyWith(
+                    //                 fontSize: 14,
+                    //                 height: 1.2,
+                    //                 color: changeTheme(
+                    //                     SharedPrefs.readStringValue(
+                    //                         PrefConstants.gender))),
+                    //           ),
+                    //         ),
+                    //         GestureDetector(
+                    //           onTap: () {
+                    //             launchWhatsApp("8897090838");
+                    //           },
+                    //           child: Text(
+                    //             "+91 8897090838",
+                    //             style: AppTextTheme.bold.copyWith(
+                    //                 fontSize: 14,
+                    //                 height: 1.2,
+                    //                 color: changeTheme(
+                    //                     SharedPrefs.readStringValue(
+                    //                         PrefConstants.gender))),
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     )
+                    //   ],
+                    // ),
                   ],
                 )
               : const SizedBox(),
-          widget.bookingData.orderStatus == "confirmed"
-              ? GestureDetector(
-                  onTap: widget.onPress,
-                  child: Container(
-                    height: 50,
-                    width: Get.width,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: const Color(0xffEAEAEA),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "VIEW",
-                        style: AppTextTheme.bold.copyWith(
-                            color: ColorConstant.blackColor, fontSize: 16),
-                      ),
-                    ),
+
+          // old flow of showing view on confirmed only.
+          // widget.bookingData.orderStatus == "confirmed"
+          //     ? GestureDetector(
+          //         onTap: widget.
+          //         ,
+          //         child: Container(
+          //           height: 50,
+          //           width: Get.width,
+          //           decoration: BoxDecoration(
+          //             borderRadius: BorderRadius.circular(8),
+          //             color: const Color(0xffEAEAEA),
+          //           ),
+          //           child: Center(
+          //             child: Text(
+          //               "VIEW",
+          //               style: AppTextTheme.bold.copyWith(
+          //                   color: ColorConstant.blackColor, fontSize: 16),
+          //             ),
+          //           ),
+          //         ),
+          //       )
+          //     : const SizedBox()
+
+          const SizedBox(height: 15),
+          if (!(widget.bookingData.orderStatus == "user_cancelled" ||
+              widget.bookingData.orderStatus == "salon_rejected" ||
+              widget.bookingData.orderStatus == "salon_artist_rejected")) ...[
+            GestureDetector(
+              onTap: widget.onPress,
+              child: Container(
+                height: 40,
+                width: Get.width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: const Color(0xffEAEAEA),
+                ),
+                child: Center(
+                  child: Text(
+                    "VIEW",
+                    style: AppTextTheme.bold.copyWith(
+                        color: ColorConstant.blackColor, fontSize: 16),
                   ),
-                )
-              : const SizedBox()
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: widget.onReSchedule,
+              child: Container(
+                height: 40,
+                width: Get.width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: const Color(0xffEAEAEA),
+                ),
+                child: Center(
+                  child: Text(
+                    "Re Schedule",
+                    style: AppTextTheme.bold.copyWith(
+                        color: ColorConstant.blackColor, fontSize: 16),
+                  ),
+                ),
+              ),
+            ),
+          ]
         ],
       ),
     );

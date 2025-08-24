@@ -139,7 +139,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         ),
                         const SizedBox(width: 3),
                         Text(
-                          widget.homeSalonModel.averageArtistRatings.toString(),
+                          (widget.homeSalonModel.averageArtistRatings ?? 0).toStringAsFixed(2),
                           style: AppTextTheme.medium.copyWith(
                               fontSize: 11, color: ColorConstant.yellowColor),
                         ),

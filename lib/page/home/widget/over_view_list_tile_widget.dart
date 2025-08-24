@@ -128,8 +128,7 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                       width: 123,
                       height: 123,
                       fit: BoxFit.cover,
-                      imageUrl:
-                          "${APIConstants.image}${widget.servicesList.image ?? " "}",
+                      imageUrl: "${APIConstants.image}${widget.servicesList.image ?? " "}",
                       placeholder: (context, url) => const Image(
                         image: AssetImage(AssetsConstant.placeHolder),
                         width: 108,

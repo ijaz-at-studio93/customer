@@ -9,6 +9,7 @@ import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
+import '../../util/call_wrapper.dart';
 
 class InsightsHomePage extends StatefulWidget {
   const InsightsHomePage({super.key});
@@ -17,10 +18,13 @@ class InsightsHomePage extends StatefulWidget {
   State<InsightsHomePage> createState() => _InsightsHomePageState();
 }
 
-class _InsightsHomePageState extends State<InsightsHomePage> {
+class _InsightsHomePageState extends State<InsightsHomePage>
+    with AutomaticKeepAliveClientMixin<InsightsHomePage> {
   final _homeController = Get.find<HomeController>();
+  static const insightsListKey = PageStorageKey<String>('insights_main_list');
 
   @override
+  bool get wantKeepAlive => true;
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
@@ -33,7 +37,9 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    super.build(context);
+    return CallWrapper(
+        child: Scaffold(
       backgroundColor: ColorConstant.bgColor,
       appBar: AppBar(
         elevation: 0.0,
@@ -53,6 +59,7 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
                     false || _homeController.getBlogDataModel.data == null
                 ? const NoItemsWidget(text: "No insight data is available")
                 : ListView.separated(
+                    key: _InsightsHomePageState.insightsListKey,
                     separatorBuilder: (context, i) {
                       return const Divider(
                         thickness: 1,
@@ -103,6 +110,6 @@ class _InsightsHomePageState extends State<InsightsHomePage> {
                       );
                     }),
       ),
-    );
+    ));
   }
 }

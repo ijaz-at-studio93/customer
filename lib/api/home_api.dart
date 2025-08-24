@@ -762,4 +762,42 @@ class HomeAPI {
       throw response.data;
     }
   }
+
+  static Future<bool> approveBooking({
+    required String bookingId,
+    required String artistId,
+    required String status,
+  }) async {
+    final response = await DioClient.client.put(
+      "user/booking/$bookingId/status",
+      data: {
+        "salonArtistId": artistId,
+        "status": status,
+      },
+    );
+
+    if (response.statusCode == 200 && response.data['success'] == true) {
+      return true;
+    } else {
+      throw Exception(response.data['message'] ?? 'Failed to cancel booking');
+    }
+  }
+
+  static Future<bool> reScheduleBooking({
+    required String appointmentId,
+    required String newTime
+  }) async {
+    final response = await DioClient.client.put(
+      "user/booking/$appointmentId/reSchedule",
+      data: {
+        "newDateTime": newTime
+      },
+    );
+
+    if (response.statusCode == 200 && response.data['success'] == true) {
+      return true;
+    } else {
+      throw Exception(response.data['message'] ?? 'Failed to re schedule booking');
+    }
+  }
 }

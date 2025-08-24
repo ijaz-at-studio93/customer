@@ -691,9 +691,9 @@ class _SaloonAfterSelectingServicesPageState
                     SizedBox(
                       width: Get.width * 0.05,
                       child: Text(
-                        _homeController
-                                .homeSalonDetailsData.data?.averageArtistRatings
-                                .toString() ??
+                              (_homeController
+                                .homeSalonDetailsData.data?.averageArtistRatings ?? 0)
+                                .toStringAsFixed(2) ??
                             "",
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -1705,7 +1705,7 @@ class _SaloonAfterSelectingServicesPageState
   }
 
   double convertMetersToKilometers(double meters) {
-    return meters / 1000;
+    return (meters / 1000 * 10).roundToDouble() / 10;
   }
 
   String convertTimeTo12HourFormat(String time24) {
