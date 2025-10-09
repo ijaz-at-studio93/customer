@@ -32,7 +32,7 @@ class BookingHistoryListModel {
 }
 
 class HistoryList {
-  int? orderAmount;
+  double? orderAmount;   // 🔧 changed to double
   String? bookingId;
   String? idx;
   String? finalizedAt;
@@ -46,19 +46,19 @@ class HistoryList {
 
   HistoryList(
       {this.orderAmount,
-      this.bookingId,
-      this.idx,
-      this.finalizedAt,
-      this.appointmentId,
-      this.orderStatus,
-      this.startsAt,
-      this.endsAt,
-      this.salon,
-      this.appointment,
-      this.items});
+        this.bookingId,
+        this.idx,
+        this.finalizedAt,
+        this.appointmentId,
+        this.orderStatus,
+        this.startsAt,
+        this.endsAt,
+        this.salon,
+        this.appointment,
+        this.items});
 
   HistoryList.fromJson(Map<String, dynamic> json) {
-    orderAmount = json['orderAmount'];
+    orderAmount = (json['orderAmount'] as num?)?.toDouble();  // 🔧 safe cast
     bookingId = json['bookingId'];
     idx = json['idx'];
     finalizedAt = json['finalizedAt'];
@@ -153,9 +153,9 @@ class Items {
     id = json['id'];
     isService = json['isService'];
     service =
-        json['service'] != null ? Service.fromJson(json['service']) : null;
+    json['service'] != null ? Service.fromJson(json['service']) : null;
     product =
-        json['product'] != null ? Service.fromJson(json['product']) : null;
+    json['product'] != null ? Service.fromJson(json['product']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -173,14 +173,14 @@ class Items {
 }
 
 class Service {
-  int? price;
+  double? price;   // 🔧 changed to double
   String? id;
   String? name;
 
   Service({this.price, this.id, this.name});
 
   Service.fromJson(Map<String, dynamic> json) {
-    price = json['price'];
+    price = (json['price'] as num?)?.toDouble();  // 🔧 safe cast
     id = json['id'];
     name = json['name'];
   }

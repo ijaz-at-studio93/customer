@@ -423,11 +423,13 @@ class _SelectedServiceSheetPageState extends State<SelectedServiceSheetPage> {
                                             color: ColorConstant.grayTextColor),
                                       ),
                                       Text(
-                                        "₹${_homeController.getServiceAddCartModel.data?.price ?? ""}",
+                                        "₹${(_homeController.getServiceAddCartModel.data?.price ?? 0).toDouble().toStringAsFixed(2)}",
                                         style: AppTextTheme.bold.copyWith(
                                             fontSize: 19,
-                                            color: ColorConstant.blackColor),
+                                            color: ColorConstant.blackColor,
+                                        ),
                                       )
+
                                     ],
                                   ),
                                 ],

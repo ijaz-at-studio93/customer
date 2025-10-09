@@ -747,7 +747,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                "₹${_homeController.getServiceAddCartModel.data?.price ?? ""}",
+                                "₹${(_homeController.getServiceAddCartModel.data?.price ?? 0).toStringAsFixed(2)}",
                                 style: AppTextTheme.bold.copyWith(
                                     fontSize: 19,
                                     color: ColorConstant.blackColor),
@@ -771,7 +771,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                         .getServiceAddCartModel.data?.price ??
                                     0 * 100,
                                 'name': 'ScutS',
-                                'timeout': 60,
+                                'timeout': 120,
                                 "order_id": _homeController
                                         .getOrderIdModel.data?.orderId ??
                                     "",
@@ -933,6 +933,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
   /*---------------  On Payment Success Method ------------ */
   void handlePaymentSuccessResponse(PaymentSuccessResponse response) {
+    print("🎯 Razorpay Success Response: $response");
+    print("PaymentId: ${response.paymentId}");
+    print("OrderId: ${response.orderId}");
+    print("Signature: ${response.signature}");
     showMessage("Payment Successful");
     if (selectTime == "") {
       selectTime =

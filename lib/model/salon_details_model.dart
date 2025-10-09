@@ -36,6 +36,7 @@ class Data {
   String? mobile;
   String? address;
   String? image;
+  List<String>? images;
   GeoLocationPoint? geoLocationPoint;
   String? createdAt;
   String? updatedAt;
@@ -59,6 +60,7 @@ class Data {
         this.mobile,
         this.address,
         this.image,
+        this.images,
         this.geoLocationPoint,
         this.createdAt,
         this.updatedAt,
@@ -83,6 +85,9 @@ class Data {
     mobile = json['mobile'];
     address = json['address'];
     image = json['image'];
+    if (json['images'] != null) {
+      images = List<String>.from(json['images'].map((e) => e.toString()));
+    }
     geoLocationPoint = json['geoLocationPoint'] != null
         ? GeoLocationPoint.fromJson(json['geoLocationPoint'])
         : null;

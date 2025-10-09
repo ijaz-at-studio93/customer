@@ -379,47 +379,72 @@ class _QRCodePageState extends State<QRCodePage> {
       confirmTextColor: Colors.white,
       buttonColor: Colors.red,
       onConfirm: () async {
-        Get.back(); // Close the dialog
+        // close confirmation dialog
+        Get.back();
 
-        // Optional: Show loader
-        Get.dialog(Center(child: CircularProgressIndicator()), barrierDismissible: false);
+        // show a single loader dialog
+        Get.dialog(
+          const Center(child: CircularProgressIndicator()),
+          barrierDismissible: false,
+        );
 
         try {
           final bookingId = _homeController.getUserBookingQrCodeModel.data?.idx ?? "";
-          final artistId = _homeController.getUserBookingQrCodeModel.data
-              ?.appointment?.artist?.id ?? "";
-          final response = await _homeController.cancelBooking(bookingId:bookingId,
-            artistId:artistId,
+          final artistId = _homeController.getUserBookingQrCodeModel.data?.appointment?.artist?.id ?? "";
+
+          // call cancelBooking and await the response
+          final response = await _homeController.cancelBooking(
+            bookingId: bookingId,
+            artistId: artistId,
             status: "user_cancelled",
-            callback: () {
-              Get.back(); // close popup if open
-              Get.snackbar("Cancelled", "Your booking was cancelled successfully.",
-                snackPosition: SnackPosition.BOTTOM,
-              );
-              // You can add additional UI updates here if needed
-            },
+            // IMPORTANT: do NOT use a callback that calls Get.back() or shows snackbars here
+            // because we will handle UI flow in this method after awaiting the response.
+            //callback: () {},
           );
 
-          Get.back(); // Close the loader
+          // close loader (only once)
+          if (Get.isDialogOpen ?? false) {
+            Get.back();
+          }
 
           if (response.success) {
-            // Update booking status in controller
-            _homeController.getUserBookingQrCodeModel.data?.orderStatus = "cancelled_by_customer";
+            // Update local model (optional)
+            _homeController.getUserBookingQrCodeModel.data?.orderStatus = "user_cancelled";
 
-            // Show success
-            Get.snackbar("Success", "Your booking has been cancelled.",
-                backgroundColor: Colors.green, colorText: Colors.white);
+            // Pop this QR page and send result true to the previous page to trigger a refresh
+            Get.back(result: true);
 
-            // Optional: Trigger refund logic if needed (usually on backend)
-            // Optional: Backend should handle notification to stylist & customer
+            // show success snackbar (this is safe; we are not trying to close a disposed snackbar)
+            Get.snackbar(
+              "Success",
+              "Your booking has been cancelled. Refund will be processed shortly.",
+              backgroundColor: Colors.green,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.BOTTOM,
+            );
           } else {
-            Get.snackbar("Failed", response.message ?? "Something went wrong.",
-                backgroundColor: Colors.red, colorText: Colors.white);
+            // show failure snackbar
+            Get.snackbar(
+              "Failed",
+              response.message ?? "Something went wrong.",
+              backgroundColor: Colors.red,
+              colorText: Colors.white,
+              snackPosition: SnackPosition.BOTTOM,
+            );
           }
         } catch (e) {
-          Get.back(); // Close loader
-          Get.snackbar("Error", "Something went wrong: ${e.toString()}",
-              backgroundColor: Colors.red, colorText: Colors.white);
+          // close loader (if still open)
+          if (Get.isDialogOpen ?? false) {
+            Get.back();
+          }
+
+          Get.snackbar(
+            "Error",
+            "Something went wrong: ${e.toString()}",
+            backgroundColor: Colors.red,
+            colorText: Colors.white,
+            snackPosition: SnackPosition.BOTTOM,
+          );
         }
       },
     );

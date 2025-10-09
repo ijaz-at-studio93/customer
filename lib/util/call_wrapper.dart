@@ -30,11 +30,32 @@ class _CallWrapperState extends State<CallWrapper> {
     );
   }
 
-  void _makeCall() async {
-    final uri = Uri(scheme: 'tel', path: '+919347882037');
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri);
-    }
+  void _showCallOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (ctx) => Wrap(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.call),
+            title: const Text("Call +91 93478 82037"),
+            onTap: () async {
+              Navigator.pop(ctx);
+              final uri = Uri(scheme: 'tel', path: '+919347882037');
+              if (await canLaunchUrl(uri)) launchUrl(uri);
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.call),
+            title: const Text("Call +91 94404 67103"),
+            onTap: () async {
+              Navigator.pop(ctx);
+              final uri = Uri(scheme: 'tel', path: '+919440467103');
+              if (await canLaunchUrl(uri)) launchUrl(uri);
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   Offset _clampToBounds(Offset p) {
@@ -73,18 +94,19 @@ class _CallWrapperState extends State<CallWrapper> {
               children: [
                 FloatingActionButton(
                   heroTag: 'global-call-fab',
-                  onPressed: _makeCall,
-                  backgroundColor: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender),
-                  ),
+                  onPressed: () {_showCallOptions(context);},
+                  // backgroundColor: changeTheme(
+                  //   SharedPrefs.readStringValue(PrefConstants.gender),
+                  // ),
+                  backgroundColor: const Color(0xFF25D366),
                   child: const Icon(Icons.call, size: 28),
                 ),
                 const SizedBox(height: 6),
                 const Text(
                   "Help 24×7",
                   style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w900,
                     color: Colors.black,
                   ),
                 ),

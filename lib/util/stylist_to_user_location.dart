@@ -46,7 +46,8 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
   GoogleMapController? _controller;
   LatLng _initialPosition = const LatLng(0.0, 0.0);
   bool _locationLoaded = false;
-  PolylinePoints polylinePoints = PolylinePoints();
+  //PolylinePoints polylinePoints = PolylinePoints();
+  PolylinePoints polylinePoints = PolylinePoints(apiKey: "AIzaSyClfJgsQEwO0zO6io_TuR-TDUsVwGT3ex0");
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
 
@@ -224,23 +225,24 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
 
   void makeLines(
       {required double currentLat,
-      required double currentLng,
-      required double destLat,
-      required double destLng}) async {
-    await polylinePoints
-        .getRouteBetweenCoordinates(
-            request: PolylineRequest(
-                headers: {},
-                origin: PointLatLng(currentLat, currentLng),
-                destination: PointLatLng(destLat, destLng),
-                mode: TravelMode.driving),
-            googleApiKey: "AIzaSyClfJgsQEwO0zO6io_TuR-TDUsVwGT3ex0")
-        .then((value) {
-      for (var point in value.points) {
+        required double currentLng,
+        required double destLat,
+        required double destLng}) async {
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      request: PolylineRequest(
+        origin: PointLatLng(currentLat, currentLng),
+        destination: PointLatLng(destLat, destLng),
+        mode: TravelMode.driving,
+        //apiKey: "AIzaSyClfJgsQEwO0zO6io_TuR-TDUsVwGT3ex0", // API Key goes here!
+      ),
+    );
+
+    if (result.points.isNotEmpty) {
+      for (var point in result.points) {
         polylineCoordinates.add(LatLng(point.latitude, point.longitude));
       }
-    }).then((value) {
-      addPolyLine();
-    });
+    }
+
+    addPolyLine();
   }
 }

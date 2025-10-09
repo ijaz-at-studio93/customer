@@ -82,6 +82,7 @@ class HomeSalonDataList {
   String? mobile;
   String? address;
   String? image;
+  List<String>? images;
   GeoLocationPoint? geoLocationPoint;
   String? createdAt;
   String? updatedAt;
@@ -104,6 +105,7 @@ class HomeSalonDataList {
         this.mobile,
         this.address,
         this.image,
+        this.images,
         this.geoLocationPoint,
         this.createdAt,
         this.updatedAt,
@@ -129,6 +131,10 @@ class HomeSalonDataList {
     mobile = json['mobile'];
     address = json['address'];
     image = json['image'];
+    if (json['images'] != null) {
+      images = List<String>.from(json['images'].map((e) => e.toString()));
+    }
+
     geoLocationPoint = json['geoLocationPoint'] != null
         ? GeoLocationPoint.fromJson(json['geoLocationPoint'])
         : null;
@@ -155,6 +161,10 @@ class HomeSalonDataList {
     data['mobile'] = mobile;
     data['address'] = address;
     data['image'] = image;
+    if (images != null) {
+      data['images'] = images;
+    }
+
     if (geoLocationPoint != null) {
       data['geoLocationPoint'] = geoLocationPoint!.toJson();
     }

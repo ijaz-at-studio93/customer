@@ -190,7 +190,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                   children: [
                     Text(
                       widget.bookingData.orderStatus == "pending"
-                          ? "Your anticipation matters. Awaiting salon's happy news."
+                          ? "Waiting for confirmation, will get back to you with good news."
                           : widget.bookingData.orderStatus == "confirmed"
                           ? "So thrilled! Your appointment is now a reality."
                           : widget.bookingData.orderStatus == "salon_rejected" ||
@@ -303,25 +303,25 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
-            GestureDetector(
-              onTap: widget.onReSchedule,
-              child: Container(
-                height: 40,
-                width: Get.width,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: const Color(0xffEAEAEA),
-                ),
-                child: Center(
-                  child: Text(
-                    "Re Schedule",
-                    style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 16),
-                  ),
-                ),
-              ),
-            ),
+            //const SizedBox(height: 10),
+            // GestureDetector(
+            //   onTap: widget.onReSchedule,
+            //   child: Container(
+            //     height: 40,
+            //     width: Get.width,
+            //     decoration: BoxDecoration(
+            //       borderRadius: BorderRadius.circular(8),
+            //       color: const Color(0xffEAEAEA),
+            //     ),
+            //     child: Center(
+            //       child: Text(
+            //         "Re Schedule",
+            //         style: AppTextTheme.bold.copyWith(
+            //             color: ColorConstant.blackColor, fontSize: 16),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ]
         ],
       ),

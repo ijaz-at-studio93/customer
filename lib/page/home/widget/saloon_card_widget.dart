@@ -11,6 +11,8 @@ import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/model/home_salon_list_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'dart:async';
+import 'package:flutter/gestures.dart';
 
 class SaloonCardWidget extends StatefulWidget {
   final VoidCallback onPress;
@@ -29,6 +31,237 @@ class SaloonCardWidget extends StatefulWidget {
 
 class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   final _homeController = Get.find<HomeController>();
+
+  // --- Carousel state ---
+  late final PageController _pageController;
+  Timer? _autoPlayTimer;
+  int _currentPage = 0;
+  static const Duration _autoPlayInterval = Duration(seconds: 2);
+  static const Duration _autoPlayResumeDelay = Duration(seconds: 2);
+  bool _isUserInteracting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: 0, viewportFraction: 1.0);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartAutoPlay());
+  }
+
+  @override
+  void didUpdateWidget(covariant SaloonCardWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // If images changed, reset page and timer
+    if (_getImageList(oldWidget.homeSalonModel) != _getImageList(widget.homeSalonModel)) {
+      _currentPage = 0;
+      if (_pageController.hasClients) _pageController.jumpToPage(0);
+      _restartAutoPlay();
+    }
+  }
+
+  @override
+  void dispose() {
+    _autoPlayTimer?.cancel();
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  // --- helpers ---
+  List<String> _getImageList(HomeSalonDataList model) {
+    final imgs = <String>[];
+    // prefer a list property `images` if exists
+    try {
+      final dynamic candidate = model.images;
+      if (candidate is List && candidate.isNotEmpty) {
+        for (final e in candidate) {
+          if (e != null && e.toString().isNotEmpty) imgs.add(e.toString());
+        }
+      }
+    } catch (_) {}
+    // fallback to single image field
+    if (imgs.isEmpty) {
+      if ((model.image ?? '').isNotEmpty) imgs.add("${APIConstants.image}${model.image}");
+    } else {
+      for (int i = 0; i < imgs.length; i++) {
+        final s = imgs[i];
+        if (!s.startsWith('http')) imgs[i] = "${APIConstants.image}$s";
+      }
+    }
+    return imgs;
+  }
+
+  void _maybeStartAutoPlay() {
+    final images = _getImageList(widget.homeSalonModel);
+    if (images.length > 1) {
+      _startAutoPlay();
+    }
+  }
+
+  void _startAutoPlay() {
+    _autoPlayTimer?.cancel();
+    _autoPlayTimer = Timer.periodic(_autoPlayInterval, (_) {
+      if (_isUserInteracting) return;
+      final images = _getImageList(widget.homeSalonModel);
+      if (images.length <= 1) return;
+      final nextPage = (_currentPage + 1) % images.length;
+      if (!_pageController.hasClients) return;
+      _pageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _stopAutoPlay() {
+    _autoPlayTimer?.cancel();
+    _autoPlayTimer = null;
+  }
+
+  void _restartAutoPlay() {
+    _stopAutoPlay();
+    Future.delayed(_autoPlayResumeDelay, () {
+      if (!_isUserInteracting) _startAutoPlay();
+    });
+  }
+
+  void _onUserInteractionStart() {
+    _isUserInteracting = true;
+    _stopAutoPlay();
+  }
+
+  void _onUserInteractionEnd() {
+    _isUserInteracting = false;
+    _restartAutoPlay();
+  }
+
+  Widget _buildImageCarousel(BuildContext context) {
+    final images = _getImageList(widget.homeSalonModel);
+    final imageHeight = Get.height * 0.25; // EXACT original height
+
+    if (images.isEmpty) {
+      return ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
+        child: Image.asset(
+          AssetsConstant.placeHolder,
+          width: Get.width,
+          height: imageHeight,
+          fit: BoxFit.fitWidth,
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(20),
+        topRight: Radius.circular(20),
+      ),
+      child: SizedBox(
+        width: Get.width,
+        height: imageHeight, // FORCE same height
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onPanDown: (_) => _onUserInteractionStart(),
+          onPanCancel: _onUserInteractionEnd,
+          onPanEnd: (_) => _onUserInteractionEnd(),
+          onTapDown: (_) => _onUserInteractionStart(),
+          onTapUp: (_) => _onUserInteractionEnd(),
+          child: Stack(
+            children: [
+              PageView.builder(
+                controller: _pageController,
+                itemCount: images.length,
+                onPageChanged: (index) {
+                  setState(() => _currentPage = index);
+                },
+                itemBuilder: (context, index) {
+                  final imageUrl = images[index];
+                  // replace the existing `return SizedBox(...)` inside itemBuilder with this:
+                  return GestureDetector(
+                    onTap: widget.onPress, // restore image tap (calls same callback as whole card)
+                    behavior: HitTestBehavior.opaque,
+                    child: SizedBox(
+                      width: Get.width,
+                      height: imageHeight,
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        width: Get.width,
+                        height: imageHeight,
+                        fit: BoxFit.fitWidth,
+                        placeholder: (c, u) => Image.asset(
+                          AssetsConstant.placeHolder,
+                          width: Get.width,
+                          height: imageHeight,
+                          fit: BoxFit.fitWidth,
+                        ),
+                        errorWidget: (c, u, e) => Image.asset(
+                          AssetsConstant.placeHolder,
+                          width: Get.width,
+                          height: imageHeight,
+                          fit: BoxFit.fitWidth,
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+
+              // gradient overlay (single copy inside carousel)
+              Positioned.fill(
+                child: IgnorePointer(
+                  ignoring: true,
+                  child: Container(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      width: Get.width,
+                      height: Get.height * 0.25, // same overlay as original
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            ColorConstant.blackColor,
+                            Colors.black.withOpacity(0),
+                            Colors.black.withOpacity(0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              // dots indicator
+              if (images.length > 1)
+                Positioned(
+                  bottom: 8,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(images.length, (i) {
+                      final isActive = i == _currentPage;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: isActive ? 10 : 7,
+                        height: isActive ? 10 : 7,
+                        decoration: BoxDecoration(
+                          color: isActive ? ColorConstant.whiteColor : Colors.white54,
+                          shape: BoxShape.circle,
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -46,46 +279,22 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
             children: [
               Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
-                    child: CachedNetworkImage(
-                      width: Get.width,
-                      height: Get.height * 0.20,
-                      fit: BoxFit.fitWidth,
-                      imageUrl:
-                          "${APIConstants.image}${widget.homeSalonModel.image}",
-                      placeholder: (context, url) => Image(
-                        image: const AssetImage(AssetsConstant.placeHolder),
-                        width: Get.width,
-                        height: Get.height * 0.20,
-                        fit: BoxFit.fitWidth,
-                      ),
-                      errorWidget: (context, url, error) => Image(
-                        image: const AssetImage(AssetsConstant.placeHolder),
-                        width: Get.width,
-                        height: Get.height * 0.20,
-                        fit: BoxFit.fitWidth,
-                      ),
-                    ),
-                  ),
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          ColorConstant.blackColor,
-                          Colors.black.withOpacity(0),
-                          Colors.black.withOpacity(0),
-                        ],
-                      ),
-                    ),
-                    width: Get.width,
-                    height: Get.height * 0.25,
-                  ),
+                  _buildImageCarousel(context),
+                  // Container(
+                  //   decoration: BoxDecoration(
+                  //     gradient: LinearGradient(
+                  //       begin: Alignment.bottomCenter,
+                  //       end: Alignment.topCenter,
+                  //       colors: [
+                  //         ColorConstant.blackColor,
+                  //         Colors.black.withOpacity(0),
+                  //         Colors.black.withOpacity(0),
+                  //       ],
+                  //     ),
+                  //   ),
+                  //   width: Get.width,
+                  //   height: Get.height * 0.25,
+                  // ),
                   Positioned(
                     top: 10,
                     right: 10,

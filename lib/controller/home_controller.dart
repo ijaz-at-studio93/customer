@@ -1346,17 +1346,16 @@ class HomeController extends GetxController {
     required String bookingId,
     required String artistId,
     required String status,
-    required VoidCallback callback,
+    //required VoidCallback callback,
   }) async {
     try {
-      _showProgress.value = true;
+      //_showProgress.value = true;
       bool result = await HomeAPI.approveBooking(
           bookingId: bookingId,
           artistId: artistId,
           status: status);
 
       if (result) {
-        callback.call();
         return StandardResponse(success: true, message: "Cancelled successfully");
       } else {
         return StandardResponse(success: false, message: "Failed to cancel");

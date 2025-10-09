@@ -27,6 +27,8 @@ import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
 import '../appointment/appointment_booking_page.dart';
 import '../search/stylist_search_page.dart';
+import 'dart:async';
+import 'dart:convert';
 
 class SaloonAfterSelectingServicesPage extends StatefulWidget {
   final String id;
@@ -48,31 +50,160 @@ class _SaloonAfterSelectingServicesPageState
     extends State<SaloonAfterSelectingServicesPage> {
   final _homeController = Get.find<HomeController>();
 
+  late final PageController _pageController;
+  Timer? _autoScrollTimer;
+  int _currentPage = 0;
+  List<String> _images = [];
+  Worker? _dataWatcher; // GetX worker to listen to data updates
+
   bool loading = false;
   final box = GetStorage();
 
   @override
+  @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _homeController.doGetHomeSalonDetails(
+
+    // init page controller for pageview
+    _pageController = PageController(initialPage: 0);
+
+    // Fetch data and then load images once the API response is received.
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      // Await the fetch so we can load images right after data is available
+      try {
+        await _homeController.doGetHomeSalonDetails(
           salonId: widget.id,
           serviceGender:
-              SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                  ? "male"
-                  : "female",
+          SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+              ? "male"
+              : "female",
           lat: SharedPrefs.readStringValue(PrefConstants.latitude),
-          lng: SharedPrefs.readStringValue(PrefConstants.longitude));
-      _homeController.doGetSalonDetailsService(
-        salonId: widget.id,
-        serviceGender: SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-            ? "male"
-            : "female",
-      );
-      _homeController.doGetSalonArtiestListData(salonId: widget.id);
-      _homeController.doGetCart();
+          lng: SharedPrefs.readStringValue(PrefConstants.longitude),
+        );
+      } catch (_) {
+        // ignore fetch error here; still attempt to parse whatever is available
+      }
+
+      // load other data (you can await these too if they return futures)
+      try {
+        await _homeController.doGetSalonDetailsService(
+          salonId: widget.id,
+          serviceGender:
+          SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+              ? "male"
+              : "female",
+        );
+      } catch (_) {}
+
+      try {
+        await _homeController.doGetSalonArtiestListData(salonId: widget.id);
+      } catch (_) {}
+
+      try {
+        await _homeController.doGetCart();
+      } catch (_) {}
+
+      // Now that the main fetch has finished (or at least attempted), load images
+      _loadImagesFromData();
     });
   }
+
+  void _loadImagesFromData() {
+    final data = _homeController.homeSalonDetailsData.data;
+    final dynamic raw = data?.images; // dynamic because backend might send different types
+
+    List<String> imgs = [];
+
+    try {
+      if (raw == null) {
+        imgs = [];
+      } else if (raw is List) {
+        // Case 1: already a List from backend
+        imgs = raw.map((e) => e?.toString() ?? "").where((e) => e.isNotEmpty).toList();
+      } else if (raw is String) {
+        // Case 2: backend gave a string
+        final str = raw.trim();
+        if (str.startsWith('[') && str.endsWith(']')) {
+          // JSON array in string
+          final parsed = jsonDecode(str);
+          if (parsed is List) {
+            imgs = parsed.map((e) => e?.toString() ?? "").where((e) => e.isNotEmpty).toList();
+          }
+        } else if (str.contains(',')) {
+          // Comma-separated
+          imgs = str.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+        } else {
+          // Single URL string
+          if (str.isNotEmpty) imgs = [str];
+        }
+      } else {
+        // Case 3: unknown type → fallback to toString
+        final s = raw.toString();
+        if (s.isNotEmpty) imgs = [s];
+      }
+    } catch (e) {
+      // Fallback to "image" field if parsing fails
+      final fallback = data?.image;
+      if (fallback != null && fallback.toString().isNotEmpty) {
+        imgs = [fallback.toString()];
+      } else {
+        imgs = [];
+      }
+    }
+
+    // Prefix with APIConstants.image if it's a relative path
+    imgs = imgs.map((url) {
+      if (url.startsWith("http") || url.startsWith("https")) return url;
+      return "${APIConstants.image}$url";
+    }).toList();
+
+    setState(() {
+      _images = imgs;
+      _currentPage = 0;
+    });
+
+// Instead of starting auto-scroll immediately, prefetch first 1–2 images
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final toPrefetch = _images.length >= 2 ? 2 : _images.length;
+      for (int i = 0; i < toPrefetch; i++) {
+        final url = _images[i];
+        try {
+          await precacheImage(CachedNetworkImageProvider(url), context);
+        } catch (e) {
+          // ignore prefetch errors
+        }
+      }
+
+      // Now start auto-scroll only if multiple images exist
+      if (_images.length > 1) {
+        _startAutoScroll();
+      } else {
+        _stopAutoScroll();
+      }
+    });
+
+  }
+
+  void _startAutoScroll() {
+    if (_images.length <= 1) return;
+    _autoScrollTimer?.cancel();
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 2), (_) {
+      if (_pageController.hasClients && _images.isNotEmpty) {
+        final next = (_currentPage + 1) % _images.length;
+        _pageController.animateToPage(
+          next,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  void _stopAutoScroll() {
+    _autoScrollTimer?.cancel();
+    _autoScrollTimer = null;
+  }
+
 
   String serviceId = "";
 
@@ -375,11 +506,13 @@ class _SaloonAfterSelectingServicesPageState
                                             ],
                                           ),
                                           Text(
-                                            "₹${_homeController.getServiceAddCartModel.data?.price ?? ""}",
+                                            "₹${(_homeController.getServiceAddCartModel.data?.price ?? 0).toStringAsFixed(2)}",
                                             style: AppTextTheme.bold.copyWith(
-                                                fontSize: 19,
-                                                color: ColorConstant.blackColor),
+                                              fontSize: 19,
+                                              color: ColorConstant.blackColor,
+                                            ),
                                           )
+
                                         ],
                                       ),
                                     ),
@@ -471,6 +604,14 @@ class _SaloonAfterSelectingServicesPageState
     );
   }
 
+  @override
+  void dispose() {
+    _autoScrollTimer?.cancel();
+    _pageController.dispose();
+    _dataWatcher?.dispose();
+    super.dispose();
+  }
+
   /*------------ Back Button --------------*/
   buttonWidget(
       {required String imageUrl,
@@ -498,40 +639,93 @@ class _SaloonAfterSelectingServicesPageState
   }
 
   /*-------------- Image header Widget ------------*/
-  _imageHeaderWidget() {
+  Widget _imageHeaderWidget() {
+    final data = _homeController.homeSalonDetailsData.data;
     return Stack(
       children: [
-        CachedNetworkImage(
+        SizedBox(
           width: Get.width,
           height: Get.height * 0.28,
-          fit: BoxFit.fitWidth,
-          imageUrl:
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onPanDown: (_) => _stopAutoScroll(),
+            onPanCancel: () {
+              if (_images.length > 1) _startAutoScroll();
+            },
+            onPanEnd: (_) {
+              if (_images.length > 1) _startAutoScroll();
+            },
+            child: _images.isEmpty
+                ? CachedNetworkImage(
+              width: Get.width,
+              height: Get.height * 0.28,
+              fit: BoxFit.fitWidth,
+              imageUrl:
               "${APIConstants.image}${_homeController.homeSalonDetailsData.data?.image ?? ""}",
-          placeholder: (context, url) => Image(
-            image: const AssetImage(AssetsConstant.placeHolder),
-            width: Get.width,
-            height: Get.height * 0.28,
-            fit: BoxFit.fitWidth,
-          ),
-          errorWidget: (context, url, error) => Image(
-            image: const AssetImage(AssetsConstant.placeHolder),
-            width: Get.width,
-            height: Get.height * 0.28,
-            fit: BoxFit.fitWidth,
-          ),
-        ),
-        Positioned(
-            child: Container(
-          width: Get.width,
-          height: Get.height * 0.28,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment(0.02, 1.00),
-              end: Alignment(-0.02, -1),
-              colors: [Colors.black, Color(0x003D3636)],
+              fadeInDuration: Duration.zero,
+              fadeOutDuration: Duration.zero,
+              placeholder: (context, url) => Image(
+                image: const AssetImage(AssetsConstant.placeHolder),
+                width: Get.width,
+                height: Get.height * 0.28,
+                fit: BoxFit.fitWidth,
+              ),
+              errorWidget: (context, url, error) => Image(
+                image: const AssetImage(AssetsConstant.placeHolder),
+                width: Get.width,
+                height: Get.height * 0.28,
+                fit: BoxFit.fitWidth,
+              ),
+            )
+                : PageView.builder(
+              controller: _pageController,
+              itemCount: _images.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPage = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                final imageUrl = _images[index];
+                return CachedNetworkImage(
+                  width: Get.width,
+                  height: Get.height * 0.28,
+                  fit: BoxFit.fitWidth,
+                  imageUrl: imageUrl,
+                  placeholder: (context, url) => Image(
+                    image: const AssetImage(AssetsConstant.placeHolder),
+                    width: Get.width,
+                    height: Get.height * 0.28,
+                    fit: BoxFit.fitWidth,
+                  ),
+                  errorWidget: (context, url, error) => Image(
+                    image: const AssetImage(AssetsConstant.placeHolder),
+                    width: Get.width,
+                    height: Get.height * 0.28,
+                    fit: BoxFit.fitWidth,
+                  ),
+                );
+              },
             ),
           ),
-        )),
+        ),
+
+        // --- ORIGINAL GRADIENT (unchanged) ---
+        Positioned(
+          child: Container(
+            width: Get.width,
+            height: Get.height * 0.28,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment(0.02, 1.00),
+                end: Alignment(-0.02, -1),
+                colors: [Colors.black, Color(0x003D3636)],
+              ),
+            ),
+          ),
+        ),
+
+        // --- ORIGINAL TOP CONTROLS: back, search, share, favourite (UNCHANGED) ---
         Positioned(
           top: 12,
           left: 16,
@@ -554,11 +748,11 @@ class _SaloonAfterSelectingServicesPageState
                     imageUrl: AssetsConstant.iconSearch,
                     onPress: () {
                       Get.to(() => StylistSearchPage(
-                            salonName: _homeController
-                                    .homeSalonDetailsData.data?.name ??
-                                "",
-                            salonId: widget.id,
-                          ));
+                        salonName: _homeController
+                            .homeSalonDetailsData.data?.name ??
+                            "",
+                        salonId: widget.id,
+                      ));
                     },
                     h: 24,
                     w: 24,
@@ -578,11 +772,11 @@ class _SaloonAfterSelectingServicesPageState
                     onTap: () {
                       setState(() {
                         _homeController.homeSalonDetailsData.data?.isFavourite =
-                            !(_homeController
-                                    .homeSalonDetailsData.data?.isFavourite ??
-                                false);
+                        !(_homeController
+                            .homeSalonDetailsData.data?.isFavourite ??
+                            false);
                         if (_homeController
-                                .homeSalonDetailsData.data?.isFavourite ??
+                            .homeSalonDetailsData.data?.isFavourite ??
                             false) {
                           _homeController.doAddFavouriteSalon(
                               salonId: widget.id);
@@ -600,16 +794,16 @@ class _SaloonAfterSelectingServicesPageState
                           color: ColorConstant.blackColor.withOpacity(0.50)),
                       child: Center(
                           child: _homeController
-                                      .homeSalonDetailsData.data?.isFavourite ??
-                                  false
+                              .homeSalonDetailsData.data?.isFavourite ??
+                              false
                               ? const Icon(
-                                  CupertinoIcons.heart_fill,
-                                  color: Colors.red,
-                                )
+                            CupertinoIcons.heart_fill,
+                            color: Colors.red,
+                          )
                               : const Icon(
-                                  CupertinoIcons.heart,
-                                  color: ColorConstant.whiteColor,
-                                )),
+                            CupertinoIcons.heart,
+                            color: ColorConstant.whiteColor,
+                          )),
                     ),
                   )
                 ],
@@ -617,99 +811,128 @@ class _SaloonAfterSelectingServicesPageState
             ],
           ),
         ),
+
+        // --- ORIGINAL BOTTOM RATING BLOCK (UNCHANGED) ---
         Positioned(
-            bottom: 16,
-            left: 19,
-            right: 10,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: ColorConstant.greenColor,
-                          borderRadius: BorderRadius.circular(5)),
-                      width: 60,
-                      height: 30,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 3),
-                          SizedBox(
-                            child: Text(
-                              "${_homeController.homeSalonDetailsData.data?.rating}",
-                              style: AppTextTheme.medium.copyWith(
-                                  fontSize: 11,
-                                  color: ColorConstant.whiteColor),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 13),
-                    GestureDetector(
-                      onTap: () {
-                        Get.to(() => SalonRatingPage(
-                              salonId: widget.id,
-                            ));
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "${_homeController.homeSalonDetailsData.data?.rating} Ratings",
+          bottom: 16,
+          left: 19,
+          right: 10,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        color: ColorConstant.greenColor,
+                        borderRadius: BorderRadius.circular(5)),
+                    width: 60,
+                    height: 30,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(
+                          Icons.star,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 3),
+                        SizedBox(
+                          child: Text(
+                            "${_homeController.homeSalonDetailsData.data?.rating}",
                             style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.whiteColor, fontSize: 13),
+                                fontSize: 11, color: ColorConstant.whiteColor),
                           ),
-                          const SizedBox(height: 5),
-                          const Dash(
-                            direction: Axis.horizontal,
-                            length: 70,
-                            dashLength: 2,
-                            dashColor: ColorConstant.whiteColor,
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.star,
-                      color: ColorConstant.yellowColor,
-                      size: 20,
+                  ),
+                  const SizedBox(width: 13),
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(() => SalonRatingPage(
+                        salonId: widget.id,
+                      ));
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "${_homeController.homeSalonDetailsData.data?.rating} Ratings",
+                          style: AppTextTheme.medium.copyWith(
+                              color: ColorConstant.whiteColor, fontSize: 13),
+                        ),
+                        const SizedBox(height: 5),
+                        const Dash(
+                          direction: Axis.horizontal,
+                          length: 70,
+                          dashLength: 2,
+                          dashColor: ColorConstant.whiteColor,
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 5),
-                    SizedBox(
-                      width: Get.width * 0.05,
-                      child: Text(
-                              (_homeController
-                                .homeSalonDetailsData.data?.averageArtistRatings ?? 0)
-                                .toStringAsFixed(2) ??
-                            "",
-                        overflow: TextOverflow.ellipsis,
-                        maxLines: 1,
-                        style: AppTextTheme.medium.copyWith(
-                            fontSize: 11, color: ColorConstant.yellowColor),
-                      ),
-                    ),
-                    Text(
-                      'Average Stylist Rating',
+                  ),
+                ],
+              ),
+              Row(
+                children: [
+                  const Icon(
+                    Icons.star,
+                    color: ColorConstant.yellowColor,
+                    size: 20,
+                  ),
+                  const SizedBox(width: 5),
+                  SizedBox(
+                    width: Get.width * 0.05,
+                    child: Text(
+                      (_homeController.homeSalonDetailsData.data?.averageArtistRatings ?? 0)
+                          .toStringAsFixed(2),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
                       style: AppTextTheme.medium.copyWith(
-                          fontSize: 13, color: ColorConstant.whiteColor),
+                          fontSize: 11, color: ColorConstant.yellowColor),
                     ),
-                  ],
-                )
-              ],
-            )),
+                  ),
+                  Text(
+                    'Average Stylist Rating',
+                    style: AppTextTheme.medium.copyWith(
+                        fontSize: 13, color: ColorConstant.whiteColor),
+                  ),
+                ],
+              )
+            ],
+          ),
+        ),
+
+        // --- DOT INDICATOR (keeps bottom position) ---
+        if (_images.length > 1)
+          Positioned(
+            bottom: 16,
+            left: 0,
+            right: 0,
+            child: SizedBox(
+              height: 24,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(_images.length, (index) {
+                  final isActive = index == _currentPage;
+                  return AnimatedContainer(
+                    duration: const Duration(milliseconds: 250),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    width: isActive ? 18 : 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: isActive
+                          ? ColorConstant.whiteColor
+                          : ColorConstant.whiteColor.withOpacity(0.4),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
       ],
     );
   }

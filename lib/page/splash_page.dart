@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:page_transition/page_transition.dart';
-import 'package:platform_device_id/platform_device_id.dart';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
@@ -75,15 +76,26 @@ class _SplashPageState extends State<SplashPage> {
 
   /*-------------- GET VERSION  APP -------------------*/
   void getVersionApp() async {
-    String? deviceId = await PlatformDeviceId.getDeviceId;
-    SharedPrefs.writeValue(PrefConstants.deviceId, deviceId);
+    String? deviceId;
+    var deviceInfo = DeviceInfoPlugin();
+
+    if (Platform.isAndroid) {
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      deviceId = androidInfo.id;
+    } else if (Platform.isIOS) {
+      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+      deviceId = iosInfo.identifierForVendor;
+    }
+
+    if (deviceId != null) {
+      SharedPrefs.writeValue(PrefConstants.deviceId, deviceId);
+    }
+
     String data = await getVersion();
 
     _authController.doAppUpdate(callback: () {
-      if (_authController.getAppUpdateModel.data?.userAppLatestVersion !=
-          data) {
-        if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ??
-            false) {
+      if (_authController.getAppUpdateModel.data?.userAppLatestVersion != data) {
+        if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ?? false) {
           _forceUpdateDialog();
         } else {
           _normalUpdateDialog();
@@ -93,7 +105,6 @@ class _SplashPageState extends State<SplashPage> {
       }
     });
   }
-
   /*---------------  Force Update Widget ---------------*/
   _forceUpdateDialog() async {
     return Get.defaultDialog(

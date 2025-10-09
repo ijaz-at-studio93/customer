@@ -80,24 +80,33 @@ class _BookingHomePageState extends State<BookingHomePage>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 20, vertical: 5),
                           child: PendingCardWidget(
-                            onPress: () {
-                              Get.to(() => QRCodePage(
-                                  isBooking: false,
-                                  appointmentId: _homeController
-                                      .getCurrentBookingListModel
-                                      .data?[index]
-                                      .appointmentId ??
-                                      ""));
+                            onPress: () async {
+                              final result = await Get.to(() => QRCodePage(
+                                isBooking: false,
+                                appointmentId: _homeController
+                                    .getCurrentBookingListModel
+                                    .data?[index]
+                                    .appointmentId ??
+                                    "",
+                              ));
+
+                              if (result == true) {
+                                // ✅ Refresh booking list after cancel
+                                _homeController.doGetCurrentBookingListData();
+                              }
                             },
-                            onReSchedule: () {
-                              _showRescheduleDialog(context, _homeController
-                                  .getCurrentBookingListModel
-                                  .data?[index]
-                                  .appointmentId ?? "");
+                            onReSchedule: () async {
+                              final result = await _showRescheduleDialog(
+                                context,
+                                _homeController.getCurrentBookingListModel.data?[index].appointmentId ?? "",
+                              );
+
+                              if (result == true) {
+                                // ✅ Refresh booking list after reschedule
+                                _homeController.doGetCurrentBookingListData();
+                              }
                             },
-                            bookingData: _homeController
-                                .getCurrentBookingListModel
-                                .data![index],
+                            bookingData: _homeController.getCurrentBookingListModel.data![index],
                           ),
                         );
                       })
@@ -199,7 +208,7 @@ class _BookingHomePageState extends State<BookingHomePage>
     );
   }
 
-  void _showRescheduleDialog(BuildContext context, String appointmentId) async {
+  Future<bool?> _showRescheduleDialog(BuildContext context, String appointmentId) async {
     DateTime? newDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now().add(const Duration(days: 1)),
@@ -225,7 +234,7 @@ class _BookingHomePageState extends State<BookingHomePage>
         final response = await _homeController.reScheduledBooking(appointmentId:appointmentId,
           newTime:finalDateTime.toIso8601String(),
           callback: () {
-            Get.back(); // close popup if open
+            Get.back(result: true); // close popup if open
             Get.snackbar("Re scheduled", "Your booking was re scheduled successfully.",
               snackPosition: SnackPosition.BOTTOM,
             );
