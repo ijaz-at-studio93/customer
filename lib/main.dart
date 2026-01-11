@@ -171,5 +171,6 @@ class _MyAppState extends State<MyApp> {
       initialRoute: "/",
       getPages: [GetPage(name: "/", page: () => const SplashPage())],
     );
+    // added comment
   }
 }
