@@ -269,6 +269,23 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                                                             location[0]
                                                                 .longitude)));
                                               });
+                                              // code of coming to home page automatically when i clicked on any location result
+                                              // Save to controller
+                                              _authController.userCity = city;
+                                              _authController.userCurrentLocation = address;
+
+                                              // Save to shared prefs
+                                              SharedPrefs.writeValue(PrefConstants.userCity, city);
+                                              SharedPrefs.writeValue(PrefConstants.address, address);
+                                              SharedPrefs.writeValue(PrefConstants.latitude, lat.toString());
+                                              SharedPrefs.writeValue(PrefConstants.longitude, lng.toString());
+
+                                              // Notify home page
+                                              widget.callback.call();
+
+                                              // Go back automatically
+                                              Get.back();
+
                                             }
                                           },
                                           child: Container(

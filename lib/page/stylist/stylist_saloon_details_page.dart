@@ -96,7 +96,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                                       separatorBuilder: (context, i) {
                                         return Container(
                                           margin: const EdgeInsets.only(
-                                              top: 20, bottom: 20),
+                                              top: 25, bottom: 10),
                                           height: 1,
                                           width: Get.width,
                                           color: ColorConstant.dividerColor,

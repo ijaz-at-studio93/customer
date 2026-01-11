@@ -15,10 +15,66 @@ import 'package:salon_customer/util/NotificationUtils.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/notification_service.dart';
 
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+Future<void> _setupAndroidChannels() async {
+  // Confirm (sound)
+  const AndroidNotificationChannel confirm = AndroidNotificationChannel(
+    'confirm',
+    'Appointment Confirmed',
+    description: 'Custom sound when appointment is confirmed',
+    importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
+    sound: RawResourceAndroidNotificationSound('confirm'), // res/raw/confirm.wav
+  );
+
+  // Completed (sound)
+  const AndroidNotificationChannel completed = AndroidNotificationChannel(
+    'complete',
+    'Appointment Completed',
+    description: 'Custom sound when appointment is completed',
+    importance: Importance.max,
+    playSound: true,
+    enableVibration: true,
+    sound: RawResourceAndroidNotificationSound('complete'), // res/raw/complete.wav
+  );
+
+  // General/Silent (for booked)
+  const AndroidNotificationChannel generalSilent = AndroidNotificationChannel(
+    'general_silent',
+    'General (Silent)',
+    description: 'General notifications without sound',
+    importance: Importance.defaultImportance,
+    playSound: false, // 👈 silent
+    enableVibration: false,
+  );
+
+  final impl = flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+
+  await impl?.createNotificationChannel(confirm);
+  await impl?.createNotificationChannel(completed);
+  await impl?.createNotificationChannel(generalSilent);
+}
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DioClient.init();
   await Firebase.initializeApp();
+  // 👇 NEW: initialize local notifications plugin (safe on iOS too)
+  const AndroidInitializationSettings androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initSettings = InitializationSettings(android: androidInit);
+  await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  // 👇 NEW: create the channel BEFORE receiving any notifications
+  if (Platform.isAndroid) {
+    await _setupAndroidChannels();
+  }
   Get.put(AuthController());
   Get.put(HomeController());
   await GetStorage.init();

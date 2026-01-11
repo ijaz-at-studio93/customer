@@ -15,7 +15,7 @@ import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/log_out_dialog.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-
+import '../../util/call_wrapper.dart';
 import 'fav_blog_page.dart';
 import 'widget/about_app_page.dart';
 
@@ -41,136 +41,138 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: true,
-      onPopInvoked: (didPop) {
-        widget.callback.call();
-      },
-      child: Scaffold(
-        backgroundColor: ColorConstant.bgColor,
-        appBar: AppBar(
-          elevation: 0.0,
-          backgroundColor: ColorConstant.whiteColor,
-          leading: IconButton(
-            onPressed: () {
-              Get.back();
-              widget.callback.call();
-            },
-            icon: const Icon(
-              Icons.arrow_back_ios,
-              color: ColorConstant.blackColor,
+    return CallWrapper(
+        child:PopScope(
+        canPop: true,
+        onPopInvoked: (didPop) {
+          widget.callback.call();
+        },
+        child: Scaffold(
+          backgroundColor: ColorConstant.bgColor,
+          appBar: AppBar(
+            elevation: 0.0,
+            backgroundColor: ColorConstant.whiteColor,
+            leading: IconButton(
+              onPressed: () {
+                Get.back();
+                widget.callback.call();
+              },
+              icon: const Icon(
+                Icons.arrow_back_ios,
+                color: ColorConstant.blackColor,
+              ),
+            ),
+            centerTitle: true,
+            title: Text(
+              "My Details",
+              style: AppTextTheme.bold
+                  .copyWith(color: ColorConstant.blackColor, fontSize: 19),
             ),
           ),
-          centerTitle: true,
-          title: Text(
-            "My Details",
-            style: AppTextTheme.bold
-                .copyWith(color: ColorConstant.blackColor, fontSize: 19),
-          ),
-        ),
-        body: Obx(
-          () => ProgressContainerView(
-            isProgressRunning: _authController.showProgress,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _imageRowWidget(),
-                  const SizedBox(height: 5),
-                  const Divider(
-                      color: ColorConstant.garyDividerColor,
-                      indent: 20,
-                      endIndent: 20,
-                      thickness: 1),
-                  _listTitleWidget(
-                      image: AssetsConstant.likeBlank,
-                      name: "Favourite Salon",
-                      onPress: () {
-                        Get.to(() => FavouriteSalonPage(
-                              callback: () {
-                                widget.callback.call();
-                              },
-                            ));
-                      }),
-                  const Divider(
-                      color: ColorConstant.garyDividerColor,
-                      indent: 20,
-                      endIndent: 20,
-                      thickness: 1),
-                  _listTitleWidget(
-                      image: AssetsConstant.reviewRatings,
-                      name: "Review & Ratings",
-                      onPress: () {
-                        Get.to(() => const ReviewAndRatingPage());
-                      }),
-                  const Divider(
-                      color: ColorConstant.garyDividerColor,
-                      indent: 20,
-                      endIndent: 20,
-                      thickness: 1),
-                  _listTitleWidget(
-                      image: AssetsConstant.insights,
-                      name: "Saved Insights",
-                      onPress: () {
-                        Get.to(() => const BlogFavPage());
-                      }),
-                  const Divider(
-                      color: ColorConstant.garyDividerColor,
-                      indent: 20,
-                      endIndent: 20,
-                      thickness: 1),
-                  _listTitleWidget(
-                      image: AssetsConstant.locationDetails,
-                      name: "Address",
-                      onPress: () {
-                        Get.to(() => const AddAddressPage(
-                              isSelect: false,
-                            ));
-                      }),
-                  const Divider(
-                      color: ColorConstant.garyDividerColor,
-                      indent: 20,
-                      endIndent: 20,
-                      thickness: 1),
-                  _listTitleWidget(
-                      image: AssetsConstant.faq,
-                      name: "FAQ’s & Support",
-                      onPress: () {
-                        Get.to(() => const FaqPage());
-                      }),
-                  const Divider(
-                      color: ColorConstant.garyDividerColor,
-                      indent: 20,
-                      endIndent: 20,
-                      thickness: 1),
-                  _listTitleWidget(
-                      image: AssetsConstant.about,
-                      name: "About Us",
-                      onPress: () {
-                        Get.to(() => const AboutAppPage());
-                      }),
-                  const Divider(
-                      color: ColorConstant.garyDividerColor,
-                      indent: 20,
-                      endIndent: 20,
-                      thickness: 1),
-                  _listTitleWidget(
-                      image: AssetsConstant.signOut,
-                      name: "Sign Out",
-                      onPress: () {
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return LogOutDialog(
-                                noPress: () {
-                                  Get.back();
+          body: Obx(
+            () => ProgressContainerView(
+              isProgressRunning: _authController.showProgress,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _imageRowWidget(),
+                    const SizedBox(height: 5),
+                    const Divider(
+                        color: ColorConstant.garyDividerColor,
+                        indent: 20,
+                        endIndent: 20,
+                        thickness: 1),
+                    _listTitleWidget(
+                        image: AssetsConstant.likeBlank,
+                        name: "Favourite Salon",
+                        onPress: () {
+                          Get.to(() => FavouriteSalonPage(
+                                callback: () {
+                                  widget.callback.call();
                                 },
-                                yesPress: () {
-                                  _authController.resetApp();
-                                },
-                              );
-                            });
-                      }),
-                ],
+                              ));
+                        }),
+                    const Divider(
+                        color: ColorConstant.garyDividerColor,
+                        indent: 20,
+                        endIndent: 20,
+                        thickness: 1),
+                    _listTitleWidget(
+                        image: AssetsConstant.reviewRatings,
+                        name: "Review & Ratings",
+                        onPress: () {
+                          Get.to(() => const ReviewAndRatingPage());
+                        }),
+                    const Divider(
+                        color: ColorConstant.garyDividerColor,
+                        indent: 20,
+                        endIndent: 20,
+                        thickness: 1),
+                    _listTitleWidget(
+                        image: AssetsConstant.insights,
+                        name: "Saved Insights",
+                        onPress: () {
+                          Get.to(() => const BlogFavPage());
+                        }),
+                    const Divider(
+                        color: ColorConstant.garyDividerColor,
+                        indent: 20,
+                        endIndent: 20,
+                        thickness: 1),
+                    _listTitleWidget(
+                        image: AssetsConstant.locationDetails,
+                        name: "Address",
+                        onPress: () {
+                          Get.to(() => const AddAddressPage(
+                                isSelect: false,
+                              ));
+                        }),
+                    const Divider(
+                        color: ColorConstant.garyDividerColor,
+                        indent: 20,
+                        endIndent: 20,
+                        thickness: 1),
+                    _listTitleWidget(
+                        image: AssetsConstant.faq,
+                        name: "FAQ’s & Support",
+                        onPress: () {
+                          Get.to(() => const FaqPage());
+                        }),
+                    const Divider(
+                        color: ColorConstant.garyDividerColor,
+                        indent: 20,
+                        endIndent: 20,
+                        thickness: 1),
+                    _listTitleWidget(
+                        image: AssetsConstant.about,
+                        name: "About Us",
+                        onPress: () {
+                          Get.to(() => const AboutAppPage());
+                        }),
+                    const Divider(
+                        color: ColorConstant.garyDividerColor,
+                        indent: 20,
+                        endIndent: 20,
+                        thickness: 1),
+                    _listTitleWidget(
+                        image: AssetsConstant.signOut,
+                        name: "Sign Out",
+                        onPress: () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return LogOutDialog(
+                                  noPress: () {
+                                    Get.back();
+                                  },
+                                  yesPress: () {
+                                    _authController.resetApp();
+                                  },
+                                );
+                              });
+                        }),
+                  ],
+                ),
               ),
             ),
           ),

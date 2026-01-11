@@ -175,7 +175,7 @@ class _BookingHomePageState extends State<BookingHomePage>
               height: Get.height * 0.05,
               child: Center(
                 child: Text(
-                  "Pending",
+                  "Upcoming",
                   style: bookingOverView == "0"
                       ? AppTextTheme.bold.copyWith(
                           fontSize: 14, color: ColorConstant.blackColor)

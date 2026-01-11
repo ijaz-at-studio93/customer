@@ -62,7 +62,7 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
                     height: 100,
                     fit: BoxFit.cover,
                     imageUrl:
-                        "${APIConstants.image}${widget.servicesModel.image}",
+                        "${APIConstants.image}${widget.servicesModel.salonImage}",
                     placeholder: (context, url) => const Image(
                       image: AssetImage(AssetsConstant.placeHolder),
                       width: 100,
@@ -82,9 +82,9 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.servicesModel.name ?? "",
+                      widget.servicesModel.salonName ?? "",
                       style: AppTextTheme.bold.copyWith(
-                          fontSize: 14, color: ColorConstant.blackColor),
+                          fontSize: 16, color: ColorConstant.blackColor),
                     ),
                     const SizedBox(height: 5),
                     Row(
@@ -103,11 +103,18 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
                           child: Text(
                             maxLines: 3,
                             widget.servicesModel.salonAddress ?? "",
-                            style: AppTextTheme.medium.copyWith(
+                            style: AppTextTheme.regular.copyWith(
                                 fontSize: 14, color: ColorConstant.blackColor),
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      "( Considering factors like Hygiene,\n Hospitality, Atmosphere, etc. )",
+                      style: AppTextTheme.medium.copyWith(
+                          fontSize: 14, color: changeTheme(SharedPrefs.readStringValue(
+                          PrefConstants.gender))),
                     ),
                   ],
                 )
@@ -131,7 +138,7 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
     return Column(
       children: [
         Text(
-          "Rate The",
+          "Please rate the Salon",
           style: AppTextTheme.bold
               .copyWith(fontSize: 14, color: ColorConstant.blackColor),
         ),
@@ -140,13 +147,15 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
           initialRating: rate,
           minRating: 1,
           direction: Axis.horizontal,
-          allowHalfRating: true,
+          allowHalfRating: false,
           itemCount: 5,
           itemSize: 30.0,
           ignoreGestures: false,
-          itemBuilder: (context, _) => const Icon(
+          itemBuilder: (context, _) => Icon(
             Icons.star,
-            color: ColorConstant.primaryColor,
+            color: changeTheme(
+              SharedPrefs.readStringValue(PrefConstants.gender),
+            ),
             size: 25,
           ),
           onRatingUpdate: (rating) {
@@ -155,45 +164,45 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
             });
           },
         ),
-        const SizedBox(height: 5),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-              emojiList.length,
-              (index) => Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectEmoji = index;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3),
-                            border: Border.all(
-                                width: 2,
-                                color: selectEmoji == index
-                                    ? ColorConstant.primaryColor
-                                    : Colors.transparent)),
-                        child: Center(
-                          child: Text(
-                            emojiList[index],
-                            style: const TextStyle(fontSize: 30),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )),
-        ),
+        const SizedBox(height: 15),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: List.generate(
+        //       emojiList.length,
+        //       (index) => Padding(
+        //             padding: const EdgeInsets.all(8.0),
+        //             child: GestureDetector(
+        //               onTap: () {
+        //                 setState(() {
+        //                   selectEmoji = index;
+        //                 });
+        //               },
+        //               child: Container(
+        //                 padding: const EdgeInsets.all(3),
+        //                 decoration: BoxDecoration(
+        //                     borderRadius: BorderRadius.circular(3),
+        //                     border: Border.all(
+        //                         width: 2,
+        //                         color: selectEmoji == index
+        //                             ? ColorConstant.primaryColor
+        //                             : Colors.transparent)),
+        //                 child: Center(
+        //                   child: Text(
+        //                     emojiList[index],
+        //                     style: const TextStyle(fontSize: 30),
+        //                   ),
+        //                 ),
+        //               ),
+        //             ),
+        //           )),
+        // ),
         Text(
-          "Share Your Opinion",
+          "Your feedback matters a lot.",
           style: AppTextTheme.bold
               .copyWith(fontSize: 14, color: ColorConstant.blackColor),
         ),
         _address(
-          hintText: "Write Your Review Here....",
+          hintText: "Please share your feedback about salon hygiene, product quality, hospitality, atmosphere, etc....",
           textEditingController: _reviewTextEditingController,
           textInputType: TextInputType.text,
           textInputAction: TextInputAction.none,
@@ -268,7 +277,7 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
             style: AppTextTheme.regular
                 .copyWith(fontSize: 13, color: ColorConstant.blackColor),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 1),
           Container(
               height: 130,
               width: Get.width,
@@ -300,5 +309,5 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
   }
 
   /*----------------  List Emoji ------------------*/
-  List emojiList = ["😡", "☹️", "😐", "😊", "😍"];
+  //List emojiList = ["😡", "☹️", "😐", "😊", "😍"];
 }

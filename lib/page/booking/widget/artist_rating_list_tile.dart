@@ -11,11 +11,15 @@ import 'package:salon_customer/model/review_list_data_model.dart';
 import 'package:salon_customer/project_specific/button_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 
+import '../../../constant/variable_constant.dart';
+import '../../../util/SharedPrefs.dart';
+
 class ArtistRatingListTile extends StatefulWidget {
   final String appointmentId;
   final Artists artists;
+  final List<Services> services;
   const ArtistRatingListTile(
-      {super.key, required this.appointmentId, required this.artists});
+      {super.key, required this.appointmentId, required this.artists, required this.services});
 
   @override
   State<ArtistRatingListTile> createState() => _ArtistRatingListTileState();
@@ -33,6 +37,10 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
 
   @override
   Widget build(BuildContext context) {
+    final serviceNames = widget.services
+        .map((s) => s.name ?? "")
+        .where((name) => name.isNotEmpty)
+        .join(", "); // "Hair cut, Beard Shave"
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 8),
       decoration: BoxDecoration(
@@ -82,27 +90,29 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
                     Text(
                       widget.artists.name ?? "",
                       style: AppTextTheme.bold.copyWith(
-                          fontSize: 14, color: ColorConstant.blackColor),
+                          fontSize: 16, color: ColorConstant.blackColor),
                     ),
                     Text(
                       widget.artists.salonName ?? "",
-                      style: AppTextTheme.medium.copyWith(
-                          fontSize: 14, color: ColorConstant.blackColor),
+                      style: AppTextTheme.bold.copyWith(
+                          fontSize: 16, color: ColorConstant.blackColor),
                     ),
                     SizedBox(
                       width: Get.width * 0.6,
                       child: Text(
                         maxLines: 3,
-                        widget.artists.salonAddress ?? "",
-                        style: AppTextTheme.medium.copyWith(
-                            fontSize: 14, color: ColorConstant.blackColor),
+                        serviceNames,
+                        style: AppTextTheme.regular.copyWith(
+                          fontSize: 14,
+                          color: ColorConstant.blackColor,
+                        ),
                       ),
                     ),
-                    Text(
-                      widget.artists.salonName ?? "",
-                      style: AppTextTheme.medium.copyWith(
-                          fontSize: 14, color: ColorConstant.blackColor),
-                    ),
+                    // Text(
+                    //   widget.artists.salonName ?? "",
+                    //   style: AppTextTheme.medium.copyWith(
+                    //       fontSize: 14, color: ColorConstant.blackColor),
+                    // ),
                   ],
                 )
               ],
@@ -125,7 +135,7 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
     return Column(
       children: [
         Text(
-          "Rate The",
+          "Please rate the Service.",
           style: AppTextTheme.bold
               .copyWith(fontSize: 14, color: ColorConstant.blackColor),
         ),
@@ -134,13 +144,15 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
           initialRating: rate,
           minRating: 1,
           direction: Axis.horizontal,
-          allowHalfRating: true,
+          allowHalfRating: false,
           itemCount: 5,
           itemSize: 30.0,
           ignoreGestures: false,
-          itemBuilder: (context, _) => const Icon(
+          itemBuilder: (context, _) => Icon(
             Icons.star,
-            color: ColorConstant.primaryColor,
+            color: changeTheme(
+              SharedPrefs.readStringValue(PrefConstants.gender),
+            ),
             size: 25,
           ),
           onRatingUpdate: (rating) {
@@ -149,45 +161,45 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
             });
           },
         ),
-        const SizedBox(height: 5),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(
-              emojiList.length,
-              (index) => Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectEmoji = index;
-                        });
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.all(3),
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(3),
-                            border: Border.all(
-                                width: 2,
-                                color: selectEmoji == index
-                                    ? ColorConstant.primaryColor
-                                    : Colors.transparent)),
-                        child: Center(
-                          child: Text(
-                            emojiList[index],
-                            style: const TextStyle(fontSize: 30),
-                          ),
-                        ),
-                      ),
-                    ),
-                  )),
-        ),
+        const SizedBox(height: 15),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: List.generate(
+        //       emojiList.length,
+        //       (index) => Padding(
+        //             padding: const EdgeInsets.all(8.0),
+        //             child: GestureDetector(
+        //               onTap: () {
+        //                 setState(() {
+        //                   selectEmoji = index;
+        //                 });
+        //               },
+        //               child: Container(
+        //                 padding: const EdgeInsets.all(3),
+        //                 decoration: BoxDecoration(
+        //                     borderRadius: BorderRadius.circular(3),
+        //                     border: Border.all(
+        //                         width: 2,
+        //                         color: selectEmoji == index
+        //                             ? ColorConstant.primaryColor
+        //                             : Colors.transparent)),
+        //                 child: Center(
+        //                   child: Text(
+        //                     emojiList[index],
+        //                     style: const TextStyle(fontSize: 30),
+        //                   ),
+        //                 ),
+        //               ),
+        //             ),
+        //           )),
+        // ),
         Text(
-          "Share Your Opinion",
+          "Your feedback matters a lot.",
           style: AppTextTheme.bold
               .copyWith(fontSize: 14, color: ColorConstant.blackColor),
         ),
         _address(
-          hintText: "Write Your Review Here....",
+          hintText: "Please share your feedback about Staff skill, Behaviour, Service quality etc....",
           textEditingController: _reviewTextEditingController,
           textInputType: TextInputType.text,
           textInputAction: TextInputAction.none,
@@ -262,7 +274,7 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
             style: AppTextTheme.regular
                 .copyWith(fontSize: 13, color: ColorConstant.blackColor),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 1),
           Container(
               height: 130,
               width: Get.width,
@@ -295,5 +307,5 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
   }
 
   /*----------------  List Emoji ------------------*/
-  List emojiList = ["😡", "☹️", "😐", "😊", "😍"];
+  //List emojiList = ["😡", "☹️", "😐", "😊", "😍"];
 }

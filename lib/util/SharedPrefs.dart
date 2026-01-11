@@ -13,18 +13,21 @@ class SharedPrefs {
     return GetStorage().read(key) ?? "";
   }
 
-
   static bool readBoolValue(String key) {
     return GetStorage().read(key) ?? false;
   }
 
+  // 🔥 ADD THIS
+  static Future<void> writeBoolValue(String key, bool value) async {
+    await GetStorage().write(key, value);
+  }
+
   static Future<void> clearAll() async {
     await GetStorage().erase();
-    return;
   }
 
   static Future<void> remove(String key) async {
-    return await GetStorage().remove(key);
+    await GetStorage().remove(key);
   }
 }
 

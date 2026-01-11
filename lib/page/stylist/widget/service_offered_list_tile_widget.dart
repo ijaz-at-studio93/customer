@@ -48,7 +48,7 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                 width: Get.width * 0.6,
                 child: Text(
                   name,
-                  maxLines: 1,
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.bold
@@ -56,22 +56,22 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 5),
-              Row(
-                children: [
-                  const Icon(
-                    Icons.star,
-                    color: ColorConstant.grayColor,
-                    size: 20,
-                  ),
-                  const SizedBox(width: 5),
-                  Text(
-                    "$rate ($reviewCount Reviews)",
-                    textScaler: const TextScaler.linear(0.85),
-                    style: AppTextTheme.medium
-                        .copyWith(color: ColorConstant.grayColor, fontSize: 16),
-                  ),
-                ],
-              ),
+              // Row(
+              //   children: [
+              //     const Icon(
+              //       Icons.star,
+              //       color: ColorConstant.grayColor,
+              //       size: 20,
+              //     ),
+              //     const SizedBox(width: 5),
+              //     Text(
+              //       "$rate ($reviewCount Reviews)",
+              //       textScaler: const TextScaler.linear(0.85),
+              //       style: AppTextTheme.medium
+              //           .copyWith(color: ColorConstant.grayColor, fontSize: 16),
+              //     ),
+              //   ],
+              // ),
               const SizedBox(height: 10),
               Row(
                 children: [

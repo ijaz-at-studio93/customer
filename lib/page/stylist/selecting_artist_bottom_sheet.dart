@@ -79,7 +79,7 @@ class _SelectingArtistBottomSheetWidgetState
                   ),
                 ),
                 Text(
-                  "Select Your Favorite Stylist",
+                  "Select a Stylist",
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.bold.copyWith(
                     fontSize: 19,
@@ -92,86 +92,63 @@ class _SelectingArtistBottomSheetWidgetState
             ),
           ),
           Obx(
-            () => Expanded(
+                () => Expanded(
               child: _homeController.showProgress
                   ? const ProgressBarView()
-                  : _homeController.getArtiestListData.data?.isEmpty ??
-                          false ||
-                              _homeController.getArtiestListData.data == null
-                      ? const NoItemsWidget(
-                          text: "No Artiest Available For Selected Services",
-                        )
-                      : GridView.builder(
-                          shrinkWrap: true,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 15),
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, // Number of columns
-                            mainAxisSpacing:
-                                12.0, // Spacing between items vertically
-                            crossAxisSpacing:
-                                12.0, // Spacing between items horizontally
-                            childAspectRatio: 0.62, // Aspect ratio of each item
-                          ),
-                          itemCount:
-                              _homeController.getArtiestListData.data?.length ??
-                                  0,
-                          itemBuilder: (context, index) {
-                            return SelectedFavArtistCardWidget(
-                              callback: (){
+                  : _homeController.getArtiestListData.data == null ||
+                  (_homeController.getArtiestListData.data?.isEmpty ?? true)
+                  ? const NoItemsWidget(text: "No Artiest Available For Selected Services")
+                  : Builder(builder: (context) {
+                // 👇 NEW: de-duplicate by artist id
+                final seen = <String>{};
+                final unique = (_homeController.getArtiestListData.data ?? [])
+                    .where((a) {
+                  final id = a.id?.trim() ?? '';
+                  if (id.isEmpty || seen.contains(id)) return false;
+                  seen.add(id);
+                  return true;
+                })
+                    .toList();
 
-                                stylistId.value = _homeController
-                                    .getArtiestListData
-                                    .data![index]
-                                    .id ??
-                                    "";
+                return GridView.builder(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 12.0,
+                    crossAxisSpacing: 12.0,
+                    childAspectRatio: 0.62,
+                  ),
+                  itemCount: unique.length, // 👈 use unique
+                  itemBuilder: (context, index) {
+                    final artist = unique[index]; // 👈 use unique
+                    return SelectedFavArtistCardWidget(
+                      callback: () {
+                        stylistId.value = artist.id ?? "";
+                        widget.callback.call();
+                      },
+                      salonId: widget.salonId,
+                      artiest: artist,
+                      onPress: () {
+                        Navigator.pop(context);
+                        Get.to(() => AppointmentBookingPage(
+                          artiestId: artist.id ?? "",
+                        ));
 
-                                widget.callback.call();
-                              },
-                             salonId: widget.salonId,
-                              artiest: _homeController
-                                  .getArtiestListData.data![index],
-                              onPress: () {
-
-                                Navigator.pop(context);
-                                Get.to(() => AppointmentBookingPage(
-                                  artiestId: _homeController
-                                      .getArtiestListData
-                                      .data![index]
-                                      .id ??
-                                      "",
-                                ));
-
-                                setState(() {
-                                  _homeController
-                                      .getArtiestListData
-                                      .data![index]
-                                      .isSelectArtist = !(_homeController
-                                          .getArtiestListData
-                                          .data![index]
-                                          .isSelectArtist ??
-                                      false);
-                                  if (_homeController.getArtiestListData
-                                          .data![index].isSelectArtist ??
-                                      false) {
-                                    stylistId.value = _homeController
-                                            .getArtiestListData
-                                            .data![index]
-                                            .id ??
-                                        "";
-
-                                    widget.callback.call();
-
-                                  } else {
-                                    stylistId.value = "";
-                                  }
-                                });
-
-                              },
-                            );
-                          },
-                        ),
+                        setState(() {
+                          artist.isSelectArtist = !(artist.isSelectArtist ?? false);
+                          if (artist.isSelectArtist ?? false) {
+                            stylistId.value = artist.id ?? "";
+                            widget.callback.call();
+                          } else {
+                            stylistId.value = "";
+                          }
+                        });
+                      },
+                    );
+                  },
+                );
+              }),
             ),
           )
         ],

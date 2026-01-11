@@ -27,6 +27,7 @@ import '../../constant/color_constant.dart';
 import '../../project_specific/text_theme.dart';
 import '../appointment/appointment_booking_page.dart';
 import '../search/stylist_search_page.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'dart:convert';
 
@@ -645,7 +646,7 @@ class _SaloonAfterSelectingServicesPageState
       children: [
         SizedBox(
           width: Get.width,
-          height: Get.height * 0.28,
+          height: Get.height * 0.34,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onPanDown: (_) => _stopAutoScroll(),
@@ -658,7 +659,7 @@ class _SaloonAfterSelectingServicesPageState
             child: _images.isEmpty
                 ? CachedNetworkImage(
               width: Get.width,
-              height: Get.height * 0.28,
+              height: Get.height * 0.34,
               fit: BoxFit.fitWidth,
               imageUrl:
               "${APIConstants.image}${_homeController.homeSalonDetailsData.data?.image ?? ""}",
@@ -667,13 +668,13 @@ class _SaloonAfterSelectingServicesPageState
               placeholder: (context, url) => Image(
                 image: const AssetImage(AssetsConstant.placeHolder),
                 width: Get.width,
-                height: Get.height * 0.28,
+                height: Get.height * 0.34,
                 fit: BoxFit.fitWidth,
               ),
               errorWidget: (context, url, error) => Image(
                 image: const AssetImage(AssetsConstant.placeHolder),
                 width: Get.width,
-                height: Get.height * 0.28,
+                height: Get.height * 0.34,
                 fit: BoxFit.fitWidth,
               ),
             )
@@ -689,19 +690,19 @@ class _SaloonAfterSelectingServicesPageState
                 final imageUrl = _images[index];
                 return CachedNetworkImage(
                   width: Get.width,
-                  height: Get.height * 0.28,
+                  height: Get.height * 0.34,
                   fit: BoxFit.fitWidth,
                   imageUrl: imageUrl,
                   placeholder: (context, url) => Image(
                     image: const AssetImage(AssetsConstant.placeHolder),
                     width: Get.width,
-                    height: Get.height * 0.28,
+                    height: Get.height * 0.34,
                     fit: BoxFit.fitWidth,
                   ),
                   errorWidget: (context, url, error) => Image(
                     image: const AssetImage(AssetsConstant.placeHolder),
                     width: Get.width,
-                    height: Get.height * 0.28,
+                    height: Get.height * 0.34,
                     fit: BoxFit.fitWidth,
                   ),
                 );
@@ -714,7 +715,7 @@ class _SaloonAfterSelectingServicesPageState
         Positioned(
           child: Container(
             width: Get.width,
-            height: Get.height * 0.28,
+            height: Get.height * 0.34,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment(0.02, 1.00),
@@ -823,32 +824,35 @@ class _SaloonAfterSelectingServicesPageState
               Row(
                 children: [
                   Container(
+                    height: 32,
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
                     decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: ColorConstant.greenColor,
-                        borderRadius: BorderRadius.circular(5)),
-                    width: 60,
-                    height: 30,
+                      color: ColorConstant.greenColor,
+                      borderRadius: BorderRadius.circular(14), // 👈 pill shape
+                    ),
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(
                           Icons.star,
-                          color: Colors.white,
-                          size: 20,
+                          color: ColorConstant.whiteColor,
+                          size: 14,
                         ),
-                        const SizedBox(width: 3),
-                        SizedBox(
-                          child: Text(
-                            "${_homeController.homeSalonDetailsData.data?.rating}",
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 11, color: ColorConstant.whiteColor),
+                        const SizedBox(width: 4),
+                        Text(
+                          _homeController.homeSalonDetailsData.data?.rating
+                              ?.toStringAsFixed(1) ?? "0.0",
+                          style: AppTextTheme.medium.copyWith(
+                            color: ColorConstant.whiteColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
                           ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 13),
+                  const SizedBox(width: 10),
                   GestureDetector(
                     onTap: () {
                       Get.to(() => SalonRatingPage(
@@ -859,9 +863,9 @@ class _SaloonAfterSelectingServicesPageState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${_homeController.homeSalonDetailsData.data?.rating} Ratings",
+                          "${_homeController.homeSalonDetailsData.data?.reviewCount} Reviews",
                           style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.whiteColor, fontSize: 13),
+                              color: ColorConstant.whiteColor, fontSize: 14),
                         ),
                         const SizedBox(height: 5),
                         const Dash(
@@ -882,18 +886,19 @@ class _SaloonAfterSelectingServicesPageState
                     color: ColorConstant.yellowColor,
                     size: 20,
                   ),
-                  const SizedBox(width: 5),
+                  const SizedBox(width: 2),
                   SizedBox(
                     width: Get.width * 0.05,
                     child: Text(
                       (_homeController.homeSalonDetailsData.data?.averageArtistRatings ?? 0)
                           .toStringAsFixed(2),
-                      overflow: TextOverflow.ellipsis,
+                      //overflow: TextOverflow.ellipsis,
                       maxLines: 1,
                       style: AppTextTheme.medium.copyWith(
-                          fontSize: 11, color: ColorConstant.yellowColor),
+                          fontSize: 13, color: ColorConstant.yellowColor),
                     ),
                   ),
+                  const SizedBox(width: 4),
                   Text(
                     'Average Stylist Rating',
                     style: AppTextTheme.medium.copyWith(
@@ -949,7 +954,7 @@ class _SaloonAfterSelectingServicesPageState
           SizedBox(
             width: Get.width * 0.9,
             child: Text(
-              maxLines: 1,
+              maxLines: 2,
               _homeController.homeSalonDetailsData.data?.name ?? "",
               overflow: TextOverflow.ellipsis,
               style: AppTextTheme.bold
@@ -987,8 +992,8 @@ class _SaloonAfterSelectingServicesPageState
                 children: [
                   Image.asset(
                     AssetsConstant.manWalk,
-                    height: 13,
-                    width: 13,
+                    height: 18,
+                    width: 18,
                     color: changeTheme(
                         SharedPrefs.readStringValue(PrefConstants.gender)),
                   ),
@@ -996,7 +1001,8 @@ class _SaloonAfterSelectingServicesPageState
                   Row(
                     children: [
                       Text(
-                        "${_homeController.homeSalonDetailsData.data?.distanceTime ?? ""} min • ${_homeController.homeSalonDetailsData.data?.distance.toString() == "" ? "" : convertMetersToKilometers(_homeController.homeSalonDetailsData.data?.distance ?? 0.0)} km",
+                        //"${_homeController.homeSalonDetailsData.data?.distanceTime ?? ""} min • ${_homeController.homeSalonDetailsData.data?.distance.toString() == "" ? "" : convertMetersToKilometers(_homeController.homeSalonDetailsData.data?.distance ?? 0.0)} km",
+                        "• ${_homeController.homeSalonDetailsData.data?.distance.toString() == "" ? "" : convertMetersToKilometers(_homeController.homeSalonDetailsData.data?.distance ?? 0.0)} K.M. Drive",
                         style: AppTextTheme.medium.copyWith(
                             color: ColorConstant.blackColor, fontSize: 13),
                       ),
@@ -1022,7 +1028,7 @@ class _SaloonAfterSelectingServicesPageState
                   Row(
                     children: [
                       Text(
-                        "Mon-Sat •${_homeController.homeSalonDetailsData.data?.startTiming == null ? "" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.startTiming ?? "")} ${_homeController.homeSalonDetailsData.data?.endTiming == null ? "" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.endTiming ?? "")}",
+                        "Mon-Sun •${_homeController.homeSalonDetailsData.data?.startTiming == null ? "" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.startTiming ?? "")} ${_homeController.homeSalonDetailsData.data?.endTiming == null ? "" : convertTimeTo12HourFormat(_homeController.homeSalonDetailsData.data?.endTiming ?? "")}",
                         textScaler: const TextScaler.linear(0.85),
                         style: AppTextTheme.medium.copyWith(
                             color: ColorConstant.blackColor, fontSize: 15),
@@ -1061,14 +1067,15 @@ class _SaloonAfterSelectingServicesPageState
               ),
               GestureDetector(
                 onTap: () {
-                  Get.to(() => StylistToUserLocation(
-                        latitude: _homeController.homeSalonDetailsData.data
-                                ?.geoLocationPoint?.coordinates?[1] ??
-                            0.0,
-                        longitude: _homeController.homeSalonDetailsData.data
-                                ?.geoLocationPoint?.coordinates?[0] ??
-                            0.0,
-                      ));
+                  _openGoogleMapsForSalon();
+                  // Get.to(() => StylistToUserLocation(
+                  //       latitude: _homeController.homeSalonDetailsData.data
+                  //               ?.geoLocationPoint?.coordinates?[1] ??
+                  //           0.0,
+                  //       longitude: _homeController.homeSalonDetailsData.data
+                  //               ?.geoLocationPoint?.coordinates?[0] ??
+                  //           0.0,
+                  //     ));
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),
@@ -1564,7 +1571,7 @@ class _SaloonAfterSelectingServicesPageState
                       Padding(
                         padding: const EdgeInsets.only(left: 19, top: 15),
                         child: Text(
-                          "Recommended Services",
+                          "Service Categories",
                           style: AppTextTheme.bold.copyWith(
                               fontSize: 19, color: ColorConstant.blackColor),
                         ),
@@ -1605,7 +1612,7 @@ class _SaloonAfterSelectingServicesPageState
                                         separatorBuilder: (context, index) {
                                           return Container(
                                             margin: const EdgeInsets.only(
-                                                top: 30, bottom: 20),
+                                                top:25, bottom:10),
                                             height: 1,
                                             width: Get.width,
                                             color: ColorConstant.dividerColor,
@@ -1942,4 +1949,29 @@ class _SaloonAfterSelectingServicesPageState
       return time12;
     }
   }
+  Future<void> _openGoogleMapsForSalon() async {
+    final salon = _homeController.homeSalonDetailsData.data;
+
+    final mapUrl = salon?.googleplaceid;
+
+    if (mapUrl != null && mapUrl.isNotEmpty) {
+      final uri = Uri.parse(mapUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return;
+      }
+    }
+
+    // Fallback: open coordinates if link not available or invalid
+    final lat = salon?.geoLocationPoint?.coordinates?[1];
+    final lng = salon?.geoLocationPoint?.coordinates?[0];
+
+    if (lat != null && lng != null) {
+      final fallbackUrl =
+          "https://www.google.com/maps/search/?api=1&query=$lat,$lng";
+      final uri = Uri.parse(fallbackUrl);
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    }
+  }
+
 }

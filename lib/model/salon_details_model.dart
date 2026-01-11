@@ -37,6 +37,7 @@ class Data {
   String? address;
   String? image;
   List<String>? images;
+  String? googleplaceid;
   GeoLocationPoint? geoLocationPoint;
   String? createdAt;
   String? updatedAt;
@@ -61,6 +62,7 @@ class Data {
         this.address,
         this.image,
         this.images,
+        this.googleplaceid,
         this.geoLocationPoint,
         this.createdAt,
         this.updatedAt,
@@ -85,6 +87,7 @@ class Data {
     mobile = json['mobile'];
     address = json['address'];
     image = json['image'];
+    googleplaceid = json['googleplaceid'];
     if (json['images'] != null) {
       images = List<String>.from(json['images'].map((e) => e.toString()));
     }

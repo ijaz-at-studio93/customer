@@ -30,7 +30,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace "com.anantax.scuts"
     compileSdk 36
-    ndkVersion flutter.ndkVersion
+    ndkVersion "26.1.10909125"
 
     compileOptions {
         // Add this line to enable desugaring

@@ -18,9 +18,7 @@ class CreateBookingAppointmentModel {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['statusCode'] = statusCode;
     data['success'] = success;
-    if (this.data != null) {
-      data['data'] = this.data!.toJson();
-    }
+    if (this.data != null) data['data'] = this.data!.toJson();
     data['message'] = message;
     return data;
   }
@@ -41,23 +39,35 @@ class Data {
   String? finalizedAt;
   String? idx;
 
-  Data(
-      {this.orderAmount,
-        this.createdAt,
-        this.updatedAt,
-        this.id,
-        this.deletedAt,
-        this.completionToken,
-        this.orderStatus,
-        this.paymentStatus,
-        this.salonAppointmentId,
-        this.salonId,
-        this.userId,
-        this.finalizedAt,
-        this.idx});
+  // 🎁 Complimentary (Secret Santa)
+  String? complimentaryServiceId;
+  String? complimentaryServiceName;
+  String? complimentaryServiceCategoryName;
+
+  Data({
+    this.orderAmount,
+    this.createdAt,
+    this.updatedAt,
+    this.id,
+    this.deletedAt,
+    this.completionToken,
+    this.orderStatus,
+    this.paymentStatus,
+    this.salonAppointmentId,
+    this.salonId,
+    this.userId,
+    this.finalizedAt,
+    this.idx,
+    this.complimentaryServiceId,
+    this.complimentaryServiceName,
+    this.complimentaryServiceCategoryName,
+  });
 
   Data.fromJson(Map<String, dynamic> json) {
-    orderAmount = double.parse(json['orderAmount'].toString());
+    orderAmount = json['orderAmount'] != null
+        ? double.tryParse(json['orderAmount'].toString())
+        : null;
+
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     id = json['id'];
@@ -70,10 +80,31 @@ class Data {
     userId = json['userId'];
     finalizedAt = json['finalizedAt'];
     idx = json['idx'];
+
+    // ✅ BookingOrder persisted fields
+    if (json['complimentaryDetails'] != null) {
+      complimentaryServiceId =
+      json['complimentaryDetails']['complimentaryServiceId'];
+      complimentaryServiceName =
+      json['complimentaryDetails']['complimentaryServiceName'];
+      complimentaryServiceCategoryName =
+      json['complimentaryDetails']['complimentaryServiceCategoryName'];
+    }
+
+    // ✅ OLD FLOW (inline response)
+    if (json['secretSantaReward'] != null) {
+      complimentaryServiceId ??=
+      json['secretSantaReward']['complimentaryServiceId'];
+      complimentaryServiceName ??=
+      json['secretSantaReward']['complimentaryServiceName'];
+      complimentaryServiceCategoryName ??=
+      json['secretSantaReward']['complimentaryServiceCategoryName'];
+    }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final Map<String, dynamic> data = {};
+
     data['orderAmount'] = orderAmount;
     data['createdAt'] = createdAt;
     data['updatedAt'] = updatedAt;
@@ -87,6 +118,13 @@ class Data {
     data['userId'] = userId;
     data['finalizedAt'] = finalizedAt;
     data['idx'] = idx;
+
+    data['complimentaryDetails'] = {
+      'complimentaryServiceId': complimentaryServiceId,
+      'complimentaryServiceName': complimentaryServiceName,
+      'complimentaryServiceCategoryName':
+      complimentaryServiceCategoryName,
+    };
     return data;
   }
 }

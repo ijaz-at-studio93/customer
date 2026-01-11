@@ -1330,77 +1330,78 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                         fontSize: 17, color: ColorConstant.blackColor),
                   ),
                   const SizedBox(width: 5),
+                  // Disabled home service temporarily
                   Container(
                     height: 50,
                     color: ColorConstant.whiteColor,
                     child: Row(
                       children: [
-                        Text(
-                          "Home Service",
-                          style: AppTextTheme.bold.copyWith(
-                              color: changeTheme(SharedPrefs.readStringValue(
-                                  PrefConstants.gender)),
-                              fontSize: 13),
-                        ),
-                        SizedBox(
-                          height: 30,
-                          child: CupertinoSwitch(
-                            value: atHome,
-                            activeColor: changeTheme(
-                                SharedPrefs.readStringValue(
-                                    PrefConstants.gender)),
-                            onChanged: (bool value) {
-                              setState(() {
-                                atHome = value;
-                                if (atHome) {
-                                  SharedPrefs.writeValue(
-                                      PrefConstants.isHomeService, true);
-                                } else {
-                                  SharedPrefs.writeValue(
-                                      PrefConstants.isHomeService, false);
-                                }
-                                _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    homeService: atHome,
-                                    offset: 1,
-                                    size: 50,
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                    orderBy: "",
-                                    nearest: false,
-                                    fourPlusRating: false);
-
-                                _homeController.doGetPromoCode(
-                                    fourPlusRating: false,
-                                    homeService: SharedPrefs.readBoolValue(
-                                        PrefConstants.isHomeService),
-                                    nearest: false,
-                                    orderBy: dropdownvalue == "Sort By"
-                                        ? ""
-                                        : dropdownvalue == "Newest"
-                                            ? "createdAt"
-                                            : dropdownvalue == "Price"
-                                                ? "serviceStartingPrice"
-                                                : "name",
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)));
-                              });
-                            },
-                          ),
-                        ),
+                        // Text(
+                        //   "Home Service",
+                        //   style: AppTextTheme.bold.copyWith(
+                        //       color: changeTheme(SharedPrefs.readStringValue(
+                        //           PrefConstants.gender)),
+                        //       fontSize: 13),
+                        // ),
+                        // SizedBox(
+                        //   height: 30,
+                        //   child: CupertinoSwitch(
+                        //     value: atHome,
+                        //     activeColor: changeTheme(
+                        //         SharedPrefs.readStringValue(
+                        //             PrefConstants.gender)),
+                        //     onChanged: (bool value) {
+                        //       setState(() {
+                        //         atHome = value;
+                        //         if (atHome) {
+                        //           SharedPrefs.writeValue(
+                        //               PrefConstants.isHomeService, true);
+                        //         } else {
+                        //           SharedPrefs.writeValue(
+                        //               PrefConstants.isHomeService, false);
+                        //         }
+                        //         _homeController.doGetHomeSalonList(
+                        //             serviceGender: selectedGender.value == 0
+                        //                 ? "male"
+                        //                 : "female",
+                        //             homeService: atHome,
+                        //             offset: 1,
+                        //             size: 50,
+                        //             lat: double.parse(
+                        //                 SharedPrefs.readStringValue(
+                        //                     PrefConstants.latitude)),
+                        //             lng: double.parse(
+                        //                 SharedPrefs.readStringValue(
+                        //                     PrefConstants.longitude)),
+                        //             orderBy: "",
+                        //             nearest: false,
+                        //             fourPlusRating: false);
+                        //
+                        //         _homeController.doGetPromoCode(
+                        //             fourPlusRating: false,
+                        //             homeService: SharedPrefs.readBoolValue(
+                        //                 PrefConstants.isHomeService),
+                        //             nearest: false,
+                        //             orderBy: dropdownvalue == "Sort By"
+                        //                 ? ""
+                        //                 : dropdownvalue == "Newest"
+                        //                     ? "createdAt"
+                        //                     : dropdownvalue == "Price"
+                        //                         ? "serviceStartingPrice"
+                        //                         : "name",
+                        //             serviceGender: selectedGender.value == 0
+                        //                 ? "male"
+                        //                 : "female",
+                        //             lat: double.parse(
+                        //                 SharedPrefs.readStringValue(
+                        //                     PrefConstants.latitude)),
+                        //             lng: double.parse(
+                        //                 SharedPrefs.readStringValue(
+                        //                     PrefConstants.longitude)));
+                        //       });
+                        //     },
+                        //   ),
+                        // ),
                       ],
                     ),
                   )

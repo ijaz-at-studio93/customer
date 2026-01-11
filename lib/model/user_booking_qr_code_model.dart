@@ -33,6 +33,8 @@ class Data {
   String? finalizedAt;
   String? appointmentId;
   String? orderStatus;
+  String? paymentStatus;
+  AppliedDiscount? appliedDiscount;
   String? completionToken;
   bool? isHomeService;
   bool? allowPortfolioUpload;
@@ -51,6 +53,8 @@ class Data {
       this.finalizedAt,
       this.appointmentId,
       this.orderStatus,
+        this.paymentStatus,
+        this.appliedDiscount,
       this.completionToken,
       this.isHomeService,
       this.allowPortfolioUpload,
@@ -68,6 +72,17 @@ class Data {
     finalizedAt = json['finalizedAt'];
     appointmentId = json['appointmentId'];
     orderStatus = json['orderStatus'];
+    paymentStatus = json['paymentStatus'];
+    final discountJson = json['discountDetails'];
+
+    if (discountJson is Map<String, dynamic>) {
+      discountJson.forEach((key, value) {
+        if (value is Map<String, dynamic> &&
+            value.containsKey('discountAmount')) {
+          appliedDiscount = AppliedDiscount.fromJson(value);
+        }
+      });
+    }
     completionToken = json['completionToken'];
     isHomeService = json['isHomeService'];
     allowPortfolioUpload = json['allowPortfolioUpload'];
@@ -96,6 +111,10 @@ class Data {
     data['finalizedAt'] = finalizedAt;
     data['appointmentId'] = appointmentId;
     data['orderStatus'] = orderStatus;
+    data['paymentStatus'] = paymentStatus;
+    if (appliedDiscount != null) {
+      data['appliedDiscount'] = appliedDiscount!.toJson();
+    }
     data['completionToken'] = completionToken;
     data['isHomeService'] = isHomeService;
     data['allowPortfolioUpload'] = allowPortfolioUpload;
@@ -117,6 +136,24 @@ class Data {
     return data;
   }
 }
+
+class AppliedDiscount {
+  String? discountType;
+  double? discountAmount;
+
+  AppliedDiscount.fromJson(Map<String, dynamic> json) {
+    discountType = json['discountType'];
+    discountAmount = double.tryParse(json['discountAmount'].toString());
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'discountType': discountType,
+      'discountAmount': discountAmount,
+    };
+  }
+}
+
 
 class Address {
   String? id;

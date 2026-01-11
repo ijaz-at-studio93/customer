@@ -60,13 +60,14 @@ class DialogMenuListWidget extends StatelessWidget {
                 width: Get.width * 0.2,
                 child: Text(
                   categoryListData.name ?? "", // Horoscope name
-                  maxLines: 1,
+                  maxLines: 2,
+                  softWrap: true,
                   textAlign: TextAlign.center,
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.medium
                       .copyWith(color: ColorConstant.blackColor, fontSize: 13),
                   // Text style
-                  overflow: TextOverflow.ellipsis,
+                  overflow: TextOverflow.visible,
                 ),
               ),
             ],

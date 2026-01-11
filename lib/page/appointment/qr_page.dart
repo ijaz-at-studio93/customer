@@ -3,16 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:get/get.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/appointment/widget/promocode_sheet_widget.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:ticket_widget/ticket_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../api/dio_client.dart';
+import '../../controller/auth_controller.dart';
+import '../../model/user_booking_qr_code_model.dart';
+import '../../util/call_wrapper.dart';
 import '../bottom_navigation_bar.dart';
 import 'dart:ui';
 
@@ -31,23 +37,49 @@ class QRCodePage extends StatefulWidget {
 }
 
 class _QRCodePageState extends State<QRCodePage> {
+  late Razorpay razorpay;
+  final _authController = Get.find<AuthController>();
   final _homeController = Get.find<HomeController>();
+  final Rx<UserBookingQrCodeModel> getUserBookingQrCodeModel =
+      UserBookingQrCodeModel().obs;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      _homeController.doCreateQrCode(appointmentId: widget.appointmentId);
-      _homeController.doClearCart(callback: () {
-        stylistId.value = "";
-        stylistId.notifyListeners();
-        _homeController.doGetCart();
-      });
+
+    razorpay = Razorpay();
+    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccessResponse);
+    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentErrorResponse);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _homeController.doCreateQrCode(
+        appointmentId: widget.appointmentId,
+      );
+
+      final paymentStatus = _homeController
+          .getUserBookingQrCodeModel
+          .data
+          ?.paymentStatus
+          ?.toLowerCase();
+
+      if (paymentStatus == 'paid') {
+        _homeController.doClearCart(
+          callback: () {
+            stylistId.value = "";
+            stylistId.notifyListeners();
+            _homeController.doGetCart();
+          },
+        );
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final isPaymentPending =
+        _homeController.getUserBookingQrCodeModel.data?.paymentStatus
+            ?.toLowerCase() ==
+            "pending";
     return Scaffold(
       backgroundColor:
       changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
@@ -218,26 +250,78 @@ class _QRCodePageState extends State<QRCodePage> {
                             color: ColorConstant.divider2Color),
                       ),
                       const SizedBox(height: 10),
-                      Column(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            "Stylist Name",
-                            style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.grayTextColor,
-                                fontSize: 13),
+                          // LEFT – Stylist (unchanged)
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Stylist Name",
+                                style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.grayTextColor,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              const SizedBox(height: 3),
+                              Text(
+                                _homeController
+                                    .getUserBookingQrCodeModel
+                                    .data
+                                    ?.appointment
+                                    ?.artist
+                                    ?.name ??
+                                    "",
+                                style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.blackColor,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 3),
-                          Text(
-                            _homeController.getUserBookingQrCodeModel.data
-                                ?.appointment?.artist?.name ??
-                                "",
-                            style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.blackColor,
-                                fontSize: 13),
+
+                          const SizedBox(width: 12),
+
+                          // RIGHT – Services (make this flexible)
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  "Services",
+                                  style: AppTextTheme.medium.copyWith(
+                                    color: ColorConstant.grayTextColor,
+                                    fontSize: 13,
+                                  ),
+                                  textAlign: TextAlign.right,
+                                ),
+                                const SizedBox(height: 3),
+                                Text(
+                                  _homeController
+                                      .getUserBookingQrCodeModel
+                                      .data
+                                      ?.items
+                                      ?.where((e) => e.isService == true)
+                                      .map((e) => e.service?.name ?? "")
+                                      .where((name) => name.isNotEmpty)
+                                      .join(", ") ??
+                                      "",
+                                  style: AppTextTheme.medium.copyWith(
+                                    color: ColorConstant.blackColor,
+                                    fontSize: 13,
+                                  ),
+                                  textAlign: TextAlign.right,
+                                  maxLines: 3,              // you can increase if you want
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),
+
                       /* old flow of showing QR to only confirmed.*/
                       // Center(
                       //   child: QrImageView(
@@ -310,38 +394,173 @@ class _QRCodePageState extends State<QRCodePage> {
             ],
           ),
         ),
-      ),
+    ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Add some padding if needed
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end, // This will space them out
-            children: <Widget>[
-            FloatingActionButton.extended(
-            heroTag: "cancel", // Ensure unique heroTags if you have multiple FABs on screen
-            onPressed: _showCancelConfirmationDialog,
-            backgroundColor: Colors.red,
-            icon: const Icon(Icons.cancel),
-            label: Text(
-            "Cancel Booking",
-            style: AppTextTheme.medium.copyWith(color: Colors.white),
-            ),
+      floatingActionButton: Obx(() {
+        final isPaymentPending =
+            _homeController.getUserBookingQrCodeModel.data?.paymentStatus
+                ?.toLowerCase() == "pending";
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, // 👈 VERY IMPORTANT
+            children: [
+
+              // 🔵 Apply Offer & Pay (TOP)
+              if (isPaymentPending)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: ColorConstant.primaryColor,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: _openApplyOfferSheet,
+                    child: Text(
+                      "Apply Offer & Pay",
+                      style: AppTextTheme.bold.copyWith(color: Colors.white),
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 12),
+
+              // 🔴 Cancel Booking (BOTTOM)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: _showCancelConfirmationDialog,
+                  child: Text(
+                    "Cancel Booking",
+                    style: AppTextTheme.bold.copyWith(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
           ),
-              const SizedBox(width: 30),
-            FloatingActionButton(
-              heroTag: "sos", // Ensure unique heroTags
-              onPressed: () => _launchPhone("9347882037"),
-              backgroundColor: ColorConstant.removeStroke,
-              child: Image.asset(
-                AssetsConstant.sosIcon,
-                width: 42, // You might need to adjust these if they look too big/small for a standard FAB
-                height: 19,
+        );
+      }),
+
+    );
+  }
+
+  /*-------------  On Payment Fail Method ------------- */
+  void handlePaymentErrorResponse(PaymentFailureResponse response) {
+    final user = _authController.userResponseModel.data?.userData;
+
+    showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (ctx) {
+        return CallWrapper( // ✅ adds your Help 24×7 call button
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            title: const Text(
+              "Payment Failed",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: SingleChildScrollView( // ✅ ensures content never overflows
+              child: ListBody(
+                children: [
+                  const Text(
+                    "You may have cancelled the payment or there was a delay in response from the UPI app.",
+                  ),
+                  const SizedBox(height: 12),
+                  Text("Mobile: +91 ${user?.mobile ?? ''}"),
+                  Text("Email: ${user?.email ?? ''}"),
+                  Text("Name: ${user?.name ?? ''}"),
+                ],
               ),
             ),
-          ],
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                ),
+                onPressed: () {
+                  Navigator.of(ctx).pop();       // ✅ close dialog
+                  //Navigator.of(context).maybePop(); // ✅ go back if possible
+                },
+                child: const Text(
+                  "OK",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
           ),
-        ),
+        );
+      },
     );
+  }
+
+  /*---------------  On Payment Success Method ------------ */
+  Future<void> handlePaymentSuccessResponse(PaymentSuccessResponse response) async {
+    print("🎯 Razorpay Success Response: $response");
+    print("PaymentId: ${response.paymentId}");
+    print("OrderId: ${response.orderId}");
+    print("Signature: ${response.signature}");
+    showMessage("Payment Successful");
+    Get.back();
+  }
+
+  void _startPayment() {
+    final amount =
+        (_homeController.getUserBookingQrCodeModel.data?.orderAmount ?? 0) * 100;
+
+    final options = {
+      'key': _homeController.getOrderIdModel.data?.razorpayKey ?? "",
+      'amount': amount.toInt(),
+      'name': 'ScutS',
+      'order_id': _homeController.getOrderIdModel.data?.orderId ?? "",
+      'description': 'Pay After Service',
+      'timeout': 120,
+      'prefill': {
+        'contact': _authController.userResponseModel
+            .data?.userData?.mobile ??
+            "",
+        'email': _authController.userResponseModel
+            .data?.userData?.email ??
+            ""
+      },
+    };
+
+    razorpay.open(options);
+  }
+
+  void _openApplyOfferSheet() async {
+    String discountId = await showModalBottomSheet(
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+      ),
+      context: context,
+      builder: (_) => const PromoCodeSheetWidget(),
+    );
+
+    if (discountId.isNotEmpty) {
+      _homeController.doApplyPromoCode(
+        data: {"discountId": discountId},
+        callback: () {
+          _homeController.doCreateQrCode(
+            appointmentId: widget.appointmentId,
+          );
+          _startPayment(); // 👈 ADD THIS
+        },
+      );
+    }
   }
 
   /*-------------- Call Function -----------*/
@@ -417,7 +636,7 @@ class _QRCodePageState extends State<QRCodePage> {
             // show success snackbar (this is safe; we are not trying to close a disposed snackbar)
             Get.snackbar(
               "Success",
-              "Your booking has been cancelled. Refund will be processed shortly.",
+              "Your booking has been cancelled. Refund will be processed shortly, if it is paid booking",
               backgroundColor: Colors.green,
               colorText: Colors.white,
               snackPosition: SnackPosition.BOTTOM,
@@ -450,4 +669,9 @@ class _QRCodePageState extends State<QRCodePage> {
     );
   }
 
+  @override
+  void dispose() {
+    razorpay.clear();
+    super.dispose();
+  }
 }

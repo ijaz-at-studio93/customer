@@ -11,6 +11,8 @@ import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
 import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/appointment/person_of_the_year_page.dart';
+import 'package:salon_customer/page/appointment/secret_santa_scratch_page.dart';
 import 'package:salon_customer/page/appointment/widget/know_what_you_widget.dart';
 import 'package:salon_customer/page/appointment/widget/popular_service_widget.dart';
 import 'package:salon_customer/page/appointment/widget/promocode_sheet_widget.dart';
@@ -45,6 +47,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       userServiceAddressIdSelect = "";
       DateTime date = DateTime.now();
       String formatDate = DateFormat("yyyy-MM-dd").format(date);
+      int _visibleYear = DateTime.now().year;
       selectDate = formatDate;
       _homeController.doGetPopularServiceByYourStylist(
           stylistId: widget.artiestId);
@@ -763,66 +766,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              var options = {
-                                'key': _homeController
-                                        .getOrderIdModel.data?.razorpayKey ??
-                                    "",
-                                'amount': _homeController
-                                        .getServiceAddCartModel.data?.price ??
-                                    0 * 100,
-                                'name': 'ScutS',
-                                'timeout': 120,
-                                "order_id": _homeController
-                                        .getOrderIdModel.data?.orderId ??
-                                    "",
-                                'description': 'Booking Appointment',
-                                'retry': {'enabled': true, 'max_count': 1},
-                                'send_sms_hash': true,
-                                'prefill': {
-                                  'contact': _authController.userResponseModel
-                                          .data?.userData?.mobile ??
-                                      "",
-                                  'email': _authController.userResponseModel
-                                          .data?.userData?.mobile ??
-                                      ""
-                                },
-                                'external': {}
-                              };
-                              razorpay.on(Razorpay.EVENT_PAYMENT_ERROR,
-                                  handlePaymentErrorResponse);
-                              razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
-                                  handlePaymentSuccessResponse);
-                              razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET,
-                                  handleExternalWalletSelected);
-
-                              if (_homeController.getServiceAddCartModel.data
-                                      ?.items?.isEmpty ??
-                                  false) {
-                                showMessage("Cart Service Not Found");
-                              } else {
-                                if (_homeController
-                                        .getAvailabilitiesTimeSlotModelData
-                                        .data
-                                        ?.isEmpty ??
-                                    false) {
-                                  showMessage(
-                                      "This Date No Available Any Slot Please Select Next Date");
-                                } else {
-                                  if (SharedPrefs.readBoolValue(
-                                      PrefConstants.isHomeService)) {
-                                    if (userServiceAddressIdSelect == "") {
-                                      Get.to(() =>
-                                          const AddAddressPage(isSelect: true));
-                                    } else {
-                                      log("isHomeService  ${_homeController.getServiceAddCartModel.data?.price ?? 0 * 100}");
-                                      razorpay.open(options);
-                                    }
-                                  } else {
-                                    log("Booking Appointment without HomeService  ${_homeController.getServiceAddCartModel.data?.price ?? 0 * 100}");
-                                    razorpay.open(options);
-                                  }
-                                }
-                              }
+                              _payAndBook();
                             },
                             child: Container(
                               height: 45,
@@ -838,12 +782,13 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                 children: [
                                   Text(
                                     "Pay & Book",
+                                    //"Book",
                                     textScaler: const TextScaler.linear(0.85),
                                     style: AppTextTheme.medium.copyWith(
-                                        fontSize: 16,
+                                        fontSize: 20,
                                         color: ColorConstant.whiteColor),
                                   ),
-                                  const SizedBox(width: 10),
+                                  const SizedBox(width: 12),
                                   const Icon(
                                     Icons.arrow_forward,
                                       color: ColorConstant.whiteColor, size: 20)
@@ -859,6 +804,302 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     ));
   }
 
+  void _showBookingOptionsBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              // 🔹 Title
+              Text(
+                "Choose Payment Option",
+                style: AppTextTheme.bold.copyWith(fontSize: 18, color: Colors.black),
+              ),
+
+              const SizedBox(height: 20),
+
+              // ✅ PAY & BOOK (existing flow)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _payAndBook(); // 👈 existing Razorpay flow
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: changeTheme(SharedPrefs.readStringValue(
+                        PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    "Pay Online",
+                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // 🕒 PAY AFTER SERVICE
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _bookPayAfterService();
+                  },
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: BorderSide(color: changeTheme(SharedPrefs.readStringValue(
+                        PrefConstants.gender)) ??
+                        ColorConstant.primaryColor),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                    child: RichText(
+                      textAlign: TextAlign.center,
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Pay After Service ",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: changeTheme(
+                                SharedPrefs.readStringValue(PrefConstants.gender),
+                              ) ??
+                                  ColorConstant.primaryColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+
+                          TextSpan(
+                            text: "   (+2.36%)",
+                            style: TextStyle(
+                              fontSize: 11, // 👈 small text
+                              color: Colors.grey[600], // 👈 subtle
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // Future<void> _payAndBook() async {
+  //   if (selectTime == ""){
+  //     selectTime =
+  //         _homeController.getAvailabilitiesTimeSlotModelData.data?[0].time ??
+  //             "";
+  //   }
+  //   else {
+  //     selectTime = selectTime;
+  //   }
+  //   String inputDateTime = "$selectDate$selectTime";
+  //   String correctedDateTime =
+  //       '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+  //   DateTime dateTime = DateTime.parse(correctedDateTime);
+  //   String isoDateTime = dateTime.toIso8601String();
+  //   _homeController.doCreateBookingIntent(
+  //       userAddressId: userServiceAddressIdSelect,
+  //       isHomeService:
+  //       _homeController.getServiceAddCartModel.data?.isHomeService ??
+  //           false,
+  //       salonArtistId: widget.artiestId,
+  //       startAt: isoDateTime);
+  //   var options = {
+  //     'key': _homeController
+  //         .getOrderIdModel.data?.razorpayKey ??
+  //         "",
+  //     'amount': _homeController
+  //         .getServiceAddCartModel.data?.price ??
+  //         0 * 100,
+  //     'name': 'ScutS',
+  //     'timeout': 120,
+  //     "order_id": _homeController
+  //         .getOrderIdModel.data?.orderId ??
+  //         "",
+  //     'description': 'Booking Appointment',
+  //     'retry': {'enabled': true, 'max_count': 1},
+  //     'send_sms_hash': true,
+  //     'prefill': {
+  //       'contact': _authController.userResponseModel
+  //           .data?.userData?.mobile ??
+  //           "",
+  //       'email': _authController.userResponseModel
+  //           .data?.userData?.mobile ??
+  //           ""
+  //     },
+  //     'external': {}
+  //   };
+  //   razorpay.on(Razorpay.EVENT_PAYMENT_ERROR,
+  //       handlePaymentErrorResponse);
+  //   razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS,
+  //       handlePaymentSuccessResponse);
+  //   razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET,
+  //       handleExternalWalletSelected);
+  //
+  //   if (_homeController.getServiceAddCartModel.data
+  //       ?.items?.isEmpty ??
+  //       false) {
+  //     showMessage("Cart Service Not Found");
+  //   } else {
+  //     if (_homeController
+  //         .getAvailabilitiesTimeSlotModelData
+  //         .data
+  //         ?.isEmpty ??
+  //         false) {
+  //       showMessage(
+  //           "This Date No Available Any Slot Please Select Next Date");
+  //     } else {
+  //       if (SharedPrefs.readBoolValue(
+  //           PrefConstants.isHomeService)) {
+  //         if (userServiceAddressIdSelect == "") {
+  //           Get.to(() =>
+  //           const AddAddressPage(isSelect: true));
+  //         } else {
+  //           log("isHomeService  ${_homeController.getServiceAddCartModel.data?.price ?? 0 * 100}");
+  //           razorpay.open(options);
+  //         }
+  //       } else {
+  //         log("Booking Appointment without HomeService  ${_homeController.getServiceAddCartModel.data?.price ?? 0 * 100}");
+  //         razorpay.open(options);
+  //       }
+  //     }
+  //   }
+  // }
+
+  Future<void> _payAndBook() async {
+
+    // ✅ 1. Cart validation
+    if (_homeController.getServiceAddCartModel.data?.items?.isEmpty ?? true) {
+      showMessage("Cart Service Not Found");
+      return;
+    }
+
+    // ✅ 2. Slot validation — MUST be before selectTime logic
+    final slots = _homeController
+        .getAvailabilitiesTimeSlotModelData
+        .data;
+
+    if (slots == null || slots.isEmpty) {
+      showMessage(
+        "No slots available for today.\nPlease select a future date.",
+      );
+      return; // 👈 VERY IMPORTANT
+    }
+
+    // ✅ 3. Safe selectTime assignment
+    if (selectTime.isEmpty) {
+      selectTime = slots.first.time ?? "";
+    }
+
+    // ✅ 4. Date-time construction
+    String inputDateTime = "$selectDate$selectTime";
+    String correctedDateTime =
+        '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+
+    DateTime dateTime = DateTime.parse(correctedDateTime);
+    String isoDateTime = dateTime.toIso8601String();
+
+    // ✅ 5. Create booking intent
+    _homeController.doCreateBookingIntent(
+      userAddressId: userServiceAddressIdSelect,
+      isHomeService:
+      _homeController.getServiceAddCartModel.data?.isHomeService ?? false,
+      salonArtistId: widget.artiestId,
+      startAt: isoDateTime,
+    );
+
+    // ✅ 6. Razorpay options
+    var options = {
+      'key': _homeController.getOrderIdModel.data?.razorpayKey ?? "",
+      'amount':
+      (_homeController.getServiceAddCartModel.data?.price ?? 0) * 100,
+      'name': 'ScutS',
+      'timeout': 120,
+      'order_id': _homeController.getOrderIdModel.data?.orderId ?? "",
+      'description': 'Booking Appointment',
+      'retry': {'enabled': true, 'max_count': 1},
+      'send_sms_hash': true,
+      'prefill': {
+        'contact':
+        _authController.userResponseModel.data?.userData?.mobile ?? "",
+        'email':
+        _authController.userResponseModel.data?.userData?.email ?? "",
+      },
+      'external': {}
+    };
+
+    // ✅ 7. Razorpay listeners
+    razorpay.on(
+        Razorpay.EVENT_PAYMENT_ERROR, handlePaymentErrorResponse);
+    razorpay.on(
+        Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccessResponse);
+    razorpay.on(
+        Razorpay.EVENT_EXTERNAL_WALLET, handleExternalWalletSelected);
+
+    // ✅ 8. Home service validation
+    if (SharedPrefs.readBoolValue(PrefConstants.isHomeService)) {
+      if (userServiceAddressIdSelect.isEmpty) {
+        Get.to(() => const AddAddressPage(isSelect: true));
+        return;
+      }
+    }
+
+    // ✅ 9. Open Razorpay
+    log("Opening Razorpay for booking");
+    razorpay.open(options);
+  }
+
+  Future<void> _bookPayAfterService() async {
+    if (selectTime == ""){
+      selectTime =
+          _homeController.getAvailabilitiesTimeSlotModelData.data?[0].time ??
+              "";
+    }
+    else {
+      selectTime = selectTime;
+    }
+    String inputDateTime = "$selectDate$selectTime";
+    String correctedDateTime =
+        '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+    DateTime dateTime = DateTime.parse(correctedDateTime);
+    String isoDateTime = dateTime.toIso8601String();
+
+    _homeController.doCreateBooking(
+        userAddressId: "",
+        isHomeService:
+            _homeController.getServiceAddCartModel.data?.isHomeService ??
+                false,
+        salonArtistId: widget.artiestId,
+        startAt: isoDateTime,
+        callback: ()
+        {
+          stylistId.value = "";
+          stylistId.notifyListeners();
+          _navigateAfterBooking();
+        }
+    );
+  }
   /*================  Razor Pay ==============*/
   void showAlertDialog(BuildContext context, String title, String message) {
     // set up the buttons
@@ -932,116 +1173,134 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   }
 
   /*---------------  On Payment Success Method ------------ */
-  void handlePaymentSuccessResponse(PaymentSuccessResponse response) {
+  Future<void> handlePaymentSuccessResponse(PaymentSuccessResponse response) async {
     print("🎯 Razorpay Success Response: $response");
     print("PaymentId: ${response.paymentId}");
     print("OrderId: ${response.orderId}");
     print("Signature: ${response.signature}");
     showMessage("Payment Successful");
-    if (selectTime == "") {
-      selectTime =
-          _homeController.getAvailabilitiesTimeSlotModelData.data?[0].time ??
-              "";
-      String inputDateTime = "$selectDate$selectTime";
-      String correctedDateTime =
-          '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
-      DateTime dateTime = DateTime.parse(correctedDateTime);
-      String isoDateTime = dateTime.toIso8601String();
+    showMessage("Payment Successful");
 
-      if (_homeController.getServiceAddCartModel.data?.isHomeService ?? false) {
-        if (userServiceAddressIdSelect == "") {
-          Get.to(() => const AddAddressPage(
-                isSelect: true,
-              ));
-        } else {
-          _homeController.doCreateBooking(
-              userAddressId: userServiceAddressIdSelect,
-              isHomeService:
-                  _homeController.getServiceAddCartModel.data?.isHomeService ??
-                      false,
-              salonArtistId: widget.artiestId,
-              startAt: isoDateTime,
-              callback: () {
-                stylistId.value = "";
-                stylistId.notifyListeners();
+    final booking = await _homeController.fetchBookingByRazorpayOrderId(
+      razorpayOrderId: response.orderId!,
+    );
 
-                Get.to(() => YourApprovalPage(
-                      salonAppointmentId: _homeController
-                              .getCreateBookingAppointmentModel
-                              .data
-                              ?.salonAppointmentId ??
-                          "",
-                    ));
-              });
-        }
-      } else {
-        _homeController.doCreateBooking(
-            userAddressId: "",
-            isHomeService:
-                _homeController.getServiceAddCartModel.data?.isHomeService ??
-                    false,
-            salonArtistId: widget.artiestId,
-            startAt: isoDateTime,
-            callback: () {
-              stylistId.value = "";
-              stylistId.notifyListeners();
-
-              Get.to(() => YourApprovalPage(
-                    salonAppointmentId: _homeController
-                            .getCreateBookingAppointmentModel
-                            .data
-                            ?.salonAppointmentId ??
-                        "",
-                  ));
-            });
-      }
-    } else {
-      String inputDateTime = "$selectDate$selectTime";
-      String correctedDateTime =
-          '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
-      DateTime dateTime = DateTime.parse(correctedDateTime);
-      String isoDateTime = dateTime.toIso8601String();
-
-      if (SharedPrefs.readBoolValue(PrefConstants.isHomeService)) {
-        _homeController.doCreateBooking(
-            userAddressId: userServiceAddressIdSelect,
-            isHomeService:
-                _homeController.getServiceAddCartModel.data?.isHomeService ??
-                    false,
-            salonArtistId: widget.artiestId,
-            startAt: isoDateTime,
-            callback: () {
-              stylistId.value = "";
-              stylistId.notifyListeners();
-
-              Get.to(() => YourApprovalPage(
-                    salonAppointmentId: _homeController
-                            .getCreateBookingAppointmentModel
-                            .data
-                            ?.salonAppointmentId ??
-                        "",
-                  ));
-            });
-      } else {
-        stylistId.value = "";
-        _homeController.doCreateBooking(
-            userAddressId: "",
-            isHomeService:
-                _homeController.getServiceAddCartModel.data?.isHomeService ??
-                    false,
-            salonArtistId: widget.artiestId,
-            startAt: isoDateTime,
-            callback: () {
-              Get.to(() => YourApprovalPage(
-                    salonAppointmentId: _homeController
-                            .getCreateBookingAppointmentModel
-                            .data
-                            ?.salonAppointmentId ??
-                        "",
-                  ));
-            });
-      }
+    if (booking == null) {
+      showMessage("Booking is being processed. Please wait.");
+      return;
     }
+
+    _navigateAfterBooking(); // ✅ runs ONLY after data is ready
+
+    // Commenting because booking happening using razorpay webhooks and home service is disabled.
+    // if (selectTime == "") {
+    //   selectTime =
+    //       _homeController.getAvailabilitiesTimeSlotModelData.data?[0].time ??
+    //           "";
+    //   String inputDateTime = "$selectDate$selectTime";
+    //   String correctedDateTime =
+    //       '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+    //   DateTime dateTime = DateTime.parse(correctedDateTime);
+    //   String isoDateTime = dateTime.toIso8601String();
+    //
+    //   if (_homeController.getServiceAddCartModel.data?.isHomeService ?? false) {
+    //     if (userServiceAddressIdSelect == "") {
+    //       Get.to(() => const AddAddressPage(
+    //             isSelect: true,
+    //           ));
+    //     } else {
+    //       _homeController.doCreateBooking(
+    //           userAddressId: userServiceAddressIdSelect,
+    //           isHomeService:
+    //               _homeController.getServiceAddCartModel.data?.isHomeService ??
+    //                   false,
+    //           salonArtistId: widget.artiestId,
+    //           startAt: isoDateTime,
+    //           callback: () {
+    //             stylistId.value = "";
+    //             stylistId.notifyListeners();
+    //
+    //             // Get.to(() => YourApprovalPage(
+    //             //       salonAppointmentId: _homeController
+    //             //               .getCreateBookingAppointmentModel
+    //             //               .data
+    //             //               ?.salonAppointmentId ??
+    //             //           "",
+    //             //     ));
+    //             _navigateAfterBooking();
+    //           });
+    //     }
+    //   } else {
+    //     _homeController.doCreateBooking(
+    //         userAddressId: "",
+    //         isHomeService:
+    //             _homeController.getServiceAddCartModel.data?.isHomeService ??
+    //                 false,
+    //         salonArtistId: widget.artiestId,
+    //         startAt: isoDateTime,
+    //         callback: () {
+    //           stylistId.value = "";
+    //           stylistId.notifyListeners();
+    //
+    //           // Get.to(() => YourApprovalPage(
+    //           //       salonAppointmentId: _homeController
+    //           //               .getCreateBookingAppointmentModel
+    //           //               .data
+    //           //               ?.salonAppointmentId ??
+    //           //           "",
+    //           //     ));
+    //           _navigateAfterBooking();
+    //         });
+    //   }
+    // } else {
+    //   String inputDateTime = "$selectDate$selectTime";
+    //   String correctedDateTime =
+    //       '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+    //   DateTime dateTime = DateTime.parse(correctedDateTime);
+    //   String isoDateTime = dateTime.toIso8601String();
+    //
+    //   if (SharedPrefs.readBoolValue(PrefConstants.isHomeService)) {
+    //     _homeController.doCreateBooking(
+    //         userAddressId: userServiceAddressIdSelect,
+    //         isHomeService:
+    //             _homeController.getServiceAddCartModel.data?.isHomeService ??
+    //                 false,
+    //         salonArtistId: widget.artiestId,
+    //         startAt: isoDateTime,
+    //         callback: () {
+    //           stylistId.value = "";
+    //           stylistId.notifyListeners();
+    //
+    //           // Get.to(() => YourApprovalPage(
+    //           //       salonAppointmentId: _homeController
+    //           //               .getCreateBookingAppointmentModel
+    //           //               .data
+    //           //               ?.salonAppointmentId ??
+    //           //           "",
+    //           //     ));
+    //           _navigateAfterBooking();
+    //         });
+    //   } else {
+    //     stylistId.value = "";
+    //     _homeController.doCreateBooking(
+    //         userAddressId: "",
+    //         isHomeService:
+    //             _homeController.getServiceAddCartModel.data?.isHomeService ??
+    //                 false,
+    //         salonArtistId: widget.artiestId,
+    //         startAt: isoDateTime,
+    //         callback: () {
+    //           // Get.to(() => YourApprovalPage(
+    //           //       salonAppointmentId: _homeController
+    //           //               .getCreateBookingAppointmentModel
+    //           //               .data
+    //           //               ?.salonAppointmentId ??
+    //           //           "",
+    //           //     ));
+    //           _navigateAfterBooking();
+    //         });
+    //   }
+    // }
   }
 
   /*---------------  On  External Success Method ------------ */
@@ -1178,4 +1437,71 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     String convertTimeSlot = DateFormat("hh:mm a").format(time);
     return convertTimeSlot;
   }
+
+  Future<void> _navigateAfterBooking() async {
+    final booking = _homeController.getCreateBookingAppointmentModel.data;
+
+    final isPersonOfTheYearEnabled =
+        _authController.getAppUpdateModel.data
+            ?.personOfTheYear
+            ?.enabled ??
+            false;
+
+    String? name;
+    String? phone;
+
+    // 👉 Person of the Year (INTERMEDIATE STEP)
+    if (isPersonOfTheYearEnabled) {
+      final result = await Get.to<Map<String, String>>(
+            () => PersonOfTheYearPage(
+          salonAppointmentId: booking?.salonAppointmentId ?? "",
+        ),
+      );
+
+      if (result != null) {
+        name = result['name'];
+        phone = result['phone'];
+      }
+
+      Get.to(() => YourApprovalPage(
+        salonAppointmentId: booking?.salonAppointmentId ?? "",
+        name: name,
+        phone: phone,
+      ));
+    }
+    else {
+      Get.to(() => YourApprovalPage(
+        salonAppointmentId: booking?.salonAppointmentId ?? "",
+      ));
+    }
+
+  }
+
+// Secret santa commented
+  // Future<void> _navigateAfterBooking() async {
+  //   final booking = _homeController.getCreateBookingAppointmentModel.data;
+  //
+  //   if (booking?.complimentaryServiceId != null &&
+  //       (booking?.complimentaryServiceName?.isNotEmpty ?? false)) {
+  //     final bool? isClaimed = await showDialog<bool>(
+  //       context: context,
+  //       barrierDismissible: false,
+  //       builder: (_) => SecretSantaScratchDialog(
+  //         rewardName: booking!.complimentaryServiceName! +
+  //             ' ' +
+  //             booking!.complimentaryServiceCategoryName!,
+  //       ),
+  //     );
+  //
+  //     Get.to(() => YourApprovalPage(
+  //       salonAppointmentId: booking?.salonAppointmentId ?? "",
+  //       isClaimed: isClaimed, // 👈 NOW IT EXISTS
+  //     ));
+  //
+  //   } else {
+  //     Get.to(() => YourApprovalPage(
+  //       salonAppointmentId: booking?.salonAppointmentId ?? "",
+  //     ));
+  //   }
+  // }
 }

@@ -6,7 +6,9 @@ import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
+import '../../constant/variable_constant.dart';
 import '../../project_specific/text_theme.dart';
+import '../../util/SharedPrefs.dart';
 
 class SalonRatingPage extends StatefulWidget {
   final String salonId;
@@ -121,9 +123,11 @@ class _SalonRatingPageState extends State<SalonRatingPage> {
             itemCount: 5,
             itemSize: 25.0,
             ignoreGestures: true,
-            itemBuilder: (context, _) => const Icon(
+            itemBuilder: (context, _) => Icon(
               Icons.star,
-              color: ColorConstant.primaryColor,
+              color:  changeTheme(
+                SharedPrefs.readStringValue(
+                    PrefConstants.gender)),
               size: 25,
             ),
             onRatingUpdate: (rating) {},

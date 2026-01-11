@@ -62,24 +62,24 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
                   ),
                 ),
               ),
-              Positioned(
-                top: 10,
-                left: 12,
-                child: Container(
-                  height: 25,
-                  width: Get.width * 0.22,
-                  decoration: BoxDecoration(
-                      color: ColorConstant.topRatedColor,
-                      borderRadius: BorderRadius.circular(6)),
-                  child: Center(
-                    child: Text(
-                      "TOP RATED",
-                      style: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.whiteColor, fontSize: 11),
-                    ),
-                  ),
-                ),
-              )
+              // Positioned(
+              //   top: 10,
+              //   left: 12,
+              //   child: Container(
+              //     height: 25,
+              //     width: Get.width * 0.22,
+              //     decoration: BoxDecoration(
+              //         color: ColorConstant.topRatedColor,
+              //         borderRadius: BorderRadius.circular(6)),
+              //     child: Center(
+              //       child: Text(
+              //         "TOP RATED",
+              //         style: AppTextTheme.medium.copyWith(
+              //             color: ColorConstant.whiteColor, fontSize: 11),
+              //       ),
+              //     ),
+              //   ),
+              // )
             ],
           ),
           Padding(

@@ -33,6 +33,7 @@ class Data {
   String? salonAppLatestVersion;
   String? userAppMinimumVersion;
   String? salonAppMinimumVersion;
+  PersonOfTheYear? personOfTheYear;
 
   Data(
       {this.maintenanceMode,
@@ -41,7 +42,8 @@ class Data {
         this.userAppLatestVersion,
         this.salonAppLatestVersion,
         this.userAppMinimumVersion,
-        this.salonAppMinimumVersion});
+        this.salonAppMinimumVersion,
+        this.personOfTheYear});
 
   Data.fromJson(Map<String, dynamic> json) {
     maintenanceMode = json['maintenanceMode'];
@@ -51,6 +53,9 @@ class Data {
     salonAppLatestVersion = json['salonAppLatestVersion'];
     userAppMinimumVersion = json['userAppMinimumVersion'];
     salonAppMinimumVersion = json['salonAppMinimumVersion'];
+    personOfTheYear = json['personOfTheYear'] != null
+        ? PersonOfTheYear.fromJson(json['personOfTheYear'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -62,6 +67,24 @@ class Data {
     data['salonAppLatestVersion'] = salonAppLatestVersion;
     data['userAppMinimumVersion'] = userAppMinimumVersion;
     data['salonAppMinimumVersion'] = salonAppMinimumVersion;
+    if (personOfTheYear != null) {
+      data['personOfTheYear'] = personOfTheYear!.toJson();
+    }
     return data;
+  }
+}
+class PersonOfTheYear {
+  bool? enabled;
+
+  PersonOfTheYear({this.enabled});
+
+  PersonOfTheYear.fromJson(Map<String, dynamic> json) {
+    enabled = json['enabled'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'enabled': enabled,
+    };
   }
 }

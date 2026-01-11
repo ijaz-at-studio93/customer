@@ -10,6 +10,9 @@ import 'package:salon_customer/model/artiest_portfolio_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 
+import '../../../constant/variable_constant.dart';
+import '../../../util/SharedPrefs.dart';
+
 class ReviewAndRating extends StatefulWidget {
   final ArtiestPortfolio artiestPortfolio;
   const ReviewAndRating({super.key, required this.artiestPortfolio});
@@ -25,10 +28,16 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
       color: ColorConstant.whiteColor,
       padding: const EdgeInsets.symmetric(vertical: 30),
       child: widget.artiestPortfolio.data?.reviews?.isEmpty ?? false
-          ? const NoItemsWidget(
-              text: "No reviews or ratings are available.",
+            ? DefaultTextStyle(
+              style: Get.textTheme.titleMedium!.copyWith(
+                color: Colors.green,
+                fontWeight: FontWeight.w700,
+              ),
+              child: const NoItemsWidget(
+                text: "Be the First one to try",
+              ),
             )
-          : Column(
+            : Column(
               children: [
                 ListView.separated(
                     padding: const EdgeInsets.symmetric(vertical: 5),
@@ -101,9 +110,10 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
             itemCount: rate.toInt(),
             itemSize: 25.0,
             ignoreGestures: true,
-            itemBuilder: (context, _) => const Icon(
+            itemBuilder: (context, _) => Icon(
               Icons.star,
-              color: ColorConstant.primaryColor,
+              color: changeTheme(SharedPrefs.readStringValue(
+                  PrefConstants.gender)),
               size: 25,
             ),
             onRatingUpdate: (rating) {},

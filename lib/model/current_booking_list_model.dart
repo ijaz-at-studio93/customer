@@ -39,6 +39,8 @@ class BookingData {
   String? finalizedAt;
   String? appointmentId;
   String? orderStatus;
+  String? paymentStatus;
+  Map<String, dynamic>? discountDetails;
   bool? isHomeService;
   String? startsAt;
   String? endsAt;
@@ -53,6 +55,8 @@ class BookingData {
         this.finalizedAt,
         this.appointmentId,
         this.orderStatus,
+        this.paymentStatus,
+        this.discountDetails,
         this.isHomeService,
         this.startsAt,
         this.endsAt,
@@ -67,6 +71,8 @@ class BookingData {
     finalizedAt = json['finalizedAt'];
     appointmentId = json['appointmentId'];
     orderStatus = json['orderStatus'];
+    paymentStatus = json['paymentStatus'];
+    discountDetails = json['discountDetails'];
     isHomeService = json['isHomeService'];
     startsAt = json['startsAt'];
     endsAt = json['endsAt'];
@@ -90,6 +96,8 @@ class BookingData {
     data['finalizedAt'] = finalizedAt;
     data['appointmentId'] = appointmentId;
     data['orderStatus'] = orderStatus;
+    data['paymentStatus'] = paymentStatus;
+    data['discountDetails'] = discountDetails;
     data['isHomeService'] = isHomeService;
     data['startsAt'] = startsAt;
     data['endsAt'] = endsAt;

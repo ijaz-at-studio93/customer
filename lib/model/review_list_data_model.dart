@@ -184,6 +184,7 @@ class Services {
   String? review;
   String? salonAddress;
   String? salonName;
+  String? salonImage;
   int? price;
   List<String>? categoriesName;
 
@@ -197,6 +198,7 @@ class Services {
         this.review,
         this.salonAddress,
         this.salonName,
+        this.salonImage,
         this.price,
         this.categoriesName});
 
@@ -210,6 +212,7 @@ class Services {
     review = json['review'];
     salonAddress = json['salonAddress'];
     salonName = json['salonName'];
+    salonImage = json['salonImage'];
     price = json['price'];
     categoriesName = json['categoriesName'].cast<String>();
   }
@@ -225,6 +228,7 @@ class Services {
     data['review'] = review;
     data['salonAddress'] = salonAddress;
     data['salonName'] = salonName;
+    data['salonImage'] = salonImage;
     data['price'] = price;
     data['categoriesName'] = categoriesName;
     return data;

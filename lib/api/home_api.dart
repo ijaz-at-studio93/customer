@@ -235,6 +235,39 @@ class HomeAPI {
     }
   }
 
+  static Future<CreateBookingAppointmentModel> getBookingByRazorpayOrderId(
+  {
+    required String razorpayOrderId,
+}
+      ) async {
+  final response = await DioClient.client.post("user/booking/by-razorpay-order", data: {
+  "razorpayOrderId": razorpayOrderId
+  });
+  if (response.isSuccess) {
+  return CreateBookingAppointmentModel.fromJson(response.data);
+  } else {
+  throw response.data;
+  }
+  }
+
+  static Future<void> createBookingIntent({
+    required String salonArtistId,
+    required String startAt,
+    required bool isHomeService,
+    required String userAddressId,
+  }) async {
+    await DioClient.client.post(
+      "user/booking/intent",
+      data: {
+        "salonArtistId": salonArtistId,
+        "startAt": startAt,
+        "isHomeService": isHomeService,
+        "userAddressId": userAddressId,
+      },
+    );
+  }
+
+
   /*---------------------Get Booking Qr Code Details ------------------*/
   static Future<UserBookingQrCodeModel> userBookingQrCodeDetails({
     required String appointmentId,
@@ -399,10 +432,10 @@ class HomeAPI {
 
   /*---------------------- Allow PortFolio Upload ------------------------*/
   static Future<bool> portFolioUpload(
-      {required String appointmentId, required bool isUpload}) async {
+      {required String appointmentId, required bool isUpload, String? name, String? phone}) async {
     final response = await DioClient.client.put(
         "user/booking/appointments/$appointmentId/allow-portfolio-upload",
-        data: {"allowPortfolioUpload": isUpload});
+        data: {"allowPortfolioUpload": isUpload, "name": name, "phone": phone});
     if (response.isSuccess) {
       return true;
     } else {

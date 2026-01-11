@@ -13,6 +13,7 @@ import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'dart:async';
 import 'package:flutter/gestures.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class SaloonCardWidget extends StatefulWidget {
   final VoidCallback onPress;
@@ -36,9 +37,10 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   late final PageController _pageController;
   Timer? _autoPlayTimer;
   int _currentPage = 0;
-  static const Duration _autoPlayInterval = Duration(seconds: 2);
+  static const Duration _autoPlayInterval = Duration(seconds: 4);
   static const Duration _autoPlayResumeDelay = Duration(seconds: 2);
   bool _isUserInteracting = false;
+  //static const String kLongPressHintShown = "long_press_image_hint_shown";
 
   @override
   void initState() {
@@ -90,6 +92,8 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   }
 
   void _maybeStartAutoPlay() {
+    if (_autoPlayTimer != null) return; // prevent duplicate timers
+
     final images = _getImageList(widget.homeSalonModel);
     if (images.length > 1) {
       _startAutoPlay();
@@ -136,7 +140,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
 
   Widget _buildImageCarousel(BuildContext context) {
     final images = _getImageList(widget.homeSalonModel);
-    final imageHeight = Get.height * 0.25; // EXACT original height
+    final imageHeight = Get.height * 0.30; // EXACT original height
 
     if (images.isEmpty) {
       return ClipRRect(
@@ -181,6 +185,9 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                   // replace the existing `return SizedBox(...)` inside itemBuilder with this:
                   return GestureDetector(
                     onTap: widget.onPress, // restore image tap (calls same callback as whole card)
+                    onLongPress: () {
+                      _showImagePreview(context, imageUrl);
+                    },
                     behavior: HitTestBehavior.opaque,
                     child: SizedBox(
                       width: Get.width,
@@ -262,9 +269,110 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
     );
   }
 
+  void _showImagePreview(BuildContext context, String imageUrl) {
+    showGeneralDialog(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: "ImagePreview",
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 200),
+      pageBuilder: (_, __, ___) {
+        return Center(
+          child: GestureDetector(
+            onTap: () => Get.back(),
+            child: Hero(
+              tag: imageUrl,
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(32),
+                clipBehavior: Clip.antiAlias, // 🔥 THIS IS IMPORTANT
+                child: CachedNetworkImage(
+                  imageUrl: imageUrl,
+                  fit: BoxFit.contain,
+                  width: Get.width * 0.9,
+                  height: Get.height * 0.7,
+                  placeholder: (c, u) => const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (_, anim, __, child) {
+        return Transform.scale(
+          scale: Curves.easeOut.transform(anim.value),
+          child: Opacity(
+            opacity: anim.value,
+            child: child,
+          ),
+        );
+      },
+    );
+  }
+
+  // void _maybeShowLongPressHint(BuildContext context) async {
+  //   final alreadyShown =
+  //   SharedPrefs.readBoolValue(kLongPressHintShown);
+  //
+  //   if (alreadyShown) return;
+  //
+  //   await SharedPrefs.writeBoolValue(kLongPressHintShown, true);
+  //
+  //   await Future.delayed(const Duration(milliseconds: 600));
+  //   if (!mounted) return;
+  //
+  //   showGeneralDialog(
+  //     context: context,
+  //     barrierDismissible: true,
+  //     barrierColor: Colors.black.withOpacity(0.35),
+  //     pageBuilder: (_, __, ___) {
+  //       return Center(
+  //         child: Container(
+  //           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+  //           decoration: BoxDecoration(
+  //             color: Colors.black87,
+  //             borderRadius: BorderRadius.circular(14),
+  //           ),
+  //           child: Row(
+  //             mainAxisSize: MainAxisSize.min,
+  //             children: const [
+  //               Icon(Icons.touch_app, color: Colors.white),
+  //               SizedBox(width: 8),
+  //               Text(
+  //                 "Long press on the image to view full screen",
+  //                 style: TextStyle(color: Colors.white),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //       );
+  //     },
+  //   );
+  //
+  //   Future.delayed(const Duration(seconds: 3), () {
+  //     if (Get.isDialogOpen == true) Get.back();
+  //   });
+  // }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return VisibilityDetector(
+        key: Key('salon-${widget.homeSalonModel.id}'),
+        onVisibilityChanged: (info) {
+          final visiblePercentage = info.visibleFraction * 100;
+
+          if (visiblePercentage > 80) {
+            // ✅ Mostly visible → allow autoplay
+            _maybeStartAutoPlay();
+            //_maybeShowLongPressHint(context);
+          } else {
+            // ❌ Partially visible → stop autoplay
+            _stopAutoPlay();
+          }
+        },
+    child: Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
       child: GestureDetector(
         onTap: widget.onPress,
@@ -385,7 +493,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         ),
                         const SizedBox(height: 5),
                         Text(
-                          "${widget.homeSalonModel.distanceTime} Min • ${widget.homeSalonModel.homeService == true ? "Available for Home" : "Available for Shop"}",
+                          "${(widget.homeSalonModel.distance!/ 1000 * 10).roundToDouble() / 10} K.M. • ${widget.homeSalonModel.homeService == true ? "Available for Home" : "Available at Salon"}",
                           style: AppTextTheme.medium.copyWith(
                               color: ColorConstant.grayTextColor, fontSize: 13),
                         ),
@@ -435,27 +543,52 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         ),*/
                       ],
                     ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Container(
                       height: 28,
-                      width: 52,
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
                       decoration: BoxDecoration(
-                          color: ColorConstant.greenColor,
-                          borderRadius: BorderRadius.circular(5)),
+                        color: ColorConstant.greenColor,
+                        borderRadius: BorderRadius.circular(14), // 👈 pill shape
+                      ),
                       child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.star,
-                              color: ColorConstant.whiteColor, size: 16),
-                          const SizedBox(width: 2),
+                          const Icon(
+                            Icons.star,
+                            color: ColorConstant.whiteColor,
+                            size: 14,
+                          ),
+                          const SizedBox(width: 4),
                           Text(
-                            widget.homeSalonModel.rating.toString(),
+                            widget.homeSalonModel.rating
+                                ?.toStringAsFixed(1) ?? "0.0",
                             style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.whiteColor, fontSize: 11),
-                          )
+                              color: ColorConstant.whiteColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ],
                       ),
-                    )
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      " ${_formatReviewCount(widget.homeSalonModel.reviewCount ?? 0)} Reviews",
+                      style: AppTextTheme.medium.copyWith(
+                        fontSize: 12,
+                        color: ColorConstant.blackColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
                   ],
+                ),
+                ],
                 ),
               ),
               const SizedBox(height: 2),
@@ -477,7 +610,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      "Upto 20% Off ",
+                      "Upto 30% Off ",
                       style: AppTextTheme.bold.copyWith(
                           color: ColorConstant.offerTextColor, fontSize: 13),
                     )
@@ -488,6 +621,13 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
           ),
         ),
       ),
+    ),
     );
   }
+  String _formatReviewCount(int count) {
+    if (count >= 10000) return "10K+";
+    if (count >= 1000) return "${(count / 1000).toStringAsFixed(1)}K+";
+    return count.toString();
+  }
+
 }

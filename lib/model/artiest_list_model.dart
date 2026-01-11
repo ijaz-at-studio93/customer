@@ -6,27 +6,63 @@ class ArtistListModel {
 
   ArtistListModel({this.statusCode, this.success, this.data, this.message});
 
-  ArtistListModel.fromJson(Map<String, dynamic> json) {
-    statusCode = json['statusCode'];
-    success = json['success'];
+  factory ArtistListModel.fromJson(Map<String, dynamic> json) {
+    final model = ArtistListModel(
+      statusCode: json['statusCode'] as int?,
+      success: json['success'] as bool?,
+      message: json['message'] as String?,
+    );
+
+    final payload = json['data'];
+
+    // ─────────────────────────────────────────────────────────────
+    // ✅ NEW SHAPE → data: { hairDressers: [...], beauticians: [...] }
+    // ─────────────────────────────────────────────────────────────
+    if (payload is Map<String, dynamic>) {
+      final hair = (payload['hairDressers'] as List? ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .map(Artiest.fromJson);
+      final beauty = (payload['beauticians'] as List? ?? const [])
+          .whereType<Map<String, dynamic>>()
+          .map(Artiest.fromJson);
+
+      model.data = [...hair, ...beauty];
+      return model;
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // ✅ OLD SHAPE → data: [ {artist}, {artist} ]
+    // (kept for backward compatibility)
+    // ─────────────────────────────────────────────────────────────
+
+    /* OLD CODE (replaced by robust parsing below)
     if (json['data'] != null) {
       data = <Artiest>[];
       json['data'].forEach((v) {
         data!.add(Artiest.fromJson(v));
       });
     }
-    message = json['message'];
+    */
+
+    if (payload is List) {
+      model.data = payload
+          .whereType<Map<String, dynamic>>()
+          .map(Artiest.fromJson)
+          .toList();
+    } else {
+      model.data = <Artiest>[];
+    }
+
+    return model;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['statusCode'] = statusCode;
-    data['success'] = success;
-    if (this.data != null) {
-      data['data'] = this.data!.map((v) => v.toJson()).toList();
-    }
-    data['message'] = message;
-    return data;
+    final Map<String, dynamic> out = <String, dynamic>{};
+    out['statusCode'] = statusCode;
+    out['success'] = success;
+    out['data'] = data?.map((v) => v.toJson()).toList();
+    out['message'] = message;
+    return out;
   }
 }
 
@@ -42,41 +78,52 @@ class Artiest {
   int? reviewCount;
   bool? isSelectArtist;
 
-  Artiest(
-      {this.rating,
-      this.id,
-      this.name,
-      this.dob,
-      this.profileImage,
-      this.experience,
-      this.homeService,
-      this.gender,
-      this.reviewCount,
-      this.isSelectArtist});
+  Artiest({
+    this.rating,
+    this.id,
+    this.name,
+    this.dob,
+    this.profileImage,
+    this.experience,
+    this.homeService,
+    this.gender,
+    this.reviewCount,
+    this.isSelectArtist,
+  });
 
-  Artiest.fromJson(Map<String, dynamic> json) {
-    rating = double.parse(json['rating'].toString());
-    id = json['id'];
-    name = json['name'];
-    dob = json['dob'];
-    profileImage = json['profileImage'];
-    experience = json['experience'];
-    homeService = json['homeService'];
-    gender = json['gender'];
-    reviewCount = json['reviewCount'];
+  factory Artiest.fromJson(Map<String, dynamic> json) {
+    // Safe rating parsing (handles null / int / double / string)
+    double? parseRating(dynamic r) {
+      if (r == null) return null;
+      if (r is num) return r.toDouble();
+      return double.tryParse(r.toString());
+    }
+
+    return Artiest(
+      rating: parseRating(json['rating']),
+      id: json['id']?.toString(),
+      name: json['name'] as String?,
+      dob: json['dob'] as String?,
+      profileImage: json['profileImage'] as String?,
+      experience: (json['experience'] as num?)?.toInt(),
+      homeService: json['homeService'] as bool?,
+      gender: json['gender'] as String?,
+      reviewCount: (json['reviewCount'] as num?)?.toInt(),
+      isSelectArtist: false, // UI toggles this
+    );
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['rating'] = rating;
-    data['id'] = id;
-    data['name'] = name;
-    data['dob'] = dob;
-    data['profileImage'] = profileImage;
-    data['experience'] = experience;
-    data['homeService'] = homeService;
-    data['gender'] = gender;
-    data['reviewCount'] = reviewCount;
-    return data;
+    return {
+      'rating': rating,
+      'id': id,
+      'name': name,
+      'dob': dob,
+      'profileImage': profileImage,
+      'experience': experience,
+      'homeService': homeService,
+      'gender': gender,
+      'reviewCount': reviewCount,
+    };
   }
 }

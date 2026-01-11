@@ -12,8 +12,10 @@ import 'package:salon_customer/util/SharedPrefs.dart';
 
 class YourApprovalPage extends StatefulWidget {
   final String salonAppointmentId;
+  final String? name; // 👈 optional
+  final String? phone;
 
-  const YourApprovalPage({super.key, required this.salonAppointmentId});
+  const YourApprovalPage({super.key, required this.salonAppointmentId, this.name, this.phone});
 
   @override
   State<YourApprovalPage> createState() => _YourApprovalPageState();
@@ -301,7 +303,9 @@ class _YourApprovalPageState extends State<YourApprovalPage> {
                     onPress: () {
                       _homeController.doUploadPortFolio(
                           appointmentId: widget.salonAppointmentId,
-                          isUpload: yourApproval == 1 ? true : false);
+                          isUpload: yourApproval == 1 ? true : false,
+                          name: widget.name ?? '',
+                          phone: widget.phone ?? '');
                       Navigator.pop(context);
                       Navigator.pop(context);
                       Navigator.pop(context);
@@ -310,7 +314,8 @@ class _YourApprovalPageState extends State<YourApprovalPage> {
                         MaterialPageRoute(
                           builder: (context) => QRCodePage(
                               isBooking: true,
-                              appointmentId: widget.salonAppointmentId),
+                              appointmentId: widget.salonAppointmentId
+                          )
                         ),
                       );
                     }),

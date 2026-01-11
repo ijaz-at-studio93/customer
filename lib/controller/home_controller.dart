@@ -593,6 +593,30 @@ class HomeController extends GetxController {
     }
   }
 
+fetchBookingByRazorpayOrderId({
+    required String razorpayOrderId,
+  }) async {
+    _createBookingAppointmentModel.value = await HomeAPI.getBookingByRazorpayOrderId(
+        razorpayOrderId:razorpayOrderId
+    );
+    return _createBookingAppointmentModel.value.data;
+  }
+
+  doCreateBookingIntent({
+    required String salonArtistId,
+    required String startAt,
+    required bool isHomeService,
+    required String userAddressId,
+  }) async {
+    //_showBookingProgress.value = true;
+    await HomeAPI.createBookingIntent(
+        salonArtistId: salonArtistId,
+        startAt: startAt,
+        isHomeService: isHomeService,
+        userAddressId: userAddressId);
+  }
+
+
   /*---------------- QR Code Model -------------------*/
   doCreateQrCode({required String appointmentId}) async {
     try {
@@ -840,12 +864,22 @@ class HomeController extends GetxController {
   }
 
   /*----------------------------  Upload PortFolio --------------------*/
-  doUploadPortFolio(
-      {required String appointmentId, required bool isUpload}) async {
+  doUploadPortFolio({
+    required String appointmentId,
+    required bool isUpload,
+    String? name,
+    String? phone,
+  }) async {
     try {
       _showProgress.value = true;
+
       bool result = await HomeAPI.portFolioUpload(
-          appointmentId: appointmentId, isUpload: isUpload);
+        appointmentId: appointmentId,
+        isUpload: isUpload,
+        name: name,
+        phone: phone,
+      );
+
       if (result) {
         showMessage("Portfolio Request Sent Successfully");
       }
