@@ -947,7 +947,7 @@ class _SaloonAfterSelectingServicesPageState
     return Container(
       width: Get.width,
       color: ColorConstant.whiteColor,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 30),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -961,60 +961,34 @@ class _SaloonAfterSelectingServicesPageState
                   .copyWith(fontSize: 19, color: ColorConstant.blackColor),
             ),
           ),
-          const SizedBox(height: 5),
-          Wrap(
-            spacing: 8.0, // gap between adjacent chips
-            runSpacing: 4.0, // gap between lines
-            children: List.generate(
-                _homeController
-                        .homeSalonDetailsData.data?.serviceCategories?.length ??
-                    0,
-                (index) => Text(
-                      index == 0
-                          ? "${_homeController.homeSalonDetailsData.data?.serviceCategories?[index].name}"
-                          : " •  ${_homeController.homeSalonDetailsData.data?.serviceCategories?[index].name}",
-                      style: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.grayTextColor, fontSize: 13),
-                    )),
-          ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
+          // Removing categories on top of salon page
+          // Wrap(
+          //   spacing: 8.0, // gap between adjacent chips
+          //   runSpacing: 4.0, // gap between lines
+          //   children: List.generate(
+          //       _homeController
+          //               .homeSalonDetailsData.data?.serviceCategories?.length ??
+          //           0,
+          //       (index) => Text(
+          //             index == 0
+          //                 ? "${_homeController.homeSalonDetailsData.data?.serviceCategories?[index].name}"
+          //                 : " •  ${_homeController.homeSalonDetailsData.data?.serviceCategories?[index].name}",
+          //             style: AppTextTheme.medium.copyWith(
+          //                 color: ColorConstant.grayTextColor, fontSize: 13),
+          //           )),
+          // ),
+          //const SizedBox(height: 20),
           Dash(
             direction: Axis.horizontal,
             length: Get.width * 0.9,
             dashLength: 2,
             dashColor: const Color(0xffCFCFCF),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Image.asset(
-                    AssetsConstant.manWalk,
-                    height: 18,
-                    width: 18,
-                    color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),
-                  ),
-                  const SizedBox(width: 5),
-                  Row(
-                    children: [
-                      Text(
-                        //"${_homeController.homeSalonDetailsData.data?.distanceTime ?? ""} min • ${_homeController.homeSalonDetailsData.data?.distance.toString() == "" ? "" : convertMetersToKilometers(_homeController.homeSalonDetailsData.data?.distance ?? 0.0)} km",
-                        "• ${_homeController.homeSalonDetailsData.data?.distance.toString() == "" ? "" : convertMetersToKilometers(_homeController.homeSalonDetailsData.data?.distance ?? 0.0)} K.M. Drive",
-                        style: AppTextTheme.medium.copyWith(
-                            color: ColorConstant.blackColor, fontSize: 13),
-                      ),
-                    ],
-                  )
-                ],
-              ),
-              Text(
-                "|",
-                style: AppTextTheme.bold
-                    .copyWith(color: ColorConstant.grayBorderColor),
-              ),
               Row(
                 children: [
                   Image.asset(
@@ -1037,9 +1011,37 @@ class _SaloonAfterSelectingServicesPageState
                   )
                 ],
               ),
+
+              Text(
+                "|",
+                style: AppTextTheme.bold
+                    .copyWith(color: ColorConstant.grayBorderColor),
+              ),
+              Row(
+                children: [
+                  Image.asset(
+                    AssetsConstant.manWalk,
+                    height: 18,
+                    width: 18,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)),
+                  ),
+                  const SizedBox(width: 5),
+                  Row(
+                    children: [
+                      Text(
+                        //"${_homeController.homeSalonDetailsData.data?.distanceTime ?? ""} min • ${_homeController.homeSalonDetailsData.data?.distance.toString() == "" ? "" : convertMetersToKilometers(_homeController.homeSalonDetailsData.data?.distance ?? 0.0)} km",
+                        "• ${_homeController.homeSalonDetailsData.data?.distance.toString() == "" ? "" : convertMetersToKilometers(_homeController.homeSalonDetailsData.data?.distance ?? 0.0)} K.M. Drive",
+                        style: AppTextTheme.medium.copyWith(
+                            color: ColorConstant.blackColor, fontSize: 13),
+                      ),
+                    ],
+                  )
+                ],
+              ),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 7),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1128,7 +1130,7 @@ class _SaloonAfterSelectingServicesPageState
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 20, left: 20),
+            padding: const EdgeInsets.only(top: 5, left: 20),
             child: Row(
               children: [
                 InkWell(

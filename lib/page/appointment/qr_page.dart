@@ -333,46 +333,46 @@ class _QRCodePageState extends State<QRCodePage> {
                       //   ),
                       // ),
 
-                      Center(
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10),
-                              child: QrImageView(
-                                data: _homeController.getUserBookingQrCodeModel.data?.completionToken ?? "",
-                                version: QrVersions.auto,
-                                size: 200.0,
-                              ),
-                            ),
-
-                            if (_homeController.getUserBookingQrCodeModel.data?.orderStatus?.toLowerCase() == "pending")
-                              Positioned(
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(10),
-                                  child: BackdropFilter(
-                                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                                    child: Container(
-                                      width: 200,
-                                      height: 200,
-                                      color: Colors.black.withOpacity(0.2),
-                                      alignment: Alignment.center,
-                                      padding: const EdgeInsets.all(12),
-                                      child: Text(
-                                        "QR will be shown once stylist accepts appointment",
-                                        textAlign: TextAlign.center,
-                                        style: AppTextTheme.medium.copyWith(
-                                          fontSize: 12,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
+                      // Center(
+                      //   child: Stack(
+                      //     alignment: Alignment.center,
+                      //     children: [
+                      //       ClipRRect(
+                      //         borderRadius: BorderRadius.circular(10),
+                      //         child: QrImageView(
+                      //           data: _homeController.getUserBookingQrCodeModel.data?.completionToken ?? "",
+                      //           version: QrVersions.auto,
+                      //           size: 200.0,
+                      //         ),
+                      //       ),
+                      //
+                      //       if (_homeController.getUserBookingQrCodeModel.data?.orderStatus?.toLowerCase() == "pending")
+                      //         Positioned(
+                      //           child: ClipRRect(
+                      //             borderRadius: BorderRadius.circular(10),
+                      //             child: BackdropFilter(
+                      //               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                      //               child: Container(
+                      //                 width: 200,
+                      //                 height: 200,
+                      //                 color: Colors.black.withOpacity(0.2),
+                      //                 alignment: Alignment.center,
+                      //                 padding: const EdgeInsets.all(12),
+                      //                 child: Text(
+                      //                   "QR will be shown once stylist accepts appointment",
+                      //                   textAlign: TextAlign.center,
+                      //                   style: AppTextTheme.medium.copyWith(
+                      //                     fontSize: 12,
+                      //                     color: Colors.white,
+                      //                   ),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ),
+                      //         ),
+                      //     ],
+                      //   ),
+                      // ),
 
                       const SizedBox(height: 15),
                       Center(
@@ -397,54 +397,99 @@ class _QRCodePageState extends State<QRCodePage> {
     ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Obx(() {
-        final isPaymentPending =
-            _homeController.getUserBookingQrCodeModel.data?.paymentStatus
-                ?.toLowerCase() == "pending";
+        final data = _homeController.getUserBookingQrCodeModel.data;
+
+        final bool isPaymentPending =
+            data?.paymentStatus?.toLowerCase() == "pending";
+
+        final int actualPrice =
+            data?.items
+                ?.where((e) => e.isService == true)
+                .fold<int>(0, (sum, e) => sum + (e.service?.price?.toInt() ?? 0)) ??
+                0;
+
+        final int payableAmount = (data?.orderAmount ?? 0).toInt();
+
+        final bool isDiscountApplied =
+            actualPrice > 0 && payableAmount < actualPrice;
+
+        if (!isPaymentPending) {
+          return const SizedBox.shrink();
+        }
 
         return Padding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
           child: Column(
-            mainAxisSize: MainAxisSize.min, // 👈 VERY IMPORTANT
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
 
-              // 🔵 Apply Offer & Pay (TOP)
-              if (isPaymentPending)
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: ColorConstant.primaryColor,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: _openApplyOfferSheet,
-                    child: Text(
-                      "Apply Offer & Pay",
-                      style: AppTextTheme.bold.copyWith(color: Colors.white),
+              /// PRICE SECTION
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    "Actual Price: ₹$actualPrice",
+                    style: AppTextTheme.medium.copyWith(
+                      color: Colors.grey[600],
+                      decoration: isDiscountApplied
+                          ? TextDecoration.lineThrough
+                          : TextDecoration.none,
                     ),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  if (isDiscountApplied)
+                    Text(
+                      "To be Paid: ₹$payableAmount",
+                      style: AppTextTheme.bold.copyWith(
+                        color: Colors.green,
+                        fontSize: 17,
+                      ),
+                    ),
+                ],
+              ),
 
               const SizedBox(height: 12),
 
-              // 🔴 Cancel Booking (BOTTOM)
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+              /// PAY / APPLY BUTTON
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: ColorConstant.primaryColor,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  onPressed: _showCancelConfirmationDialog,
-                  child: Text(
-                    "Cancel Booking",
-                    style: AppTextTheme.bold.copyWith(color: Colors.white),
+                ),
+                onPressed: () {
+                  if (isDiscountApplied) {
+                    _startPayment(); // ✅ Pay directly
+                  } else {
+                    _openApplyOfferSheet(); // ✅ Apply offer first
+                  }
+                },
+                child: Text(
+                  isDiscountApplied
+                      ? "Pay ₹$payableAmount"
+                      : "Apply Offer & Pay",
+                  style: AppTextTheme.bold.copyWith(color: Colors.white),
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              /// CANCEL BUTTON
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
+                ),
+                onPressed: _showCancelConfirmationDialog,
+                child: Text(
+                  "Cancel Booking",
+                  style: AppTextTheme.bold.copyWith(color: Colors.white),
                 ),
               ),
             ],
@@ -541,7 +586,7 @@ class _QRCodePageState extends State<QRCodePage> {
   }
 
   void _openApplyOfferSheet() async {
-    String discountId = await showModalBottomSheet(
+    final String discountId = await showModalBottomSheet(
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
@@ -553,11 +598,15 @@ class _QRCodePageState extends State<QRCodePage> {
     if (discountId.isNotEmpty) {
       _homeController.doApplyPromoCode(
         data: {"discountId": discountId},
-        callback: () {
-          _homeController.doCreateQrCode(
+        //"appointmentId": widget.appointmentId,
+        callback: () async {
+          // ✅ Just refresh booking snapshot
+          await _homeController.doCreateQrCode(
             appointmentId: widget.appointmentId,
           );
-          _startPayment(); // 👈 ADD THIS
+
+          // ❌ DO NOT start payment here
+          // User must explicitly click Pay
         },
       );
     }

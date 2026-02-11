@@ -766,7 +766,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              _payAndBook();
+                              //_payAndBook();
+                              _showBookingOptionsBottomSheet(context);
                             },
                             child: Container(
                               height: 45,
@@ -781,8 +782,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    "Pay & Book",
-                                    //"Book",
+                                    //"Pay & Book",
+                                    "Book",
                                     textScaler: const TextScaler.linear(0.85),
                                     style: AppTextTheme.medium.copyWith(
                                         fontSize: 20,

@@ -75,27 +75,27 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                 Row(
                   children: [
                     Text(
-                      "₹${widget.servicesList.price} • ",
+                      "₹${widget.servicesList.price}  ",
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.bold.copyWith(
-                          color: ColorConstant.blackColor, fontSize: 16),
+                          color: ColorConstant.blackColor, fontSize: 18),
                     ),
                     Text(
-                      "${widget.servicesList.duration} min",
+                      "(${widget.servicesList.duration} min)",
                       textScaler: const TextScaler.linear(0.85),
                       style: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.primaryColor, fontSize: 16),
+                          color: ColorConstant.grayTextColor, fontSize: 13.5),
                     ),
                   ],
                 ),
-                const SizedBox(height: 5),
-                Dash(
-                  direction: Axis.horizontal,
-                  length: Get.width * 0.5,
-                  dashLength: 2,
-                  dashColor: ColorConstant.grayTextColor,
-                ),
-                const SizedBox(height: 13),
+                const SizedBox(height: 7),
+                // Dash(
+                //   direction: Axis.horizontal,
+                //   length: Get.width * 0.5,
+                //   dashLength: 2,
+                //   dashColor: ColorConstant.grayTextColor,
+                // ),
+                //const SizedBox(height: 13),
                 SizedBox(
                   width: Get.width * 0.5,
                   child: ReadMoreText(
