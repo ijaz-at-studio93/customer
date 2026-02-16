@@ -54,6 +54,9 @@ class _SaloonAfterSelectingServicesPageState
   late final PageController _pageController;
   Timer? _autoScrollTimer;
   int _currentPage = 0;
+  PageController? _offerPageController;
+  Timer? _offerAutoScrollTimer;
+  int _currentOfferPage = 0;
   List<String> _images = [];
   Worker? _dataWatcher; // GetX worker to listen to data updates
 
@@ -67,6 +70,7 @@ class _SaloonAfterSelectingServicesPageState
 
     // init page controller for pageview
     _pageController = PageController(initialPage: 0);
+    _offerPageController = PageController(initialPage: 0);
 
     // Fetch data and then load images once the API response is received.
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -93,6 +97,12 @@ class _SaloonAfterSelectingServicesPageState
           SharedPrefs.readStringValue(PrefConstants.gender) == "0"
               ? "male"
               : "female",
+        );
+      } catch (_) {}
+
+      try {
+        await _homeController.doGetSalonPromoCode(
+          salonId: widget.id,
         );
       } catch (_) {}
 
@@ -205,6 +215,32 @@ class _SaloonAfterSelectingServicesPageState
     _autoScrollTimer = null;
   }
 
+  void _startOfferAutoScroll(int length) {
+    if (length <= 1) return;
+    if (_offerPageController == null) return;
+
+    _offerAutoScrollTimer?.cancel();
+
+    _offerAutoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+
+      if (!mounted) return;
+      if (_offerPageController == null) return;
+      if (!_offerPageController!.hasClients) return;
+
+      final next = (_currentOfferPage + 1) % length;
+
+      _offerPageController!.animateToPage(
+        next,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  void _stopOfferAutoScroll() {
+    _offerAutoScrollTimer?.cancel();
+  }
+
 
   String serviceId = "";
 
@@ -229,6 +265,7 @@ class _SaloonAfterSelectingServicesPageState
                   _imageHeaderWidget(),
                   _headerWidget(),
                   const SizedBox(height: 5),
+                  _offerWidget(),
                   _tabBarView(),
                   const SizedBox(height: 110)
                 ],
@@ -609,6 +646,8 @@ class _SaloonAfterSelectingServicesPageState
   void dispose() {
     _autoScrollTimer?.cancel();
     _pageController.dispose();
+    _offerAutoScrollTimer?.cancel();
+    _offerPageController?.dispose();
     _dataWatcher?.dispose();
     super.dispose();
   }
@@ -646,7 +685,7 @@ class _SaloonAfterSelectingServicesPageState
       children: [
         SizedBox(
           width: Get.width,
-          height: Get.height * 0.34,
+          height: Get.height * 0.30,
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onPanDown: (_) => _stopAutoScroll(),
@@ -659,7 +698,7 @@ class _SaloonAfterSelectingServicesPageState
             child: _images.isEmpty
                 ? CachedNetworkImage(
               width: Get.width,
-              height: Get.height * 0.34,
+              height: Get.height * 0.30,
               fit: BoxFit.fitWidth,
               imageUrl:
               "${APIConstants.image}${_homeController.homeSalonDetailsData.data?.image ?? ""}",
@@ -668,13 +707,13 @@ class _SaloonAfterSelectingServicesPageState
               placeholder: (context, url) => Image(
                 image: const AssetImage(AssetsConstant.placeHolder),
                 width: Get.width,
-                height: Get.height * 0.34,
+                height: Get.height * 0.30,
                 fit: BoxFit.fitWidth,
               ),
               errorWidget: (context, url, error) => Image(
                 image: const AssetImage(AssetsConstant.placeHolder),
                 width: Get.width,
-                height: Get.height * 0.34,
+                height: Get.height * 0.30,
                 fit: BoxFit.fitWidth,
               ),
             )
@@ -690,19 +729,19 @@ class _SaloonAfterSelectingServicesPageState
                 final imageUrl = _images[index];
                 return CachedNetworkImage(
                   width: Get.width,
-                  height: Get.height * 0.34,
+                  height: Get.height * 0.30,
                   fit: BoxFit.fitWidth,
                   imageUrl: imageUrl,
                   placeholder: (context, url) => Image(
                     image: const AssetImage(AssetsConstant.placeHolder),
                     width: Get.width,
-                    height: Get.height * 0.34,
+                    height: Get.height * 0.30,
                     fit: BoxFit.fitWidth,
                   ),
                   errorWidget: (context, url, error) => Image(
                     image: const AssetImage(AssetsConstant.placeHolder),
                     width: Get.width,
-                    height: Get.height * 0.34,
+                    height: Get.height * 0.30,
                     fit: BoxFit.fitWidth,
                   ),
                 );
@@ -715,7 +754,7 @@ class _SaloonAfterSelectingServicesPageState
         Positioned(
           child: Container(
             width: Get.width,
-            height: Get.height * 0.34,
+            height: Get.height * 0.30,
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment(0.02, 1.00),
@@ -815,8 +854,8 @@ class _SaloonAfterSelectingServicesPageState
 
         // --- ORIGINAL BOTTOM RATING BLOCK (UNCHANGED) ---
         Positioned(
-          bottom: 16,
-          left: 19,
+          bottom: 10,
+          left: 10,
           right: 10,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -825,7 +864,7 @@ class _SaloonAfterSelectingServicesPageState
                 children: [
                   Container(
                     height: 32,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
                     decoration: BoxDecoration(
                       color: ColorConstant.greenColor,
                       borderRadius: BorderRadius.circular(14), // 👈 pill shape
@@ -865,7 +904,7 @@ class _SaloonAfterSelectingServicesPageState
                         Text(
                           "${_homeController.homeSalonDetailsData.data?.reviewCount} Reviews",
                           style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.whiteColor, fontSize: 14),
+                              color: ColorConstant.whiteColor, fontSize: 12),
                         ),
                         const SizedBox(height: 5),
                         const Dash(
@@ -913,7 +952,7 @@ class _SaloonAfterSelectingServicesPageState
         // --- DOT INDICATOR (keeps bottom position) ---
         if (_images.length > 1)
           Positioned(
-            bottom: 16,
+            bottom: 4,
             left: 0,
             right: 0,
             child: SizedBox(
@@ -958,10 +997,10 @@ class _SaloonAfterSelectingServicesPageState
               _homeController.homeSalonDetailsData.data?.name ?? "",
               overflow: TextOverflow.ellipsis,
               style: AppTextTheme.bold
-                  .copyWith(fontSize: 19, color: ColorConstant.blackColor),
+                  .copyWith(fontSize: 17, color: ColorConstant.blackColor),
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 7),
           // Removing categories on top of salon page
           // Wrap(
           //   spacing: 8.0, // gap between adjacent chips
@@ -985,7 +1024,7 @@ class _SaloonAfterSelectingServicesPageState
             dashLength: 2,
             dashColor: const Color(0xffCFCFCF),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -1070,6 +1109,7 @@ class _SaloonAfterSelectingServicesPageState
               GestureDetector(
                 onTap: () {
                   _openGoogleMapsForSalon();
+                  // Old functionality of map from customer to salon
                   // Get.to(() => StylistToUserLocation(
                   //       latitude: _homeController.homeSalonDetailsData.data
                   //               ?.geoLocationPoint?.coordinates?[1] ??
@@ -1117,6 +1157,184 @@ class _SaloonAfterSelectingServicesPageState
     );
   }
 
+  Widget _offerWidget() {
+
+    final allOffers = _homeController.getSalonPromoCodeModel.data;
+
+    if (allOffers == null || allOffers.isEmpty) {
+      return const SizedBox();
+    }
+
+    /// FILTER HERE
+    final offers = allOffers.where((promo) {
+      final salonIds = promo.salonId ?? [];
+      return salonIds.contains(widget.id);
+    }).toList();
+
+    if (offers.isEmpty) {
+      return const SizedBox();
+    }
+
+    /// START AUTO SCROLL SAFELY
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_offerAutoScrollTimer == null) {
+        _startOfferAutoScroll(offers.length);
+      }
+    });
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            "Offers for you",
+            style: AppTextTheme.bold.copyWith(
+              fontSize: 15,
+              color: ColorConstant.blackColor,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 5),
+
+        SizedBox(
+          height: 80,
+          child: PageView.builder(
+            controller: _offerPageController ?? PageController(),
+            itemCount: offers.length,
+            onPageChanged: (index) {
+              _currentOfferPage = index;
+            },
+            itemBuilder: (context, index) {
+              final promo = offers[index];
+
+              final Color startColor = Color(0xFFD96CDB);
+              final Color endColor = Color(0xFF8F7BFF);
+
+              return GestureDetector(
+                onPanDown: (_) => _stopOfferAutoScroll(),
+                onPanEnd: (_) => _startOfferAutoScroll(offers.length),
+
+                child: Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [startColor, endColor],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ),
+                    borderRadius: BorderRadius.circular(28.8),
+                  ),
+                  child: Row(
+                    children: [
+
+                      /// LEFT DISCOUNT
+                      // Text(
+                      //   promo.type == "percentage"
+                      //       ? "${promo.amount}%"
+                      //       : "₹${promo.amount}",
+                      //   style: const TextStyle(
+                      //     fontFamily: "Outfit",
+                      //     fontWeight: FontWeight.w700,
+                      //     letterSpacing: -4,
+                      //     fontSize: 44, // mapped from 572
+                      //     color: Colors.white70, // 70% opacity
+                      //     shadows: [
+                      //       Shadow(
+                      //         color: Colors.black26,
+                      //         blurRadius: 8,
+                      //         offset: Offset(0, 3),
+                      //       ),
+                      //     ],
+                      //   ),
+                      // ),
+
+                      Text(
+                        promo.type == "percentage"
+                            ? "${promo.amount}%"
+                            : "₹${promo.amount}",
+                        style: TextStyle(
+                          fontFamily: "Outfit",
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -4,
+                          fontSize: 44,
+                          color: Colors.white.withOpacity(0.7),
+
+                          // 🔥 GLOW EFFECT
+                          shadows: [
+                            Shadow(
+                              color: Colors.white.withOpacity(0.30),
+                              blurRadius: 18,
+                            ),
+                            Shadow(
+                              color: Colors.white.withOpacity(0.25),
+                              blurRadius: 30,
+                            ),
+                            Shadow(
+                              color: Colors.purpleAccent.withOpacity(0.20),
+                              blurRadius: 40,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+
+                      /// MIDDLE CONTENT
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              promo.code ?? "",
+                              style: const TextStyle(
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13, // mapped from 140
+                                color: Colors.white, // 50% opacity
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+
+                            Text(
+                              promo.description ?? "",
+                              style: const TextStyle(
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w700,
+                                fontSize: 13, // mapped from 140
+                                color: Colors.black54, // 50% opacity
+                              ),
+                            ),
+
+                            const SizedBox(height:3),
+
+                            Text(
+                              "                                *Offer applied at appointment page",
+                              style: const TextStyle(
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w500,
+                                fontSize: 9, // mapped from 92
+                                color: Colors.black,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        //const SizedBox(height: 8),
+      ],
+    );
+  }
   /*------------- Tab Bar View ------------*/
   int isSelectedTab = 1;
 
@@ -1219,7 +1437,7 @@ class _SaloonAfterSelectingServicesPageState
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 20),
+                        horizontal: 20, vertical: 5),
                     child: ReadMoreText(
                       _homeController.homeSalonDetailsData.data?.description ??
                           "",
@@ -1227,8 +1445,8 @@ class _SaloonAfterSelectingServicesPageState
                       style: AppTextTheme.medium.copyWith(
                           height: 1.5,
                           color: ColorConstant.blackColor,
-                          fontSize: 14),
-                      trimLines: 6,
+                          fontSize: 13),
+                      trimLines: 2,
                       colorClickableText: changeTheme(
                           SharedPrefs.readStringValue(PrefConstants.gender)),
                       trimCollapsedText: 'more',
@@ -1571,14 +1789,14 @@ class _SaloonAfterSelectingServicesPageState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(left: 19, top: 15),
+                        padding: const EdgeInsets.only(left: 19, top: 8),
                         child: Text(
                           "Service Categories",
                           style: AppTextTheme.bold.copyWith(
                               fontSize: 19, color: ColorConstant.blackColor),
                         ),
                       ),
-                      const SizedBox(height: 15),
+                      const SizedBox(height: 8),
                       _homeController.salonDetailsListData.data
                                   ?.recommendedCategories?.isEmpty ??
                               false

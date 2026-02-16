@@ -107,8 +107,35 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                         (promo.code?.toLowerCase() ?? '') == code);
 
                         if (matchingPromo != null) {
+
+                          /// PRE-GST cart amount
+                          final int cartAmount =
+                          (((_homeController.getServiceAddCartModel.data?.price ?? 0).toInt()/1.05).toInt());
+
+                          final int minOrder =
+                              int.tryParse(matchingPromo.minOrder?.toString() ?? '0') ?? 0;
+
+                          if (cartAmount < minOrder) {
+                            final int remaining = minOrder - cartAmount;
+
+                            Get.snackbar(
+                              "Coupon Locked",
+                              "Add ₹$remaining more to use this coupon",
+                              backgroundColor: Colors.orange,
+                              colorText: Colors.white,
+                            );
+
+                            return; // ❌ STOP — don't call API
+                          }
+
+                          /// eligible → proceed
                           Get.back(result: matchingPromo.id);
-                        } else {
+                        }
+
+                        // if (matchingPromo != null) {
+                        //   Get.back(result: matchingPromo.id);
+                        // }
+                        else {
                           Get.snackbar(
                               "Invalid Code", "No promo found with that code.");
                         }
@@ -141,60 +168,102 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                         .getPromoCodeModelList.data?.length ??
                         0,
                     shrinkWrap: true,
-                    itemBuilder: (context, i) {
-                      return PromoCodeListTile(
-                        id: _homeController
-                            .getPromoCodeModelList.data?[i].id ??
-                            "",
-                        image: _homeController
-                            .getPromoCodeModelList.data?[i].image ??
-                            "",
-                        title: _homeController
-                            .getPromoCodeModelList.data?[i].title ??
-                            "",
-                        description: _homeController
-                            .getPromoCodeModelList
-                            .data?[i]
-                            .description ??
-                            "",
-                        type: _homeController
-                            .getPromoCodeModelList.data?[i].type ??
-                            "",
-                        amount: _homeController
-                            .getPromoCodeModelList.data?[i].amount ??
-                            0,
-                        code: _homeController
-                            .getPromoCodeModelList.data?[i].code ??
-                            "",
-                        endsAt: _homeController
-                            .getPromoCodeModelList.data?[i].endsAt ??
-                            "",
-                        maxDiscount: _homeController
-                            .getPromoCodeModelList
-                            .data?[i]
-                            .maxDiscount ??
-                            "",
-                        minOrder: _homeController
-                            .getPromoCodeModelList
-                            .data?[i]
-                            .minOrder ??
-                            "",
-                        startsAt: _homeController
-                            .getPromoCodeModelList
-                            .data?[i]
-                            .startsAt ??
-                            "",
-                        onTapApplyBtn: () {
-                          Get.back(
-                              result: _homeController
-                                  .getPromoCodeModelList
-                                  .data?[i]
-                                  .id ??
-                                  "");
-                        },
-                      );
-                    }),
-              ),
+                    // itemBuilder: (context, i) {
+                    //   return PromoCodeListTile(
+                    //     id: _homeController
+                    //         .getPromoCodeModelList.data?[i].id ??
+                    //         "",
+                    //     image: _homeController
+                    //         .getPromoCodeModelList.data?[i].image ??
+                    //         "",
+                    //     title: _homeController
+                    //         .getPromoCodeModelList.data?[i].title ??
+                    //         "",
+                    //     description: _homeController
+                    //         .getPromoCodeModelList
+                    //         .data?[i]
+                    //         .description ??
+                    //         "",
+                    //     type: _homeController
+                    //         .getPromoCodeModelList.data?[i].type ??
+                    //         "",
+                    //     amount: _homeController
+                    //         .getPromoCodeModelList.data?[i].amount ??
+                    //         0,
+                    //     code: _homeController
+                    //         .getPromoCodeModelList.data?[i].code ??
+                    //         "",
+                    //     endsAt: _homeController
+                    //         .getPromoCodeModelList.data?[i].endsAt ??
+                    //         "",
+                    //     maxDiscount: _homeController
+                    //         .getPromoCodeModelList
+                    //         .data?[i]
+                    //         .maxDiscount ??
+                    //         "",
+                    //     minOrder: _homeController
+                    //         .getPromoCodeModelList
+                    //         .data?[i]
+                    //         .minOrder ??
+                    //         "",
+                    //     startsAt: _homeController
+                    //         .getPromoCodeModelList
+                    //         .data?[i]
+                    //         .startsAt ??
+                    //         "",
+                    //     onTapApplyBtn: () {
+                    //       Get.back(
+                    //           result: _homeController
+                    //               .getPromoCodeModelList
+                    //               .data?[i]
+                    //               .id ??
+                    //               "");
+                    //     },
+                    //   );
+                    // }),
+                        itemBuilder: (context, i) {
+                          final promo = _homeController.getPromoCodeModelList.data?[i];
+
+                          /// PRE-GST cart total
+                          final int cartAmount =
+                          (((_homeController.getServiceAddCartModel.data?.price ?? 0).toInt()/1.05).toInt());
+
+                          print('***************');
+                          print(cartAmount);
+
+                          final int minOrder =
+                              int.tryParse(promo?.minOrder?.toString() ?? '0') ?? 0;
+
+                          final bool isDisabled = cartAmount < minOrder;
+
+                          final int remainingAmount =
+                          isDisabled ? (minOrder - cartAmount) : 0;
+
+                          return PromoCodeListTile(
+                            id: promo?.id ?? "",
+                            image: promo?.image ?? "",
+                            title: promo?.title ?? "",
+                            description: promo?.description ?? "",
+                            type: promo?.type ?? "",
+                            amount: promo?.amount ?? 0,
+                            code: promo?.code ?? "",
+                            endsAt: promo?.endsAt ?? "",
+                            maxDiscount: promo?.maxDiscount ?? "",
+                            minOrder: minOrder,
+                            startsAt: promo?.startsAt ?? "",
+
+                            isDisabled: isDisabled,
+                            unlockAmount: remainingAmount,
+
+                            onTapApplyBtn: isDisabled
+                                ? null
+                                : () {
+                              Get.back(result: promo?.id ?? "");
+                            },
+                          );
+                        })
+
+                    ),
             ),
           ],
         ),

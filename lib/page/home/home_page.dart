@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
@@ -28,6 +29,7 @@ import '../../util/call_wrapper.dart';
 import '../../util/logger.dart';
 import '../profile/profile_page.dart';
 import '../search/search_for_salon_or_service_page.dart';
+import 'offer_animated_text_widget.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -42,11 +44,20 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
 
   final _authController = Get.find<AuthController>();
   final _homeController = Get.find<HomeController>();
+  final PageController _offerPageController =
+  PageController(viewportFraction: 0.85);
+  Timer? _offerAutoScrollTimer;
+  int _currentOfferPage = 0;
+
 
   @override
   bool get wantKeepAlive => true;
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startOfferAutoScroll();
+    });
+
     if (SharedPrefs.readBoolValue(PrefConstants.isFirstTime) == true) {
       WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
         _authController.userCity =
@@ -104,6 +115,37 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
     }
   }
 
+  void _startOfferAutoScroll() {
+    _offerAutoScrollTimer?.cancel();
+
+    _offerAutoScrollTimer =
+        Timer.periodic(const Duration(seconds: 6), (_) {
+          final data = _homeController.getPromoCodeModel.data;
+
+          if (data == null || data.isEmpty) return;
+          if (!_offerPageController.hasClients) return;
+
+          _currentOfferPage++;
+
+          if (_currentOfferPage >= data.length) {
+            _currentOfferPage = 0;
+          }
+
+          _offerPageController.animateToPage(
+            _currentOfferPage,
+            duration: const Duration(milliseconds: 450),
+            curve: Curves.easeInOut,
+          );
+        });
+  }
+
+  @override
+  void dispose() {
+    _offerAutoScrollTimer?.cancel();
+    _offerPageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -127,7 +169,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                   _offer(),
                   _homeController.getPromoCodeModel.data?.isEmpty ?? false
                       ? const SizedBox()
-                      : const SizedBox(height: 15),
+                      : const SizedBox(height: 8),
                   _saloonsFoundNear(),
                   _homeController.getHomeSalonList.data?.rows?.isEmpty ?? false
                       ? const NoItemsWidget(
@@ -1138,7 +1180,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
         ? const SizedBox()
         : Obx(
             () => SizedBox(
-              height: 100,
+              height: 75,
               width: Get.width,
               child: PageView.builder(
                   clipBehavior: Clip.none,
@@ -1194,116 +1236,104 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                               },
                             ));
                       },
-                      child: Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.symmetric(horizontal: 15),
-                            decoration: BoxDecoration(
-                              color: ColorConstant.whiteColor,
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border(
-                                right: BorderSide(
-                                    width: 9,
-                                    color: changeTheme(
-                                            SharedPrefs.readStringValue(
-                                                PrefConstants.gender)) ??
-                                        Colors.transparent),
-                              ),
-                              boxShadow: const [
-                                BoxShadow(
-                                  color: Color(0x0A000000),
-                                  blurRadius: 8.20,
-                                  offset: Offset(1, 1),
-                                  spreadRadius: 0,
-                                )
-                              ],
-                            ),
-                            child: Row(
-                              children: [
-                                CachedNetworkImage(
-                                  height: 78,
-                                  width: 78,
-                                  fit: BoxFit.cover,
-                                  imageUrl:
-                                      "${APIConstants.image}${_homeController.getPromoCodeModel.data?[index].image}",
-                                  placeholder: (context, url) => const Image(
-                                    image: AssetImage(AssetsConstant.offer),
-                                    height: 78,
-                                    width: 78,
-                                    fit: BoxFit.cover,
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      const Image(
-                                    image: AssetImage(AssetsConstant.offer),
-                                    height: 78,
-                                    width: 78,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                                const Dash(
-                                    direction: Axis.vertical,
-                                    length: 100,
-                                    dashLength: 3,
-                                    dashColor: ColorConstant.grayColor),
-                                const SizedBox(width: 17),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      _homeController.getPromoCodeModel
-                                              .data?[index].title ??
-                                          "",
-                                      style: AppTextTheme.bold.copyWith(
-                                          color: ColorConstant.blackColor,
-                                          fontSize: 20),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      _homeController.getPromoCodeModel
-                                                  .data?[index].type ==
-                                              "percentage"
-                                          ? "${_homeController.getPromoCodeModel.data?[index].amount} % Off"
-                                          : "₹ ${_homeController.getPromoCodeModel.data?[index].amount} Off",
-                                      style: AppTextTheme.bold.copyWith(
-                                          color: ColorConstant.blackColor,
-                                          fontSize: 15),
-                                    ),
-                                    const SizedBox(height: 2),
-                                    Text(
-                                      "Above - ${_homeController.getPromoCodeModel.data?[index].minOrder ?? ""}",
-                                      style: AppTextTheme.medium.copyWith(
-                                          color: ColorConstant.blackColor,
-                                          fontSize: 13),
-                                    ),
-                                    const SizedBox(height: 2),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+
+                            /// MAIN OFFER CARD
+                            Container(
+                              //margin: const EdgeInsets.symmetric(horizontal: 12),
+                              margin: const EdgeInsets.only(left: 12, right: 1),
+                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFFD96CDB),
+                                    Color(0xFF8F7BFF),
                                   ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
                                 ),
-                              ],
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 2,
-                            right: 30,
-                            child: SizedBox(
-                              child: Text(
-                                "By - ${_homeController.getPromoCodeModel.data?[index].salon?.name ?? ""}",
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: AppTextTheme.medium.copyWith(
-                                    color: changeTheme(
-                                            SharedPrefs.readStringValue(
-                                                PrefConstants.gender)) ??
-                                        Colors.transparent,
-                                    fontSize: 13),
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              child: Row(
+                                children: [
+
+                                  /// LEFT BIG DISCOUNT
+                                  Text(
+                                    _homeController.getPromoCodeModel.data?[index].type == "percentage"
+                                        ? "${_homeController.getPromoCodeModel.data?[index].amount}%"
+                                        : "₹${_homeController.getPromoCodeModel.data?[index].amount}",
+                                    style: AppTextTheme.bold.copyWith(
+                                      fontSize: 44,
+                                      letterSpacing: -4,
+                                      color: Colors.white.withOpacity(0.7),
+                                      // shadows: const [
+                                      //   Shadow(
+                                      //     offset: Offset(0, 2),
+                                      //     blurRadius: 6,
+                                      //     color: Colors.black26,
+                                      //   ),
+                                      // ],
+                                      // 🔥 GLOW EFFECT
+                                      // shadows: [
+                                      //   Shadow(
+                                      //     color: Colors.white.withOpacity(0.30),
+                                      //     blurRadius: 18,
+                                      //   ),
+                                      //   Shadow(
+                                      //     color: Colors.white.withOpacity(0.25),
+                                      //     blurRadius: 30,
+                                      //   ),
+                                      //   Shadow(
+                                      //     color: Colors.purpleAccent.withOpacity(0.20),
+                                      //     blurRadius: 40,
+                                      //   ),
+                                      // ],
+                                      shadows: [
+                                        // Inner highlight — improves readability
+                                        Shadow(
+                                          color: Colors.white.withOpacity(0.30),
+                                          blurRadius: 12,
+                                        ),
+
+                                        // Mid glow — brand beauty tone
+                                        Shadow(
+                                          color: Colors.purpleAccent.withOpacity(0.25),
+                                          blurRadius: 26,
+                                        ),
+
+                                        // Outer aura — premium gold
+                                        Shadow(
+                                          color: Color(0xFFFFC107).withOpacity(0.35),
+                                          blurRadius: 44,
+                                        ),
+                                      ],
+
+                                    ),
+                                  ),
+
+                                  const SizedBox(width: 5),
+                                  Expanded(
+                                    child: OfferAnimatedTextWidget(
+                                      salonName: _homeController.getPromoCodeModel.data?[index].salon?.name ?? "",
+                                      title: _homeController.getPromoCodeModel.data?[index].title ?? "",
+                                      description: _homeController.getPromoCodeModel.data?[index].description ?? "",
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        )
                     );
-                  }),
+                  },
+                  controller: _offerPageController,
+                  onPageChanged: (index) {
+                    _currentOfferPage = index;   // ⭐ VERY IMPORTANT
+                  },
+                  padEnds: false
+              ),
             ),
           );
   }

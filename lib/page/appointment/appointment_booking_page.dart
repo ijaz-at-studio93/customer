@@ -111,7 +111,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               child: Column(
                 children: [
                   _customBackgroundExample(),
-                  const SizedBox(height: 29),
+                  const SizedBox(height: 15),
                   /*----------- Popular Service By Your Artist ---------------*/
                   _homeController.showProgress
                       ? Column(
@@ -130,7 +130,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                     width: Get.width,
                                     color: ColorConstant.whiteColor,
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 15),
+                                        horizontal: 20, vertical: 10),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -141,16 +141,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                               fontSize: 16,
                                               color: ColorConstant.blackColor),
                                         ),
-                                        const SizedBox(height: 15),
-                                        Dash(
-                                          direction: Axis.horizontal,
-                                          length: Get.width * 0.88,
-                                          dashLength: 2,
-                                          dashColor: const Color(0xffCFCFCF),
-                                        ),
-                                        const SizedBox(height: 15),
+                                        const SizedBox(height: 8),
                                         SizedBox(
-                                          height: 150,
+                                          height: 140,
                                           child: ListView.builder(
                                               padding: EdgeInsets.zero,
                                               shrinkWrap: true,
@@ -289,7 +282,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                             Container(
                               color: ColorConstant.whiteColor,
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
+                                  horizontal: 20, vertical: 12),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -299,14 +292,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                         fontSize: 16,
                                         color: ColorConstant.blackColor),
                                   ),
-                                  const SizedBox(height: 15),
+                                  const SizedBox(height: 7),
                                   Dash(
                                     direction: Axis.horizontal,
                                     length: Get.width * 0.88,
                                     dashLength: 2,
                                     dashColor: const Color(0xffCFCFCF),
                                   ),
-                                  const SizedBox(height: 10),
+                                  const SizedBox(height: 7),
                                   _homeController
                                               .getAvailabilitiesTimeSlotModelData
                                               .data
@@ -359,7 +352,6 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                                     ""));
                                                   }),
                                             ),
-                                            const SizedBox(height: 18),
                                           ],
                                         ),
                                 ],
@@ -379,12 +371,12 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                               children: [
                                 Padding(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 10),
+                                      horizontal: 16, vertical: 12),
                                   child: Text(
-                                    "Apply For PromoCode",
+                                    "Exclusive ScutS Offers",
                                     textScaler: const TextScaler.linear(0.90),
                                     style: AppTextTheme.bold.copyWith(
-                                        fontSize: 17,
+                                        fontSize: 18,
                                         color: ColorConstant.blackColor),
                                   ),
                                 ),
@@ -535,7 +527,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                               ),
                                               const SizedBox(width: 10),
                                               Text(
-                                                "Apply PromoCode",
+                                                "Tap to Save More",
                                                 style: AppTextTheme.bold
                                                     .copyWith(
                                                         fontSize: 14,
@@ -738,36 +730,86 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Total Price",
-                                style: AppTextTheme.bold.copyWith(
-                                    fontSize: 13,
-                                    color: ColorConstant.grayTextColor),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                "₹${(_homeController.getServiceAddCartModel.data?.price ?? 0).toStringAsFixed(2)}",
-                                style: AppTextTheme.bold.copyWith(
-                                    fontSize: 19,
-                                    color: ColorConstant.blackColor),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                "GST is included",
-                                style: AppTextTheme.regular.copyWith(
+                          // Column(
+                          //   mainAxisAlignment: MainAxisAlignment.center,
+                          //   crossAxisAlignment: CrossAxisAlignment.start,
+                          //   children: [
+                          //     Text(
+                          //       "Total Price",
+                          //       style: AppTextTheme.bold.copyWith(
+                          //           fontSize: 13,
+                          //           color: ColorConstant.grayTextColor),
+                          //     ),
+                          //     const SizedBox(height: 2),
+                          //     Text(
+                          //       "₹${(_homeController.getServiceAddCartModel.data?.price ?? 0).toStringAsFixed(2)}",
+                          //       style: AppTextTheme.bold.copyWith(
+                          //           fontSize: 19,
+                          //           color: ColorConstant.blackColor),
+                          //     ),
+                          //     const SizedBox(height: 2),
+                          //     Text(
+                          //       "GST is included",
+                          //       style: AppTextTheme.regular.copyWith(
+                          //           color: ColorConstant.blackColor,
+                          //           fontSize: 12),
+                          //     )
+                          //   ],
+                          // ),
+                          GestureDetector(
+                            onTap: _showPriceBreakdownSheet,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      "Total Payable",
+                                      style: AppTextTheme.bold.copyWith(
+                                        fontSize: 13,
+                                        color: ColorConstant.grayTextColor,
+                                      ),
+                                    ),
+
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Row(
+                                  children: [
+                                    Text(
+                                      "₹${(_homeController.getServiceAddCartModel.data?.price ?? 0).toStringAsFixed(2)}",
+                                      style: AppTextTheme.bold.copyWith(
+                                        fontSize: 19,
+                                        color: ColorConstant.blackColor,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 5),
+                                    Transform.rotate(
+                                      angle: 3.1416, // 180° in radians
+                                      child: Icon(
+                                        Icons.expand_circle_down,
+                                        size: 24,
+                                        color: Colors.black,
+                                      ),
+                                    )
+                                  ]
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  "View Breakdown",
+                                  style: AppTextTheme.regular.copyWith(
                                     color: ColorConstant.blackColor,
-                                    fontSize: 12),
-                              )
-                            ],
+                                    fontSize: 12,
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                           GestureDetector(
                             onTap: () {
-                              //_payAndBook();
-                              _showBookingOptionsBottomSheet(context);
+                              _payAndBook();
+                              //_showBookingOptionsBottomSheet(context);
                             },
                             child: Container(
                               height: 45,
@@ -782,8 +824,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   Text(
-                                    //"Pay & Book",
-                                    "Book",
+                                    "Pay & Book",
+                                    //"Book",
                                     textScaler: const TextScaler.linear(0.85),
                                     style: AppTextTheme.medium.copyWith(
                                         fontSize: 20,
@@ -803,6 +845,199 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         ),
       ),
     ));
+  }
+
+  void _showPriceBreakdownSheet() {
+    final data = _homeController.getServiceAddCartModel.data;
+
+    /// ORIGINAL service total
+    final double original =
+    (data?.totalPrice ?? 0).toDouble();
+
+    /// DISCOUNT applied
+    final double discount =
+    (data?.discountAmount ?? 0).toDouble();
+
+    /// AFTER DISCOUNT (before GST)
+    final double subtotal =
+    (data?.taxAbleTotal ?? 0).toDouble();
+
+    /// GST
+    final double gst =
+    (data?.cartTaxDetails?.totalTaxAmount ?? 0).toDouble();
+
+    /// FINAL PAYABLE
+    final double total =
+    (data?.price ?? 0).toDouble();
+
+    final double platformFee =
+    (data?.platformFee ?? 0).toDouble();
+
+
+    showModalBottomSheet(
+      context: Get.context!,
+      isScrollControlled: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) {
+        return Container(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+
+              /// HANDLE BAR
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+
+              /// TITLE
+              Text(
+                "Price Breakdown",
+                style: AppTextTheme.bold.copyWith(fontSize: 16,color: ColorConstant.blackColor),
+              ),
+
+              const SizedBox(height: 16),
+
+              /// ORIGINAL PRICE
+              _priceRow("Original Price", original),
+
+              /// GST
+              //_priceRow("GST", gst),
+              GestureDetector(
+                onTap: _showChargesPopup,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _priceRow("GST & Other Charges", gst+platformFee),
+
+                    /// dotted underline
+                    Container(
+                      margin: const EdgeInsets.only(top: 2),
+                      width: 150,
+                      child: Row(
+                        children: List.generate(
+                          30,
+                              (_) => Expanded(
+                            child: Container(
+                              height: 1,
+                              margin: const EdgeInsets.symmetric(horizontal: 1),
+                              color: Colors.grey.shade400,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// DISCOUNT
+              if (discount > 0)
+                _priceRow("Discount", discount, isDiscount: true),
+
+              const Divider(height: 24),
+
+              /// FINAL TOTAL
+              _priceRow("Total Payable", total, isBold: true),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showChargesPopup() {
+    final data = _homeController.getServiceAddCartModel.data;
+
+    final double gst =
+    (data?.cartTaxDetails?.totalTaxAmount ?? 0).toDouble();
+
+    final double platformFee = data?.platformFee ?? 0; // replace when backend sends
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      builder: (context) {
+        return Stack(
+          children: [
+            Positioned(
+              bottom: 120, // adjust based on your layout
+              left: 20,
+              right: 20,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _priceRow("GST", gst),
+                      const SizedBox(height: 6),
+                      _priceRow("Platform Fee", platformFee),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _priceRow(
+      String label,
+      double value, {
+        bool isBold = false,
+        bool isDiscount = false,
+      }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: AppTextTheme.medium.copyWith(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              color: isDiscount
+                  ? Colors.green
+                  : (isBold ? Colors.black : ColorConstant.grayTextColor),
+            ),
+          ),
+          Text(
+            isDiscount
+                ? "- ₹${value.toStringAsFixed(2)}"
+                : "₹${value.toStringAsFixed(2)}",
+            style: AppTextTheme.medium.copyWith(
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              color: isDiscount
+                  ? Colors.green
+                  : (isBold ? Colors.black : ColorConstant.blackColor),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   void _showBookingOptionsBottomSheet(BuildContext context) {

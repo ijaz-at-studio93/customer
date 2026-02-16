@@ -38,6 +38,7 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
       child: InkWell(
         onTap: widget.onTap,
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Column(

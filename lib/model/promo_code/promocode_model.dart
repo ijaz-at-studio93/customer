@@ -31,7 +31,7 @@ class PromoCodeModel {
 }
 
 class PromoCode {
-  int? amount;
+  num? amount;
   String? maxDiscount;
   String? minOrder;
   String? id;
@@ -43,6 +43,7 @@ class PromoCode {
   String? code;
   String? type;
   Salon? salon;
+  List<String>? salonId;
 
   PromoCode(
       {this.amount,
@@ -56,7 +57,8 @@ class PromoCode {
       this.endsAt,
       this.code,
       this.type,
-      this.salon});
+      this.salon,
+      this.salonId});
 
   PromoCode.fromJson(Map<String, dynamic> json) {
     amount = json['amount'];
@@ -71,6 +73,9 @@ class PromoCode {
     code = json['code'];
     type = json['type'];
     salon = json['salon'] != null ? Salon.fromJson(json['salon']) : null;
+    if (json['salonId'] != null) {
+      salonId = List<String>.from(json['salonId'].map((e) => e.toString()));
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -89,6 +94,7 @@ class PromoCode {
     if (salon != null) {
       data['salon'] = salon!.toJson();
     }
+    data['salonId'] = salonId;
     return data;
   }
 }

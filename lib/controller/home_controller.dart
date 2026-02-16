@@ -281,6 +281,13 @@ class HomeController extends GetxController {
 
   set setPromoCodeModel(val) => _promoCodeModel.value = val;
 
+  /*--------------- Salon PromoCode Model ------------------*/
+  final Rx<PromoCodeModel> _salonPromoCodeModel = PromoCodeModel().obs;
+
+  PromoCodeModel get getSalonPromoCodeModel => _salonPromoCodeModel.value;
+
+  set setSalonPromoCodeModel(val) => _salonPromoCodeModel.value = val;
+
   /*--------------------  Get  PromoCode List ------------------------*/
   final Rx<PromoCodeModel> _promoCodeModelList = PromoCodeModel().obs;
 
@@ -1305,6 +1312,21 @@ fetchBookingByRazorpayOrderId({
     try {
       _showProgress.value = true;
       _promoCodeModelList.value = await HomeAPI.getPromoCodeList();
+    } catch (e) {
+      if (kDebugMode) {
+        print("GetListPromoCode $e");
+      }
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*-------------------  Get PromoCode List  ----------------------*/
+  doGetSalonPromoCode({required String salonId}) async {
+    try {
+      _showProgress.value = true;
+      _salonPromoCodeModel.value = await HomeAPI.getSalonPromoCodeList(salonId: salonId);
     } catch (e) {
       if (kDebugMode) {
         print("GetListPromoCode $e");

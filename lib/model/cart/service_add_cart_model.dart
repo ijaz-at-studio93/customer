@@ -37,6 +37,10 @@ class Data {
   bool? isHomeService;
   List<Items>? items;
   double? price;
+  double? totalPrice;        // original service total (before discount & tax)
+  double? taxAbleTotal;      // subtotal after discount, before GST
+  CartTaxDetails? cartTaxDetails;
+  double? platformFee;
   List<String>? previewImages;
   List<ServicesAvailableProductList>? servicesAvailableProductList;
   List<ServicesWithProduct>? servicesWithProduct;
@@ -60,6 +64,20 @@ class Data {
     logger.e(discountAmount);
     isDiscountApplied = json['isDiscountApplied'];
     isHomeService = json['isHomeService'];
+    totalPrice = double.parse(json['totalPrice'] == null
+        ? "0.0"
+        : json['totalPrice'].toString());
+
+    taxAbleTotal = double.parse(json['taxAbleTotal'] == null
+        ? "0.0"
+        : json['taxAbleTotal'].toString());
+
+    cartTaxDetails = json['cartTaxDetails'] != null
+        ? CartTaxDetails.fromJson(json['cartTaxDetails'])
+        : null;
+    platformFee = double.parse(json['platformFee'] == null
+        ? "0.0"
+        : json['platformFee'].toString());
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
@@ -442,3 +460,21 @@ class ServicesWithProduct {
     return data;
   }
 }
+
+class CartTaxDetails {
+  double? totalTaxAmount;
+
+  CartTaxDetails({this.totalTaxAmount});
+
+  CartTaxDetails.fromJson(Map<String, dynamic> json) {
+    totalTaxAmount = double.parse(
+        json['totalTaxAmount'] == null ? "0.0" : json['totalTaxAmount'].toString());
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = {};
+    data['totalTaxAmount'] = totalTaxAmount;
+    return data;
+  }
+}
+

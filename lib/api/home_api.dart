@@ -764,6 +764,16 @@ class HomeAPI {
     }
   }
 
+  static Future<PromoCodeModel> getSalonPromoCodeList({required String salonId}) async {
+    final response =
+    await DioClient.client.get("user/salon/$salonId/discounts");
+    if (response.isSuccess) {
+      return PromoCodeModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
   /*----------------------- Apply  PromoCode --------------------*/
   static Future<bool> applyPromoCode({required Map data}) async {
     final response =

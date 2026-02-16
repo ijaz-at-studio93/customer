@@ -609,13 +609,24 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                       height: 20,
                     ),
                     const SizedBox(width: 8),
-                    Text(
-                      "Upto 30% Off ",
-                      style: AppTextTheme.bold.copyWith(
-                          color: ColorConstant.offerTextColor, fontSize: 13),
-                    )
+
+                    Builder(
+                      builder: (_) {
+                        final discountText = _getHighestDiscountForSalon();
+
+                        if (discountText.isEmpty) return const SizedBox();
+
+                        return Text(
+                          discountText,
+                          style: AppTextTheme.bold.copyWith(
+                            color: ColorConstant.offerTextColor,
+                            fontSize: 13,
+                          ),
+                        );
+                      },
+                    ),
                   ],
-                ),
+                )
               )
             ],
           ),
@@ -628,6 +639,37 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
     if (count >= 10000) return "10K+";
     if (count >= 1000) return "${(count / 1000).toStringAsFixed(1)}K+";
     return count.toString();
+  }
+  String _getHighestDiscountForSalon() {
+    final promoList = _homeController.getPromoCodeModel.data;
+    final salonId = widget.homeSalonModel.id;
+
+    if (promoList == null || promoList.isEmpty || salonId == null) return "";
+
+    double maxPercent = 0;
+
+    for (var promo in promoList) {
+      if (promo.salon?.id == salonId && promo.type == "percentage") {
+
+        final percent = (promo.amount ?? 0).toDouble();
+
+        if (percent > maxPercent) {
+          maxPercent = percent;
+        }
+      }
+    }
+
+    if (maxPercent == 0) return "";
+
+    return "Upto ${_formatPercent(maxPercent)} Off";
+  }
+
+  String _formatPercent(double value) {
+    if (value % 1 == 0) {
+      return "${value.toInt()}%";
+    } else {
+      return "${value.toStringAsFixed(1)}%";
+    }
   }
 
 }

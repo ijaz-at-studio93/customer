@@ -88,7 +88,7 @@ class KnowWhatYouWidget extends StatelessWidget {
             dashColor: ColorConstant.grayBorderColor),
         const SizedBox(height: 15),
         Text(
-          "Service Cost: ₹${items.totalServiceCost} • Product Cost: ₹${items.totalProductCost}",
+          "Service Cost: ₹${items.totalServiceCost}", //• Product Cost: ₹${items.totalProductCost}",
           style: AppTextTheme.medium
               .copyWith(color: ColorConstant.grayTextColor, fontSize: 13),
         )

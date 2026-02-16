@@ -6,12 +6,12 @@ import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../../constant/assetsconstant.dart';
 
 class PromoCodeListTile extends StatelessWidget {
-  final VoidCallback onTapApplyBtn;
+  final VoidCallback? onTapApplyBtn;
 
 
-  final  int amount;
+  final  num amount;
   final  String maxDiscount;
-  final String minOrder;
+  final int minOrder;
   final String id;
   final String title;
   final String description;
@@ -20,10 +20,12 @@ class PromoCodeListTile extends StatelessWidget {
   final String endsAt;
   final String code;
   final String type;
+  final bool isDisabled;
+  final int unlockAmount;
 
 
   const PromoCodeListTile(
-      {super.key, required this.onTapApplyBtn, required this.amount, required this.maxDiscount, required this.minOrder, required this.id, required this.title, required this.description, required this.image, required this.startsAt, required this.endsAt, required this.code, required this.type,  });
+      {super.key, this.onTapApplyBtn, required this.amount, required this.maxDiscount, required this.minOrder, required this.id, required this.title, required this.description, required this.image, required this.startsAt, required this.endsAt, required this.code, required this.type,  this.isDisabled = false, this.unlockAmount = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -50,26 +52,44 @@ class PromoCodeListTile extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: type == "percentage"
-                        ? Text('Up To $amount% OFF',
+                        ? Text('Flat $amount% OFF',
                             style: AppTextTheme.bold
                                 .copyWith(color: ColorConstant.whiteColor))
-                        : Text('Up To $amount OFF',
+                        : Text('Flat $amount OFF',
                             style: AppTextTheme.bold
                                 .copyWith(color: ColorConstant.whiteColor)),
                   ),
+                  // GestureDetector(
+                  //   onTap: onTapApplyBtn,
+                  //   child: Container(
+                  //     padding:  EdgeInsets.all(8),
+                  //     decoration: BoxDecoration(
+                  //       color: changeTheme(SharedPrefs.readStringValue(
+                  //           PrefConstants.gender)) ??
+                  //           ColorConstant.primaryColor,
+                  //       borderRadius: BorderRadius.circular(5),
+                  //     ),
+                  //     child: Text('APPLY',
+                  //         style: AppTextTheme.bold
+                  //             .copyWith(color: ColorConstant.whiteColor)),
+                  //   ),
+                  // ),
                   GestureDetector(
-                    onTap: onTapApplyBtn,
+                    onTap: isDisabled ? null : onTapApplyBtn,
                     child: Container(
-                      padding:  EdgeInsets.all(8),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: changeTheme(SharedPrefs.readStringValue(
+                        color: isDisabled
+                            ? Colors.grey
+                            : changeTheme(SharedPrefs.readStringValue(
                             PrefConstants.gender)) ??
                             ColorConstant.primaryColor,
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      child: Text('APPLY',
-                          style: AppTextTheme.bold
-                              .copyWith(color: ColorConstant.whiteColor)),
+                      child: Text(
+                        isDisabled ? 'LOCKED' : 'APPLY',
+                        style: AppTextTheme.bold.copyWith(color: ColorConstant.whiteColor),
+                      ),
                     ),
                   ),
                 ],
@@ -96,15 +116,33 @@ class PromoCodeListTile extends StatelessWidget {
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.medium
                       .copyWith(color: ColorConstant.blackColor)),
-              const SizedBox(height: 10),
-              Text(
-                code,
-                textScaler: const TextScaler.linear(0.85),
-                style: AppTextTheme.bold
-                    .copyWith(color: changeTheme(SharedPrefs.readStringValue(
-                    PrefConstants.gender)) ??
-                    ColorConstant.primaryColor),
-              ),
+
+              if (isDisabled)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    "Add services worth ₹$unlockAmount to unlock this offer",
+                    style: AppTextTheme.medium.copyWith(color: Colors.red),
+                  ),
+                )
+              // else
+              //   Padding(
+              //     padding: const EdgeInsets.only(top: 6),
+              //     child: Text(
+              //       "You are eligible 🎉",
+              //       style: AppTextTheme.medium.copyWith(color: Colors.green),
+              //     ),
+              //   ),
+
+              // const SizedBox(height: 10),
+              // Text(
+              //   code,
+              //   textScaler: const TextScaler.linear(0.85),
+              //   style: AppTextTheme.bold
+              //       .copyWith(color: changeTheme(SharedPrefs.readStringValue(
+              //       PrefConstants.gender)) ??
+              //       ColorConstant.primaryColor),
+              // ),
             ],
           ),
         ));
