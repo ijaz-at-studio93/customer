@@ -54,39 +54,39 @@ class _SalonRatingPageState extends State<SalonRatingPage> {
         ),
       ),
       body: Obx(
-        () => _homeController.showProgress
+            () => _homeController.showProgress
             ? const ProgressBarView()
             : _homeController.getSalonIdReviewsModel.data?.isEmpty ?? false
-                ? const NoItemsWidget(
-                    text: "No reviews or ratings found for this salon.")
-                : ListView.builder(
-                    shrinkWrap: true,
-                    itemCount:
-                        _homeController.getSalonIdReviewsModel.data?.length ??
-                            0,
-                    itemBuilder: (context, index) {
-                      return (_homeController.getSalonIdReviewsModel
-                                  .data?[index].isServices ==
-                              true)
-                          ? Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10, vertical: 10),
-                              child: _listTileWidget(
-                                  rate: _homeController.getSalonIdReviewsModel
-                                          .data?[index].rating ??
-                                      0.0,
-                                  title: _homeController.getSalonIdReviewsModel
-                                          .data?[index].review ??
-                                      "",
-                                  userName: _homeController
-                                          .getSalonIdReviewsModel
-                                          .data?[index]
-                                          .user
-                                          ?.name ??
-                                      ""),
-                            )
-                          : const SizedBox();
-                    }),
+            ? const NoItemsWidget(
+            text: "Be the first to try!")
+            : ListView.builder(
+            shrinkWrap: true,
+            itemCount:
+            _homeController.getSalonIdReviewsModel.data?.length ??
+                0,
+            itemBuilder: (context, index) {
+              return (_homeController.getSalonIdReviewsModel
+                  .data?[index].isServices ==
+                  true)
+                  ? Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 10),
+                child: _listTileWidget(
+                    rate: _homeController.getSalonIdReviewsModel
+                        .data?[index].rating ??
+                        0.0,
+                    title: _homeController.getSalonIdReviewsModel
+                        .data?[index].review ??
+                        "",
+                    userName: _homeController
+                        .getSalonIdReviewsModel
+                        .data?[index]
+                        .user
+                        ?.name ??
+                        ""),
+              )
+                  : const SizedBox();
+            }),
       ),
     );
   }
@@ -126,8 +126,8 @@ class _SalonRatingPageState extends State<SalonRatingPage> {
             itemBuilder: (context, _) => Icon(
               Icons.star,
               color:  changeTheme(
-                SharedPrefs.readStringValue(
-                    PrefConstants.gender)),
+                  SharedPrefs.readStringValue(
+                      PrefConstants.gender)),
               size: 25,
             ),
             onRatingUpdate: (rating) {},
@@ -136,7 +136,7 @@ class _SalonRatingPageState extends State<SalonRatingPage> {
           Row(
             children: [
               Text(
-                "Posted On $userName",
+                "Posted By $userName",
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 13, color: ColorConstant.blackColor),
               ),

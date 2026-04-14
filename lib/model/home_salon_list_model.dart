@@ -76,6 +76,7 @@ class Data {
 class HomeSalonDataList {
   String? id;
   String? name;
+  String? displayName;
   String? description;
   String? email;
   String? countryCode;
@@ -99,6 +100,7 @@ class HomeSalonDataList {
   HomeSalonDataList(
       {this.id,
         this.name,
+        this.displayName,
         this.description,
         this.email,
         this.countryCode,
@@ -125,6 +127,7 @@ class HomeSalonDataList {
   HomeSalonDataList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
+    displayName = json['displayName'];
     description = json['description'];
     email = json['email'];
     countryCode = json['countryCode'];
@@ -156,6 +159,7 @@ class HomeSalonDataList {
     data['id'] = id;
     data['name'] = name;
     data['description'] = description;
+    data['displayName'] = displayName;
     data['email'] = email;
     data['countryCode'] = countryCode;
     data['mobile'] = mobile;

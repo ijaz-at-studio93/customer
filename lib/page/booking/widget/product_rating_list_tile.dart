@@ -182,7 +182,7 @@ class _ProductRatingListTileState extends State<ProductRatingListTile> {
           hintText: "Write Your Review Here....",
           textEditingController: _reviewTextEditingController,
           textInputType: TextInputType.text,
-          textInputAction: TextInputAction.none,
+          textInputAction: TextInputAction.unspecified,
           title: '',
         ),
         const SizedBox(height: 15),

@@ -24,15 +24,15 @@ class ServiceOfferListTileWidget extends StatelessWidget {
 
   const ServiceOfferListTileWidget(
       {super.key,
-      required this.name,
-      required this.image,
-      required this.price,
-      required this.rate,
-      required this.reviewCount,
-      required this.duration,
-      required this.isSelect,
-      required this.addButtonTap,
-      required this.description});
+        required this.name,
+        required this.image,
+        required this.price,
+        required this.rate,
+        required this.reviewCount,
+        required this.duration,
+        required this.isSelect,
+        required this.addButtonTap,
+        required this.description});
 
   @override
   Widget build(BuildContext context) {
@@ -51,8 +51,12 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   textScaler: const TextScaler.linear(0.85),
-                  style: AppTextTheme.bold
-                      .copyWith(color: ColorConstant.blackColor, fontSize: 17),
+                  style: AppTextTheme.bold.copyWith(
+                    fontSize: 16.5,
+                    fontFamily: 'Outfit',
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black, // female
+                  ),
                 ),
               ),
               const SizedBox(height: 5),
@@ -79,13 +83,14 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                     "₹$price • ",
                     textScaler: const TextScaler.linear(0.85),
                     style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 16),
+                      color: ColorConstant.blackColor, fontSize: 17, fontFamily: 'Inter',
+                      fontWeight: FontWeight.w800,),
                   ),
                   Text(
                     "$duration min",
                     textScaler: const TextScaler.linear(0.85),
-                    style: AppTextTheme.medium
-                        .copyWith(color: ColorConstant.grayColor, fontSize: 16),
+                    style: AppTextTheme.medium.copyWith(
+                      color: ColorConstant.grayTextColor, fontSize: 13, fontFamily: 'Inter',),
                   ),
                 ],
               ),
@@ -96,26 +101,26 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                 dashLength: 2,
                 dashColor: ColorConstant.grayTextColor,
               ),
-              const SizedBox(height: 13),
-              SizedBox(
-                width: Get.width * 0.5,
-                child: ReadMoreText(
-                  description,
-                  trimMode: TrimMode.Line,
-                  style: AppTextTheme.medium.copyWith(
-                      color: ColorConstant.grayTextColor, fontSize: 14),
-                  trimLines: 2,
-                  colorClickableText: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)),
-                  trimCollapsedText: 'more',
-                  trimExpandedText: 'Show less',
-                  moreStyle: AppTextTheme.medium.copyWith(
-                    fontSize: 15,
-                    color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),
-                  ),
-                ),
-              ),
+              // const SizedBox(height: 13),
+              // SizedBox(
+              //   width: Get.width * 0.5,
+              //   child: ReadMoreText(
+              //     description,
+              //     trimMode: TrimMode.Line,
+              //     style: AppTextTheme.medium.copyWith(
+              //         color: ColorConstant.grayTextColor, fontSize: 14),
+              //     trimLines: 2,
+              //     colorClickableText: changeTheme(
+              //         SharedPrefs.readStringValue(PrefConstants.gender)),
+              //     trimCollapsedText: 'more',
+              //     trimExpandedText: 'Show less',
+              //     moreStyle: AppTextTheme.medium.copyWith(
+              //       fontSize: 15,
+              //       color: changeTheme(
+              //           SharedPrefs.readStringValue(PrefConstants.gender)),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
           GestureDetector(
@@ -151,11 +156,11 @@ class ServiceOfferListTileWidget extends StatelessWidget {
                   child: isSelect
                       ? RemoveButtonWidget(onPress: addButtonTap)
                       : AddButtonWidget(
-                          onPress: addButtonTap,
-                          color: changeTheme(SharedPrefs.readStringValue(
-                                  PrefConstants.gender)) ??
-                              ColorConstant.primaryColor,
-                        ),
+                    onPress: addButtonTap,
+                    color: changeTheme(SharedPrefs.readStringValue(
+                        PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
+                  ),
                 ),
 
               ],

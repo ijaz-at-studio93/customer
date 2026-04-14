@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dash/flutter_dash.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -28,50 +26,50 @@ class _ReviewAndRatingState extends State<ReviewAndRating> {
       color: ColorConstant.whiteColor,
       padding: const EdgeInsets.symmetric(vertical: 30),
       child: widget.artiestPortfolio.data?.reviews?.isEmpty ?? false
-            ? DefaultTextStyle(
-              style: Get.textTheme.titleMedium!.copyWith(
-                color: Colors.green,
-                fontWeight: FontWeight.w700,
-              ),
-              child: const NoItemsWidget(
-                text: "Be the First one to try",
-              ),
-            )
-            : Column(
-              children: [
-                ListView.separated(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    separatorBuilder: (context, index) {
-                      return Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 10),
-                        height: 1,
-                        width: Get.width,
-                        color: ColorConstant.idColor,
-                      );
-                    },
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    itemCount:
-                        widget.artiestPortfolio.data?.reviews?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      return _listTileWidget(
-                        review: widget.artiestPortfolio.data?.reviews?[index]
-                            .createdAt ??
-                            "",
-                          rate: widget.artiestPortfolio.data?.reviews?[index]
-                                  .rating ??
-                              0.0,
-                          title: widget.artiestPortfolio.data?.reviews?[index]
-                                  .review ??
-                              "",
-                          userName: widget.artiestPortfolio.data
-                                  ?.reviews?[index].user?.name ??
-                              "");
-                    }),
-                SizedBox(height: Get.height * 0.12)
-              ],
-            ),
+          ? DefaultTextStyle(
+        style: Get.textTheme.titleMedium!.copyWith(
+          color: Colors.green,
+          fontWeight: FontWeight.w700,
+        ),
+        child: const NoItemsWidget(
+          text: "Be the First one to try",
+        ),
+      )
+          : Column(
+        children: [
+          ListView.separated(
+              padding: const EdgeInsets.symmetric(vertical: 5),
+              separatorBuilder: (context, index) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 10),
+                  height: 1,
+                  width: Get.width,
+                  color: ColorConstant.idColor,
+                );
+              },
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount:
+              widget.artiestPortfolio.data?.reviews?.length ?? 0,
+              itemBuilder: (context, index) {
+                return _listTileWidget(
+                    review: widget.artiestPortfolio.data?.reviews?[index]
+                        .createdAt ??
+                        "",
+                    rate: widget.artiestPortfolio.data?.reviews?[index]
+                        .rating ??
+                        0.0,
+                    title: widget.artiestPortfolio.data?.reviews?[index]
+                        .review ??
+                        "",
+                    userName: widget.artiestPortfolio.data
+                        ?.reviews?[index].user?.name ??
+                        "");
+              }),
+          SizedBox(height: Get.height * 0.12)
+        ],
+      ),
     );
   }
 

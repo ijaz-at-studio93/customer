@@ -30,6 +30,8 @@ class Data {
   bool? forceUpdateUserApp;
   bool? forceUpdateSalonApp;
   String? userAppLatestVersion;
+  String? userAppIOSMinimumVersion;
+  String? userAppIOSLatestVersion;
   String? salonAppLatestVersion;
   String? userAppMinimumVersion;
   String? salonAppMinimumVersion;
@@ -40,6 +42,8 @@ class Data {
         this.forceUpdateUserApp,
         this.forceUpdateSalonApp,
         this.userAppLatestVersion,
+        this.userAppIOSMinimumVersion,
+        this.userAppIOSLatestVersion,
         this.salonAppLatestVersion,
         this.userAppMinimumVersion,
         this.salonAppMinimumVersion,
@@ -50,6 +54,8 @@ class Data {
     forceUpdateUserApp = json['forceUpdateUserApp'];
     forceUpdateSalonApp = json['forceUpdateSalonApp'];
     userAppLatestVersion = json['userAppLatestVersion'];
+    userAppIOSLatestVersion = json['userAppIOSLatestVersion'];
+    userAppIOSMinimumVersion = json['userAppIOSMinimumVersion'];
     salonAppLatestVersion = json['salonAppLatestVersion'];
     userAppMinimumVersion = json['userAppMinimumVersion'];
     salonAppMinimumVersion = json['salonAppMinimumVersion'];
@@ -64,6 +70,8 @@ class Data {
     data['forceUpdateUserApp'] = forceUpdateUserApp;
     data['forceUpdateSalonApp'] = forceUpdateSalonApp;
     data['userAppLatestVersion'] = userAppLatestVersion;
+    data['userAppIOSMinimumVersion'] = userAppIOSMinimumVersion;
+    data['userAppIOSLatestVersion'] = userAppIOSLatestVersion;
     data['salonAppLatestVersion'] = salonAppLatestVersion;
     data['userAppMinimumVersion'] = userAppMinimumVersion;
     data['salonAppMinimumVersion'] = salonAppMinimumVersion;

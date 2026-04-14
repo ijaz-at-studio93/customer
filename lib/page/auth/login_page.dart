@@ -11,6 +11,7 @@ import 'package:salon_customer/project_specific/button_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/gestures.dart';
 
 class LoginPage extends StatefulWidget {
   final bool splashPage;
@@ -22,209 +23,258 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  /*-----------  Define Controller ------------*/
   final _mobileTextEditingController = TextEditingController();
-
   final _authController = Get.find<AuthController>();
+
+  bool getWhatsappUpdate = false;
+  bool iAgree = false;
+  bool readEula = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ColorConstant.whiteColor,
+      resizeToAvoidBottomInset: true,
       body: Obx(
-        () => ProgressContainerView(
+            () => ProgressContainerView(
           isProgressRunning: _authController.showProgress,
-          child: Column(
-            children: [
-              _headerWidget(),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 35),
-                      _columWithTextField(),
-                      const SizedBox(height: 12),
-                      _termsCondition(),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 30),
-                        child: ButtonWidget(
-                            color: changeTheme(SharedPrefs.readStringValue(
-                                    PrefConstants.gender)) ??
-                                ColorConstant.primaryColor,
-                            buttonTitleText: "Continue",
-                            onPress: () {
-                              _doLogin();
-                            }),
-                      )
-                    ],
+          child: SafeArea(
+            child: Column(
+              children: [
+
+                /// 🔽 SCROLLABLE CONTENT
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.only(
+                      bottom: MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+
+                          const SizedBox(height: 20),
+
+                          /// 🎬 FIXED GIF (no empty space)
+                          ClipRect(
+                            child: Align(
+                              alignment: Alignment.topCenter,
+                              heightFactor: 0.75,
+                              child: Image.asset(
+                                "assets/gifs/login_gif.gif",
+                                width: 250,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          /// 🎨 TITLE
+                          // ShaderMask(
+                          //   shaderCallback: (bounds) => const LinearGradient(
+                          //     colors: [Color(0xFFCD73B4), Color(0xFF8454E5)],
+                          //   ).createShader(bounds),
+                          //   child: const Text(
+                          //     "Welcome To Scuts",
+                          //     textAlign: TextAlign.center,
+                          //     style: TextStyle(
+                          //       fontFamily: "Outfit",
+                          //       fontSize: 35,
+                          //       fontWeight: FontWeight.w900,
+                          //       color: Colors.white,
+                          //     ),
+                          //   ),
+                          // ),
+                          Text(
+                            "Welcome To Scuts",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 40,
+                              fontWeight: FontWeight.w800, // 🔥 important
+                              letterSpacing: 0.2,
+                              foreground: Paint()
+                                ..shader = const LinearGradient(
+                                  colors: [Color(0xFFCD73B4), Color(0xFF8454E5)],
+                                ).createShader(Rect.fromLTWH(0, 0, 350, 80)),
+                            ),
+                          ),
+
+                          const SizedBox(height: 6),
+
+                          /// SUBTITLE
+                          const Text(
+                            "Log in Using Your Phone Number",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 20,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+
+                          const SizedBox(height: 15),
+
+                          /// 📱 INPUT
+                          Container(
+                            height: 50,
+                            width: 350,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: const Color(0xFF8565D0).withOpacity(0.4),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                const Text(
+                                  "+91 |",
+                                  style: TextStyle(fontWeight: FontWeight.w600),
+                                ),
+                                const SizedBox(width: 10),
+
+                                Expanded(
+                                  child: TextField(
+                                      controller: _mobileTextEditingController,
+                                      keyboardType: TextInputType.phone,
+                                      maxLength: 14,
+                                      autofillHints: const [
+                                        AutofillHints.telephoneNumber
+                                      ],
+                                      textInputAction: TextInputAction.done,
+                                      onSubmitted: (_) => _doLogin(),
+                                      style: const TextStyle(fontSize: 16),
+                                      decoration: const InputDecoration(
+                                        hintText: "Enter phone number",
+                                        border: InputBorder.none,
+                                        counterText: "",
+                                        hintStyle: TextStyle(
+                                          color: Colors.black26, // 👈 reduced opacity
+                                          fontSize: 16,
+                                        ),
+                                      ),
+
+                                      /// ✅ CLEANING LOGIC
+                                      onChanged: (value) {
+                                        print(value);
+                                        String digits = value.replaceAll(RegExp(r'[^0-9]'), '');
+
+                                        if (digits.length > 10) {
+                                          digits = digits.substring(digits.length - 10);
+                                        }
+
+                                        if (digits != value) {
+                                          _mobileTextEditingController.value = TextEditingValue(
+                                            text: digits,
+                                            selection: TextSelection.collapsed(offset: digits.length),
+                                          );
+                                        }
+                                      }
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 15),
+
+                          /// 📜 TERMS
+                          _termsCondition(),
+                          const SizedBox(height: 20),
+                          /// ✅ MOVE BUTTON HERE
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: ButtonWidget(
+                              decoration: BoxDecoration(
+                                gradient: const LinearGradient(
+                                  colors: [
+                                    Color(0xFF8454E5),
+                                    Color(0xFFCD73B4),
+                                  ],
+                                  begin: Alignment.centerLeft,
+                                  end: Alignment.centerRight,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              buttonTitleText: "Continue",
+                              onPress: () {
+                                _doLogin();
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ],
+
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  /*---------- header widget ---------*/
-  _headerWidget() {
-    return Container(
-      width: Get.width,
-      padding: const EdgeInsets.only(top: 50, left: 21, right: 21, bottom: 35),
-      decoration: BoxDecoration(
-        color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
-            ColorConstant.primaryColor,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [SizedBox(width: 34, height: 34)],
-          ),
-          const SizedBox(height: 35),
-          Text(
-            "Login to \nyour Scuts Account",
-            style: AppTextTheme.bold
-                .copyWith(color: ColorConstant.whiteColor, fontSize: 23),
-          ),
-        ],
-      ),
+
+  Widget _termsCondition() {
+    // Common text style for the gray text
+    const TextStyle grayStyle = TextStyle(
+      fontFamily: "Outfit",
+      fontSize: 15,
+      fontWeight: FontWeight.w500,
+      color: ColorConstant.grayTextColor,
     );
-  }
 
-  /*--------------  Enter Your Phone Number -----------*/
-  _columWithTextField() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Enter Your Phone Number",
-            style: AppTextTheme.regular
-                .copyWith(fontSize: 13, color: ColorConstant.blackColor),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            height: 50,
-            width: Get.width,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: ColorConstant.borderColor,
-              ),
-            ),
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 12),
-                  child: Row(
-                    children: [
-                      Text(
-                        "+91",
-                        style: AppTextTheme.bold.copyWith(
-                            fontSize: 13, color: ColorConstant.blackColor),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        "|",
-                        style: AppTextTheme.bold.copyWith(
-                            fontSize: 13, color: ColorConstant.grayColor),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(width: 12),
-                SizedBox(
-                  width: Get.width * 0.7,
-                  child: TextField(
-                    controller: _mobileTextEditingController,
-                    keyboardType: TextInputType.phone,
-                    maxLength: 10,
-                    style: AppTextTheme.medium.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 13),
-                    decoration: InputDecoration(
-                        contentPadding: const EdgeInsets.only(bottom: 2),
-                        border: InputBorder.none,
-                        hintText: "10 digit mobile number",
-                        counterText: "",
-                        hintStyle: AppTextTheme.medium.copyWith(
-                            color: ColorConstant.grayColor, fontSize: 13)),
-                  ),
-                )
-              ],
-            ),
-          )
-        ],
-      ),
+    // Common text style for the clickable black text
+    const TextStyle linkStyle = TextStyle(
+      fontFamily: "Outfit",
+      fontSize: 15,
+      fontWeight: FontWeight.w700,
+      color: ColorConstant.blackColor,
+      decoration: TextDecoration.underline,
     );
-  }
 
-  /*------------ terms & Condition  ------------------*/
-  bool getWhatsappUpdate = false;
-  bool iAgree = false;
-
-  _termsCondition() {
     return Column(
       children: [
+        // --- FIRST ROW ---
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            GestureDetector(
-              onTap: () {
+            _customCheckbox(
+              iAgree,
+                  () {
                 setState(() {
                   iAgree = !iAgree;
                 });
               },
-              child: Row(
+            ),
+            const SizedBox(width: 6),
+            RichText(
+              text: TextSpan(
                 children: [
-                  Container(
-                    height: 20,
-                    width: 20,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        color: iAgree
-                            ? ColorConstant.primaryColor
-                            : Colors.transparent,
-                        border: Border.all(color: CupertinoColors.black)),
-                    child: Center(
-                      child: Icon(
-                        CupertinoIcons.checkmark_alt,
-                        color: iAgree
-                            ? ColorConstant.whiteColor
-                            : Colors.transparent,
-                        size: 18,
-                      ),
-                    ),
+                  const TextSpan(
+                    text: "By clicking, I accept the ",
+                    style: grayStyle,
                   ),
-                  const SizedBox(width: 6),
-                  Text(
-                    "By clicking , I accept the",
-                    style: AppTextTheme.medium.copyWith(
-                        fontSize: 14, color: ColorConstant.grayTextColor),
+                  TextSpan(
+                    text: "Terms & Condition",
+                    style: linkStyle,
+                    recognizer: TapGestureRecognizer()
+                      ..onTap = () => openUrl("https://scuts.in/terms-conditions/"),
                   ),
                 ],
               ),
             ),
-            TextButton(
-              onPressed: () {
-                openUrl("https://scuts.in/terms-conditions/");
-              },
-              child: Text(
-                "Terms & Condition",
-                style: AppTextTheme.medium.copyWith(
-                  color: ColorConstant.blackColor,
-                  fontSize: 14,
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            )
           ],
         ),
-        const SizedBox(height: 8),
+
+        const SizedBox(height: 8), // Precise control over the gap between lines
+
+        // --- SECOND ROW ---
         GestureDetector(
           onTap: () {
             setState(() {
@@ -240,20 +290,20 @@ class _LoginPageState extends State<LoginPage> {
                 decoration: BoxDecoration(
                   color: getWhatsappUpdate
                       ? changeTheme(SharedPrefs.readStringValue(
-                              PrefConstants.gender)) ??
-                          ColorConstant.primaryColor
+                      PrefConstants.gender)) ??
+                      ColorConstant.primaryColor
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(3),
                   border: Border.all(
                     color: changeTheme(SharedPrefs.readStringValue(
-                            PrefConstants.gender)) ??
+                        PrefConstants.gender)) ??
                         ColorConstant.primaryColor,
                   ),
                 ),
                 child: Center(
                   child: Icon(
                     CupertinoIcons.check_mark,
-                    size: 10,
+                    size: 8,
                     color: getWhatsappUpdate
                         ? ColorConstant.whiteColor
                         : Colors.transparent,
@@ -265,7 +315,7 @@ class _LoginPageState extends State<LoginPage> {
                 "Get Update on whatsapp",
                 style: AppTextTheme.medium.copyWith(
                     color: changeTheme(SharedPrefs.readStringValue(
-                            PrefConstants.gender)) ??
+                        PrefConstants.gender)) ??
                         ColorConstant.primaryColor,
                     fontSize: 14),
               ),
@@ -276,6 +326,34 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+// Reusable Checkbox Widget to keep code DRY
+  Widget _customCheckbox(bool value, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 16,
+        width: 16,
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: value
+              ? ColorConstant.primaryColor
+              : Colors.transparent,
+          border: Border.all(color: ColorConstant.primary2, width: 1),
+          borderRadius: BorderRadius.circular(2),
+        ),
+        child: Center(
+          child: Icon(
+            CupertinoIcons.checkmark_alt,
+            color: value
+                ? ColorConstant.whiteColor
+                : Colors.transparent,
+            size: 14,
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> openUrl(String url) async {
     final Uri uri = Uri.parse(url);
     if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
@@ -283,25 +361,25 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  /*----------- do Login ------------*/
-  _doLogin() {
+  /// 🚀 LOGIN LOGIC (UNCHANGED)
+  void _doLogin() {
     if (_mobileTextEditingController.text.isEmpty) {
       showMessage("Please enter mobile Number");
     } else if (_mobileTextEditingController.text.length != 10) {
       showMessage("Please enter 10 digit mobile Number");
-    }else if(!iAgree){
-      showMessage("Please select Terms and Conditions to proceed further");
+    } else if (!iAgree) {
+      showMessage("Please accept Terms and Conditions");
     } else {
       _authController.doCheckMobileNumberRegistration(
-          mobileNo: _mobileTextEditingController.text,
-          countryCode: "91",
-          callback: () {
-            Get.to(() => OtpScreenPage(
-                  mobileNumber: _mobileTextEditingController.text,
-                  isLogin: false,
-                ));
-          });
-      /* Get.to(() => const CreateProfilePage());*/
+        mobileNo: _mobileTextEditingController.text,
+        countryCode: "91",
+        callback: () {
+          Get.to(() => OtpScreenPage(
+            mobileNumber: _mobileTextEditingController.text,
+            isLogin: false,
+          ));
+        },
+      );
     }
   }
 }

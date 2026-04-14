@@ -8,11 +8,13 @@ class RemoveAndAddServiceDialog extends StatefulWidget {
   final VoidCallback noPress;
   final VoidCallback yesPress;
   final String? descriptionText;
+  final String? salonName;
   const RemoveAndAddServiceDialog(
       {super.key,
       required this.noPress,
       required this.yesPress,
-      this.descriptionText = "Are You Sure You Want a Clear Your Cart"});
+      this.descriptionText = "Are You Sure You Want a Clear Your Cart",
+      this.salonName});
 
   @override
   State<RemoveAndAddServiceDialog> createState() =>
@@ -22,6 +24,8 @@ class RemoveAndAddServiceDialog extends StatefulWidget {
 class _RemoveAndAddServiceDialogState extends State<RemoveAndAddServiceDialog> {
   @override
   Widget build(BuildContext context) {
+    print(widget.salonName);
+    print('&&&&&&&&&&&&');
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(10),
@@ -41,7 +45,7 @@ class _RemoveAndAddServiceDialogState extends State<RemoveAndAddServiceDialog> {
             ),
             const SizedBox(height: 10),
             Text(
-              widget.descriptionText ?? "",
+              "${widget.descriptionText} ${widget.salonName ?? ""}" ?? "",
               textScaler: const TextScaler.linear(0.90),
               style: AppTextTheme.medium
                   .copyWith(color: ColorConstant.grayTextColor, fontSize: 14),

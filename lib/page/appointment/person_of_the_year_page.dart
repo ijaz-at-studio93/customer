@@ -142,7 +142,7 @@ class _PersonOfTheYearPageState extends State<PersonOfTheYearPage> {
                       width: 220, // 👈 adjust (240–280 works well)
                       child: _inputField(
                         controller: phoneController,
-                        hint: "Phone Number",
+                        hint: "Enter Phone Number",
                         keyboardType: TextInputType.phone,
                       ),
                     ),
@@ -154,7 +154,7 @@ class _PersonOfTheYearPageState extends State<PersonOfTheYearPage> {
                       width: 160,
                       child: _inputField(
                         controller: nameController,
-                        hint: "Name",
+                        hint: "Enter Name",
                       ),
                     ),
 
@@ -162,25 +162,29 @@ class _PersonOfTheYearPageState extends State<PersonOfTheYearPage> {
 
                     /// Submit
                     SizedBox(
-                      width: 260,
+                      width: 120,
                       height: 48,
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: ColorConstant.primaryColor,
                           foregroundColor: Colors.white,
+                          alignment: Alignment.center, // ✅ IMPORTANT
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                         ),
                         onPressed: _submitNomination,
-                        child: const Text(
-                          "Submit Nomination",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                        child: const Center( // ✅ ENSURES perfect centering
+                          child: Text(
+                            "Submit Nomination",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
 
                     /// Skip
                     TextButton(

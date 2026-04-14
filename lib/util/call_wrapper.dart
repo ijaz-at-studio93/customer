@@ -25,8 +25,9 @@ class _CallWrapperState extends State<CallWrapper> {
 
     // Start bottom-right but lifted up by ~80px (enough for label + safe space)
     position = Offset(
-      size.width - fabSize - margin,
-      size.height - fabSize - margin - kBottomNavigationBarHeight - 80,
+      //size.width - fabSize - margin,
+      margin,
+      size.height - fabSize - margin - kBottomNavigationBarHeight - 70,
     );
   }
 
@@ -105,8 +106,9 @@ class _CallWrapperState extends State<CallWrapper> {
                 const Text(
                   "Help 24×7",
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w900,
+                    fontFamily: "Outfit",          // ✅ added
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,   // ✅ better than w900 (Figma style)
                     color: Colors.black,
                   ),
                 ),

@@ -25,30 +25,30 @@ class DialogMenuListWidget extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(100),
                 child: CachedNetworkImage(
-                  height: 70,
-                  width: 70,
+                  height: 60,
+                  width: 60,
                   // Horoscope image
                   fit: BoxFit.cover,
                   imageUrl:  SharedPrefs.readStringValue(PrefConstants.gender) ==
-                          "0"
+                      "0"
                       ? "${APIConstants.image}${categoryListData.imageMale}"
                       : "${APIConstants.image}${categoryListData.imageFemale}",
                   placeholder: (context, url) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
-                    height: 70,
-                    width: 70,
+                    height: 60,
+                    width: 60,
                     // Horoscope image
                     fit: BoxFit.cover,
                   ),
                   errorWidget: (context, url, error) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
-                    height: 70,
-                    width: 70,
+                    height: 60,
+                    width: 60,
                     // Horoscope image
                     fit: BoxFit.cover,
                   ),
@@ -59,14 +59,17 @@ class DialogMenuListWidget extends StatelessWidget {
               SizedBox(
                 width: Get.width * 0.2,
                 child: Text(
-                  categoryListData.name ?? "", // Horoscope name
+                  categoryListData.name ?? "",
                   maxLines: 2,
                   softWrap: true,
                   textAlign: TextAlign.center,
                   textScaler: const TextScaler.linear(0.85),
-                  style: AppTextTheme.medium
-                      .copyWith(color: ColorConstant.blackColor, fontSize: 13),
-                  // Text style
+                  style: AppTextTheme.medium.copyWith(
+                    fontFamily: "Outfit",           // ✅ added
+                    fontWeight: FontWeight.w500,    // ✅ Medium weight
+                    fontSize: 13,
+                    color: ColorConstant.blackColor,
+                  ),
                   overflow: TextOverflow.visible,
                 ),
               ),
@@ -74,24 +77,24 @@ class DialogMenuListWidget extends StatelessWidget {
           ),
           Positioned(
             right: -3,
-            top: 10,
+            top: 1,
             child: categoryListData.isSelectCategory ?? false
                 ? Container(
-                    height: 21,
-                    width: 21,
-                    decoration: BoxDecoration(
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)),
-                        shape: BoxShape.circle),
-                    child: Center(
-                      child: Image.asset(
-                        AssetsConstant.xMark,
-                        color: ColorConstant.whiteColor,
-                        width: 10,
-                        height: 10,
-                      ),
-                    ),
-                  )
+              height: 21,
+              width: 21,
+              decoration: BoxDecoration(
+                  color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)),
+                  shape: BoxShape.circle),
+              child: Center(
+                child: Image.asset(
+                  AssetsConstant.xMark,
+                  color: ColorConstant.whiteColor,
+                  width: 10,
+                  height: 10,
+                ),
+              ),
+            )
                 : const SizedBox(),
           )
         ],

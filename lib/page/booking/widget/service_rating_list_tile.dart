@@ -62,7 +62,7 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
                     height: 100,
                     fit: BoxFit.cover,
                     imageUrl:
-                        "${APIConstants.image}${widget.servicesModel.salonImage}",
+                    "${APIConstants.image}${widget.servicesModel.salonImage}",
                     placeholder: (context, url) => const Image(
                       image: AssetImage(AssetsConstant.placeHolder),
                       width: 100,
@@ -212,46 +212,47 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: Get.width * 0.05),
           child: Obx(
-            () => _homeController.gteShowAddProgress
+                () => _homeController.gteShowAddProgress
                 ? const CircularProgressIndicator()
                 : widget.servicesModel.isReviewGiven ?? false
-                    ? const SizedBox()
-                    : ButtonWidget(
-                        buttonTitleText: "Submit",
-                        onPress: () {
-                          if (rate == 0.0) {
-                            showMessage("Please Give Yore Rate Opinion");
-                            return;
-                          } else if (_reviewTextEditingController
-                              .text.isEmpty) {
-                            showMessage("Please Enter Your Opinion");
-                            return;
-                          } else {
-                            String review = selectEmoji == 0
-                                ? "😡"
-                                : selectEmoji == 1
-                                    ? "😐"
-                                    : selectEmoji == 2
-                                        ? "😐"
-                                        : selectEmoji == 3
-                                            ? "😊"
-                                            : "😍";
+                ? const SizedBox()
+                : ButtonWidget(
+                buttonTitleText: "Submit",
+                onPress: () {
+                  if (rate == 0.0) {
+                    showMessage("Please Give Yore Rate Opinion");
+                    return;
+                  } else if (_reviewTextEditingController
+                      .text.isEmpty) {
+                    showMessage("Please Enter Your Opinion");
+                    return;
+                  } else {
+                    String review = selectEmoji == 0
+                        ? "😡"
+                        : selectEmoji == 1
+                        ? "😐"
+                        : selectEmoji == 2
+                        ? "😐"
+                        : selectEmoji == 3
+                        ? "😊"
+                        : "😍";
 
-                            _homeController.doAddServiceReview(
-                                appointmentId: widget.appointmentId,
-                                rate: rate,
-                                salonServiceId: widget.servicesModel.id ?? "",
-                                review:
-                                    review + _reviewTextEditingController.text,
-                                callback: () {
-                                  _homeController.doGetReviewDataList(
-                                      appointmentId: widget.appointmentId);
-                                  _reviewTextEditingController.text =
-                                      widget.servicesModel.review ?? "";
-                                  rate = widget.servicesModel.rating ?? 0.0;
-                                });
-                          }
-                        }),
+                    _homeController.doAddServiceReview(
+                      appointmentId: widget.appointmentId,
+                      rate: rate,
+                      salonServiceId: widget.servicesModel.id ?? "",
+                      review:
+                      review + _reviewTextEditingController.text,
+                      // callback: () {
+                      //   _homeController.doGetReviewDataList(
+                      //       appointmentId: widget.appointmentId);
+                      //   _reviewTextEditingController.text =
+                      //       widget.servicesModel.review ?? "";
+                      //   rate = widget.servicesModel.rating ?? 0.0;
+                      // }
+                    );
+                  }
+                }),
           ),
         ),
         const SizedBox(height: 20),
@@ -308,6 +309,6 @@ class _ServiceRatingListTileState extends State<ServiceRatingListTile> {
     );
   }
 
-  /*----------------  List Emoji ------------------*/
-  //List emojiList = ["😡", "☹️", "😐", "😊", "😍"];
+/*----------------  List Emoji ------------------*/
+//List emojiList = ["😡", "☹️", "😐", "😊", "😍"];
 }

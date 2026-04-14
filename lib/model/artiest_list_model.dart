@@ -1,68 +1,55 @@
 class ArtistListModel {
   int? statusCode;
   bool? success;
-  List<Artiest>? data;
+
+  List<Artiest>? maleHairArtists;
+  List<Artiest>? femaleHairArtists;
+  List<Artiest>? maleBeautyArtists;
+  List<Artiest>? femaleBeautyArtists;
+
+  ServiceMeta? serviceMeta;
   String? message;
 
-  ArtistListModel({this.statusCode, this.success, this.data, this.message});
+  /// ✅ ADD THIS
+  ArtistListModel({
+    this.statusCode,
+    this.success,
+    this.maleHairArtists,
+    this.femaleHairArtists,
+    this.maleBeautyArtists,
+    this.femaleBeautyArtists,
+    this.serviceMeta,
+    this.message,
+  });
 
   factory ArtistListModel.fromJson(Map<String, dynamic> json) {
-    final model = ArtistListModel(
-      statusCode: json['statusCode'] as int?,
-      success: json['success'] as bool?,
-      message: json['message'] as String?,
+    final data = json['data'];
+
+    return ArtistListModel(
+      statusCode: json['statusCode'],
+      success: json['success'],
+      message: json['message'],
+
+      maleHairArtists: (data['maleHairArtists'] as List? ?? [])
+          .map((e) => Artiest.fromJson(e))
+          .toList(),
+
+      femaleHairArtists: (data['femaleHairArtists'] as List? ?? [])
+          .map((e) => Artiest.fromJson(e))
+          .toList(),
+
+      maleBeautyArtists: (data['maleBeautyArtists'] as List? ?? [])
+          .map((e) => Artiest.fromJson(e))
+          .toList(),
+
+      femaleBeautyArtists: (data['femaleBeautyArtists'] as List? ?? [])
+          .map((e) => Artiest.fromJson(e))
+          .toList(),
+
+      serviceMeta: data['serviceMeta'] != null
+          ? ServiceMeta.fromJson(data['serviceMeta'])
+          : null,
     );
-
-    final payload = json['data'];
-
-    // ─────────────────────────────────────────────────────────────
-    // ✅ NEW SHAPE → data: { hairDressers: [...], beauticians: [...] }
-    // ─────────────────────────────────────────────────────────────
-    if (payload is Map<String, dynamic>) {
-      final hair = (payload['hairDressers'] as List? ?? const [])
-          .whereType<Map<String, dynamic>>()
-          .map(Artiest.fromJson);
-      final beauty = (payload['beauticians'] as List? ?? const [])
-          .whereType<Map<String, dynamic>>()
-          .map(Artiest.fromJson);
-
-      model.data = [...hair, ...beauty];
-      return model;
-    }
-
-    // ─────────────────────────────────────────────────────────────
-    // ✅ OLD SHAPE → data: [ {artist}, {artist} ]
-    // (kept for backward compatibility)
-    // ─────────────────────────────────────────────────────────────
-
-    /* OLD CODE (replaced by robust parsing below)
-    if (json['data'] != null) {
-      data = <Artiest>[];
-      json['data'].forEach((v) {
-        data!.add(Artiest.fromJson(v));
-      });
-    }
-    */
-
-    if (payload is List) {
-      model.data = payload
-          .whereType<Map<String, dynamic>>()
-          .map(Artiest.fromJson)
-          .toList();
-    } else {
-      model.data = <Artiest>[];
-    }
-
-    return model;
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> out = <String, dynamic>{};
-    out['statusCode'] = statusCode;
-    out['success'] = success;
-    out['data'] = data?.map((v) => v.toJson()).toList();
-    out['message'] = message;
-    return out;
   }
 }
 
@@ -125,5 +112,36 @@ class Artiest {
       'gender': gender,
       'reviewCount': reviewCount,
     };
+  }
+}
+
+class ServiceMeta {
+  final bool hasMaleServices;
+  final bool hasFemaleServices;
+
+  final bool hasMaleHair;
+  final bool hasMaleBeauty;
+
+  final bool hasFemaleHair;
+  final bool hasFemaleBeauty;
+
+  ServiceMeta({
+    required this.hasMaleServices,
+    required this.hasFemaleServices,
+    required this.hasMaleHair,
+    required this.hasMaleBeauty,
+    required this.hasFemaleHair,
+    required this.hasFemaleBeauty,
+  });
+
+  factory ServiceMeta.fromJson(Map<String, dynamic> json) {
+    return ServiceMeta(
+      hasMaleServices: json['hasMaleServices'] ?? false,
+      hasFemaleServices: json['hasFemaleServices'] ?? false,
+      hasMaleHair: json['hasMaleHair'] ?? false,
+      hasMaleBeauty: json['hasMaleBeauty'] ?? false,
+      hasFemaleHair: json['hasFemaleHair'] ?? false,
+      hasFemaleBeauty: json['hasFemaleBeauty'] ?? false,
+    );
   }
 }

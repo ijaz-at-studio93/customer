@@ -47,7 +47,7 @@ class _InsightsHomePageState extends State<InsightsHomePage>
         leading: const SizedBox(),
         centerTitle: true,
         title: Text(
-          "Insights",
+          "Content",
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
@@ -57,7 +57,7 @@ class _InsightsHomePageState extends State<InsightsHomePage>
             ? const ProgressBarView()
             : _homeController.getBlogDataModel.data?.isEmpty ??
                     false || _homeController.getBlogDataModel.data == null
-                ? const NoItemsWidget(text: "No insight data is available")
+                ? const NoItemsWidget(text: "Content is not available")
                 : ListView.separated(
                     key: _InsightsHomePageState.insightsListKey,
                     separatorBuilder: (context, i) {

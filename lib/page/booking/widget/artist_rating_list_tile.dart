@@ -209,46 +209,47 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
         Padding(
           padding: EdgeInsets.symmetric(horizontal: Get.width * 0.05),
           child: Obx(
-            () => _homeController.gteShowAddProgress
+                () => _homeController.gteShowAddProgress
                 ? const CircularProgressIndicator()
                 : widget.artists.isReviewGiven ?? false
-                    ? const SizedBox()
-                    : ButtonWidget(
-                        buttonTitleText: "Submit",
-                        onPress: () {
-                          if (rate == 0.0) {
-                            showMessage("Please Give Yore Rate Opinion");
-                            return;
-                          } else if (_reviewTextEditingController
-                              .text.isEmpty) {
-                            showMessage("Please Enter Your Opinion");
-                            return;
-                          } else {
-                            String review = selectEmoji == 0
-                                ? "😡"
-                                : selectEmoji == 1
-                                    ? "😐"
-                                    : selectEmoji == 2
-                                        ? "😐"
-                                        : selectEmoji == 3
-                                            ? "😊"
-                                            : "😍";
+                ? const SizedBox()
+                : ButtonWidget(
+                buttonTitleText: "Submit",
+                onPress: () {
+                  if (rate == 0.0) {
+                    showMessage("Please Give Yore Rate Opinion");
+                    return;
+                  } else if (_reviewTextEditingController
+                      .text.isEmpty) {
+                    showMessage("Please Enter Your Opinion");
+                    return;
+                  } else {
+                    String review = selectEmoji == 0
+                        ? "😡"
+                        : selectEmoji == 1
+                        ? "😐"
+                        : selectEmoji == 2
+                        ? "😐"
+                        : selectEmoji == 3
+                        ? "😊"
+                        : "😍";
 
-                            _homeController.doAddArtiestReview(
-                                appointmentId: widget.appointmentId,
-                                rate: rate,
-                                salonArtistId: widget.artists.id ?? "",
-                                review:
-                                    review + _reviewTextEditingController.text,
-                                callback: () {
-                                  _homeController.doGetReviewDataList(
-                                      appointmentId: widget.appointmentId);
-                                  _reviewTextEditingController.text =
-                                      widget.artists.review ?? "";
-                                  rate = widget.artists.rating ?? 0.0;
-                                });
-                          }
-                        }),
+                    _homeController.doAddArtistReview(
+                      appointmentId: widget.appointmentId,
+                      rate: rate,
+                      salonArtistId: widget.artists.id ?? "",
+                      review:
+                      review + _reviewTextEditingController.text,
+                      // callback: () {
+                      //   _homeController.doGetReviewDataList(
+                      //       appointmentId: widget.appointmentId);
+                      //   _reviewTextEditingController.text =
+                      //       widget.artists.review ?? "";
+                      //   rate = widget.artists.rating ?? 0.0;
+                      // }
+                    );
+                  }
+                }),
           ),
         ),
         const SizedBox(height: 20),
@@ -287,7 +288,7 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
               child: TextField(
                 readOnly: widget.artists.isReviewGiven ?? false ? true : false,
                 canRequestFocus:
-                    widget.artists.isReviewGiven ?? false ? false : true,
+                widget.artists.isReviewGiven ?? false ? false : true,
                 controller: textEditingController,
                 maxLines: 8,
                 keyboardType: textInputType,
@@ -306,6 +307,6 @@ class _ArtistRatingListTileState extends State<ArtistRatingListTile> {
     );
   }
 
-  /*----------------  List Emoji ------------------*/
-  //List emojiList = ["😡", "☹️", "😐", "😊", "😍"];
+/*----------------  List Emoji ------------------*/
+//List emojiList = ["😡", "☹️", "😐", "😊", "😍"];
 }

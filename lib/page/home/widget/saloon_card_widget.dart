@@ -170,13 +170,13 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
 
   Widget _buildImageCarousel(BuildContext context) {
     final images = _getImageList(widget.homeSalonModel);
-    final imageHeight = Get.height * 0.30; // EXACT original height
+    final imageHeight = 183.0;//Get.height * 0.30; // EXACT original height
 
     if (images.isEmpty) {
       return ClipRRect(
         borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
+          topLeft: Radius.circular(10),
+          topRight: Radius.circular(10),
         ),
         child: Image.asset(
           AssetsConstant.placeHolder,
@@ -189,8 +189,8 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
 
     return ClipRRect(
       borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(20),
-        topRight: Radius.circular(20),
+        topLeft: Radius.circular(10),
+        topRight: Radius.circular(10),
       ),
       child: SizedBox(
         width: Get.width,
@@ -673,6 +673,326 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
           ),
         ),
       ),
+        if (visiblePercentage > 80) {
+          // ✅ Mostly visible → allow autoplay
+          _maybeStartAutoPlay();
+          //_maybeShowLongPressHint(context);
+        } else {
+          // ❌ Partially visible → stop autoplay
+          _stopAutoPlay();
+        }
+      },
+      child: void Padding(
+        padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        child = GestureDetector(
+          onTap: widget.onPress,
+          child: Container(
+            width: 368,//Get.width,
+            height: 265,
+            decoration: BoxDecoration(
+              color: ColorConstant.crossMarkColor,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender),
+                )!,
+                width: 1.5,
+              ),
+            ),
+            child: Column(
+              children: [
+                Stack(
+                  children: [
+                    _buildImageCarousel(context),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            widget.homeSalonModel.isFavourite =
+                            !(widget.homeSalonModel.isFavourite ?? false);
+                            if (widget.homeSalonModel.isFavourite ?? false) {
+                              _homeController.doAddFavouriteSalon(
+                                  salonId: widget.homeSalonModel.id ?? "");
+                            } else {
+                              _homeController.doRemoveFavouriteSalon(
+                                  callback: () {},
+                                  salonId: widget.homeSalonModel.id ?? "");
+                            }
+                          });
+                        },
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ColorConstant.blackColor),
+                          child: Center(
+                            child: widget.homeSalonModel.isFavourite ?? false
+                                ? const Icon(
+                              CupertinoIcons.heart_fill,
+                              color: Colors.red,
+                            )
+                                : Image.asset(
+                              AssetsConstant.likeBlank,
+                              height: 20,
+                              width: 20,
+                              color: ColorConstant.whiteColor,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      top: 17,
+                      left: 1,
+                      child: Container(
+                        //height: 18,
+                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.7), // ✅ Figma color
+                          borderRadius: BorderRadius.circular(4), // ✅ pill shape
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min, // ✅ important (no full width)
+                          children: [
+                            Image.asset(
+                              AssetsConstant.newOfferIcon,
+                              width: 18, // 🔥 slightly smaller (Figma match)
+                              height: 18,
+                            ),
+                            const SizedBox(width: 4),
+
+                            Builder(
+                              builder: (_) {
+                                final discountText = _getHighestDiscountForSalon();
+
+                                if (discountText.isEmpty) return const SizedBox();
+
+                                return Text(
+                                  discountText,
+                                  style: AppTextTheme.bold.copyWith(
+                                    fontFamily: "Inter",           // ✅ Figma font
+                                    fontWeight: FontWeight.w900,   // ✅ Black weight
+                                    fontSize: 12,                  // ✅ exact size
+                                    color: const Color(0xFFE800E4), // ✅ exact color
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                //const SizedBox(height: 3),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 7),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+
+                          /// TOP CONTENT
+                          SizedBox(
+                            width: Get.width * 0.65,
+                            child: Text(
+                              //'${widget.homeSalonModel.name}',
+                              '${widget.homeSalonModel.displayName}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextTheme.bold.copyWith(
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                                color: ColorConstant.blackColor,
+                              ),
+                            ),
+                          ),
+
+                          SizedBox(
+                            width: Get.width * 0.6,
+                            child: Text(
+                              '${widget.homeSalonModel.address}',
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextTheme.bold.copyWith(
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                                fontSize: 10.5,
+                                color: Colors.black45,
+                                height: 1,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 1),
+
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.location_on,
+                                size: 12.5,
+                                color: const Color(0xFF057336),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                "${(widget.homeSalonModel.distance! / 1000 * 10).roundToDouble() / 10} Km Drive",
+                                style: AppTextTheme.medium.copyWith(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 12.5,
+                                  color: const Color(0xFF057336),
+                                ),
+                              ),
+                            ],
+                          ),
+
+                          /// 🔥 KEY FIX
+                          //const SizedBox(height: 6), // 👈 fixed gap (won’t depend on above)
+
+                          /// STARTS FROM (LOCKED POSITION RELATIVE)
+                          Row(
+                            children: [
+                              Text(
+                                "Starts From",
+                                style: AppTextTheme.medium.copyWith(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: Colors.black.withOpacity(0.3),
+                                ),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                "₹${widget.homeSalonModel.serviceStartingPrice} Onwards",
+                                style: AppTextTheme.bold.copyWith(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                  color: changeTheme(
+                                    SharedPrefs.readStringValue(PrefConstants.gender),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: 26,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: ColorConstant.greenColor,
+                              borderRadius: BorderRadius.circular(10), // 👈 pill shape
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  //Icons.star,
+                                  Icons.star_rounded,
+                                  color: ColorConstant.whiteColor,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 2),
+                                Text(
+                                  widget.homeSalonModel.rating?.toStringAsFixed(1) ?? "0.0",
+                                  style: AppTextTheme.medium.copyWith(
+                                    fontFamily: "Outfit",        // ✅ Figma font
+                                    fontWeight: FontWeight.w600, // ✅ SemiBold
+                                    fontSize: 16,                // ✅ correct size
+                                    color: ColorConstant.whiteColor,
+                                    height: 1.2,                   // ✅ keeps it vertically tight
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 4),
+
+
+                          Center(
+                            child: Text(
+                              "${_formatReviewCount(widget.homeSalonModel.reviewCount ?? 0)} Reviews",
+                              style: AppTextTheme.medium.copyWith(
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                                fontSize: 11,
+                                color: ColorConstant.blackColor,
+                                height: 1,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 2), // 🔥 spacing like Figma
+
+                          Container(
+                            height: 2, // 🔥 stroke thickness
+                            width: 40, // 🔥 adjust based on text width
+                            decoration: BoxDecoration(
+                              color: changeTheme(
+                                SharedPrefs.readStringValue(PrefConstants.gender),
+                              ), // ✅ Figma purple
+                              borderRadius: BorderRadius.circular(10), // 👈 rounded ends
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                // const SizedBox(height: 2),
+                // Dash(
+                //   direction: Axis.horizontal,
+                //   length: Get.width * 0.8,
+                //   dashLength: 2,
+                //   dashColor: ColorConstant.grayTextColor,
+                // ),
+                // Padding(
+                //   padding:
+                //       const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                //   child: Row(
+                //     children: [
+                //       Image.asset(
+                //         AssetsConstant.newOfferIcon,
+                //         width: 20,
+                //         height: 20,
+                //       ),
+                //       const SizedBox(width: 8),
+                //
+                //       Builder(
+                //         builder: (_) {
+                //           final discountText = _getHighestDiscountForSalon();
+                //
+                //           if (discountText.isEmpty) return const SizedBox();
+                //
+                //           return Text(
+                //             discountText,
+                //             style: AppTextTheme.bold.copyWith(
+                //               color: ColorConstant.offerTextColor,
+                //               fontSize: 13,
+                //             ),
+                //           );
+                //         },
+                //       ),
+                //     ],
+                //   )
+                // )
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -702,7 +1022,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
 
     if (maxPercent == 0) return "";
 
-    return "Upto ${_formatPercent(maxPercent)} Off";
+    return "${_formatPercent(maxPercent)} Off";
   }
 
   String _formatPercent(double value) {

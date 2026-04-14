@@ -104,39 +104,67 @@ class HistoryList {
 class Salon {
   String? id;
   String? name;
+  String? displayName;
 
-  Salon({this.id, this.name});
+  Salon({this.id, this.name, this.displayName});
 
   Salon.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     name = json['name'];
+    displayName = json['displayName'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['name'] = name;
+    data['displayName'] = displayName;
     return data;
   }
 }
 
+// class Appointment {
+//   String? id;
+//   Salon? artist;
+//
+//   Appointment({this.id, this.artist});
+//
+//   Appointment.fromJson(Map<String, dynamic> json) {
+//     id = json['id'];
+//     artist = json['artist'] != null ? Salon.fromJson(json['artist']) : null;
+//   }
+//
+//   Map<String, dynamic> toJson() {
+//     final Map<String, dynamic> data = <String, dynamic>{};
+//     data['id'] = id;
+//     if (artist != null) {
+//       data['artist'] = artist!.toJson();
+//     }
+//     return data;
+//   }
+// }
+
 class Appointment {
   String? id;
-  Salon? artist;
+  List<String>? stylistIds;
 
-  Appointment({this.id, this.artist});
+  Appointment({this.id, this.stylistIds});
 
   Appointment.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    artist = json['artist'] != null ? Salon.fromJson(json['artist']) : null;
+
+    /// ✅ SAFE PARSING
+    if (json['stylistIds'] != null) {
+      stylistIds = List<String>.from(json['stylistIds']);
+    } else {
+      stylistIds = [];
+    }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
-    if (artist != null) {
-      data['artist'] = artist!.toJson();
-    }
+    data['stylistIds'] = stylistIds;
     return data;
   }
 }

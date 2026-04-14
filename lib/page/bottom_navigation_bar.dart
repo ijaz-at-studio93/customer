@@ -109,7 +109,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                           : ColorConstant.primary2
                           : ColorConstant.grayTextColor,
                     ),
-                    label: 'Insights',
+                    label: 'Content',
                   ),
                 ],
                 onTap: (val) {

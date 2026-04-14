@@ -30,7 +30,7 @@ class PromoCodeListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
@@ -38,7 +38,7 @@ class PromoCodeListTile extends StatelessWidget {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(8.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -48,47 +48,41 @@ class PromoCodeListTile extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.orange,
+                      color: Colors.green,
                       borderRadius: BorderRadius.circular(5),
                     ),
                     child: type == "percentage"
                         ? Text('Flat $amount% OFF',
-                            style: AppTextTheme.bold
-                                .copyWith(color: ColorConstant.whiteColor))
+                        style: AppTextTheme.bold
+                            .copyWith(color: ColorConstant.whiteColor,fontFamily: "Outfit", ))
                         : Text('Flat $amount OFF',
-                            style: AppTextTheme.bold
-                                .copyWith(color: ColorConstant.whiteColor)),
+                        style: AppTextTheme.bold
+                            .copyWith(color: ColorConstant.whiteColor,fontFamily: "Outfit", )),
                   ),
-                  // GestureDetector(
-                  //   onTap: onTapApplyBtn,
-                  //   child: Container(
-                  //     padding:  EdgeInsets.all(8),
-                  //     decoration: BoxDecoration(
-                  //       color: changeTheme(SharedPrefs.readStringValue(
-                  //           PrefConstants.gender)) ??
-                  //           ColorConstant.primaryColor,
-                  //       borderRadius: BorderRadius.circular(5),
-                  //     ),
-                  //     child: Text('APPLY',
-                  //         style: AppTextTheme.bold
-                  //             .copyWith(color: ColorConstant.whiteColor)),
-                  //   ),
-                  // ),
                   GestureDetector(
                     onTap: isDisabled ? null : onTapApplyBtn,
                     child: Container(
-                      padding: const EdgeInsets.all(8),
+                      width: 100,
+                      height: 38,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: isDisabled
                             ? Colors.grey
-                            : changeTheme(SharedPrefs.readStringValue(
-                            PrefConstants.gender)) ??
-                            ColorConstant.primaryColor,
-                        borderRadius: BorderRadius.circular(5),
+                            : null,
+                        gradient: const LinearGradient(
+                          colors: [
+                            Color(0xFF8454E5), // 🔥 left
+                            Color(0xFFCD73B4), // 🔥 right
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        isDisabled ? 'LOCKED' : 'APPLY',
-                        style: AppTextTheme.bold.copyWith(color: ColorConstant.whiteColor),
+                        isDisabled ? 'Locked' : 'Apply',
+                        style: AppTextTheme.bold.copyWith(color: ColorConstant.whiteColor,fontFamily: "Outfit", ),
                       ),
                     ),
                   ),
@@ -97,25 +91,38 @@ class PromoCodeListTile extends StatelessWidget {
               const SizedBox(height: 10),
               Row(
                 children: [
-                  Image.asset(
-                    AssetsConstant.offerIcon,
-                    width: 25,
-                    height: 25,
-                    color: changeTheme(SharedPrefs.readStringValue(
-                        PrefConstants.gender)) ??
-                        ColorConstant.primaryColor,
+                  ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [
+                        Color(0xFF8454E5),
+                        Color(0xFFCD73B4),
+                      ],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ).createShader(bounds),
+                    child: Image.asset(
+                      AssetsConstant.offerIcon,
+                      width: 25,
+                      height: 25,
+                      color: Colors.white, // 👈 important
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Text(title,
                       style: AppTextTheme.bold.copyWith(
-                          fontSize: 16, color: ColorConstant.blackColor)),
+                          fontSize: 16,fontFamily: "Outfit",  color: ColorConstant.blackColor)),
                 ],
               ),
               const SizedBox(height: 10),
-              Text(description,
-                  textScaler: const TextScaler.linear(0.85),
-                  style: AppTextTheme.medium
-                      .copyWith(color: ColorConstant.blackColor)),
+              Text(
+                description,
+                textScaler: const TextScaler.linear(0.85),
+                style: AppTextTheme.medium.copyWith(
+                  fontFamily: "Outfit",          // 👈 added
+                  color: ColorConstant.blackColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
 
               if (isDisabled)
                 Padding(

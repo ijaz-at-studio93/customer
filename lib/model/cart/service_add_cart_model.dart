@@ -29,7 +29,11 @@ class ServiceAddCartModel {
 
 class Data {
   String? cartId;
+  String? gender;
+  DateTime? deletedAt;
   String? salonId;
+  Salon? salon;
+  DiscountDetails? discountDetails;
   double? discountAmount;
   bool? isDiscountApplied;
   bool? isHomeService;
@@ -45,6 +49,9 @@ class Data {
 
   Data(
       {this.cartId,
+      this.salon,
+      this.gender,
+      this.deletedAt,
       this.salonId,
       this.discountAmount,
       this.isDiscountApplied,
@@ -57,6 +64,11 @@ class Data {
 
   Data.fromJson(Map<String, dynamic> json) {
     cartId = json['cartId'];
+    if (json['salon'] != null) {
+      salon = Salon.fromJson(json['salon']);
+    }
+    gender = json['gender'];
+    deletedAt = json['deletedAt'];
     salonId = json['salonId'];
     discountAmount = double.parse(json['discountAmount'] == null
         ? "0.0"
@@ -64,6 +76,11 @@ class Data {
     // logger.e(discountAmount);
     isDiscountApplied = json['isDiscountApplied'];
     isHomeService = json['isHomeService'];
+    totalPrice = double.parse(
+        json['totalPrice'] == null ? "0.0" : json['totalPrice'].toString());
+    discountDetails = json['discountDetails'] != null
+        ? DiscountDetails.fromJson(json['discountDetails'])
+        : null;
     totalPrice = double.parse(
         json['totalPrice'] == null ? "0.0" : json['totalPrice'].toString());
 
@@ -104,10 +121,18 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['cartId'] = cartId;
+    if (salon != null) {
+      data['salon'] = salon!.toJson();
+    }
+    data['gender'] = gender;
+    data['deletedAt'] = deletedAt;
     data['salonId'] = salonId;
     data['discountAmount'] = discountAmount;
     data['isDiscountApplied'] = isDiscountApplied;
     data['isHomeService'] = isHomeService;
+    if (discountDetails != null) {
+      data['discountDetails'] = discountDetails!.toJson();
+    }
     if (items != null) {
       data['items'] = items!.map((v) => v.toJson()).toList();
     }
@@ -122,6 +147,25 @@ class Data {
           servicesWithProduct!.map((v) => v.toJson()).toList();
     }
     return data;
+  }
+}
+
+class Salon {
+  String? id;
+  String? displayName;
+
+  Salon({this.id, this.displayName});
+
+  Salon.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    displayName = json['displayName'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'displayName': displayName,
+    };
   }
 }
 
@@ -290,6 +334,22 @@ class Product {
   }
 }
 
+class DiscountDetails {
+  String? code;
+
+  DiscountDetails({this.code});
+
+  DiscountDetails.fromJson(Map<String, dynamic> json) {
+    code = json['code'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'code': code,
+    };
+  }
+}
+
 class ServicesAvailableProductList {
   String? id;
   String? createdAt;
@@ -357,6 +417,7 @@ class ServicesAvailableProductList {
 
 class ServicesWithProduct {
   int? price;
+  int? quantity;
   double? rating;
   String? id;
   String? createdAt;
@@ -380,6 +441,7 @@ class ServicesWithProduct {
 
   ServicesWithProduct(
       {this.price,
+      this.quantity,
       this.rating,
       this.id,
       this.createdAt,
@@ -403,6 +465,7 @@ class ServicesWithProduct {
 
   ServicesWithProduct.fromJson(Map<String, dynamic> json) {
     price = json['price'];
+    quantity = json['quantity'] ?? 0;
     rating = double.parse(json['rating'].toString());
     id = json['id'];
     createdAt = json['createdAt'];
@@ -433,6 +496,7 @@ class ServicesWithProduct {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['price'] = price;
+    data['quantity'] = quantity;
     data['rating'] = rating;
     data['id'] = id;
     data['createdAt'] = createdAt;

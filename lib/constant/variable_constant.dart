@@ -24,3 +24,5 @@ int yourApproval = 1;
 ValueNotifier<int> selectedGender =  ValueNotifier(0);
 
 ValueNotifier<String>  stylistId = ValueNotifier("");
+
+ValueNotifier<List<String>> selectedArtistIdsGlobal = ValueNotifier([]);

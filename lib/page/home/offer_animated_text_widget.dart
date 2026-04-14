@@ -29,11 +29,17 @@ class _OfferAnimatedTextWidgetState extends State<OfferAnimatedTextWidget> {
     _startLoop();
   }
 
-  void _startLoop() {
-    loopTimer = Timer.periodic(const Duration(seconds: 5), (_) async {
-      if (!mounted) return;
+  void _startLoop() async {
+    while (mounted) {
+      /// ✅ SHOW SALON
+      setState(() {
+        showSalon = true;
+        showContent = false;
+      });
 
-      /// STEP 1 — salon goes DOWN
+      await Future.delayed(const Duration(seconds: 2));
+
+      /// transition
       setState(() {
         showSalon = false;
       });
@@ -41,30 +47,20 @@ class _OfferAnimatedTextWidgetState extends State<OfferAnimatedTextWidget> {
       await Future.delayed(const Duration(milliseconds: 450));
       if (!mounted) return;
 
-      /// STEP 2 — content comes FROM TOP
+      /// ✅ SHOW CONTENT
       setState(() {
         showContent = true;
       });
 
       // await Future.delayed(const Duration(seconds: 2));
 
-      // /// STEP 3 — content goes DOWN
-      // if (!context.mounted) return;
+      /// transition
+      setState(() {
+        showContent = false;
+      });
 
-      // setState(() {
-      //   showContent = false;
-      // });
-
-      // await Future.delayed(const Duration(milliseconds: 450));
-
-      // /// STEP 4 — salon comes FROM TOP again
-      // if (!context.mounted) return;
-
-      // ///
-      // setState(() {
-      //   showSalon = true;
-      // });
-    });
+      await Future.delayed(const Duration(milliseconds: 450));
+    }
   }
 
   @override
@@ -81,9 +77,9 @@ class _OfferAnimatedTextWidgetState extends State<OfferAnimatedTextWidget> {
       children: [
         /// ANIMATED AREA (salon + offer)
         SizedBox(
-          height: 45,
+          height: 42,
           child: Stack(
-            alignment: Alignment.center, // 🔥 keeps everything centered
+            //alignment: Alignment.center, // 🔥 keeps everything centered
             children: [
               /// SALON NAME — moves DOWN from center
               AnimatedSlide(
@@ -105,7 +101,7 @@ class _OfferAnimatedTextWidgetState extends State<OfferAnimatedTextWidget> {
                         style: const TextStyle(
                           fontFamily: "Outfit",
                           fontWeight: FontWeight.w700,
-                          fontSize: 18,
+                          fontSize: 15,
                           color: Colors.white,
                         ),
                       ),
@@ -122,52 +118,44 @@ class _OfferAnimatedTextWidgetState extends State<OfferAnimatedTextWidget> {
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 300),
                   opacity: showContent ? 1 : 0,
-                  child: SizedBox(
-                    width: double.infinity, // 🔥 IMPORTANT
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          widget.title,
-                          style: const TextStyle(
-                            fontFamily: "Outfit",
-                            fontWeight: FontWeight.w700,
-                            fontSize: 13,
-                            color: Colors.white,
+                  child: Align(
+                    alignment: Alignment.centerLeft, // 👈 SAME AS SALON
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment:
+                            MainAxisAlignment.center, // 👈 KEY FIX
+                        children: [
+                          Text(
+                            widget.title,
+                            style: const TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12,
+                              color: Colors.white,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          widget.description,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                            fontFamily: "Outfit",
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                            color: Colors.black87,
+                          const SizedBox(height: 2), // small spacing
+                          Text(
+                            widget.description,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11,
+                              color: Colors.black87,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ],
-          ),
-        ),
-
-        const SizedBox(height: 1),
-
-        /// STATIC TEXT (never animates)
-        const Text(
-          "               *Offer can be applied at checkout",
-          style: TextStyle(
-            fontFamily: "Outfit",
-            fontWeight: FontWeight.w500,
-            fontSize: 9,
-            color: Colors.black,
           ),
         ),
       ],

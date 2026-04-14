@@ -43,7 +43,7 @@ class _BlogFavPageState extends State<BlogFavPage> {
             )),
         centerTitle: true,
         title: Text(
-          "Insights",
+          "Content",
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),

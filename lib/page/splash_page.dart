@@ -37,13 +37,13 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(
-        () => ProgressContainerView(
+            () => ProgressContainerView(
           isProgressRunning: _authController.showProgress,
           child: Container(
             height: Get.height,
             width: Get.width,
             color:
-                changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+            changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
             child: Center(
               child: Text(
                 "SCUTS",
@@ -65,13 +65,13 @@ class _SplashPageState extends State<SplashPage> {
             child: SharedPrefs.readBoolValue(PrefConstants.isUserLogin)
                 ? const BottomNavBarPage()
                 : const LoginPage(
-                    splashPage: true,
-                  ),
+              splashPage: true,
+            ),
             alignment: Alignment.center,
             duration: const Duration(milliseconds: 800),
             // type: PageTransitionType.rightToLeftWithFade
             type: PageTransitionType.size),
-        (route) => false);
+            (route) => false);
   }
 
   /*-------------- GET VERSION  APP -------------------*/
@@ -93,13 +93,30 @@ class _SplashPageState extends State<SplashPage> {
 
     String data = await getVersion();
 
+    // _authController.doAppUpdate(callback: () {
+    //   if (_authController.getAppUpdateModel.data?.userAppLatestVersion != data) {
+    //     if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ?? false) {
+    //       _forceUpdateDialog();
+    //     } else {
+    //       _normalUpdateDialog();
+    //     }
+    //   } else {
+    //     route();
+    //   }
+    // });
     _authController.doAppUpdate(callback: () {
-      if (_authController.getAppUpdateModel.data?.userAppLatestVersion != data) {
+      final serverVersion =
+          _authController.getAppUpdateModel.data?.userAppLatestVersion;
+
+      if (serverVersion != null &&
+          isUpdateRequired(data, serverVersion)) {
+
         if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ?? false) {
           _forceUpdateDialog();
         } else {
           _normalUpdateDialog();
         }
+
       } else {
         route();
       }
@@ -243,5 +260,20 @@ class _SplashPageState extends State<SplashPage> {
     } else {
       throw 'Could not launch $url';
     }
+  }
+
+  bool isUpdateRequired(String current, String server) {
+    final currentParts = current.split('.').map(int.parse).toList();
+    final serverParts = server.split('.').map(int.parse).toList();
+
+    for (int i = 0; i < serverParts.length; i++) {
+      final c = i < currentParts.length ? currentParts[i] : 0;
+      final s = serverParts[i];
+
+      if (c < s) return true;
+      if (c > s) return false;
+    }
+
+    return false;
   }
 }

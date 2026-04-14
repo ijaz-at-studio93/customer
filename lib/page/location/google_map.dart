@@ -285,7 +285,6 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
 
                                               // Go back automatically
                                               Get.back();
-
                                             }
                                           },
                                           child: Container(
@@ -348,28 +347,73 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
 
   /*----------------- Set  init  Location  -----------------*/
   Future<void> _setInitialLocation() async {
-    await requestPermission();
-    Position position = await getCurrentLocation();
-    setState(() {
-      _initialPosition = LatLng(position.latitude, position.longitude);
-      _locationLoaded = true;
-      _marker.add(Marker(
-        markerId: const MarkerId('current_Postion'),
-        position: LatLng(position.latitude, position.longitude),
-        icon: BitmapDescriptor.defaultMarkerWithHue(
-          BitmapDescriptor.hueViolet,
-        ),
-      ));
-    });
-    List<Placemark> placeMarks =
-        await placemarkFromCoordinates(position.latitude, position.longitude);
-    Placemark place = placeMarks[0];
+    try {
+      // 1) ensure location services are enabled
+      final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        showMessage('Please enable location services on your device.');
+        return;
+      }
 
-    city = "${place.locality}";
-    address =
-        "${place.street}, ${place.subLocality}, ${place.locality},${place.thoroughfare}, ${place.subThoroughfare} , ${place.administrativeArea} ${place.postalCode}, ${place.country}";
-    lat = position.latitude;
-    lng = position.longitude;
+      // 2) check & request permission using Geolocator APIs
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission(); // triggers iOS system dialog
+      }
+
+      if (permission == LocationPermission.denied) {
+        // user denied (not permanent) -> show friendly message
+        showMessage('Location permission denied. Please allow location to continue.');
+        return;
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        // permissions are permanently denied, open app settings
+        showMessage('Location permission is permanently denied. Please enable it from Settings.');
+        await openAppSettings();
+        return;
+      }
+
+      // 3) At this point permission is granted (either while-in-use or always)
+      Position position;
+      try {
+        position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+          timeLimit: const Duration(seconds: 10),
+        );
+      } catch (e) {
+        // fallback: try to get last known position
+        position = (await Geolocator.getLastKnownPosition()) ??
+            (throw Exception('Unable to obtain location'));
+      }
+
+      setState(() {
+        _initialPosition = LatLng(position.latitude, position.longitude);
+        _locationLoaded = true;
+        _marker.clear();
+        _marker.add(Marker(
+          markerId: const MarkerId('current_Postion'),
+          position: LatLng(position.latitude, position.longitude),
+          icon: BitmapDescriptor.defaultMarkerWithHue(
+            BitmapDescriptor.hueViolet,
+          ),
+        ));
+      });
+
+      // reverse geocode
+      final placeMarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      if (placeMarks.isNotEmpty) {
+        final place = placeMarks.first;
+        city = place.locality ?? "";
+        address =
+        "${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.postalCode ?? ''}, ${place.country ?? ''}";
+        lat = position.latitude;
+        lng = position.longitude;
+      }
+    } catch (err) {
+      print("Error while setting initial location: $err");
+      showMessage('Unable to get your location. Please try again.');
+    }
   }
 
   /*------------------- Location  Change Liston --------------------*/
@@ -387,19 +431,42 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
   }
 
   /*---------------- Request  Permission  -----------------*/
-  Future<void> requestPermission() async {
-    var status = await Permission.location.request();
-    if (status.isDenied) {
-      await Permission.location.request();
-    } else if (status.isPermanentlyDenied) {
-      showMessage(
-          "Location permissions are permanently denied, we cannot request permissions.");
-    }
-  }
+  // Future<void> requestPermission() async {
+  //   var status = await Permission.location.request();
+  //   if (status.isDenied) {
+  //     await Permission.location.request();
+  //   } else if (status.isPermanentlyDenied) {
+  //     showMessage(
+  //         "Location permissions are permanently denied, we cannot request permissions.");
+  //   }
+  // }
 
   /*--------------  Get Current Location  -----------------*/
   Future<Position> getCurrentLocation() async {
+    // Check if location services are enabled
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('Location services are disabled.');
+    }
+
+    // Check permission
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission(); // triggers iOS dialog
+      if (permission == LocationPermission.denied) {
+        throw Exception('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception(
+          'Location permissions are permanently denied, please enable them from Settings.');
+    }
+
+    // Get current location safely
     return await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+      desiredAccuracy: LocationAccuracy.high,
+    );
   }
+
 }

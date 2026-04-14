@@ -38,192 +38,248 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
     return Scaffold(
       backgroundColor: ColorConstant.whiteColor,
       body: Obx(
-        () => ProgressContainerView(
+            () => ProgressContainerView(
           isProgressRunning: _authController.showProgress,
-          child: Column(
-            children: [
-              _headerWidget(),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 35),
-                      _columWithNameTextField(),
-                      const SizedBox(height: 30),
-                      _columPhoneWithTextField(),
-                      const SizedBox(height: 10),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 18),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Gender",
-                              style: AppTextTheme.regular.copyWith(
-                                  fontSize: 13,
-                                  color: ColorConstant.blackColor),
-                            ),
-                            const SizedBox(height: 10),
-                            Row(
-                              children: [
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selectGender = 1;
-                                    });
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "male",
-                                        style: AppTextTheme.medium.copyWith(
-                                            color: ColorConstant.blackColor,
-                                            fontSize: 14),
-                                      ),
-                                      const SizedBox(width: 15),
-                                      Container(
-                                        height: 16,
-                                        width: 16,
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: selectGender == 1
-                                                ? ColorConstant.primaryColor
-                                                : ColorConstant.blackColor,
-                                          ),
-                                        ),
-                                        child: Container(
-                                          width: 10,
-                                          height: 10,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: selectGender == 1
-                                                ? ColorConstant.primaryColor
-                                                : Colors.transparent,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                const SizedBox(width: 15),
-                                GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      selectGender = 2;
-                                    });
-                                  },
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                        "female",
-                                        style: AppTextTheme.medium.copyWith(
-                                            color: ColorConstant.blackColor,
-                                            fontSize: 14),
-                                      ),
-                                      const SizedBox(width: 15),
-                                      Container(
-                                        height: 16,
-                                        width: 16,
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: selectGender == 2
-                                                ? ColorConstant.primaryColor
-                                                : ColorConstant.blackColor,
-                                          ),
-                                        ),
-                                        child: Container(
-                                          width: 10,
-                                          height: 10,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            color: selectGender == 2
-                                                ? ColorConstant.primaryColor
-                                                : Colors.transparent,
-                                          ),
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
+          child: SafeArea(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+
+                    const SizedBox(height: 10),
+                    /// 🔙 BACK BUTTON
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: GestureDetector(
+                        onTap: () {
+                          Get.back();
+                        },
+                        child: const Icon(
+                          Icons.arrow_back_ios,
+                          size: 20,
+                          color: Colors.black,
                         ),
                       ),
-                      const SizedBox(height: 30),
-                      _columWithEmailTextField(),
-                      const SizedBox(height: 35),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 35),
-                        child: ButtonWidget(
-                            color: changeTheme(SharedPrefs.readStringValue(
-                                    PrefConstants.gender)) ??
-                                ColorConstant.primaryColor,
-                            buttonTitleText: "Continue",
-                            onPress: () {
-                              _doCreateProfile();
-                            }),
-                      )
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 10),
+
+                    /// 🧠 TITLE
+                    const Text(
+                      "Let’s Create Your Profile",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: "Outfit",
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    /// 👤 NAME
+                    _inputField(
+                      label: "Your Name",
+                      controller: _nameTextEditingController,
+                      hint: "Enter Your Name",
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    /// 📱 MOBILE (UNCHANGED)
+                    _inputField(
+                      label: "Mobile Number",
+                      controller: _mobileTextEditingController,
+                      hint: "Enter Mobile Number",
+                      isReadOnly: true,
+                      prefix: "+91 | ",
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    /// 🚻 GENDER
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Gender",
+                          style: TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+
+                        const SizedBox(height: 15),
+
+                        Row(
+                          children: [
+
+                            _genderOption("Male", 1),
+                            const SizedBox(width: 20),
+                            _genderOption("Female", 2),
+
+                          ],
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    /// 📧 EMAIL
+                    _inputField(
+                      label: "Email",
+                      controller: _emailTextEditingController,
+                      hint: "Enter Your Email (Optional)",
+                    ),
+
+                    const SizedBox(height: 30),
+
+                    /// 🚀 BUTTON (UNCHANGED FUNCTION)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: ButtonWidget(
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              Color(0xFF8454E5),
+                              Color(0xFFCD73B4),
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        buttonTitleText: "Continue",
+                        onPress: () {
+                          _doCreateProfile();
+                        },
+                      ),
+                    ),
+
+
+                    const SizedBox(height: 30),
+                  ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  /*---------- header widget ---------*/
-  _headerWidget() {
-    return Container(
-      width: Get.width,
-      padding: const EdgeInsets.only(top: 50, left: 21, right: 21, bottom: 35),
-      decoration: BoxDecoration(
-          color:
-              changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
-                  ColorConstant.primaryColor),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _inputField({
+    required String label,
+    required TextEditingController controller,
+    required String hint,
+    bool isReadOnly = false,
+    String? prefix,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontFamily: "Outfit",
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+
+        Container(
+          height: 45,
+          padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 3),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.grey.shade400),
+          ),
+          child: Row(
             children: [
-              InkWell(
-                onTap: () {
-                  Get.back();
-                },
-                child: Container(
-                  height: 34,
-                  width: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: ColorConstant.whiteColor,
-                    ),
+              if (prefix != null)
+                Text(prefix, style: const TextStyle(fontWeight: FontWeight.w600)),
+
+              Expanded(
+                child: TextField(
+                  controller: controller,
+                  readOnly: isReadOnly,
+                  keyboardType: TextInputType.text,
+                  textAlignVertical: TextAlignVertical.center,
+
+                  style: const TextStyle(
+                    fontFamily: "Outfit",
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600, // SemiBold
+                    color: Colors.black,
                   ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.arrow_back_ios_new,
-                      color: ColorConstant.whiteColor,
-                      size: 12,
+
+                  decoration: InputDecoration(
+                    hintText: hint,
+                    border: InputBorder.none,
+
+                    hintStyle: const TextStyle(
+                      fontFamily: "Outfit",
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600, // SemiBold
+                      color: Colors.grey,
                     ),
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 35),
+        ),
+      ],
+    );
+  }
+
+  Widget _genderOption(String title, int value) {
+    final isSelected = selectGender == value;
+
+    final selectedColor = value == 1
+        ? ColorConstant.primaryColor
+        : ColorConstant.primary2;
+
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectGender = value;
+        });
+      },
+      child: Row(
+        children: [
           Text(
-            "Let’s \nCreate your profile",
-            style: AppTextTheme.bold
-                .copyWith(color: ColorConstant.whiteColor, fontSize: 23),
+            title,
+            style: const TextStyle(
+              fontFamily: "Outfit",
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          Container(
+            height: 18,
+            width: 18,
+            padding: const EdgeInsets.all(3),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected
+                    ? selectedColor
+                    : Colors.grey,
+              ),
+            ),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isSelected
+                    ? selectedColor
+                    : Colors.transparent,
+              ),
+            ),
           ),
         ],
       ),
@@ -322,14 +378,40 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                     border: InputBorder.none,
                     hintText: "Enter Your Name",
                     hintStyle: AppTextTheme.medium.copyWith(
-                        color: ColorConstant.grayColor, fontSize: 13)),
+                        color: ColorConstant.grayColor, fontFamily: 'Outfit', fontSize: 13)),
               )),
         ],
       ),
     );
   }
 
-/*--------------  Email TextField -------------*/
+  String? validateName(String name) {
+    final trimmed = name.trim();
+
+    if (trimmed.isEmpty) {
+      return "Please enter your name";
+    }
+
+    if (trimmed.length < 3) {
+      return "Name must be at least 3 characters";
+    }
+
+    // Only alphabets + space
+    final regex = RegExp(r'^[a-zA-Z ]+$');
+
+    if (!regex.hasMatch(trimmed)) {
+      return "Only letters allowed";
+    }
+
+    // Avoid multiple spaces
+    if (trimmed.contains(RegExp(r'\s{2,}'))) {
+      return "Invalid name format";
+    }
+
+    return null;
+  }
+
+  /*--------------  Email TextField -------------*/
   _columWithEmailTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -339,7 +421,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
           Text(
             "Enter Your Email",
             style: AppTextTheme.regular
-                .copyWith(fontSize: 13, color: ColorConstant.blackColor),
+                .copyWith(fontSize: 12, fontFamily: 'Outfit',color: ColorConstant.blackColor),
           ),
           const SizedBox(height: 12),
           Container(
@@ -370,25 +452,59 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
 
   /*------------  Do  Create Profile ----*/
   _doCreateProfile() {
-    if (_nameTextEditingController.text.isEmpty) {
+    final name = _nameTextEditingController.text.trim();
+    final mobile = _mobileTextEditingController.text.trim();
+
+    // 🔹 NAME VALIDATION
+    if (name.isEmpty) {
       showMessage("Please enter your name");
-    } else if (_mobileTextEditingController.text.isEmpty) {
-      showMessage("Please enter mobile number");
-    } else if (_mobileTextEditingController.text.length != 10) {
-      showMessage("Please enter 10 digit mobile number");
-    } else {
-      _authController.doSignUp(
-          gender: selectGender == 1 ? "MALE" : "FEMALE",
-          mobileNO: _mobileTextEditingController.text,
-          name: _nameTextEditingController.text,
-          cc: "91",
-          email: _emailTextEditingController.text,
-          callback: () {
-            Get.to(() => OtpScreenPage(
-                  mobileNumber: _mobileTextEditingController.text,
-                  isLogin: false,
-                ));
-          });
+      return;
     }
+
+    if (name.length < 3) {
+      showMessage("Name must be at least 3 characters");
+      return;
+    }
+
+    if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(name)) {
+      showMessage("Only letters allowed in name");
+      return;
+    }
+
+    if (name.contains(RegExp(r'\s{2,}'))) {
+      showMessage("Invalid name format");
+      return;
+    }
+
+    // 🔹 MOBILE VALIDATION
+    if (mobile.isEmpty) {
+      showMessage("Please enter mobile number");
+      return;
+    }
+
+    if (mobile.length != 10) {
+      showMessage("Please enter 10 digit mobile number");
+      return;
+    }
+
+    if (!RegExp(r'^[0-9]+$').hasMatch(mobile)) {
+      showMessage("Invalid mobile number");
+      return;
+    }
+
+    // ✅ ALL GOOD → API CALL
+    _authController.doSignUp(
+      gender: selectGender == 1 ? "MALE" : "FEMALE",
+      mobileNO: mobile,
+      name: name,
+      cc: "91",
+      email: _emailTextEditingController.text.trim(),
+      callback: () {
+        Get.to(() => OtpScreenPage(
+          mobileNumber: mobile,
+          isLogin: false,
+        ));
+      },
+    );
   }
 }

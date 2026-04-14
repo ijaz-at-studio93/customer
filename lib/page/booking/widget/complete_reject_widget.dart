@@ -9,6 +9,7 @@ import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 
+import '../../../controller/home_controller.dart';
 import '../../../model/booking_history_list_model.dart';
 
 class CompleteAndRejectWidget extends StatefulWidget {
@@ -24,6 +25,23 @@ class CompleteAndRejectWidget extends StatefulWidget {
 }
 
 class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
+  @override
+  void initState() {
+    super.initState();
+
+    loadSalonStylists();
+  }
+  void loadSalonStylists() async {
+    final salonId = widget.historyList.salon?.id;
+
+    if (salonId == null) return;
+
+    await Get.find<HomeController>().doGetSalonArtiestListData(
+      salonId: salonId,
+    );
+
+    setState(() {}); // 🔥 refresh UI after loading
+  }
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -56,7 +74,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                 ],
               ),
               Text(
-                "${convertDate(date: widget.historyList.startsAt ?? "")}- ${convertDate(date: widget.historyList.endsAt ?? "")}",
+                "${convertDate(date: widget.historyList.startsAt ?? "")}",
                 style: AppTextTheme.regular
                     .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
               )
@@ -96,7 +114,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                "₹${widget.historyList.orderAmount}/-",
+                "₹${widget.historyList.orderAmount}",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
@@ -115,6 +133,8 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
               Text(
                 widget.historyList.orderStatus == "salon_artist_rejected"
                     ? "Rejected"
+                    : widget.historyList.orderStatus == "completed"
+                    ? "Completed"
                     : widget.historyList.orderStatus ?? "",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold.copyWith(
@@ -137,7 +157,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                widget.historyList.salon?.name ?? "",
+                widget.historyList.salon?.displayName ?? "",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
@@ -154,7 +174,8 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                widget.historyList.appointment?.artist?.name ?? "",
+                //widget.historyList.appointment?.artist?.name ?? "",
+                getStylistNames(widget.historyList),
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
@@ -168,57 +189,107 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                 .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
           ),
           const SizedBox(height: 10),
-          Wrap(
-            spacing: 8.0, // gap between adjacent chips
-            runSpacing: 4.0, // gap between lines
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(
               widget.historyList.items?.length ?? 0,
-              (index) => widget.historyList.items?[index].isService ?? false
-                  ? Text(
-                      index == 0
-                          ? "${widget.historyList.items?[index].service?.name ?? ""}"
-                          : " •  ${widget.historyList.items?[index].service?.name ?? ""}",
-                      style: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.grayTextColor, fontSize: 13),
-                    )
-                  : const SizedBox(),
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            'Hope you liked the service! Tap the VIEW button below to leave your valuable feedback.',
-            style: AppTextTheme.medium.copyWith(
-              fontSize: 16,
-              color: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender)),
-            ),
-            textAlign: TextAlign.center,
-          ),
+                  (index) {
+                final item = widget.historyList.items?[index];
 
+                if (item?.isService ?? false) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        /// 🔥 BULLET
+                        const Text(
+                          "•",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: ColorConstant.grayTextColor,
+                          ),
+                        ),
+
+                        const SizedBox(width: 4),
+
+                        /// 🔥 TEXT (MULTILINE SAFE)
+                        Expanded(
+                          child: Text(
+                            item?.service?.name ?? "",
+                            style: AppTextTheme.medium.copyWith(
+                              color:  changeTheme(
+                                SharedPrefs.readStringValue(PrefConstants.gender),
+                          ),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                return const SizedBox();
+              },
+            ),
+          ),
           const SizedBox(height: 10),
-          widget.historyList.orderStatus == "salon_artist_rejected"
-              ? const SizedBox()
-              : GestureDetector(
-                  onTap: widget.onPress,
-                  child: Container(
-                    height: 50,
-                    width: Get.width,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: const Color(0xffEAEAEA),
-                    ),
-                    child: Center(
-                      child: Text(
-                        "VIEW",
-                        style: AppTextTheme.bold.copyWith(
-                            color: ColorConstant.blackColor, fontSize: 16),
-                      ),
-                    ),
-                  ),
-                )
+          // Text(
+          //   'Hope you liked the service! Tap the VIEW button below to leave your valuable feedback.',
+          //   style: AppTextTheme.medium.copyWith(
+          //     fontSize: 16,
+          //     color: changeTheme(
+          //         SharedPrefs.readStringValue(PrefConstants.gender)),
+          //   ),
+          //   textAlign: TextAlign.center,
+          // ),
+
+          // const SizedBox(height: 10),
+          // widget.historyList.orderStatus == "salon_artist_rejected"
+          //     ? const SizedBox()
+          //     : GestureDetector(
+          //         onTap: widget.onPress,
+          //         child: Container(
+          //           height: 50,
+          //           width: Get.width,
+          //           decoration: BoxDecoration(
+          //             borderRadius: BorderRadius.circular(8),
+          //             color: const Color(0xffEAEAEA),
+          //           ),
+          //           child: Center(
+          //             child: Text(
+          //               "VIEW",
+          //               style: AppTextTheme.bold.copyWith(
+          //                   color: ColorConstant.blackColor, fontSize: 16),
+          //             ),
+          //           ),
+          //         ),
+          //       )
         ],
       ),
     );
+  }
+
+  String getStylistNames(HistoryList historyList) {
+    final stylistIds = historyList.appointment?.stylistIds ?? [];
+
+    // 🔥 SKIP CASE
+    if (stylistIds.isEmpty) {
+      return "Any Stylist";
+    }
+
+    final artists =
+        Get.find<HomeController>().getSalonDetailsArtiestData.data ?? [];
+
+    final names = artists
+        .where((a) => stylistIds.contains(a.id))
+        .map((a) => a.name ?? "")
+        .toList();
+
+    return names.isEmpty ? "No Stylist Specified" : names.join(", ");
   }
 
   /*---------------- convertTime ------------*/
