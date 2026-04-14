@@ -99,21 +99,19 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                 //const SizedBox(height: 13),
                 SizedBox(
                   width: Get.width * 0.5,
-                  child: ReadMoreText(
-                    widget.servicesList.description ?? "",
-                    trimMode: TrimMode.Line,
-                    style: AppTextTheme.medium.copyWith(
-                        color: ColorConstant.primaryColor, fontSize: 14),
-                    trimLines: 2,
-                    colorClickableText: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),
-                    trimCollapsedText: 'more',
-                    trimExpandedText: 'Show less',
-                    moreStyle: AppTextTheme.medium.copyWith(
-                      fontSize: 15,
-                      color: ColorConstant.primary2,
-                    )
-                  ),
+                  child: ReadMoreText(widget.servicesList.description ?? "",
+                      trimMode: TrimMode.Line,
+                      style: AppTextTheme.medium.copyWith(
+                          color: ColorConstant.primaryColor, fontSize: 14),
+                      trimLines: 2,
+                      colorClickableText: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
+                      trimCollapsedText: 'more',
+                      trimExpandedText: 'Show less',
+                      moreStyle: AppTextTheme.medium.copyWith(
+                        fontSize: 15,
+                        color: ColorConstant.primary2,
+                      )),
                 ),
               ],
             ),
@@ -128,7 +126,8 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                       width: 138,
                       height: 138,
                       fit: BoxFit.cover,
-                      imageUrl: "${APIConstants.image}${widget.servicesList.image ?? " "}",
+                      imageUrl:
+                          "${APIConstants.image}${widget.servicesList.image ?? " "}",
                       placeholder: (context, url) => const Image(
                         image: AssetImage(AssetsConstant.placeHolder),
                         width: 108,

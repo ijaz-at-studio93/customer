@@ -7,7 +7,6 @@ import 'package:flutter_dash/flutter_dash.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
-import 'package:open_settings/open_settings.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/constant/api_constant.dart';
@@ -24,6 +23,7 @@ import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/util/cached_image_widget.dart';
 import '../../constant/variable_constant.dart';
 import '../../util/call_wrapper.dart';
 import '../../util/logger.dart';
@@ -38,20 +38,23 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<HomePage> {
+class _HomePageState extends State<HomePage>
+    with AutomaticKeepAliveClientMixin<HomePage> {
   static const homeListKey = PageStorageKey<String>('home_main_list');
   /*-------------------  Controller ----------------------*/
 
   final _authController = Get.find<AuthController>();
   final _homeController = Get.find<HomeController>();
   final PageController _offerPageController =
-  PageController(viewportFraction: 0.85);
+      PageController(viewportFraction: 0.85);
+  final ScrollController _mainScrollController = ScrollController();
   Timer? _offerAutoScrollTimer;
   int _currentOfferPage = 0;
-
+  bool _isInitialLoad = true;
 
   @override
   bool get wantKeepAlive => true;
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -83,14 +86,16 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
             serviceGender: selectedGender.value == 0 ? "male" : "female",
             homeService: atHome,
             offset: 1,
-            size: 50,
+            size: 500,
             lat: double.parse(
                 SharedPrefs.readStringValue(PrefConstants.latitude)),
             lng: double.parse(
                 SharedPrefs.readStringValue(PrefConstants.longitude)),
             orderBy: "",
             nearest: false,
-            fourPlusRating: false);
+            fourPlusRating: false).then((_) {
+          if (mounted) setState(() => _isInitialLoad = false);
+        });
         if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
           SharedPrefs.writeValue(PrefConstants.gender, "0");
         }
@@ -118,31 +123,31 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
   void _startOfferAutoScroll() {
     _offerAutoScrollTimer?.cancel();
 
-    _offerAutoScrollTimer =
-        Timer.periodic(const Duration(seconds: 6), (_) {
-          final data = _homeController.getPromoCodeModel.data;
+    _offerAutoScrollTimer = Timer.periodic(const Duration(seconds: 6), (_) {
+      final data = _homeController.getPromoCodeModel.data;
 
-          if (data == null || data.isEmpty) return;
-          if (!_offerPageController.hasClients) return;
+      if (data == null || data.isEmpty) return;
+      if (!_offerPageController.hasClients) return;
 
-          _currentOfferPage++;
+      _currentOfferPage++;
 
-          if (_currentOfferPage >= data.length) {
-            _currentOfferPage = 0;
-          }
+      if (_currentOfferPage >= data.length) {
+        _currentOfferPage = 0;
+      }
 
-          _offerPageController.animateToPage(
-            _currentOfferPage,
-            duration: const Duration(milliseconds: 450),
-            curve: Curves.easeInOut,
-          );
-        });
+      _offerPageController.animateToPage(
+        _currentOfferPage,
+        duration: const Duration(milliseconds: 450),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   @override
   void dispose() {
     _offerAutoScrollTimer?.cancel();
     _offerPageController.dispose();
+    _mainScrollController.dispose();
     super.dispose();
   }
 
@@ -153,11 +158,13 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
         child: Scaffold(
       appBar: statusBarTheme(context),
       backgroundColor: ColorConstant.bgColor,
-      body: Obx(
-        () => _homeController.showProgress
-            ? const ProgressBarView()
-            : ListView(
+      body: _isInitialLoad
+          ? const ProgressBarView()
+          : Obx(
+        () {
+          return ListView(
                 key: _HomePageState.homeListKey,
+                controller: _mainScrollController,
                 shrinkWrap: true,
                 children: [
                   _headerWidget(),
@@ -226,7 +233,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                               //                       : "female",
                               //               homeService: atHome,
                               //               offset: 1,
-                              //               size: 50,
+                              //               size: 500,
                               //               lat: double.parse(
                               //                   SharedPrefs.readStringValue(
                               //                       PrefConstants.latitude)),
@@ -242,23 +249,33 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
 
                               // new code
                               onPress: () async {
-                                final changed = await Get.to(() => SaloonAfterSelectingServicesPage(
-                                  id: _homeController.getHomeSalonList.data?.rows?[index].id ?? "",
-                                  callback: () {}, // ✅ satisfy the required param
-                                ));
+                                final changed = await Get.to(
+                                    () => SaloonAfterSelectingServicesPage(
+                                          id: _homeController.getHomeSalonList
+                                                  .data?.rows?[index].id ??
+                                              "",
+                                          callback:
+                                              () {}, // ✅ satisfy the required param
+                                        ));
 
                                 if (changed == true) {
                                   _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0 ? "male" : "female",
+                                    serviceGender: selectedGender.value == 0
+                                        ? "male"
+                                        : "female",
                                     homeService: atHome,
                                     offset: 1,
-                                    size: 50,
-                                    lat: double.parse(SharedPrefs.readStringValue(PrefConstants.latitude)),
-                                    lng: double.parse(SharedPrefs.readStringValue(PrefConstants.longitude)),
+                                    size: 500,
+                                    lat: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.latitude)),
+                                    lng: double.parse(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.longitude)),
                                     orderBy: "",
                                     nearest: false,
                                     fourPlusRating: false,
-                                    // silent: true,
+                                    useGlobalLoader: false,
                                   );
                                 }
                               },
@@ -267,8 +284,8 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                             );
                           })
                 ],
-              ),
-      ),
+              );
+        }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: Container(
         width: Get.width * 0.58,
@@ -305,7 +322,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                         serviceGender: "male",
                         homeService: atHome,
                         offset: 1,
-                        size: 50,
+                        size: 500,
                         lat: double.parse(SharedPrefs.readStringValue(
                             PrefConstants.latitude)),
                         lng: double.parse(SharedPrefs.readStringValue(
@@ -372,7 +389,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                         serviceGender: "female",
                         homeService: atHome,
                         offset: 1,
-                        size: 50,
+                        size: 500,
                         lat: double.parse(SharedPrefs.readStringValue(
                             PrefConstants.latitude)),
                         lng: double.parse(SharedPrefs.readStringValue(
@@ -424,7 +441,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
   }
 
   /*--------------  Header Widget ----------------*/
-  _headerWidget() {
+  Obx _headerWidget() {
     return Obx(
       () => Container(
         color: ColorConstant.whiteColor,
@@ -442,7 +459,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                 selectedGender.value == 0 ? "male" : "female",
                             homeService: atHome,
                             offset: 1,
-                            size: 50,
+                            size: 500,
                             lat: double.parse(SharedPrefs.readStringValue(
                                 PrefConstants.latitude)),
                             lng: double.parse(SharedPrefs.readStringValue(
@@ -520,7 +537,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                 selectedGender.value == 0 ? "male" : "female",
                             homeService: atHome,
                             offset: 1,
-                            size: 50,
+                            size: 500,
                             lat: double.parse(SharedPrefs.readStringValue(
                                 PrefConstants.latitude)),
                             lng: double.parse(SharedPrefs.readStringValue(
@@ -556,7 +573,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
   }
 
   /*--------------- Search Widget ------------*/
-  _searchWidget() {
+  GestureDetector _searchWidget() {
     return GestureDetector(
       onTap: () {
         Get.to(() => const SearchForSalonService());
@@ -609,7 +626,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
   }
 
   /*---------------- Our Service ------------*/
-  _ourService() {
+  Container _ourService() {
     return Container(
       color: ColorConstant.whiteColor,
       child: Column(
@@ -663,25 +680,25 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       serviceCategoryIds: storeServiceId,
                                       callback: () {
                                         _homeController.doGetMakePackageData();
-                                _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    homeService: atHome,
-                                    offset: 1,
-                                    size: 50,
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                    orderBy: "",
-                                    nearest: false,
-                                    fourPlusRating: false);
+                                        _homeController.doGetHomeSalonList(
+                                            serviceGender:
+                                                selectedGender.value == 0
+                                                    ? "male"
+                                                    : "female",
+                                            homeService: atHome,
+                                            offset: 1,
+                                            size: 500,
+                                            lat: double.parse(
+                                                SharedPrefs.readStringValue(
+                                                    PrefConstants.latitude)),
+                                            lng: double.parse(
+                                                SharedPrefs.readStringValue(
+                                                    PrefConstants.longitude)),
+                                            orderBy: "",
+                                            nearest: false,
+                                            fourPlusRating: false);
                                       });
                                 }
-
                               },
                             );
                           });
@@ -740,23 +757,25 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                             callback: () {
                                               _homeController
                                                   .doGetMakePackageData();
-                                      _homeController.doGetHomeSalonList(
-                                          serviceGender:
-                                              selectedGender.value == 0
-                                                  ? "male"
-                                                  : "female",
-                                          homeService: atHome,
-                                          offset: 1,
-                                          size: 50,
-                                          lat: double.parse(
-                                              SharedPrefs.readStringValue(
-                                                  PrefConstants.latitude)),
-                                          lng: double.parse(
-                                              SharedPrefs.readStringValue(
-                                                  PrefConstants.longitude)),
-                                          orderBy: "",
-                                          nearest: false,
-                                          fourPlusRating: false);
+                                              _homeController.doGetHomeSalonList(
+                                                  serviceGender:
+                                                      selectedGender.value == 0
+                                                          ? "male"
+                                                          : "female",
+                                                  homeService: atHome,
+                                                  offset: 1,
+                                                  size: 500,
+                                                  lat: double.parse(SharedPrefs
+                                                      .readStringValue(
+                                                          PrefConstants
+                                                              .latitude)),
+                                                  lng: double.parse(SharedPrefs
+                                                      .readStringValue(
+                                                          PrefConstants
+                                                              .longitude)),
+                                                  orderBy: "",
+                                                  nearest: false,
+                                                  fourPlusRating: false);
                                             });
                                       }
                                     },
@@ -836,47 +855,56 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                         callback: () {
                                           _homeController
                                               .doGetMakePackageData();
-                                    _homeController.doGetHomeSalonList(
-                                        serviceGender: selectedGender.value == 0
-                                            ? "male"
-                                            : "female",
-                                        homeService: atHome,
-                                        offset: 1,
-                                        size: 50,
-                                        lat: double.parse(
-                                            SharedPrefs.readStringValue(
-                                                PrefConstants.latitude)),
-                                        lng: double.parse(
-                                            SharedPrefs.readStringValue(
-                                                PrefConstants.longitude)),
-                                        orderBy: "",
-                                        nearest: false,
-                                        fourPlusRating: false);
+                                          _homeController.doGetHomeSalonList(
+                                              serviceGender:
+                                                  selectedGender.value == 0
+                                                      ? "male"
+                                                      : "female",
+                                              homeService: atHome,
+                                              offset: 1,
+                                              size: 500,
+                                              lat: double.parse(
+                                                  SharedPrefs.readStringValue(
+                                                      PrefConstants.latitude)),
+                                              lng: double.parse(
+                                                  SharedPrefs.readStringValue(
+                                                      PrefConstants.longitude)),
+                                              orderBy: "",
+                                              nearest: false,
+                                              fourPlusRating: false);
                                         });
-
                                   },
                                   child: Column(
                                     children: [
                                       ClipRRect(
                                         borderRadius:
                                             BorderRadius.circular(100),
-                                        child: CachedNetworkImage(
+                                        child: ExtendedCachedNetworkImage(
                                           height: 70,
                                           width: 70,
+                                          // memCacheWidth: 140,
+                                          // memCacheHeight: 140,
+                                          // fadeInDuration: index < 4
+                                          //     ? Duration.zero
+                                          //     : const Duration(milliseconds: 300),
+                                          memoryManagementLevel:
+                                              MemoryManagementLevel.aggressive,
                                           fit: BoxFit.cover,
                                           imageUrl: SharedPrefs.readStringValue(
                                                       PrefConstants.gender) ==
                                                   "0"
                                               ? "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageMale}"
                                               : "${APIConstants.image}${_homeController.homeCategoryListResponseModel.data?[index].imageFemale}",
-                                          placeholder: (context, url) =>
-                                              const Image(
-                                            image: AssetImage(
-                                                AssetsConstant.placeHolder),
-                                            height: 70,
-                                            width: 70,
-                                            fit: BoxFit.cover,
-                                          ),
+                                          placeholder: (context, url) {
+                                            return Container(
+                                              height: 60,
+                                              width: 60,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade200,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            );
+                                          },
                                           errorWidget: (context, url, error) =>
                                               const Image(
                                             image: AssetImage(
@@ -968,7 +996,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                             : "female",
                                         homeService: atHome,
                                         offset: 1,
-                                        size: 50,
+                                        size: 500,
                                         lat: double.parse(
                                             SharedPrefs.readStringValue(
                                                 PrefConstants.latitude)),
@@ -990,6 +1018,12 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                             child: CachedNetworkImage(
                                               height: 70,
                                               width: 70,
+                                              memCacheWidth: 140,
+                                              memCacheHeight: 140,
+                                              fadeInDuration: index < 4
+                                                  ? Duration.zero
+                                                  : const Duration(
+                                                      milliseconds: 300),
                                               fit: BoxFit.cover,
                                               imageUrl: SharedPrefs
                                                           .readStringValue(
@@ -1116,7 +1150,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                                       : "female",
                                               homeService: atHome,
                                               offset: 1,
-                                              size: 50,
+                                              size: 500,
                                               lat: double.parse(
                                                   SharedPrefs.readStringValue(
                                                       PrefConstants.latitude)),
@@ -1174,7 +1208,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
   }
 
   /*-------------------- Offer -------------------*/
-  _offer() {
+  Widget _offer() {
     return _homeController.getPromoCodeModel.data?.isEmpty ??
             false || _homeController.getPromoCodeModel.data == null
         ? const SizedBox()
@@ -1188,63 +1222,63 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                   itemCount: _homeController.getPromoCodeModel.data?.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onTap: () {
-                        Get.to(() => SaloonAfterSelectingServicesPage(
-                              id: _homeController.getPromoCodeModel.data?[index]
-                                      .salon?.id ??
-                                  "",
-                              callback: () {
-                                _homeController.doGetHomeCategory(
-                                  gender: selectedGender.value == 0
-                                      ? "male"
-                                      : "female",
-                                );
-                                _homeController.doGetMakePackageData();
-
-                                _homeController.doGetPromoCode(
-                                    fourPlusRating: false,
-                                    homeService: SharedPrefs.readBoolValue(
-                                        PrefConstants.isHomeService),
-                                    nearest: false,
-                                    orderBy: "",
-                                    serviceGender: selectedGender.value == 0
+                        onTap: () {
+                          Get.to(() => SaloonAfterSelectingServicesPage(
+                                id: _homeController.getPromoCodeModel
+                                        .data?[index].salon?.id ??
+                                    "",
+                                callback: () {
+                                  _homeController.doGetHomeCategory(
+                                    gender: selectedGender.value == 0
                                         ? "male"
                                         : "female",
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)));
+                                  );
+                                  _homeController.doGetMakePackageData();
 
-                                _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    homeService: atHome,
-                                    offset: 1,
-                                    size: 50,
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                    orderBy: "",
-                                    nearest: false,
-                                    fourPlusRating: false);
-                              },
-                            ));
-                      },
+                                  _homeController.doGetPromoCode(
+                                      fourPlusRating: false,
+                                      homeService: SharedPrefs.readBoolValue(
+                                          PrefConstants.isHomeService),
+                                      nearest: false,
+                                      orderBy: "",
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)));
+
+                                  _homeController.doGetHomeSalonList(
+                                      serviceGender: selectedGender.value == 0
+                                          ? "male"
+                                          : "female",
+                                      homeService: atHome,
+                                      offset: 1,
+                                      size: 500,
+                                      lat: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.latitude)),
+                                      lng: double.parse(
+                                          SharedPrefs.readStringValue(
+                                              PrefConstants.longitude)),
+                                      orderBy: "",
+                                      nearest: false,
+                                      fourPlusRating: false);
+                                },
+                              ));
+                        },
                         child: Stack(
                           clipBehavior: Clip.none,
                           children: [
-
                             /// MAIN OFFER CARD
                             Container(
                               //margin: const EdgeInsets.symmetric(horizontal: 12),
                               margin: const EdgeInsets.only(left: 12, right: 1),
-                              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 9),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 18, vertical: 9),
                               decoration: BoxDecoration(
                                 gradient: const LinearGradient(
                                   colors: [
@@ -1258,10 +1292,11 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                               ),
                               child: Row(
                                 children: [
-
                                   /// LEFT BIG DISCOUNT
                                   Text(
-                                    _homeController.getPromoCodeModel.data?[index].type == "percentage"
+                                    _homeController.getPromoCodeModel
+                                                .data?[index].type ==
+                                            "percentage"
                                         ? "${_homeController.getPromoCodeModel.data?[index].amount}%"
                                         : "₹${_homeController.getPromoCodeModel.data?[index].amount}",
                                     style: AppTextTheme.bold.copyWith(
@@ -1299,41 +1334,51 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
 
                                         // Mid glow — brand beauty tone
                                         Shadow(
-                                          color: Colors.purpleAccent.withOpacity(0.25),
+                                          color: Colors.purpleAccent
+                                              .withOpacity(0.25),
                                           blurRadius: 26,
                                         ),
 
                                         // Outer aura — premium gold
                                         Shadow(
-                                          color: Color(0xFFFFC107).withOpacity(0.35),
+                                          color: Color(0xFFFFC107)
+                                              .withOpacity(0.35),
                                           blurRadius: 44,
                                         ),
                                       ],
-
                                     ),
                                   ),
 
                                   const SizedBox(width: 5),
                                   Expanded(
                                     child: OfferAnimatedTextWidget(
-                                      salonName: _homeController.getPromoCodeModel.data?[index].salon?.name ?? "",
-                                      title: _homeController.getPromoCodeModel.data?[index].title ?? "",
-                                      description: _homeController.getPromoCodeModel.data?[index].description ?? "",
+                                      salonName: _homeController
+                                              .getPromoCodeModel
+                                              .data?[index]
+                                              .salon
+                                              ?.name ??
+                                          "",
+                                      title: _homeController.getPromoCodeModel
+                                              .data?[index].title ??
+                                          "",
+                                      description: _homeController
+                                              .getPromoCodeModel
+                                              .data?[index]
+                                              .description ??
+                                          "",
                                     ),
                                   ),
                                 ],
                               ),
                             ),
                           ],
-                        )
-                    );
+                        ));
                   },
                   controller: _offerPageController,
                   onPageChanged: (index) {
-                    _currentOfferPage = index;   // ⭐ VERY IMPORTANT
+                    _currentOfferPage = index; // ⭐ VERY IMPORTANT
                   },
-                  padEnds: false
-              ),
+                  padEnds: false),
             ),
           );
   }
@@ -1342,7 +1387,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
   bool atHome = false;
   int select = 0;
 
-  _saloonsFoundNear() {
+  Obx _saloonsFoundNear() {
     return Obx(
       () => Container(
         color: ColorConstant.whiteColor,
@@ -1396,7 +1441,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                         //                 : "female",
                         //             homeService: atHome,
                         //             offset: 1,
-                        //             size: 50,
+                        //             size: 500,
                         //             lat: double.parse(
                         //                 SharedPrefs.readStringValue(
                         //                     PrefConstants.latitude)),
@@ -1498,7 +1543,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                           : "female",
                                       homeService: atHome,
                                       offset: 1,
-                                      size: 50,
+                                      size: 500,
                                       lat: double.parse(
                                           SharedPrefs.readStringValue(
                                               PrefConstants.latitude)),
@@ -1508,10 +1553,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : dropdownvalue == "Price"
-                                          ? "serviceStartingPrice"
-                                          : "name",
+                                              ? "createdAt"
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       nearest: false,
                                       fourPlusRating: false);
                                 });
@@ -1573,7 +1618,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                           : "female",
                                       homeService: atHome,
                                       offset: 1,
-                                      size: 50,
+                                      size: 500,
                                       lat: double.parse(
                                           SharedPrefs.readStringValue(
                                               PrefConstants.latitude)),
@@ -1583,10 +1628,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : dropdownvalue == "Price"
-                                          ? "serviceStartingPrice"
-                                          : "name",
+                                              ? "createdAt"
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       nearest: true,
                                       fourPlusRating: false);
 
@@ -1598,10 +1643,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : dropdownvalue == "Price"
-                                          ? "serviceStartingPrice"
-                                          : "name",
+                                              ? "createdAt"
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       serviceGender: selectedGender.value == 0
                                           ? "male"
                                           : "female",
@@ -1619,7 +1664,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                           : "female",
                                       homeService: atHome,
                                       offset: 1,
-                                      size: 50,
+                                      size: 500,
                                       lat: double.parse(
                                           SharedPrefs.readStringValue(
                                               PrefConstants.latitude)),
@@ -1629,10 +1674,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : dropdownvalue == "Price"
-                                          ? "serviceStartingPrice"
-                                          : "name",
+                                              ? "createdAt"
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       nearest: false,
                                       fourPlusRating: false);
 
@@ -1644,10 +1689,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : dropdownvalue == "Price"
-                                          ? "serviceStartingPrice"
-                                          : "name",
+                                              ? "createdAt"
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       serviceGender: selectedGender.value == 0
                                           ? "male"
                                           : "female",
@@ -1697,7 +1742,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                           : "female",
                                       homeService: atHome,
                                       offset: 1,
-                                      size: 50,
+                                      size: 500,
                                       lat: double.parse(
                                           SharedPrefs.readStringValue(
                                               PrefConstants.latitude)),
@@ -1707,10 +1752,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : dropdownvalue == "Price"
-                                          ? "serviceStartingPrice"
-                                          : "name",
+                                              ? "createdAt"
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       nearest: false,
                                       fourPlusRating: true);
 
@@ -1722,10 +1767,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : dropdownvalue == "Price"
-                                          ? "serviceStartingPrice"
-                                          : "name",
+                                              ? "createdAt"
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       serviceGender: selectedGender.value == 0
                                           ? "male"
                                           : "female",
@@ -1743,7 +1788,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                           : "female",
                                       homeService: atHome,
                                       offset: 1,
-                                      size: 50,
+                                      size: 500,
                                       lat: double.parse(
                                           SharedPrefs.readStringValue(
                                               PrefConstants.latitude)),
@@ -1753,10 +1798,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : dropdownvalue == "Price"
-                                          ? "serviceStartingPrice"
-                                          : "name",
+                                              ? "createdAt"
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       nearest: false,
                                       fourPlusRating: false);
 
@@ -1768,10 +1813,10 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
                                       orderBy: dropdownvalue == "Sort By"
                                           ? ""
                                           : dropdownvalue == "Newest"
-                                          ? "createdAt"
-                                          : dropdownvalue == "Price"
-                                          ? "serviceStartingPrice"
-                                          : "name",
+                                              ? "createdAt"
+                                              : dropdownvalue == "Price"
+                                                  ? "serviceStartingPrice"
+                                                  : "name",
                                       serviceGender: selectedGender.value == 0
                                           ? "male"
                                           : "female",
@@ -1859,7 +1904,7 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
   var items = ['Sort By', 'Newest', 'Name', 'Price'];
 
   /*--------------------- Current location lat lng --------------------- */
-  getCurrentLatLng() async {
+  Future<void> getCurrentLatLng() async {
     if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
       SharedPrefs.writeValue(PrefConstants.gender, "0");
     }
@@ -1903,16 +1948,18 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
           serviceGender: selectedGender.value == 0 ? "male" : "female",
           homeService: atHome,
           offset: 1,
-          size: 50,
+          size: 500,
           lat: position.latitude,
           lng: position.longitude,
           orderBy: "",
           nearest: false,
-          fourPlusRating: false);
+          fourPlusRating: false).then((_) {
+        if (mounted) setState(() => _isInitialLoad = false);
+      });
       SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
     }).onPermanentlyDeniedCallback(() async {
       openAppSettings();
-      OpenSettings.openLocationSourceSetting();
+      Geolocator.openLocationSettings();
       showMessage(
           "Location permissions are permanently denied, we cannot request permissions.");
     }).onRestrictedCallback(() async {
@@ -1965,12 +2012,14 @@ class _HomePageState extends State<HomePage> with AutomaticKeepAliveClientMixin<
           serviceGender: selectedGender.value == 0 ? "male" : "female",
           homeService: atHome,
           offset: 1,
-          size: 50,
+          size: 500,
           lat: position.latitude,
           lng: position.longitude,
           orderBy: "",
           nearest: false,
-          fourPlusRating: false);
+          fourPlusRating: false).then((_) {
+        if (mounted) setState(() => _isInitialLoad = false);
+      });
       SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
     }
   }

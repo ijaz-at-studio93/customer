@@ -39,25 +39,31 @@ class _OfferAnimatedTextWidgetState extends State<OfferAnimatedTextWidget> {
       });
 
       await Future.delayed(const Duration(milliseconds: 450));
+      if (!mounted) return;
 
       /// STEP 2 — content comes FROM TOP
       setState(() {
         showContent = true;
       });
 
-      await Future.delayed(const Duration(seconds: 2));
+      // await Future.delayed(const Duration(seconds: 2));
 
-      /// STEP 3 — content goes DOWN
-      setState(() {
-        showContent = false;
-      });
+      // /// STEP 3 — content goes DOWN
+      // if (!context.mounted) return;
 
-      await Future.delayed(const Duration(milliseconds: 450));
+      // setState(() {
+      //   showContent = false;
+      // });
 
-      /// STEP 4 — salon comes FROM TOP again
-      setState(() {
-        showSalon = true;
-      });
+      // await Future.delayed(const Duration(milliseconds: 450));
+
+      // /// STEP 4 — salon comes FROM TOP again
+      // if (!context.mounted) return;
+
+      // ///
+      // setState(() {
+      //   showSalon = true;
+      // });
     });
   }
 
@@ -73,14 +79,12 @@ class _OfferAnimatedTextWidgetState extends State<OfferAnimatedTextWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-
         /// ANIMATED AREA (salon + offer)
         SizedBox(
           height: 45,
           child: Stack(
             alignment: Alignment.center, // 🔥 keeps everything centered
             children: [
-
               /// SALON NAME — moves DOWN from center
               AnimatedSlide(
                 duration: const Duration(milliseconds: 450),

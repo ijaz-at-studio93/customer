@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +19,7 @@ import 'package:salon_customer/util/notification_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
+    FlutterLocalNotificationsPlugin();
 
 Future<void> _setupAndroidChannels() async {
   // Confirm (sound)
@@ -29,7 +30,8 @@ Future<void> _setupAndroidChannels() async {
     importance: Importance.max,
     playSound: true,
     enableVibration: true,
-    sound: RawResourceAndroidNotificationSound('confirm'), // res/raw/confirm.wav
+    sound:
+        RawResourceAndroidNotificationSound('confirm'), // res/raw/confirm.wav
   );
 
   // Completed (sound)
@@ -40,7 +42,8 @@ Future<void> _setupAndroidChannels() async {
     importance: Importance.max,
     playSound: true,
     enableVibration: true,
-    sound: RawResourceAndroidNotificationSound('complete'), // res/raw/complete.wav
+    sound:
+        RawResourceAndroidNotificationSound('complete'), // res/raw/complete.wav
   );
 
   // General/Silent (for booked)
@@ -53,23 +56,27 @@ Future<void> _setupAndroidChannels() async {
     enableVibration: false,
   );
 
-  final impl = flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+  final impl =
+      flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
 
   await impl?.createNotificationChannel(confirm);
   await impl?.createNotificationChannel(completed);
   await impl?.createNotificationChannel(generalSilent);
 }
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DioClient.init();
   await Firebase.initializeApp();
   // 👇 NEW: initialize local notifications plugin (safe on iOS too)
-  const AndroidInitializationSettings androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const InitializationSettings initSettings = InitializationSettings(android: androidInit);
-  await flutterLocalNotificationsPlugin.initialize(initSettings);
+  const AndroidInitializationSettings androidInit =
+      AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initSettings =
+      InitializationSettings(android: androidInit);
+  if (!kDebugMode) {
+    await flutterLocalNotificationsPlugin.initialize(initSettings);
+  }
 
   // 👇 NEW: create the channel BEFORE receiving any notifications
   if (Platform.isAndroid) {
@@ -109,7 +116,7 @@ class _MyAppState extends State<MyApp> {
     initNotification();
   }
 
-  initFCM() async {
+  Future<void> initFCM() async {
     String? fcmToken = await FirebaseMessaging.instance.getToken();
     debugPrint(fcmToken);
     await SharedPrefs.writeValue(PrefConstants.fcmToken, fcmToken);
@@ -118,12 +125,12 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  getFCMToken() async {
+  Future<void> getFCMToken() async {
     String? token = await FirebaseMessaging.instance.getToken();
     await SharedPrefs.writeValue(PrefConstants.fcmToken, token);
   }
 
-  initNotification() async {
+  Future<void> initNotification() async {
     String? token = Platform.isAndroid
         ? await FirebaseMessaging.instance.getToken()
         : await FirebaseMessaging.instance.getAPNSToken();

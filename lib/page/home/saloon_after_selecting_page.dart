@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ import 'package:salon_customer/project_specific/remove_and_add_service_dialog.da
 import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/util/cached_image_widget.dart';
 import 'package:salon_customer/util/stylist_to_user_location.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../constant/color_constant.dart';
@@ -79,9 +82,9 @@ class _SaloonAfterSelectingServicesPageState
         await _homeController.doGetHomeSalonDetails(
           salonId: widget.id,
           serviceGender:
-          SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-              ? "male"
-              : "female",
+              SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                  ? "male"
+                  : "female",
           lat: SharedPrefs.readStringValue(PrefConstants.latitude),
           lng: SharedPrefs.readStringValue(PrefConstants.longitude),
         );
@@ -94,9 +97,9 @@ class _SaloonAfterSelectingServicesPageState
         await _homeController.doGetSalonDetailsService(
           salonId: widget.id,
           serviceGender:
-          SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-              ? "male"
-              : "female",
+              SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                  ? "male"
+                  : "female",
         );
       } catch (_) {}
 
@@ -121,7 +124,8 @@ class _SaloonAfterSelectingServicesPageState
 
   void _loadImagesFromData() {
     final data = _homeController.homeSalonDetailsData.data;
-    final dynamic raw = data?.images; // dynamic because backend might send different types
+    final dynamic raw =
+        data?.images; // dynamic because backend might send different types
 
     List<String> imgs = [];
 
@@ -130,7 +134,10 @@ class _SaloonAfterSelectingServicesPageState
         imgs = [];
       } else if (raw is List) {
         // Case 1: already a List from backend
-        imgs = raw.map((e) => e?.toString() ?? "").where((e) => e.isNotEmpty).toList();
+        imgs = raw
+            .map((e) => e?.toString() ?? "")
+            .where((e) => e.isNotEmpty)
+            .toList();
       } else if (raw is String) {
         // Case 2: backend gave a string
         final str = raw.trim();
@@ -138,11 +145,18 @@ class _SaloonAfterSelectingServicesPageState
           // JSON array in string
           final parsed = jsonDecode(str);
           if (parsed is List) {
-            imgs = parsed.map((e) => e?.toString() ?? "").where((e) => e.isNotEmpty).toList();
+            imgs = parsed
+                .map((e) => e?.toString() ?? "")
+                .where((e) => e.isNotEmpty)
+                .toList();
           }
         } else if (str.contains(',')) {
           // Comma-separated
-          imgs = str.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+          imgs = str
+              .split(',')
+              .map((s) => s.trim())
+              .where((s) => s.isNotEmpty)
+              .toList();
         } else {
           // Single URL string
           if (str.isNotEmpty) imgs = [str];
@@ -192,7 +206,6 @@ class _SaloonAfterSelectingServicesPageState
         _stopAutoScroll();
       }
     });
-
   }
 
   void _startAutoScroll() {
@@ -222,7 +235,6 @@ class _SaloonAfterSelectingServicesPageState
     _offerAutoScrollTimer?.cancel();
 
     _offerAutoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-
       if (!mounted) return;
       if (_offerPageController == null) return;
       if (!_offerPageController!.hasClients) return;
@@ -240,7 +252,6 @@ class _SaloonAfterSelectingServicesPageState
   void _stopOfferAutoScroll() {
     _offerAutoScrollTimer?.cancel();
   }
-
 
   String serviceId = "";
 
@@ -324,7 +335,9 @@ class _SaloonAfterSelectingServicesPageState
                                                       1
                                                   ? Row(
                                                       children: [
-                                                        for (int i = 0; i < 1; i++)
+                                                        for (int i = 0;
+                                                            i < 1;
+                                                            i++)
                                                           Align(
                                                             widthFactor: 0.8,
                                                             child: ClipRRect(
@@ -334,30 +347,32 @@ class _SaloonAfterSelectingServicesPageState
                                                                           100),
                                                               child:
                                                                   CachedNetworkImage(
-                                                                fit: BoxFit.cover,
+                                                                fit: BoxFit
+                                                                    .cover,
                                                                 width: 30,
                                                                 height: 30,
                                                                 imageUrl:
                                                                     "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
-                                                                placeholder:
-                                                                    (context,
-                                                                            url) =>
-                                                                        const Image(
+                                                                placeholder: (context,
+                                                                        url) =>
+                                                                    const Image(
                                                                   image: AssetImage(
                                                                       AssetsConstant
                                                                           .placeHolder),
-                                                                  fit: BoxFit.cover,
+                                                                  fit: BoxFit
+                                                                      .cover,
                                                                   width: 30,
                                                                   height: 30,
                                                                 ),
-                                                                errorWidget:
-                                                                    (context, url,
-                                                                            error) =>
-                                                                        const Image(
+                                                                errorWidget: (context,
+                                                                        url,
+                                                                        error) =>
+                                                                    const Image(
                                                                   image: AssetImage(
                                                                       AssetsConstant
                                                                           .placeHolder),
-                                                                  fit: BoxFit.cover,
+                                                                  fit: BoxFit
+                                                                      .cover,
                                                                   width: 30,
                                                                   height: 30,
                                                                 ),
@@ -378,8 +393,10 @@ class _SaloonAfterSelectingServicesPageState
                                                                 i < 2;
                                                                 i++)
                                                               Align(
-                                                                widthFactor: 0.8,
-                                                                child: ClipRRect(
+                                                                widthFactor:
+                                                                    0.8,
+                                                                child:
+                                                                    ClipRRect(
                                                                   borderRadius:
                                                                       BorderRadius
                                                                           .circular(
@@ -392,16 +409,18 @@ class _SaloonAfterSelectingServicesPageState
                                                                     height: 30,
                                                                     imageUrl:
                                                                         "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
-                                                                    placeholder: (context,
-                                                                            url) =>
-                                                                        const Image(
+                                                                    placeholder:
+                                                                        (context,
+                                                                                url) =>
+                                                                            const Image(
                                                                       image: AssetImage(
                                                                           AssetsConstant
                                                                               .placeHolder),
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       width: 30,
-                                                                      height: 30,
+                                                                      height:
+                                                                          30,
                                                                     ),
                                                                     errorWidget: (context,
                                                                             url,
@@ -413,7 +432,8 @@ class _SaloonAfterSelectingServicesPageState
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       width: 30,
-                                                                      height: 30,
+                                                                      height:
+                                                                          30,
                                                                     ),
                                                                   ),
                                                                 ),
@@ -426,8 +446,10 @@ class _SaloonAfterSelectingServicesPageState
                                                                 i < 2;
                                                                 i++)
                                                               Align(
-                                                                widthFactor: 0.7,
-                                                                child: ClipRRect(
+                                                                widthFactor:
+                                                                    0.7,
+                                                                child:
+                                                                    ClipRRect(
                                                                   borderRadius:
                                                                       BorderRadius
                                                                           .circular(
@@ -440,16 +462,18 @@ class _SaloonAfterSelectingServicesPageState
                                                                     height: 35,
                                                                     imageUrl:
                                                                         "${APIConstants.image}${_homeController.getServiceAddCartModel.data?.previewImages?[i] ?? ""}",
-                                                                    placeholder: (context,
-                                                                            url) =>
-                                                                        const Image(
+                                                                    placeholder:
+                                                                        (context,
+                                                                                url) =>
+                                                                            const Image(
                                                                       image: AssetImage(
                                                                           AssetsConstant
                                                                               .placeHolder),
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       width: 35,
-                                                                      height: 35,
+                                                                      height:
+                                                                          35,
                                                                     ),
                                                                     errorWidget: (context,
                                                                             url,
@@ -461,7 +485,8 @@ class _SaloonAfterSelectingServicesPageState
                                                                       fit: BoxFit
                                                                           .cover,
                                                                       width: 35,
-                                                                      height: 35,
+                                                                      height:
+                                                                          35,
                                                                     ),
                                                                   ),
                                                                 ),
@@ -485,10 +510,9 @@ class _SaloonAfterSelectingServicesPageState
                                                                           ?.length
                                                                           .toString() ??
                                                                       "",
-                                                                  style:
-                                                                      AppTextTheme
-                                                                          .medium
-                                                                          .copyWith(
+                                                                  style: AppTextTheme
+                                                                      .medium
+                                                                      .copyWith(
                                                                     color: ColorConstant
                                                                         .whiteColor,
                                                                   ),
@@ -519,7 +543,8 @@ class _SaloonAfterSelectingServicesPageState
                                             });
                                       },
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
@@ -527,10 +552,11 @@ class _SaloonAfterSelectingServicesPageState
                                             children: [
                                               Text(
                                                 "${_homeController.getServiceAddCartModel.data?.items?.length} Added",
-                                                style: AppTextTheme.bold.copyWith(
-                                                    fontSize: 13,
-                                                    color: ColorConstant
-                                                        .grayTextColor),
+                                                style: AppTextTheme.bold
+                                                    .copyWith(
+                                                        fontSize: 13,
+                                                        color: ColorConstant
+                                                            .grayTextColor),
                                               ),
                                               const SizedBox(width: 2),
                                               Image.asset(
@@ -550,7 +576,6 @@ class _SaloonAfterSelectingServicesPageState
                                               color: ColorConstant.blackColor,
                                             ),
                                           )
-
                                         ],
                                       ),
                                     ),
@@ -565,7 +590,6 @@ class _SaloonAfterSelectingServicesPageState
                                 )
                               ],
                             ),
-
                             GestureDetector(
                               onTap: () {
                                 if (stylistId.value != "") {
@@ -653,7 +677,7 @@ class _SaloonAfterSelectingServicesPageState
   }
 
   /*------------ Back Button --------------*/
-  buttonWidget(
+  GestureDetector buttonWidget(
       {required String imageUrl,
       required VoidCallback onPress,
       required double h,
@@ -696,57 +720,75 @@ class _SaloonAfterSelectingServicesPageState
               if (_images.length > 1) _startAutoScroll();
             },
             child: _images.isEmpty
-                ? CachedNetworkImage(
-              width: Get.width,
-              height: Get.height * 0.30,
-              fit: BoxFit.fitWidth,
-              imageUrl:
-              "${APIConstants.image}${_homeController.homeSalonDetailsData.data?.image ?? ""}",
-              fadeInDuration: Duration.zero,
-              fadeOutDuration: Duration.zero,
-              placeholder: (context, url) => Image(
-                image: const AssetImage(AssetsConstant.placeHolder),
-                width: Get.width,
-                height: Get.height * 0.30,
-                fit: BoxFit.fitWidth,
-              ),
-              errorWidget: (context, url, error) => Image(
-                image: const AssetImage(AssetsConstant.placeHolder),
-                width: Get.width,
-                height: Get.height * 0.30,
-                fit: BoxFit.fitWidth,
-              ),
-            )
+                ? Builder(builder: (context) {
+                    final imageUrl =
+                        "${APIConstants.image}${_homeController.homeSalonDetailsData.data?.image ?? ""}";
+                    return ExtendedCachedNetworkImage(
+                      key: ValueKey(imageUrl),
+                      height: Get.height * 0.30,
+                      fit: BoxFit.fitWidth,
+                      imageUrl: imageUrl,
+                      cacheKey: imageUrl,
+                      memoryManagementLevel: MemoryManagementLevel.aggressive,
+                      placeholder: (context, url) {
+                        log("placeholder: $url");
+                        return Image(
+                          image: const AssetImage(AssetsConstant.placeHolder),
+                          width: Get.width,
+                          height: Get.height * 0.30,
+                          fit: BoxFit.fitWidth,
+                        );
+                      },
+                      errorWidget: (context, url, error) {
+                        log("errorWidget: $url");
+                        return Image(
+                          image: const AssetImage(AssetsConstant.placeHolder),
+                          width: Get.width,
+                          height: Get.height * 0.30,
+                          fit: BoxFit.fitWidth,
+                        );
+                      },
+                    );
+                  })
                 : PageView.builder(
-              controller: _pageController,
-              itemCount: _images.length,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index;
-                });
-              },
-              itemBuilder: (context, index) {
-                final imageUrl = _images[index];
-                return CachedNetworkImage(
-                  width: Get.width,
-                  height: Get.height * 0.30,
-                  fit: BoxFit.fitWidth,
-                  imageUrl: imageUrl,
-                  placeholder: (context, url) => Image(
-                    image: const AssetImage(AssetsConstant.placeHolder),
-                    width: Get.width,
-                    height: Get.height * 0.30,
-                    fit: BoxFit.fitWidth,
+                    controller: _pageController,
+                    itemCount: _images.length,
+                    onPageChanged: (index) {
+                      setState(() {
+                        _currentPage = index;
+                      });
+                    },
+                    itemBuilder: (context, index) {
+                      final imageUrl = _images[index];
+                      return ExtendedCachedNetworkImage(
+                        key: ValueKey(imageUrl),
+                        width: Get.width,
+                        height: Get.height * 0.30,
+                        fit: BoxFit.fitWidth,
+                        imageUrl: imageUrl,
+                        cacheKey: imageUrl,
+                        memoryManagementLevel: MemoryManagementLevel.aggressive,
+                        placeholder: (context, url) {
+                          log("placeholder: $url");
+                          return Image(
+                            image: const AssetImage(AssetsConstant.placeHolder),
+                            width: Get.width,
+                            height: Get.height * 0.30,
+                            fit: BoxFit.fitWidth,
+                          );
+                        },
+                        errorWidget: (context, url, error) {
+                          log("errorWidget: $url");
+                          return Image(
+                            image: const AssetImage(AssetsConstant.placeHolder),
+                            width: Get.width,
+                            height: Get.height * 0.30,
+                            fit: BoxFit.fitWidth,
+                          );
+                        },
+                      );
+                    },
                   ),
-                  errorWidget: (context, url, error) => Image(
-                    image: const AssetImage(AssetsConstant.placeHolder),
-                    width: Get.width,
-                    height: Get.height * 0.30,
-                    fit: BoxFit.fitWidth,
-                  ),
-                );
-              },
-            ),
           ),
         ),
 
@@ -788,11 +830,11 @@ class _SaloonAfterSelectingServicesPageState
                     imageUrl: AssetsConstant.iconSearch,
                     onPress: () {
                       Get.to(() => StylistSearchPage(
-                        salonName: _homeController
-                            .homeSalonDetailsData.data?.name ??
-                            "",
-                        salonId: widget.id,
-                      ));
+                            salonName: _homeController
+                                    .homeSalonDetailsData.data?.name ??
+                                "",
+                            salonId: widget.id,
+                          ));
                     },
                     h: 24,
                     w: 24,
@@ -812,11 +854,11 @@ class _SaloonAfterSelectingServicesPageState
                     onTap: () {
                       setState(() {
                         _homeController.homeSalonDetailsData.data?.isFavourite =
-                        !(_homeController
-                            .homeSalonDetailsData.data?.isFavourite ??
-                            false);
+                            !(_homeController
+                                    .homeSalonDetailsData.data?.isFavourite ??
+                                false);
                         if (_homeController
-                            .homeSalonDetailsData.data?.isFavourite ??
+                                .homeSalonDetailsData.data?.isFavourite ??
                             false) {
                           _homeController.doAddFavouriteSalon(
                               salonId: widget.id);
@@ -834,16 +876,16 @@ class _SaloonAfterSelectingServicesPageState
                           color: ColorConstant.blackColor.withOpacity(0.50)),
                       child: Center(
                           child: _homeController
-                              .homeSalonDetailsData.data?.isFavourite ??
-                              false
+                                      .homeSalonDetailsData.data?.isFavourite ??
+                                  false
                               ? const Icon(
-                            CupertinoIcons.heart_fill,
-                            color: Colors.red,
-                          )
+                                  CupertinoIcons.heart_fill,
+                                  color: Colors.red,
+                                )
                               : const Icon(
-                            CupertinoIcons.heart,
-                            color: ColorConstant.whiteColor,
-                          )),
+                                  CupertinoIcons.heart,
+                                  color: ColorConstant.whiteColor,
+                                )),
                     ),
                   )
                 ],
@@ -881,7 +923,8 @@ class _SaloonAfterSelectingServicesPageState
                         const SizedBox(width: 4),
                         Text(
                           _homeController.homeSalonDetailsData.data?.rating
-                              ?.toStringAsFixed(1) ?? "0.0",
+                                  ?.toStringAsFixed(1) ??
+                              "0.0",
                           style: AppTextTheme.medium.copyWith(
                             color: ColorConstant.whiteColor,
                             fontSize: 13,
@@ -895,8 +938,8 @@ class _SaloonAfterSelectingServicesPageState
                   GestureDetector(
                     onTap: () {
                       Get.to(() => SalonRatingPage(
-                        salonId: widget.id,
-                      ));
+                            salonId: widget.id,
+                          ));
                     },
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -929,7 +972,9 @@ class _SaloonAfterSelectingServicesPageState
                   SizedBox(
                     width: Get.width * 0.05,
                     child: Text(
-                      (_homeController.homeSalonDetailsData.data?.averageArtistRatings ?? 0)
+                      (_homeController.homeSalonDetailsData.data
+                                  ?.averageArtistRatings ??
+                              0)
                           .toStringAsFixed(2),
                       //overflow: TextOverflow.ellipsis,
                       maxLines: 1,
@@ -982,7 +1027,7 @@ class _SaloonAfterSelectingServicesPageState
   }
 
   /*---------- Header Widget ------------*/
-  _headerWidget() {
+  Container _headerWidget() {
     return Container(
       width: Get.width,
       color: ColorConstant.whiteColor,
@@ -1050,7 +1095,6 @@ class _SaloonAfterSelectingServicesPageState
                   )
                 ],
               ),
-
               Text(
                 "|",
                 style: AppTextTheme.bold
@@ -1158,7 +1202,6 @@ class _SaloonAfterSelectingServicesPageState
   }
 
   Widget _offerWidget() {
-
     final allOffers = _homeController.getSalonPromoCodeModel.data;
 
     if (allOffers == null || allOffers.isEmpty) {
@@ -1185,7 +1228,6 @@ class _SaloonAfterSelectingServicesPageState
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Text(
@@ -1216,10 +1258,10 @@ class _SaloonAfterSelectingServicesPageState
               return GestureDetector(
                 onPanDown: (_) => _stopOfferAutoScroll(),
                 onPanEnd: (_) => _startOfferAutoScroll(offers.length),
-
                 child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 8),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       colors: [startColor, endColor],
@@ -1230,7 +1272,6 @@ class _SaloonAfterSelectingServicesPageState
                   ),
                   child: Row(
                     children: [
-
                       /// LEFT DISCOUNT
                       // Text(
                       //   promo.type == "percentage"
@@ -1298,7 +1339,6 @@ class _SaloonAfterSelectingServicesPageState
                               ),
                             ),
                             const SizedBox(height: 2),
-
                             Text(
                               promo.description ?? "",
                               style: const TextStyle(
@@ -1308,9 +1348,7 @@ class _SaloonAfterSelectingServicesPageState
                                 color: Colors.black54, // 50% opacity
                               ),
                             ),
-
-                            const SizedBox(height:3),
-
+                            const SizedBox(height: 3),
                             Text(
                               "                                *Offer applied at appointment page",
                               style: const TextStyle(
@@ -1335,6 +1373,7 @@ class _SaloonAfterSelectingServicesPageState
       ],
     );
   }
+
   /*------------- Tab Bar View ------------*/
   int isSelectedTab = 1;
 
@@ -1342,7 +1381,7 @@ class _SaloonAfterSelectingServicesPageState
   bool isHomeService = false;
   bool serviceOffered = false;
 
-  _tabBarView() {
+  Container _tabBarView() {
     return Container(
       color: ColorConstant.whiteColor,
       child: Column(
@@ -1436,8 +1475,8 @@ class _SaloonAfterSelectingServicesPageState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: ReadMoreText(
                       _homeController.homeSalonDetailsData.data?.description ??
                           "",
@@ -1576,15 +1615,15 @@ class _SaloonAfterSelectingServicesPageState
                                                                       .readStringValue(
                                                                           PrefConstants
                                                                               .longitude));
-                                                              _homeController
-                                                                  .doGetSalonDetailsService(
+                                                              _homeController.doGetSalonDetailsService(
                                                                   serviceGender:
-                                                                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                                                                      ? "male"
-                                                                      : "female",
-                                                                      salonId:
-                                                                          widget
-                                                                              .id);
+                                                                      SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                              "0"
+                                                                          ? "male"
+                                                                          : "female",
+                                                                  salonId:
+                                                                      widget
+                                                                          .id);
                                                               _homeController
                                                                   .doGetSalonArtiestListData(
                                                                       salonId:
@@ -1602,15 +1641,15 @@ class _SaloonAfterSelectingServicesPageState
                                                                 stylistId
                                                                     .notifyListeners();
                                                               }
-                                                              _homeController
-                                                                  .doGetSalonDetailsService(
+                                                              _homeController.doGetSalonDetailsService(
                                                                   serviceGender:
-                                                                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                                                                      ? "male"
-                                                                      : "female",
-                                                                      salonId:
-                                                                          widget
-                                                                              .id);
+                                                                      SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                              "0"
+                                                                          ? "male"
+                                                                          : "female",
+                                                                  salonId:
+                                                                      widget
+                                                                          .id);
                                                             });
                                                             Navigator.pop(
                                                                 context);
@@ -1671,15 +1710,14 @@ class _SaloonAfterSelectingServicesPageState
                                                               stylistId
                                                                   .notifyListeners();
                                                             }
-                                                            _homeController
-                                                                .doGetSalonDetailsService(
+                                                            _homeController.doGetSalonDetailsService(
                                                                 serviceGender:
-                                                                SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                                                                    ? "male"
-                                                                    : "female",
-                                                                    salonId:
-                                                                        widget
-                                                                            .id);
+                                                                    SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                            "0"
+                                                                        ? "male"
+                                                                        : "female",
+                                                                salonId:
+                                                                    widget.id);
                                                             showModalBottomSheet(
                                                                 isScrollControlled:
                                                                     true,
@@ -1760,14 +1798,14 @@ class _SaloonAfterSelectingServicesPageState
                                                                   stylistId
                                                                       .notifyListeners();
                                                                 }
-                                                                _homeController
-                                                                    .doGetSalonDetailsService(
-                                                                    serviceGender:
-                                                                    SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                                _homeController.doGetSalonDetailsService(
+                                                                    serviceGender: SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                            "0"
                                                                         ? "male"
                                                                         : "female",
-                                                                        salonId:
-                                                                            widget.id);
+                                                                    salonId:
+                                                                        widget
+                                                                            .id);
                                                               });
                                                     }
                                                   });
@@ -1832,7 +1870,7 @@ class _SaloonAfterSelectingServicesPageState
                                         separatorBuilder: (context, index) {
                                           return Container(
                                             margin: const EdgeInsets.only(
-                                                top:25, bottom:10),
+                                                top: 25, bottom: 10),
                                             height: 1,
                                             width: Get.width,
                                             color: ColorConstant.dividerColor,
@@ -1905,15 +1943,14 @@ class _SaloonAfterSelectingServicesPageState
                                                                     .readStringValue(
                                                                         PrefConstants
                                                                             .longitude));
-                                                            _homeController
-                                                                .doGetSalonDetailsService(
+                                                            _homeController.doGetSalonDetailsService(
                                                                 serviceGender:
-                                                                SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                                                                    ? "male"
-                                                                    : "female",
-                                                                    salonId:
-                                                                        widget
-                                                                            .id);
+                                                                    SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                            "0"
+                                                                        ? "male"
+                                                                        : "female",
+                                                                salonId:
+                                                                    widget.id);
                                                             _homeController
                                                                 .doGetSalonArtiestListData(
                                                                     salonId:
@@ -1931,15 +1968,14 @@ class _SaloonAfterSelectingServicesPageState
                                                               stylistId
                                                                   .notifyListeners();
                                                             }
-                                                            _homeController
-                                                                .doGetSalonDetailsService(
+                                                            _homeController.doGetSalonDetailsService(
                                                                 serviceGender:
-                                                                SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                                                                    ? "male"
-                                                                    : "female",
-                                                                    salonId:
-                                                                        widget
-                                                                            .id);
+                                                                    SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                            "0"
+                                                                        ? "male"
+                                                                        : "female",
+                                                                salonId:
+                                                                    widget.id);
                                                           });
                                                           Navigator.pop(
                                                               context);
@@ -1999,15 +2035,15 @@ class _SaloonAfterSelectingServicesPageState
                                                             stylistId
                                                                 .notifyListeners();
                                                           }
-                                                          _homeController
-                                                              .doGetSalonDetailsService(
+                                                          _homeController.doGetSalonDetailsService(
                                                               serviceGender:
-                                                              SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                                                                  ? "male"
-                                                                  : "female",
-                                                                  salonId:
-                                                                      widget
-                                                                          .id);
+                                                                  SharedPrefs.readStringValue(PrefConstants
+                                                                              .gender) ==
+                                                                          "0"
+                                                                      ? "male"
+                                                                      : "female",
+                                                              salonId:
+                                                                  widget.id);
                                                           showModalBottomSheet(
                                                               isScrollControlled:
                                                                   true,
@@ -2092,15 +2128,15 @@ class _SaloonAfterSelectingServicesPageState
                                                                 stylistId
                                                                     .notifyListeners();
                                                               }
-                                                              _homeController
-                                                                  .doGetSalonDetailsService(
+                                                              _homeController.doGetSalonDetailsService(
                                                                   serviceGender:
-                                                                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                                                                      ? "male"
-                                                                      : "female",
-                                                                      salonId:
-                                                                          widget
-                                                                              .id);
+                                                                      SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                              "0"
+                                                                          ? "male"
+                                                                          : "female",
+                                                                  salonId:
+                                                                      widget
+                                                                          .id);
                                                             });
                                                   }
                                                 });
@@ -2169,6 +2205,7 @@ class _SaloonAfterSelectingServicesPageState
       return time12;
     }
   }
+
   Future<void> _openGoogleMapsForSalon() async {
     final salon = _homeController.homeSalonDetailsData.data;
 
@@ -2193,5 +2230,4 @@ class _SaloonAfterSelectingServicesPageState
       await launchUrl(uri, mode: LaunchMode.externalApplication);
     }
   }
-
 }

@@ -6,6 +6,7 @@ import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/util/cached_image_widget.dart';
 
 import '../../../constant/variable_constant.dart';
 
@@ -45,9 +46,11 @@ class PopularServiceWidget extends StatelessWidget {
             height: 110,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(6),
-              child: CachedNetworkImage(
+              child: ExtendedCachedNetworkImage(
                 fit: BoxFit.cover,
                 imageUrl: '${APIConstants.image}$image',
+                cacheKey: '${APIConstants.image}$image',
+                memoryManagementLevel: MemoryManagementLevel.aggressive,
                 placeholder: (context, url) => const Image(
                   image: AssetImage(AssetsConstant.placeHolder),
                   fit: BoxFit.cover,

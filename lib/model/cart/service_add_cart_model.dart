@@ -1,5 +1,3 @@
-
-
 import 'package:salon_customer/util/logger.dart';
 
 class ServiceAddCartModel {
@@ -37,8 +35,8 @@ class Data {
   bool? isHomeService;
   List<Items>? items;
   double? price;
-  double? totalPrice;        // original service total (before discount & tax)
-  double? taxAbleTotal;      // subtotal after discount, before GST
+  double? totalPrice; // original service total (before discount & tax)
+  double? taxAbleTotal; // subtotal after discount, before GST
   CartTaxDetails? cartTaxDetails;
   double? platformFee;
   List<String>? previewImages;
@@ -60,31 +58,31 @@ class Data {
   Data.fromJson(Map<String, dynamic> json) {
     cartId = json['cartId'];
     salonId = json['salonId'];
-    discountAmount = double.parse(json['discountAmount'] ==  null ? "0.0": json['discountAmount'].toString());
-    logger.e(discountAmount);
+    discountAmount = double.parse(json['discountAmount'] == null
+        ? "0.0"
+        : json['discountAmount'].toString());
+    // logger.e(discountAmount);
     isDiscountApplied = json['isDiscountApplied'];
     isHomeService = json['isHomeService'];
-    totalPrice = double.parse(json['totalPrice'] == null
-        ? "0.0"
-        : json['totalPrice'].toString());
+    totalPrice = double.parse(
+        json['totalPrice'] == null ? "0.0" : json['totalPrice'].toString());
 
-    taxAbleTotal = double.parse(json['taxAbleTotal'] == null
-        ? "0.0"
-        : json['taxAbleTotal'].toString());
+    taxAbleTotal = double.parse(
+        json['taxAbleTotal'] == null ? "0.0" : json['taxAbleTotal'].toString());
 
     cartTaxDetails = json['cartTaxDetails'] != null
         ? CartTaxDetails.fromJson(json['cartTaxDetails'])
         : null;
-    platformFee = double.parse(json['platformFee'] == null
-        ? "0.0"
-        : json['platformFee'].toString());
+    platformFee = double.parse(
+        json['platformFee'] == null ? "0.0" : json['platformFee'].toString());
     if (json['items'] != null) {
       items = <Items>[];
       json['items'].forEach((v) {
         items!.add(Items.fromJson(v));
       });
     }
-    price = double.parse(json['price'] ==  null ? "0.0":json['price'].toString());
+    price =
+        double.parse(json['price'] == null ? "0.0" : json['price'].toString());
     if (json['previewImages'] != null) {
       previewImages = json['previewImages'].cast<String>();
     }
@@ -467,8 +465,9 @@ class CartTaxDetails {
   CartTaxDetails({this.totalTaxAmount});
 
   CartTaxDetails.fromJson(Map<String, dynamic> json) {
-    totalTaxAmount = double.parse(
-        json['totalTaxAmount'] == null ? "0.0" : json['totalTaxAmount'].toString());
+    totalTaxAmount = double.parse(json['totalTaxAmount'] == null
+        ? "0.0"
+        : json['totalTaxAmount'].toString());
   }
 
   Map<String, dynamic> toJson() {
@@ -477,4 +476,3 @@ class CartTaxDetails {
     return data;
   }
 }
-

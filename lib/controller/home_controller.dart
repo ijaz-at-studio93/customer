@@ -39,6 +39,7 @@ class HomeController extends GetxController {
 
   set setShowProgress(val) => _showProgress.value = val;
 
+
   final Rx<bool> _showAddProgress = false.obs;
 
   bool get gteShowAddProgress => _showAddProgress.value;
@@ -428,9 +429,10 @@ class HomeController extends GetxController {
     required String lat,
     required String lng,
     required String serviceGender,
+    bool useGlobalLoader = true,
   }) async {
     try {
-      _showProgress.value = true;
+      if (useGlobalLoader) _showProgress.value = true;
       _homeSalonDetailsData.value = await HomeAPI.getSalonDetail(
           salonId: salonId, lng: lng, lat: lat, serviceGender: serviceGender);
     } catch (e) {
@@ -439,7 +441,7 @@ class HomeController extends GetxController {
         print("GetHomeSalonDetails $e");
       }
     } finally {
-      _showProgress.value = false;
+      if (useGlobalLoader) _showProgress.value = false;
     }
   }
 
@@ -447,9 +449,10 @@ class HomeController extends GetxController {
   doGetSalonDetailsService({
     required String salonId,
     required String serviceGender,
+    bool useGlobalLoader = true,
   }) async {
     try {
-      _showProgress.value = true;
+      if (useGlobalLoader) _showProgress.value = true;
       _salonDetailsListData.value =
           await HomeAPI.getSalonDetailsCategoryServiceList(
               salonId: salonId, serviceGender: serviceGender);
@@ -459,7 +462,7 @@ class HomeController extends GetxController {
         print("DO Get Artiest List Data $e");
       }
     } finally {
-      _showProgress.value = false;
+      if (useGlobalLoader) _showProgress.value = false;
     }
   }
 
@@ -474,9 +477,10 @@ class HomeController extends GetxController {
     required bool nearest,
     required bool fourPlusRating,
     required bool homeService,
+    bool useGlobalLoader = true,
   }) async {
     try {
-      _showProgress.value = true;
+      if (useGlobalLoader) _showProgress.value = true;
       _homeSalonList.value = await HomeAPI.getSalonHome(
           offset: offset,
           size: size,
@@ -493,14 +497,14 @@ class HomeController extends GetxController {
         print("Do Get Home Salon List $e");
       }
     } finally {
-      _showProgress.value = false;
+      if (useGlobalLoader) _showProgress.value = false;
     }
   }
 
   /*--------------- Do Get Salon Artiest ---------------*/
-  doGetSalonArtiestListData({required String salonId}) async {
+  doGetSalonArtiestListData({required String salonId, bool useGlobalLoader = true}) async {
     try {
-      _showProgress.value = true;
+      if (useGlobalLoader) _showProgress.value = true;
       _salonDetailsArtiestData.value =
           await HomeAPI.salonDetailsArtiest(salonId: salonId);
     } catch (e) {
@@ -509,7 +513,7 @@ class HomeController extends GetxController {
         print("Do Get Salon Artiest $e");
       }
     } finally {
-      _showProgress.value = false;
+      if (useGlobalLoader) _showProgress.value = false;
     }
   }
 
@@ -1323,9 +1327,9 @@ fetchBookingByRazorpayOrderId({
   }
 
   /*-------------------  Get PromoCode List  ----------------------*/
-  doGetSalonPromoCode({required String salonId}) async {
+  doGetSalonPromoCode({required String salonId, bool useGlobalLoader = true}) async {
     try {
-      _showProgress.value = true;
+      if (useGlobalLoader) _showProgress.value = true;
       _salonPromoCodeModel.value = await HomeAPI.getSalonPromoCodeList(salonId: salonId);
     } catch (e) {
       if (kDebugMode) {
@@ -1333,7 +1337,7 @@ fetchBookingByRazorpayOrderId({
       }
       showError(e);
     } finally {
-      _showProgress.value = false;
+      if (useGlobalLoader) _showProgress.value = false;
     }
   }
 

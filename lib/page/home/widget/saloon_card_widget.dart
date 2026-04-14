@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +15,7 @@ import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'dart:async';
 import 'package:flutter/gestures.dart';
+import 'package:salon_customer/util/cached_image_widget.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class SaloonCardWidget extends StatefulWidget {
@@ -46,14 +49,40 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0, viewportFraction: 1.0);
-    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartAutoPlay());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _maybeStartAutoPlay();
+      _precacheImages();
+    });
+  }
+
+  /// Pre-load the first 2 images into memory cache so they appear instantly.
+  /// Must use ResizeImage with the same dimensions that CachedNetworkImage
+  /// uses internally (via memCacheHeight / memCacheWidth), otherwise the
+  /// cache keys won't match and the precache is wasted.
+  void _precacheImages() {
+    final images = _getImageList(widget.homeSalonModel);
+    final imageHeight = Get.height * 0.30;
+    final toPrefetch = images.length >= 2 ? 2 : images.length;
+    for (int i = 0; i < toPrefetch; i++) {
+      try {
+        precacheImage(
+          ResizeImage(
+            CachedNetworkImageProvider(images[i]),
+            height: (imageHeight * 2).toInt(),
+            width: 500,
+          ),
+          context,
+        );
+      } catch (_) {}
+    }
   }
 
   @override
   void didUpdateWidget(covariant SaloonCardWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
     // If images changed, reset page and timer
-    if (_getImageList(oldWidget.homeSalonModel) != _getImageList(widget.homeSalonModel)) {
+    if (_getImageList(oldWidget.homeSalonModel) !=
+        _getImageList(widget.homeSalonModel)) {
       _currentPage = 0;
       if (_pageController.hasClients) _pageController.jumpToPage(0);
       _restartAutoPlay();
@@ -81,7 +110,8 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
     } catch (_) {}
     // fallback to single image field
     if (imgs.isEmpty) {
-      if ((model.image ?? '').isNotEmpty) imgs.add("${APIConstants.image}${model.image}");
+      if ((model.image ?? '').isNotEmpty)
+        imgs.add("${APIConstants.image}${model.image}");
     } else {
       for (int i = 0; i < imgs.length; i++) {
         final s = imgs[i];
@@ -184,7 +214,8 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                   final imageUrl = images[index];
                   // replace the existing `return SizedBox(...)` inside itemBuilder with this:
                   return GestureDetector(
-                    onTap: widget.onPress, // restore image tap (calls same callback as whole card)
+                    onTap: widget
+                        .onPress, // restore image tap (calls same callback as whole card)
                     onLongPress: () {
                       _showImagePreview(context, imageUrl);
                     },
@@ -192,53 +223,59 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     child: SizedBox(
                       width: Get.width,
                       height: imageHeight,
-                      child: CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        width: Get.width,
-                        height: imageHeight,
-                        fit: BoxFit.fitWidth,
-                        placeholder: (c, u) => Image.asset(
-                          AssetsConstant.placeHolder,
-                          width: Get.width,
+                      child: ExtendedCachedNetworkImage(
+                          key: ValueKey(imageUrl),
+                          imageUrl: imageUrl,
                           height: imageHeight,
-                          fit: BoxFit.fitWidth,
-                        ),
-                        errorWidget: (c, u, e) => Image.asset(
-                          AssetsConstant.placeHolder,
-                          width: Get.width,
-                          height: imageHeight,
-                          fit: BoxFit.fitWidth,
-                        ),
-                      ),
+                          fit: BoxFit.cover,
+                          cacheKey: imageUrl,
+                          memoryManagementLevel:
+                              MemoryManagementLevel.aggressive,
+                          placeholder: (c, u) {
+                            log('placeholder: $u');
+                            return Image.asset(
+                              AssetsConstant.placeHolder,
+                              height: imageHeight,
+                              fit: BoxFit.fitWidth,
+                            );
+                          },
+                          errorWidget: (c, u, e) {
+                            log('errorWidget: $u');
+                            return Image.asset(
+                              AssetsConstant.placeHolder,
+                              height: imageHeight,
+                              fit: BoxFit.fitWidth,
+                            );
+                          }),
                     ),
                   );
                 },
               ),
 
               // gradient overlay (single copy inside carousel)
-              Positioned.fill(
-                child: IgnorePointer(
-                  ignoring: true,
-                  child: Container(
-                    alignment: Alignment.bottomCenter,
-                    child: Container(
-                      width: Get.width,
-                      height: Get.height * 0.25, // same overlay as original
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          colors: [
-                            ColorConstant.blackColor,
-                            Colors.black.withOpacity(0),
-                            Colors.black.withOpacity(0),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              // Positioned.fill(
+              //   child: IgnorePointer(
+              //     ignoring: true,
+              //     child: Container(
+              //       alignment: Alignment.bottomCenter,
+              //       child: Container(
+              //         width: Get.width,
+              //         height: Get.height * 0.25, // same overlay as original
+              //         decoration: BoxDecoration(
+              //           gradient: LinearGradient(
+              //             begin: Alignment.bottomCenter,
+              //             end: Alignment.topCenter,
+              //             colors: [
+              //               ColorConstant.blackColor,
+              //               Colors.black.withOpacity(0),
+              //               Colors.black.withOpacity(0),
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ),
+              // ),
               // dots indicator
               if (images.length > 1)
                 Positioned(
@@ -255,7 +292,9 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         width: isActive ? 10 : 7,
                         height: isActive ? 10 : 7,
                         decoration: BoxDecoration(
-                          color: isActive ? ColorConstant.whiteColor : Colors.white54,
+                          color: isActive
+                              ? ColorConstant.whiteColor
+                              : Colors.white54,
                           shape: BoxShape.circle,
                         ),
                       );
@@ -359,167 +398,170 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
-        key: Key('salon-${widget.homeSalonModel.id}'),
-        onVisibilityChanged: (info) {
-          final visiblePercentage = info.visibleFraction * 100;
+      key: Key('salon-${widget.homeSalonModel.id}'),
+      onVisibilityChanged: (info) {
+        final visiblePercentage = info.visibleFraction * 100;
 
-          if (visiblePercentage > 80) {
-            // ✅ Mostly visible → allow autoplay
-            _maybeStartAutoPlay();
-            //_maybeShowLongPressHint(context);
-          } else {
-            // ❌ Partially visible → stop autoplay
-            _stopAutoPlay();
-          }
-        },
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-      child: GestureDetector(
-        onTap: widget.onPress,
-        child: Container(
-          width: Get.width,
-          decoration: BoxDecoration(
-            color: ColorConstant.crossMarkColor,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: ColorConstant.strokeColor, width: 1.5),
-          ),
-          child: Column(
-            children: [
-              Stack(
-                children: [
-                  _buildImageCarousel(context),
-                  // Container(
-                  //   decoration: BoxDecoration(
-                  //     gradient: LinearGradient(
-                  //       begin: Alignment.bottomCenter,
-                  //       end: Alignment.topCenter,
-                  //       colors: [
-                  //         ColorConstant.blackColor,
-                  //         Colors.black.withOpacity(0),
-                  //         Colors.black.withOpacity(0),
-                  //       ],
-                  //     ),
-                  //   ),
-                  //   width: Get.width,
-                  //   height: Get.height * 0.25,
-                  // ),
-                  Positioned(
-                    top: 10,
-                    right: 10,
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          widget.homeSalonModel.isFavourite =
-                              !(widget.homeSalonModel.isFavourite ?? false);
-                          if (widget.homeSalonModel.isFavourite ?? false) {
-                            _homeController.doAddFavouriteSalon(
-                                salonId: widget.homeSalonModel.id ?? "");
-                          } else {
-                            _homeController.doRemoveFavouriteSalon(
-                                callback: () {},
-                                salonId: widget.homeSalonModel.id ?? "");
-                          }
-                        });
-                      },
-                      child: Container(
-                        width: 38,
-                        height: 38,
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: ColorConstant.blackColor),
-                        child: Center(
-                          child: widget.homeSalonModel.isFavourite ?? false
-                              ? const Icon(
-                                  CupertinoIcons.heart_fill,
-                                  color: Colors.red,
-                                )
-                              : Image.asset(
-                                  AssetsConstant.likeBlank,
-                                  height: 20,
-                                  width: 20,
-                                  color: ColorConstant.whiteColor,
-                                ),
+        if (visiblePercentage > 80) {
+          // ✅ Mostly visible → allow autoplay
+          _maybeStartAutoPlay();
+          //_maybeShowLongPressHint(context);
+        } else {
+          // ❌ Partially visible → stop autoplay
+          _stopAutoPlay();
+        }
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        child: GestureDetector(
+          onTap: widget.onPress,
+          child: Container(
+            width: Get.width,
+            decoration: BoxDecoration(
+              color: ColorConstant.crossMarkColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: ColorConstant.strokeColor, width: 1.5),
+            ),
+            child: Column(
+              children: [
+                Stack(
+                  children: [
+                    _buildImageCarousel(context),
+                    // Container(
+                    //   decoration: BoxDecoration(
+                    //     gradient: LinearGradient(
+                    //       begin: Alignment.bottomCenter,
+                    //       end: Alignment.topCenter,
+                    //       colors: [
+                    //         ColorConstant.blackColor,
+                    //         Colors.black.withOpacity(0),
+                    //         Colors.black.withOpacity(0),
+                    //       ],
+                    //     ),
+                    //   ),
+                    //   width: Get.width,
+                    //   height: Get.height * 0.25,
+                    // ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            widget.homeSalonModel.isFavourite =
+                                !(widget.homeSalonModel.isFavourite ?? false);
+                            if (widget.homeSalonModel.isFavourite ?? false) {
+                              _homeController.doAddFavouriteSalon(
+                                  salonId: widget.homeSalonModel.id ?? "");
+                            } else {
+                              _homeController.doRemoveFavouriteSalon(
+                                  callback: () {},
+                                  salonId: widget.homeSalonModel.id ?? "");
+                            }
+                          });
+                        },
+                        child: Container(
+                          width: 38,
+                          height: 38,
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ColorConstant.blackColor),
+                          child: Center(
+                            child: widget.homeSalonModel.isFavourite ?? false
+                                ? const Icon(
+                                    CupertinoIcons.heart_fill,
+                                    color: Colors.red,
+                                  )
+                                : Image.asset(
+                                    AssetsConstant.likeBlank,
+                                    height: 20,
+                                    width: 20,
+                                    color: ColorConstant.whiteColor,
+                                  ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    bottom: 10,
-                    left: 15,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(
-                          Icons.star,
-                          color: ColorConstant.yellowColor,
-                          size: 20,
-                        ),
-                        const SizedBox(width: 3),
-                        Text(
-                          (widget.homeSalonModel.averageArtistRatings ?? 0).toStringAsFixed(2),
-                          style: AppTextTheme.medium.copyWith(
-                              fontSize: 11, color: ColorConstant.yellowColor),
-                        ),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Average Stylist Rating',
-                          style: AppTextTheme.medium.copyWith(
-                              fontSize: 13, color: ColorConstant.whiteColor),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 5),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: Get.width * 0.5,
-                          child: Text(
-                            '${widget.homeSalonModel.name}',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            textScaler: const TextScaler.linear(0.85),
-                            style: AppTextTheme.bold.copyWith(
-                                fontSize: 19, color: ColorConstant.blackColor),
+                    Positioned(
+                      bottom: 10,
+                      left: 15,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.star,
+                            color: ColorConstant.yellowColor,
+                            size: 20,
                           ),
-                        ),
-                        const SizedBox(height: 5),
-                        Text(
-                          "${(widget.homeSalonModel.distance!/ 1000 * 10).roundToDouble() / 10} K.M. • ${widget.homeSalonModel.homeService == true ? "Available for Home" : "Available at Salon"}",
-                          style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.grayTextColor, fontSize: 13),
-                        ),
-                        const SizedBox(height: 5),
-                        Row(
-                          children: [
-                            Text(
-                              "Starting From",
-                              style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.grayTextColor,
-                                  fontSize: 13),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              "₹${widget.homeSalonModel.serviceStartingPrice} Onwards",
+                          const SizedBox(width: 3),
+                          Text(
+                            (widget.homeSalonModel.averageArtistRatings ?? 0)
+                                .toStringAsFixed(2),
+                            style: AppTextTheme.medium.copyWith(
+                                fontSize: 11, color: ColorConstant.yellowColor),
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            'Average Stylist Rating',
+                            style: AppTextTheme.medium.copyWith(
+                                fontSize: 13, color: ColorConstant.whiteColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            width: Get.width * 0.5,
+                            child: Text(
+                              '${widget.homeSalonModel.name}',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textScaler: const TextScaler.linear(0.85),
                               style: AppTextTheme.bold.copyWith(
-                                  color: changeTheme(
-                                      SharedPrefs.readStringValue(
-                                          PrefConstants.gender)),
-                                  fontSize: 13),
+                                  fontSize: 19,
+                                  color: ColorConstant.blackColor),
                             ),
-                          ],
-                        ),
-                        const SizedBox(
-                            height:
-                                5), /* Row(
+                          ),
+                          const SizedBox(height: 5),
+                          Text(
+                            "${(widget.homeSalonModel.distance! / 1000 * 10).roundToDouble() / 10} K.M. • ${widget.homeSalonModel.homeService == true ? "Available for Home" : "Available at Salon"}",
+                            style: AppTextTheme.medium.copyWith(
+                                color: ColorConstant.grayTextColor,
+                                fontSize: 13),
+                          ),
+                          const SizedBox(height: 5),
+                          Row(
+                            children: [
+                              Text(
+                                "Starting From",
+                                style: AppTextTheme.medium.copyWith(
+                                    color: ColorConstant.grayTextColor,
+                                    fontSize: 13),
+                              ),
+                              const SizedBox(width: 5),
+                              Text(
+                                "₹${widget.homeSalonModel.serviceStartingPrice} Onwards",
+                                style: AppTextTheme.bold.copyWith(
+                                    color: changeTheme(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.gender)),
+                                    fontSize: 13),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(
+                              height:
+                                  5), /* Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Image.asset(
@@ -541,105 +583,105 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                             ),
                           ],
                         ),*/
-                      ],
-                    ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 28,
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      decoration: BoxDecoration(
-                        color: ColorConstant.greenColor,
-                        borderRadius: BorderRadius.circular(14), // 👈 pill shape
+                        ],
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Icon(
-                            Icons.star,
-                            color: ColorConstant.whiteColor,
-                            size: 14,
+                          Container(
+                            height: 28,
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: ColorConstant.greenColor,
+                              borderRadius:
+                                  BorderRadius.circular(14), // 👈 pill shape
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.star,
+                                  color: ColorConstant.whiteColor,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  widget.homeSalonModel.rating
+                                          ?.toStringAsFixed(1) ??
+                                      "0.0",
+                                  style: AppTextTheme.medium.copyWith(
+                                    color: ColorConstant.whiteColor,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(height: 4),
                           Text(
-                            widget.homeSalonModel.rating
-                                ?.toStringAsFixed(1) ?? "0.0",
+                            " ${_formatReviewCount(widget.homeSalonModel.reviewCount ?? 0)} Reviews",
                             style: AppTextTheme.medium.copyWith(
-                              color: ColorConstant.whiteColor,
-                              fontSize: 13,
+                              fontSize: 12,
+                              color: ColorConstant.blackColor,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    Text(
-                      " ${_formatReviewCount(widget.homeSalonModel.reviewCount ?? 0)} Reviews",
-                      style: AppTextTheme.medium.copyWith(
-                        fontSize: 12,
-                        color: ColorConstant.blackColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-                ],
+                const SizedBox(height: 2),
+                Dash(
+                  direction: Axis.horizontal,
+                  length: Get.width * 0.8,
+                  dashLength: 2,
+                  dashColor: ColorConstant.grayTextColor,
                 ),
-              ),
-              const SizedBox(height: 2),
-              Dash(
-                direction: Axis.horizontal,
-                length: Get.width * 0.8,
-                dashLength: 2,
-                dashColor: ColorConstant.grayTextColor,
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                child: Row(
-                  children: [
-                    Image.asset(
-                      AssetsConstant.newOfferIcon,
-                      width: 20,
-                      height: 20,
-                    ),
-                    const SizedBox(width: 8),
+                Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 15, vertical: 10),
+                    child: Row(
+                      children: [
+                        Image.asset(
+                          AssetsConstant.newOfferIcon,
+                          width: 20,
+                          height: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Builder(
+                          builder: (_) {
+                            final discountText = _getHighestDiscountForSalon();
 
-                    Builder(
-                      builder: (_) {
-                        final discountText = _getHighestDiscountForSalon();
+                            if (discountText.isEmpty) return const SizedBox();
 
-                        if (discountText.isEmpty) return const SizedBox();
-
-                        return Text(
-                          discountText,
-                          style: AppTextTheme.bold.copyWith(
-                            color: ColorConstant.offerTextColor,
-                            fontSize: 13,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                )
-              )
-            ],
+                            return Text(
+                              discountText,
+                              style: AppTextTheme.bold.copyWith(
+                                color: ColorConstant.offerTextColor,
+                                fontSize: 13,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ))
+              ],
+            ),
           ),
         ),
       ),
-    ),
     );
   }
+
   String _formatReviewCount(int count) {
     if (count >= 10000) return "10K+";
     if (count >= 1000) return "${(count / 1000).toStringAsFixed(1)}K+";
     return count.toString();
   }
+
   String _getHighestDiscountForSalon() {
     final promoList = _homeController.getPromoCodeModel.data;
     final salonId = widget.homeSalonModel.id;
@@ -650,7 +692,6 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
 
     for (var promo in promoList) {
       if (promo.salon?.id == salonId && promo.type == "percentage") {
-
         final percent = (promo.amount ?? 0).toDouble();
 
         if (percent > maxPercent) {
@@ -671,5 +712,4 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
       return "${value.toStringAsFixed(1)}%";
     }
   }
-
 }
