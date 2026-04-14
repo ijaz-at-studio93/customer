@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dash/flutter_dash.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -24,13 +23,17 @@ import 'package:salon_customer/util/SharedPrefs.dart';
 
 import '../../api/dio_client.dart';
 import '../../util/call_wrapper.dart';
+import '../home/home_page.dart';
+import '../home/saloon_after_selecting_page.dart';
 import '../home/widget/add_product_sheet_widget.dart';
 import '../profile/add_address_page.dart';
+import '../stylist/selecting_artist_bottom_sheet.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
-  final String artiestId;
+  //final String artiestId;
+  final List<String> artistIds;
 
-  const AppointmentBookingPage({super.key, required this.artiestId});
+  const AppointmentBookingPage({super.key, required this.artistIds});
 
   @override
   State<AppointmentBookingPage> createState() => _AppointmentBookingPageState();
@@ -39,6 +42,8 @@ class AppointmentBookingPage extends StatefulWidget {
 class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   final _homeController = Get.find<HomeController>();
   final _authController = Get.find<AuthController>();
+  final ScrollController _scrollController = ScrollController();
+  List<String> selectedSlots = [];
 
   @override
   void initState() {
@@ -49,28 +54,62 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       String formatDate = DateFormat("yyyy-MM-dd").format(date);
       int _visibleYear = DateTime.now().year;
       selectDate = formatDate;
-      _homeController.doGetPopularServiceByYourStylist(
-          stylistId: widget.artiestId);
-      _homeController.doGetBlogData(
-        lat: double.parse(SharedPrefs.readStringValue(PrefConstants.latitude)),
-        lng: double.parse(SharedPrefs.readStringValue(PrefConstants.longitude)),
-      );
-      _homeController.doGetUnAvailableDatesListData(
-          artiestId: widget.artiestId, date: formatDate, callback: () {});
-
-      _homeController.doGetCart().whenComplete(() {
-        _homeController.doGetOrderId();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollToCenter(0); // today
       });
-      _homeController.doGetAvailabilitiesTimeSlot(
-        artiestId: widget.artiestId,
-        date: formatDate,
-      );
+      _scrollController.addListener(_handleScrollMonthChange);
+      // _homeController.doGetPopularServiceByYourStylist(
+      //     stylistId: widget.artistIds.first);
+      // No need of blogs in appointment page
+      // _homeController.doGetBlogData(
+      //   lat: double.parse(SharedPrefs.readStringValue(PrefConstants.latitude)),
+      //   lng: double.parse(SharedPrefs.readStringValue(PrefConstants.longitude)),
+      // );
+      // _homeController.doGetUnAvailableDatesListData(
+      //     artiestId: widget.artistIds.first, date: formatDate, callback: () {});
+
+      _homeController.doGetCart();
+      //Commenting because of Pay after service
+      // No need to creating razorpay order
+      //     .whenComplete(() {
+      //   _homeController.doGetOrderId();
+      // });
+      // _homeController.doGetAvailabilitiesTimeSlot(
+      //   artiestId: widget.artistIds.first,
+      //   date: formatDate,
+      // );
     });
   }
 
   int selectedIndex = 0;
   String selectTime = '';
   Razorpay razorpay = Razorpay();
+
+  void _handleScrollMonthChange() {
+    if (!_scrollController.hasClients) return;
+
+    final itemWidth = 64.0; // 56 + margin(8)
+
+    final offset = _scrollController.offset;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    /// 👉 detect CENTER item
+    final centerOffset = offset + screenWidth / 2;
+    final index = (centerOffset / itemWidth).floor();
+
+    final baseDate = DateTime.now();
+
+    final visibleDate = baseDate.add(Duration(days: index));
+
+    final newMonth = DateTime(visibleDate.year, visibleDate.month);
+
+    if (newMonth.month != currentMonth.month ||
+        newMonth.year != currentMonth.year) {
+      setState(() {
+        currentMonth = newMonth;
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -82,777 +121,1120 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   Widget build(BuildContext context) {
     return CallWrapper(
         child: SafeArea(
-      bottom: true,
-      top: false,
-      child: Scaffold(
-        backgroundColor: ColorConstant.bgColor,
-        appBar: AppBar(
-          elevation: 0.0,
-          backgroundColor: ColorConstant.whiteColor,
-          leading: GestureDetector(
-              onTap: () {
-                Get.back();
-              },
-              child: const Icon(
-                Icons.arrow_back_ios,
-                color: ColorConstant.blackColor,
-              )),
-          centerTitle: true,
-          title: Text(
-            "Booking Appointment",
-            style: AppTextTheme.bold
-                .copyWith(color: ColorConstant.blackColor, fontSize: 19),
-          ),
-        ),
-        body: Obx(
-          () => ProgressContainerView(
-            isProgressRunning: _homeController.showBookingProgress,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  _customBackgroundExample(),
-                  const SizedBox(height: 15),
-                  /*----------- Popular Service By Your Artist ---------------*/
-                  _homeController.showProgress
-                      ? Column(
-                          children: [
-                            SizedBox(height: Get.height * 0.23),
-                            const ProgressBarView(),
-                          ],
-                        )
-                      : Column(
-                          children: [
-                            _homeController.getArtistPopularServicesModel.data
-                                        ?.isEmpty ??
-                                    false
-                                ? const SizedBox()
-                                : Container(
-                                    width: Get.width,
-                                    color: ColorConstant.whiteColor,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 20, vertical: 10),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          "Popular Service By Your Artist",
-                                          style: AppTextTheme.bold.copyWith(
-                                              fontSize: 16,
-                                              color: ColorConstant.blackColor),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        SizedBox(
-                                          height: 140,
-                                          child: ListView.builder(
-                                              padding: EdgeInsets.zero,
-                                              shrinkWrap: true,
-                                              scrollDirection: Axis.horizontal,
-                                              itemCount: _homeController
-                                                      .getArtistPopularServicesModel
-                                                      .data
-                                                      ?.length ??
-                                                  0,
-                                              itemBuilder: (context, index) {
-                                                return PopularServiceWidget(
-                                                  addButtonTap: () {
-                                                    _homeController
-                                                        .getArtistPopularServicesModel
-                                                        .data?[index]
-                                                        .isAddCart = !(_homeController
-                                                            .getArtistPopularServicesModel
-                                                            .data?[index]
-                                                            .isAddCart ??
-                                                        false);
+          bottom: true,
+          top: false,
+          child: Scaffold(
+            backgroundColor: ColorConstant.whiteColor,
+            appBar: AppBar(
+              elevation: 0.0,
+              backgroundColor: ColorConstant.whiteColor,
+              leading: GestureDetector(
+                  onTap: () {
+                    //selectedArtistIdsGlobal.value = [];
+                    if (_homeController
+                        .getServiceAddCartModel
+                        .data
+                        ?.items ==
+                        null) {
 
-                                                    if (_homeController
-                                                            .getArtistPopularServicesModel
-                                                            .data?[index]
-                                                            .isAddCart ??
-                                                        false) {
-                                                      _homeController.doAddCart(
-                                                          salonServiceId:
-                                                              _homeController
-                                                                      .getArtistPopularServicesModel
-                                                                      .data?[
-                                                                          index]
-                                                                      .id ??
-                                                                  "",
-                                                          isHomeService: SharedPrefs
-                                                              .readBoolValue(
-                                                                  PrefConstants
-                                                                      .isHomeService),
-                                                          callback: () {
-                                                            _homeController
-                                                                .doGetCart()
-                                                                .whenComplete(
-                                                                    () {
-                                                                  _homeController
-                                                                      .doGetOrderId();
-                                                                });
-                                                            if (_homeController
-                                                                    .getServiceAddCartModel
-                                                                    .data
-                                                                    ?.items ==
-                                                                null) {
-                                                              stylistId.value =
-                                                                  "";
-                                                              stylistId
-                                                                  .notifyListeners();
-                                                            }
-                                                          });
-                                                    } else {
-                                                      _homeController
-                                                          .doRemoveCart(
-                                                              salonServiceId:
-                                                                  _homeController
-                                                                          .getArtistPopularServicesModel
-                                                                          .data?[
-                                                                              index]
-                                                                          .id ??
-                                                                      "",
-                                                              callback: () {
-                                                                _homeController
-                                                                    .doGetCart()
-                                                                    .whenComplete(
-                                                                        () {
-                                                                      _homeController
-                                                                          .doGetOrderId();
-                                                                    });
+                      Get.back();
+                    }
+                    else {
+                      _homeController.doGetArtiestListData();
+                    }
+                    Get.back();
+                  },
+                  child: const Icon(
+                    Icons.arrow_back_ios,
+                    color: ColorConstant.blackColor,
+                  )),
+              centerTitle: true,
+              title: Text(
+                "Booking Appointment",
+                style: AppTextTheme.bold.copyWith(
+                  fontFamily: "Outfit",        // ✅ important
+                  fontWeight: FontWeight.w700, // ✅ Bold
+                  fontSize: 25,                // ✅ match Figma
+                  color: ColorConstant.blackColor,
+                ),
+              ),
+            ),
+            body: Obx(
+                  () => ProgressContainerView(
+                isProgressRunning: _homeController.showBookingProgress,
+                    child: Stack(
+                        children: [
 
-                                                                if (_homeController
-                                                                        .getServiceAddCartModel
-                                                                        .data
-                                                                        ?.items ==
-                                                                    null) {
-                                                                  stylistId
-                                                                      .value = "";
-                                                                  stylistId
-                                                                      .notifyListeners();
-                                                                }
-                                                              });
-                                                    }
-                                                  },
-                                                  review: _homeController
-                                                          .getArtistPopularServicesModel
-                                                          .data?[index]
-                                                          .reviewCount
-                                                          .toString() ??
-                                                      "",
-                                                  rating: _homeController
-                                                          .getArtistPopularServicesModel
-                                                          .data?[index]
-                                                          .rating ??
-                                                      0.0,
-                                                  name: _homeController
-                                                          .getArtistPopularServicesModel
-                                                          .data?[index]
-                                                          .name ??
-                                                      "",
-                                                  image: _homeController
-                                                          .getArtistPopularServicesModel
-                                                          .data?[index]
-                                                          .image ??
-                                                      "",
-                                                  duration: _homeController
-                                                          .getArtistPopularServicesModel
-                                                          .data?[index]
-                                                          .duration
-                                                          .toString() ??
-                                                      "",
-                                                  isAdd: _homeController
-                                                          .getArtistPopularServicesModel
-                                                          .data?[index]
-                                                          .isAddCart ??
-                                                      false,
-                                                  price: _homeController
-                                                          .getArtistPopularServicesModel
-                                                          .data?[index]
-                                                          .price
-                                                          .toString() ??
-                                                      "",
-                                                );
-                                              }),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                            const SizedBox(height: 2),
-                            /*-------------- Select Time Slot  ---------------*/
-                            Container(
-                              color: ColorConstant.whiteColor,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 12),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Select Time Slot",
-                                    style: AppTextTheme.bold.copyWith(
-                                        fontSize: 16,
-                                        color: ColorConstant.blackColor),
-                                  ),
-                                  const SizedBox(height: 7),
-                                  Dash(
-                                    direction: Axis.horizontal,
-                                    length: Get.width * 0.88,
-                                    dashLength: 2,
-                                    dashColor: const Color(0xffCFCFCF),
-                                  ),
-                                  const SizedBox(height: 7),
-                                  _homeController
-                                              .getAvailabilitiesTimeSlotModelData
-                                              .data
-                                              ?.isEmpty ??
-                                          false
-                                      ? Center(
-                                          child: Text(
-                                          "No Time Slot Available",
-                                          style: AppTextTheme.bold.copyWith(
-                                              fontSize: 16,
-                                              color: ColorConstant.blackColor),
-                                        ))
-                                      : Column(
-                                          children: [
-                                            SizedBox(
-                                              height: 50,
-                                              width: Get.width,
-                                              child: ListView.builder(
-                                                  itemCount: _homeController
-                                                          .getAvailabilitiesTimeSlotModelData
-                                                          .data
-                                                          ?.length ??
-                                                      0,
-                                                  shrinkWrap: true,
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  itemBuilder: (context, i) {
-                                                    return _timeSlotContainerWidget(
-                                                        isSelected:
-                                                            selectedIndex == i,
-                                                        onPress: () {
-                                                          setState(() {
-                                                            selectedIndex = i;
-                                                            selectTime =
-                                                                _homeController
-                                                                        .getAvailabilitiesTimeSlotModelData
-                                                                        .data?[
-                                                                            i]
-                                                                        .time ??
-                                                                    "";
-                                                          });
-                                                        },
-                                                        timeSlot:
-                                                            convertTimesToAmPmString(
-                                                                _homeController
-                                                                        .getAvailabilitiesTimeSlotModelData
-                                                                        .data?[
-                                                                            i]
-                                                                        .time ??
-                                                                    ""));
-                                                  }),
-                                            ),
-                                          ],
-                                        ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-
-                            /*------------- Apply PromoCode ---------------*/
-                            Dash(
-                              direction: Axis.horizontal,
-                              length: Get.width * 0.88,
-                              dashLength: 2,
-                              dashColor: const Color(0xffCFCFCF),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                           SingleChildScrollView(
+                            child: Column(
                               children: [
+                                // _customBackgroundExample(),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 12),
-                                  child: Text(
-                                    "Exclusive ScutS Offers",
-                                    textScaler: const TextScaler.linear(0.90),
-                                    style: AppTextTheme.bold.copyWith(
-                                        fontSize: 18,
-                                        color: ColorConstant.blackColor),
-                                  ),
+                                  padding: const EdgeInsets.symmetric(horizontal: 16), // ✅ match rest UI
+                                  //child: _customBackgroundExample(),
+
+                                  child: _customDateTimeline(),
                                 ),
-                                if (_homeController.getServiceAddCartModel.data
-                                        ?.isDiscountApplied ??
-                                    false)
-                                  GestureDetector(
-                                    onTap: () async {
-                                      _homeController.doRemovePromoCode(
-                                          callback: () {
-                                            _homeController
-                                                .doGetCart()
-                                                .whenComplete(() {
-                                              _homeController.doGetOrderId();
-                                            });
-                                      });
-                                    },
-                                    child: Container(
-                                      height: 50,
-                                      width: Get.width,
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 16),
-                                      decoration: BoxDecoration(
-                                        color: ColorConstant.whiteColor,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          color: ColorConstant.primaryColor,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                const SizedBox(height: 8),
+                                /*----------- Popular Service By Your Artist ---------------*/
+                                _homeController.showProgress
+                                    ? Column(
+                                  children: [
+                                    SizedBox(height: Get.height * 0.23),
+                                    const ProgressBarView(),
+                                  ],
+                                )
+                                    : Column(
+                                  children: [
+                                    // _homeController.getArtistPopularServicesModel.data
+                                    //             ?.isEmpty ??
+                                    //         false
+                                    //     ? const SizedBox()
+                                    //     : Container(
+                                    //         width: Get.width,
+                                    //         color: ColorConstant.whiteColor,
+                                    //         padding: const EdgeInsets.symmetric(
+                                    //             horizontal: 20, vertical: 10),
+                                    //         child: Column(
+                                    //           crossAxisAlignment:
+                                    //               CrossAxisAlignment.start,
+                                    //           children: [
+                                    //             Text(
+                                    //               "Popular Service By Your Artist",
+                                    //               style: AppTextTheme.bold.copyWith(
+                                    //                   fontSize: 16,
+                                    //                   color: ColorConstant.blackColor),
+                                    //             ),
+                                    //             const SizedBox(height: 8),
+                                    //             SizedBox(
+                                    //               height: 140,
+                                    //               child: ListView.builder(
+                                    //                   padding: EdgeInsets.zero,
+                                    //                   shrinkWrap: true,
+                                    //                   scrollDirection: Axis.horizontal,
+                                    //                   itemCount: _homeController
+                                    //                           .getArtistPopularServicesModel
+                                    //                           .data
+                                    //                           ?.length ??
+                                    //                       0,
+                                    //                   itemBuilder: (context, index) {
+                                    //                     return PopularServiceWidget(
+                                    //                       addButtonTap: () {
+                                    //                         _homeController
+                                    //                             .getArtistPopularServicesModel
+                                    //                             .data?[index]
+                                    //                             .isAddCart = !(_homeController
+                                    //                                 .getArtistPopularServicesModel
+                                    //                                 .data?[index]
+                                    //                                 .isAddCart ??
+                                    //                             false);
+                                    //
+                                    //                         if (_homeController
+                                    //                                 .getArtistPopularServicesModel
+                                    //                                 .data?[index]
+                                    //                                 .isAddCart ??
+                                    //                             false) {
+                                    //                           _homeController.doAddCart(
+                                    //                               salonServiceId:
+                                    //                                   _homeController
+                                    //                                           .getArtistPopularServicesModel
+                                    //                                           .data?[
+                                    //                                               index]
+                                    //                                           .id ??
+                                    //                                       "",
+                                    //                               isHomeService: SharedPrefs
+                                    //                                   .readBoolValue(
+                                    //                                       PrefConstants
+                                    //                                           .isHomeService),
+                                    //                               callback: () {
+                                    //                                 _homeController
+                                    //                                     .doGetCart();
+                                    //                                 //Commenting because of Pay after service
+                                    //                                 // No need to creating razorpay order
+                                    //                                     // .whenComplete(
+                                    //                                     //     () {
+                                    //                                     //   _homeController
+                                    //                                     //       .doGetOrderId();
+                                    //                                     // });
+                                    //                                 if (_homeController
+                                    //                                         .getServiceAddCartModel
+                                    //                                         .data
+                                    //                                         ?.items ==
+                                    //                                     null) {
+                                    //                                   stylistId.value =
+                                    //                                       "";
+                                    //                                   stylistId
+                                    //                                       .notifyListeners();
+                                    //                                 }
+                                    //                               });
+                                    //                         } else {
+                                    //                           _homeController
+                                    //                               .doRemoveCart(
+                                    //                                   salonServiceId:
+                                    //                                       _homeController
+                                    //                                               .getArtistPopularServicesModel
+                                    //                                               .data?[
+                                    //                                                   index]
+                                    //                                               .id ??
+                                    //                                           "",
+                                    //                                   callback: () {
+                                    //                                     _homeController
+                                    //                                         .doGetCart();
+                                    //                                         //Commenting because of Pay after service
+                                    //                                         // No need to creating razorpay order
+                                    //                                         // .whenComplete(
+                                    //                                         //     () {
+                                    //                                         //   _homeController
+                                    //                                         //       .doGetOrderId();
+                                    //                                         // });
+                                    //
+                                    //                                     if (_homeController
+                                    //                                             .getServiceAddCartModel
+                                    //                                             .data
+                                    //                                             ?.items ==
+                                    //                                         null) {
+                                    //                                       stylistId
+                                    //                                           .value = "";
+                                    //                                       stylistId
+                                    //                                           .notifyListeners();
+                                    //                                     }
+                                    //                                   });
+                                    //                         }
+                                    //                       },
+                                    //                       review: _homeController
+                                    //                               .getArtistPopularServicesModel
+                                    //                               .data?[index]
+                                    //                               .reviewCount
+                                    //                               .toString() ??
+                                    //                           "",
+                                    //                       rating: _homeController
+                                    //                               .getArtistPopularServicesModel
+                                    //                               .data?[index]
+                                    //                               .rating ??
+                                    //                           0.0,
+                                    //                       name: _homeController
+                                    //                               .getArtistPopularServicesModel
+                                    //                               .data?[index]
+                                    //                               .name ??
+                                    //                           "",
+                                    //                       image: _homeController
+                                    //                               .getArtistPopularServicesModel
+                                    //                               .data?[index]
+                                    //                               .image ??
+                                    //                           "",
+                                    //                       duration: _homeController
+                                    //                               .getArtistPopularServicesModel
+                                    //                               .data?[index]
+                                    //                               .duration
+                                    //                               .toString() ??
+                                    //                           "",
+                                    //                       isAdd: _homeController
+                                    //                               .getArtistPopularServicesModel
+                                    //                               .data?[index]
+                                    //                               .isAddCart ??
+                                    //                           false,
+                                    //                       price: _homeController
+                                    //                               .getArtistPopularServicesModel
+                                    //                               .data?[index]
+                                    //                               .price
+                                    //                               .toString() ??
+                                    //                           "",
+                                    //                     );
+                                    //                   }),
+                                    //             ),
+                                    //           ],
+                                    //         ),
+                                    //       ),
+                                    const SizedBox(height: 2),
+                                    /*-------------- Select Time Slot  ---------------*/
+                                    Container(
+                                      color: ColorConstant.whiteColor,
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          Row(
-                                            children: [
-                                              Image.asset(
-                                                AssetsConstant.offerIcon,
-                                                color: changeTheme(SharedPrefs
-                                                        .readStringValue(
-                                                            PrefConstants
-                                                                .gender)) ??
-                                                    ColorConstant.primaryColor,
-                                                width: 25,
-                                                height: 25,
-                                              ),
-                                              const SizedBox(width: 10),
-                                              Text(
-                                                "Remove PromoCode",
-                                                style: AppTextTheme.bold
-                                                    .copyWith(
-                                                        fontSize: 14,
-                                                        color: ColorConstant
-                                                            .blackColor),
-                                              ),
-                                            ],
+                                          Text(
+                                            "Select Time Slot",
+                                            style: AppTextTheme.bold.copyWith(
+                                              fontFamily: "Outfit",
+                                              fontWeight: FontWeight.w700, // ✅ Bold
+                                              fontSize: 20,                // ✅ 20 as required
+                                              color: ColorConstant.blackColor,
+                                            ),
                                           ),
+
+                                          const SizedBox(height: 7),
+
+                                          // (_homeController.getAvailabilitiesTimeSlotModelData.data?.isEmpty ?? true)
+                                          //     ? Center(
+                                          //   child: Text(
+                                          //     "No Time Slot Available",
+                                          //     style: AppTextTheme.bold.copyWith(
+                                          //       fontSize: 16,
+                                          //       color: ColorConstant.blackColor,
+                                          //     ),
+                                          //   ),
+                                          // )
+                                          //     : Builder(
+                                          //   builder: (context) {
+                                          //     /// ✅ LOGIC HERE (correct place)
+                                          //     final originalList = _homeController
+                                          //         .getAvailabilitiesTimeSlotModelData.data ??
+                                          //         [];
+                                          //
+                                          //     final half = (originalList.length / 2).ceil();
+                                          //
+                                          //     final List reorderedList = [];
+                                          //
+                                          //     for (int i = 0; i < half; i++) {
+                                          //       /// first row
+                                          //       reorderedList.add(originalList[i]);
+                                          //
+                                          //       /// second row
+                                          //       if (i + half < originalList.length) {
+                                          //         reorderedList.add(originalList[i + half]);
+                                          //       }
+                                          //     }
+                                          //
+                                          //     /// ✅ UI (unchanged)
+                                          //     return SizedBox(
+                                          //       height: 90,
+                                          //       child: GridView.builder(
+                                          //         scrollDirection: Axis.horizontal,
+                                          //         itemCount: reorderedList.length,
+                                          //         gridDelegate:
+                                          //         const SliverGridDelegateWithFixedCrossAxisCount(
+                                          //           crossAxisCount: 2,
+                                          //           mainAxisSpacing: 0,
+                                          //           crossAxisSpacing: 6,
+                                          //           mainAxisExtent: 100,
+                                          //         ),
+                                          //         itemBuilder: (context, i) {
+                                          //           final slot = reorderedList[i];
+                                          //
+                                          //           return _timeSlotContainerWidget(
+                                          //             isSelected: selectedIndex == i,
+                                          //             onPress: () {
+                                          //               setState(() {
+                                          //                 selectedIndex = i;
+                                          //                 selectTime = slot.time ?? "";
+                                          //               });
+                                          //             },
+                                          //             timeSlot: convertTimesToAmPmString(
+                                          //               slot.time ?? "",
+                                          //             ),
+                                          //           );
+                                          //         },
+                                          //       ),
+                                          //     );
+                                          //   },
+                                          // ),
+
+
+                                          Builder(
+                                            builder: (context) {
+                                              final slots = generateTimeSlots();
+
+                                              return SizedBox(
+                                                height: 90,
+                                                child: GridView.builder(
+                                                  scrollDirection: Axis.horizontal,
+                                                  itemCount: slots.length,
+                                                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                                                    crossAxisCount: 2,
+                                                    mainAxisSpacing: 0,
+                                                    crossAxisSpacing: 6,
+                                                    mainAxisExtent: 100,
+                                                  ),
+                                                  itemBuilder: (context, i) {
+                                                    final slot = slots[i];
+
+                                                    return _timeSlotContainerWidget(
+                                                      isSelected: selectedSlots.contains(slot),
+                                                      onPress: () {
+                                                        setState(() {
+                                                          if (selectedSlots.contains(slot)) {
+                                                            selectedSlots.remove(slot);
+                                                          } else {
+                                                            if (selectedSlots.length < 3) {
+                                                              selectedSlots.add(slot);
+                                                            } else {
+                                                              showMessage("You can select up to 3 slots only");
+                                                            }
+                                                          }
+                                                        });
+                                                      },
+                                                      timeSlot: convertTimesToAmPmString(slot),
+                                                    );
+                                                  },
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    //const SizedBox(height: 2),
+
+                                    /*------------- Apply PromoCode ---------------*/
+                                    Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 5),
+                                          child: Text(
+                                            "Offer’s For You",
+                                            textScaler: const TextScaler.linear(0.90),
+                                            style: AppTextTheme.bold.copyWith(
+                                              fontSize: 20,
+                                              color: ColorConstant.blackColor, // Added missing comma
+                                              fontFamily: 'outfit',             // Ensure this matches your pubspec.yaml name
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 1,),
+                                        if (_homeController.getServiceAddCartModel.data
+                                            ?.isDiscountApplied ??
+                                            false)
                                           GestureDetector(
-                                            onTap: () {
+                                            onTap: () async {
                                               _homeController.doRemovePromoCode(
                                                   callback: () {
-                                                _homeController
-                                                    .doGetCart()
-                                                    .whenComplete(() {
-                                                  _homeController
-                                                      .doGetOrderId();
-                                                });
-                                              });
+                                                    _homeController
+                                                        .doGetCart();
+                                                    //Commenting because of Pay after service
+                                                    // No need to creating razorpay order
+                                                    //     .whenComplete(() {
+                                                    //   _homeController.doGetOrderId();
+                                                    // });
+                                                  });
+                                            },
+                                          child: SizedBox(
+                                            height: 44,
+                                            child: Container(
+                                              width: double.infinity,
+
+                                                padding: const EdgeInsets.only(
+                                                    left: 10,right: 2),
+                                                margin: const EdgeInsets.symmetric(
+                                                    horizontal: 16),
+                                                decoration: BoxDecoration(
+                                                  gradient: const LinearGradient(
+                                                    colors: [
+                                                      Color(0xFF8454E5), // 🔥 left
+                                                      Color(0xFFCD73B4), // 🔥 right
+                                                    ],
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight,
+                                                  ),
+                                                  color: ColorConstant.whiteColor,
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  border: Border.all(
+                                                    color: ColorConstant.primaryColor,
+                                                  ),
+                                                ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                                  children: [
+                                                    Expanded(
+                                                    child: Row(
+                                                      children: [
+                                                        Image.asset(
+                                                          AssetsConstant.offerIcon,
+                                                          // color: changeTheme(SharedPrefs
+                                                          //     .readStringValue(
+                                                          //     PrefConstants
+                                                          //         .gender)) ??
+                                                          //     ColorConstant.whiteColor,
+                                                          color: Colors.white,
+                                                          width: 25,
+                                                          height: 25,
+                                                        ),
+                                                        const SizedBox(width: 10),
+                                                        Text(
+                                                          "${_homeController.getServiceAddCartModel.data?.discountDetails?.code ?? ""} applied",
+                                                          style: AppTextTheme.medium.copyWith(
+                                                            fontFamily: "Outfit",           // ✅ Figma font
+                                                            fontWeight: FontWeight.w600,    // ✅ Medium (not bold)
+                                                            fontSize: 16,
+                                                            //color: const Color(0xFF000000),
+                                                            color: Colors.white,
+                                                            height: 1,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    )),
+                                                  Padding(
+                                                    padding: const EdgeInsets.only(left: 10),
+                                                    child: GestureDetector(
+                                                      onTap: () {
+                                                        _homeController.doRemovePromoCode(
+                                                            callback: () {
+                                                              _homeController
+                                                                  .doGetCart();
+                                                              //Commenting because of Pay after service
+                                                              // No need to creating razorpay order
+                                                              //     .whenComplete(() {
+                                                              //   _homeController
+                                                              //       .doGetOrderId();
+                                                              // });
+                                                            });
+                                                      },
+                                                      child: Container(
+                                                        height: 40,
+                                                        width: 100,
+                                                        decoration: BoxDecoration(
+                                                          color : Colors.white,
+                                                          //color: ColorConstant.redBgColor,
+                                                          borderRadius:
+                                                          BorderRadius.circular(10),
+                                                        ),
+                                                        child: Center(
+                                                          child: Text(
+                                                            "Remove",
+                                                            style: AppTextTheme.medium.copyWith(
+                                                              fontFamily: "Outfit",           // ✅ Figma font
+                                                              fontWeight: FontWeight.w600,    // ✅ Medium
+                                                              fontSize: 16,                   // ✅ correct size
+                                                              color: ColorConstant.blackColor, // or theme if needed
+                                                              height: 1,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  )
+                                                  ],
+                                                ),
+                                              )
+                                          ),
+                                          )
+                                        else
+                                          GestureDetector(
+                                            onTap: () async {
+                                              String id = await showModalBottomSheet(
+                                                  isScrollControlled: true,
+                                                  shape: const RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.only(
+                                                        topLeft: Radius.circular(32),
+                                                        topRight: Radius.circular(32),
+                                                      )),
+                                                  context: context,
+                                                  builder: (context) {
+                                                    return const PromoCodeSheetWidget();
+                                                  });
+
+                                              _homeController.doApplyPromoCode(
+                                                  data: {
+                                                    "discountId": id,
+                                                  },
+                                                  callback: () {
+                                                    _homeController
+                                                        .doGetCart();
+                                                    //Commenting because of Pay after service
+                                                    // No need to creating razorpay order
+                                                    //     .whenComplete(() {
+                                                    //   _homeController.doGetOrderId();
+                                                    // });
+                                                  });
                                             },
                                             child: Container(
-                                              height: 40,
-                                              width: 100,
+                                              height: 45,
+                                              width: 356,//Get.width,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 10),
+                                              margin: const EdgeInsets.symmetric(
+                                                  horizontal: 16),
                                               decoration: BoxDecoration(
-                                                color: ColorConstant.redBgColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(5),
-                                              ),
-                                              child: Center(
-                                                child: Text(
-                                                  "Remove",
-                                                  style: AppTextTheme.medium
-                                                      .copyWith(fontSize: 13),
+                                                gradient: const LinearGradient(
+                                                  colors: [
+                                                    Color(0xFF8454E5), // 🔥 left
+                                                    Color(0xFFCD73B4), // 🔥 right
+                                                  ],
+                                                  begin: Alignment.centerLeft,
+                                                  end: Alignment.centerRight,
                                                 ),
+                                                //color: ColorConstant.whiteColor,
+                                                borderRadius: BorderRadius.circular(10),
+                                                // border: Border.all(
+                                                //   color: ColorConstant.primaryColor,
+                                                // ),
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Image.asset(
+                                                        AssetsConstant.offerIcon,
+                                                        width: 25,
+                                                        color: Colors.white,
+                                                        // color: changeTheme(SharedPrefs
+                                                        //     .readStringValue(
+                                                        //     PrefConstants
+                                                        //         .gender)) ??
+                                                        //     ColorConstant.primaryColor,
+                                                        height: 25,
+                                                      ),
+                                                      const SizedBox(width: 10),
+                                                      Text(
+                                                        "Tap to Save More",
+                                                        style: AppTextTheme.bold.copyWith(
+                                                          fontFamily: "Outfit",          // ✅ Figma font
+                                                          fontWeight: FontWeight.w600,   // ✅ SemiBold
+                                                          fontSize: 16,                  // ✅ exact size
+                                                          //color: const Color(0xFF000000), // ✅ pure black
+                                                          color: Colors.white,
+                                                          height: 1,                     // ✅ tight line height (since H = 11)
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  const Icon(
+                                                    Icons.arrow_forward_ios,
+                                                    color: Colors.white,
+                                                    size: 20,
+                                                  )
+                                                ],
                                               ),
                                             ),
-                                          )
-                                        ],
-                                      ),
+                                          ),
+                                      ],
                                     ),
-                                  )
-                                else
-                                  GestureDetector(
-                                    onTap: () async {
-                                      String id = await showModalBottomSheet(
-                                          isScrollControlled: true,
-                                          shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(
-                                            topLeft: Radius.circular(32),
-                                            topRight: Radius.circular(32),
-                                          )),
-                                          context: context,
-                                          builder: (context) {
-                                            return const PromoCodeSheetWidget();
-                                          });
-
-                                      _homeController.doApplyPromoCode(
-                                          data: {
-                                            "discountId": id,
-                                          },
-                                          callback: () {
-                                            _homeController
-                                                .doGetCart()
-                                                .whenComplete(() {
-                                              _homeController.doGetOrderId();
-                                            });
-                                          });
-                                    },
-                                    child: Container(
-                                      height: 50,
+                                    const SizedBox(height: 15),
+                                    /*------------ Know What You are paying For ------------*/
+                                    Container(
                                       width: Get.width,
+                                      color: ColorConstant.whiteColor,
                                       padding: const EdgeInsets.symmetric(
-                                          horizontal: 10),
-                                      margin: const EdgeInsets.symmetric(
-                                          horizontal: 16),
-                                      decoration: BoxDecoration(
-                                        color: ColorConstant.whiteColor,
-                                        borderRadius: BorderRadius.circular(5),
-                                        border: Border.all(
-                                          color: ColorConstant.primaryColor,
-                                        ),
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                          horizontal: 20, vertical: 5),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Row(
+                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Image.asset(
-                                                AssetsConstant.offerIcon,
-                                                width: 25,
-                                                color: changeTheme(SharedPrefs
-                                                        .readStringValue(
-                                                            PrefConstants
-                                                                .gender)) ??
-                                                    ColorConstant.primaryColor,
-                                                height: 25,
-                                              ),
-                                              const SizedBox(width: 10),
+
+                                              /// LEFT → TITLE
                                               Text(
-                                                "Tap to Save More",
-                                                style: AppTextTheme.bold
-                                                    .copyWith(
-                                                        fontSize: 14,
-                                                        color: ColorConstant
-                                                            .blackColor),
+                                                "Your Cart",
+                                                style: AppTextTheme.bold.copyWith(
+                                                  fontSize: 20,
+                                                  color: ColorConstant.blackColor,
+                                                  fontFamily: 'Outfit',
+                                                ),
+                                              ),
+
+                                              /// RIGHT → EDIT STYLIST BUTTON
+                                              GestureDetector(
+                                                // onTap: () {
+                                                //   selectedArtistIdsGlobal.value = []; // 🔥 reset selection
+                                                //   _homeController.doGetArtiestListData();
+                                                //   Get.back(); // 👈 go back to stylist selection
+                                                // },
+                                                onTap: () {
+                                                  //selectedArtistIdsGlobal.value = [];
+
+                                                  /// 🔥 CLOSE BOTH SCREENS
+                                                  Get.back(); // appointment
+                                                  Get.back(); // bottom sheet
+
+                                                  /// 🔥 REOPEN FRESH BOTTOM SHEET
+                                                  Get.bottomSheet(
+                                                    SelectingArtistBottomSheetWidget(
+                                                      serviceId: _homeController
+                                                          .getServiceAddCartModel
+                                                          .data
+                                                          ?.salonId ??
+                                                          "",
+                                                      salonId: _homeController
+                                                          .getServiceAddCartModel
+                                                          .data
+                                                          ?.salonId ??
+                                                          "",
+                                                      callback: () {},
+                                                    ),
+                                                    isScrollControlled: true,
+                                                  );
+                                                },
+                                                child: Container(
+                                                  height: 30,
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                                  decoration: BoxDecoration(
+                                                    borderRadius: BorderRadius.circular(8),
+                                                    border: Border.all(
+                                                      color: changeTheme(
+                                                        SharedPrefs.readStringValue(PrefConstants.gender),
+                                                      ) ?? const Color(0xFF8565D0),
+                                                      width: 1.5,// Figma color
+                                                    ),
+                                                  ),
+                                                  child:  Center(
+                                                    child: Text(
+                                                      "Edit Stylist",
+                                                      style: TextStyle(
+                                                        fontFamily: "Outfit",
+                                                        fontSize: 13,
+                                                        fontWeight: FontWeight.w600,
+                                                        color: changeTheme(
+                                                          SharedPrefs.readStringValue(PrefConstants.gender),
+                                                    ) ?? const Color(0xFF8565D0),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
                                               ),
                                             ],
                                           ),
-                                          const Icon(
-                                            Icons.arrow_forward_ios,
-                                            size: 20,
-                                          )
+                                          const SizedBox(height: 5),
+                                          // Dash(
+                                          //   direction: Axis.horizontal,
+                                          //   length: Get.width * 0.88,
+                                          //   dashLength: 2,
+                                          //   dashColor: const Color(0xffCFCFCF),
+                                          // ),
+                                          const SizedBox(height: 10),
+                                          ListView.separated(
+                                              separatorBuilder: (context, index) {
+                                                return const Divider(
+                                                  height: 24,
+                                                  color: Color(0xffE0E0E0),
+                                                  thickness: 1.5,
+                                                );
+                                              },
+                                              shrinkWrap: true,
+                                              physics:
+                                              const NeverScrollableScrollPhysics(),
+                                              itemCount: _homeController
+                                                  .getServiceAddCartModel
+                                                  .data
+                                                  ?.servicesWithProduct
+                                                  ?.length ??
+                                                  0,
+                                              itemBuilder: (context, index) {
+                                                return KnowWhatYouWidget(
+                                                  serviceId: _homeController
+                                                      .getServiceAddCartModel
+                                                      .data
+                                                      ?.servicesWithProduct?[index]
+                                                      .serviceId ?? "",
+                                                  editProduct: () {
+                                                    showModalBottomSheet(
+                                                        isScrollControlled: true,
+                                                        shape:
+                                                        const RoundedRectangleBorder(
+                                                            borderRadius:
+                                                            BorderRadius.only(
+                                                              topLeft: Radius.circular(32),
+                                                              topRight: Radius.circular(32),
+                                                            )),
+                                                        context: context,
+                                                        builder: (context) {
+                                                          return AddProductSheetWidget(
+                                                            price: _homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.servicesWithProduct?[
+                                                            index]
+                                                                .totalCost ??
+                                                                0,
+                                                            rating: _homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.servicesWithProduct?[
+                                                            index]
+                                                                .rating ??
+                                                                0.0,
+                                                            review: 0,
+                                                            nameOfService: _homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.servicesWithProduct?[
+                                                            index]
+                                                                .name ??
+                                                                "",
+                                                            serviceId: _homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.servicesWithProduct?[
+                                                            index]
+                                                                .serviceId ??
+                                                                "",
+                                                          );
+                                                        });
+                                                  },
+                                                  removeBtn: () {
+                                                    _homeController.doRemoveCart(
+                                                        salonServiceId: _homeController
+                                                            .getServiceAddCartModel
+                                                            .data
+                                                            ?.servicesWithProduct?[
+                                                        index]
+                                                            .serviceId ??
+                                                            "",
+                                                        callback: () {
+                                                          // _homeController
+                                                          //     .doGetPopularServiceByYourStylist(
+                                                          //     stylistId:
+                                                          //     widget.artistIds.first);
+                                                          _homeController.doGetSalonDetailsService(
+                                                              serviceGender: SharedPrefs
+                                                                  .readStringValue(
+                                                                  PrefConstants
+                                                                      .gender) ==
+                                                                  "0"
+                                                                  ? "male"
+                                                                  : "female",
+                                                              salonId: _homeController
+                                                                  .getServiceAddCartModel
+                                                                  .data
+                                                                  ?.salonId ??
+                                                                  "");
+                                                          _homeController
+                                                              .doGetCart();
+                                                          _homeController.doGetSalonCart(
+                                                            salonId: _homeController
+                                                                .getServiceAddCartModel.data?.salonId ??
+                                                                "",
+                                                            callback: () {
+
+                                                              final items = _homeController
+                                                                  .getServiceAddCartModel
+                                                                  .data
+                                                                  ?.items;
+
+                                                              if (items == null || items.isEmpty) {
+                                                                stylistId.value = "";
+                                                                stylistId.notifyListeners();
+
+                                                                //print('going back to salon page');
+
+                                                                Get.back(); // cart page
+                                                                Get.back(); // salon page
+                                                              }
+                                                            },
+                                                          );
+                                                          //Commenting because of Pay after service
+                                                          // No need to creating razorpay order
+                                                          //     .whenComplete(() {
+                                                          //   _homeController
+                                                          //       .doGetOrderId();
+                                                          // });
+                                                          // if (_homeController
+                                                          //     .getServiceAddCartModel
+                                                          //     .data
+                                                          //     ?.items ==
+                                                          //     null) {
+                                                          //   stylistId.value = "";
+                                                          //   stylistId.notifyListeners();
+                                                          //   print('!!!!!!!!!!!!!!!!!!!!!!!');
+                                                          //   print('going back to salon page');
+                                                          //   Get.back();
+                                                          //   Get.back();
+                                                          // }
+                                                        }
+                                                        );
+                                                  },
+                                                  addBtn: () {
+                                                    _homeController.doAddCart(
+                                                      salonServiceId: _homeController
+                                                          .getServiceAddCartModel
+                                                          .data
+                                                          ?.servicesWithProduct?[index]
+                                                          .serviceId ?? "",
+                                                      isHomeService: false, // 👈 as you said
+                                                      callback: () {
+                                                        _homeController.doGetSalonDetailsService(
+                                                          serviceGender: SharedPrefs.readStringValue(PrefConstants.gender) == "0"
+                                                              ? "male"
+                                                              : "female",
+                                                          salonId: _homeController
+                                                              .getServiceAddCartModel.data?.salonId ??
+                                                              "",
+                                                        );
+
+                                                        _homeController.doGetCart();
+                                                        _homeController.doGetSalonCart(
+                                                          salonId: _homeController
+                                                              .getServiceAddCartModel.data?.salonId ??
+                                                              "",
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  items: _homeController
+                                                      .getServiceAddCartModel
+                                                      .data!
+                                                      .servicesWithProduct![index],
+                                                );
+                                              }),
+                                          const SizedBox(height: 100),
                                         ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+
+                           ),
+
+                          Positioned(
+                            bottom: 80,
+                            left: MediaQuery.of(context).size.width / 2 - 50, // 👈 CENTER FIX
+                            child: Center(
+                              child: GestureDetector(
+                                onTap: () {
+                                  selectedArtistIdsGlobal.value=[];
+                                  //Get.offAll(() => HomePage());
+                                  // Get.until((route) => Get.previousRoute == "");
+
+                                  // Future.delayed(const Duration(milliseconds: 100), () {
+                                  //   Get.to(() => SaloonAfterSelectingServicesPage(
+                                  //     id: _homeController.getServiceAddCartModel.data?.salonId ?? "",
+                                  //     callback: () {
+                                  //       _homeController.doGetCart();
+                                  //       Get.back();
+                                  //       Get.back();
+                                  //     },
+                                  //   ));
+                                  // });
+
+                                  Get.back();
+                                  Get.back();
+
+                                  Get.to(() => SaloonAfterSelectingServicesPage(
+                                    id: _homeController.getServiceAddCartModel.data?.salonId ?? "",
+                                    callback: () {
+                                      _homeController.doGetCart();
+
+                                    },
+                                  ));
+
+                                },
+                                child: Container(
+                                  height: 32,
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(
+                                      color: const Color(0xFF01AB4D),
+                                      width: 1.5,
+                                    ),
+                                    color: const Color(0x1401AB4D),
+                                  ),
+                                  child: const Center(
+                                    child: Text(
+                                      "Add More",
+                                      style: TextStyle(
+                                        fontFamily: "Outfit",
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                        color: Color(0xFF01AB4D),
                                       ),
                                     ),
                                   ),
-                              ],
-                            ),
-                            const SizedBox(height: 15),
-                            Dash(
-                              direction: Axis.horizontal,
-                              length: Get.width * 0.88,
-                              dashLength: 2,
-                              dashColor: const Color(0xffCFCFCF),
-                            ),
-                            /*------------ Know What You are paying For ------------*/
-                            Container(
-                              width: Get.width,
-                              color: ColorConstant.whiteColor,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 15),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    "Know What You Are Paying For",
-                                    style: AppTextTheme.bold.copyWith(
-                                        fontSize: 16,
-                                        color: ColorConstant.blackColor),
-                                  ),
-                                  const SizedBox(height: 15),
-                                  Dash(
-                                    direction: Axis.horizontal,
-                                    length: Get.width * 0.88,
-                                    dashLength: 2,
-                                    dashColor: const Color(0xffCFCFCF),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  ListView.separated(
-                                      separatorBuilder: (context, index) {
-                                        return const Divider(
-                                          height: 24,
-                                          color: Color(0xffE0E0E0),
-                                          thickness: 1.5,
-                                        );
-                                      },
-                                      shrinkWrap: true,
-                                      physics:
-                                          const NeverScrollableScrollPhysics(),
-                                      itemCount: _homeController
-                                              .getServiceAddCartModel
-                                              .data
-                                              ?.servicesWithProduct
-                                              ?.length ??
-                                          0,
-                                      itemBuilder: (context, index) {
-                                        return KnowWhatYouWidget(
-                                          editProduct: () {
-                                            showModalBottomSheet(
-                                                isScrollControlled: true,
-                                                shape:
-                                                    const RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius.only(
-                                                  topLeft: Radius.circular(32),
-                                                  topRight: Radius.circular(32),
-                                                )),
-                                                context: context,
-                                                builder: (context) {
-                                                  return AddProductSheetWidget(
-                                                    price: _homeController
-                                                            .getServiceAddCartModel
-                                                            .data
-                                                            ?.servicesWithProduct?[
-                                                                index]
-                                                            .totalCost ??
-                                                        0,
-                                                    rating: _homeController
-                                                            .getServiceAddCartModel
-                                                            .data
-                                                            ?.servicesWithProduct?[
-                                                                index]
-                                                            .rating ??
-                                                        0.0,
-                                                    review: 0,
-                                                    nameOfService: _homeController
-                                                            .getServiceAddCartModel
-                                                            .data
-                                                            ?.servicesWithProduct?[
-                                                                index]
-                                                            .name ??
-                                                        "",
-                                                    serviceId: _homeController
-                                                            .getServiceAddCartModel
-                                                            .data
-                                                            ?.servicesWithProduct?[
-                                                                index]
-                                                            .serviceId ??
-                                                        "",
-                                                  );
-                                                });
-                                          },
-                                          removeBtn: () {
-                                            _homeController.doRemoveCart(
-                                                salonServiceId: _homeController
-                                                        .getServiceAddCartModel
-                                                        .data
-                                                        ?.servicesWithProduct?[
-                                                            index]
-                                                        .serviceId ??
-                                                    "",
-                                                callback: () {
-                                                  _homeController
-                                                      .doGetPopularServiceByYourStylist(
-                                                          stylistId:
-                                                              widget.artiestId);
-                                                  _homeController.doGetSalonDetailsService(
-                                                      serviceGender: SharedPrefs
-                                                                  .readStringValue(
-                                                                      PrefConstants
-                                                                          .gender) ==
-                                                              "0"
-                                                          ? "male"
-                                                          : "female",
-                                                      salonId: _homeController
-                                                              .getServiceAddCartModel
-                                                              .data
-                                                              ?.salonId ??
-                                                          "");
-                                                  _homeController
-                                                      .doGetCart()
-                                                      .whenComplete(() {
-                                                    _homeController
-                                                        .doGetOrderId();
-                                                  });
-                                                  if (_homeController
-                                                          .getServiceAddCartModel
-                                                          .data
-                                                          ?.items ==
-                                                      null) {
-                                                    stylistId.value = "";
-                                                    stylistId.notifyListeners();
-                                                  }
-                                                });
-                                          },
-                                          items: _homeController
-                                              .getServiceAddCartModel
-                                              .data!
-                                              .servicesWithProduct![index],
-                                        );
-                                      }),
-                                  const SizedBox(height: 100),
-                                ],
+                                ),
                               ),
-                            )
-                          ],
-                        ),
-                ],
+                            ),
+                          )
+                        ]
+
+                    ),
+              ),
+            ),
+            floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+            floatingActionButton: Obx(
+                  () => _homeController.showProgress
+                  ? const SizedBox()
+                  : _homeController.getServiceAddCartModel.data?.servicesWithProduct
+                  ?.isEmpty ??
+                  false ||
+                      _homeController.getServiceAddCartModel.data
+                          ?.servicesWithProduct ==
+                          null
+                  ? const SizedBox()
+                  : Container(
+                width: Get.width,
+                height: 65,
+                    decoration: const BoxDecoration(
+                      color: ColorConstant.whiteColor,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(15),   // 👈 adjust value if needed
+                        topRight: Radius.circular(15),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0x1E000000),
+                          blurRadius: 8,
+                          offset: Offset(-2, -2),
+                          spreadRadius: 0,
+                        )
+                      ],
+                    ),                clipBehavior: Clip.none,
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: _showPriceBreakdownSheet,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                "Approx Payable",
+                                style: AppTextTheme.medium.copyWith(
+                                  fontFamily: "Outfit",           // ✅ Outfit font
+                                  fontWeight: FontWeight.w600,    // ✅ Medium (closest match)
+                                  fontSize: 13,
+                                  color: ColorConstant.grayTextColor,
+                                  height: 1,
+                                ),
+                              ),
+
+                            ],
+                          ),
+                          const SizedBox(height: 2),
+                          Row(
+                              children: [
+                                Text(
+                                  "₹${_homeController.getTotalPrice().toStringAsFixed(2)}",
+                                  style: AppTextTheme.bold.copyWith(
+                                    fontFamily: "Outfit",          // ✅ Figma font
+                                    fontWeight: FontWeight.w800,   // ✅ Bold
+                                    fontSize: 19,                  // ✅ correct size
+                                    color: const Color(0xFF000000),
+                                    height: 1,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Transform.rotate(
+                                  angle: 3.1416, // 180° in radians
+                                  child: Icon(
+                                    Icons.expand_circle_down,
+                                    size: 24,
+                                    color: Colors.black,
+                                  ),
+                                )
+                              ]
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            "View Breakdown",
+                            style: AppTextTheme.medium.copyWith(
+                              fontFamily: "Outfit",           // ✅ Figma font
+                              fontWeight: FontWeight.w500,    // ✅ Medium (not regular)
+                              fontSize: 12,
+                              color: const Color(0xFF000000),
+                              height: 1,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        // _payAndBook();
+                        //_showBookingOptionsBottomSheet(context);
+                        _showPaymentInfoDialog(context);
+                      },
+                      child: Container(
+                          height: 50,
+                          width: 140,//Get.width * 0.40,
+                          //padding: Padding(padding: padding),
+                          decoration: BoxDecoration(
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender)) ??
+                                ColorConstant.primaryColor,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  children: [
+                                    TextSpan(
+                                      text: "Book &\n",
+                                      style: AppTextTheme.bold.copyWith( // or directly TextStyle if needed
+                                        fontFamily: "Outfit",
+                                        fontWeight: FontWeight.w800, // 🔥 ExtraBold
+                                        fontSize: 15,
+                                        color: ColorConstant.whiteColor,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: "Pay After Service",
+                                      style: AppTextTheme.bold.copyWith(
+                                        fontFamily: "Outfit",
+                                        fontWeight: FontWeight.w800, // 🔥 ExtraBold
+                                        fontSize: 15,
+                                        color: ColorConstant.whiteColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              // const SizedBox(width: 5),
+                              // const Icon(
+                              //   Icons.arrow_forward,
+                              //   color: ColorConstant.whiteColor,
+                              //   size: 20,
+                              // )
+                            ],
+                          )
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
           ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Obx(
-          () => _homeController.showProgress
-              ? const SizedBox()
-              : _homeController.getServiceAddCartModel.data?.servicesWithProduct
-                          ?.isEmpty ??
-                      false ||
-                          _homeController.getServiceAddCartModel.data
-                                  ?.servicesWithProduct ==
-                              null
-                  ? const SizedBox()
-                  : Container(
-                      width: Get.width,
-                      height: 100,
-                      decoration: const BoxDecoration(
-                        color: ColorConstant.whiteColor,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color(0x1E000000),
-                            blurRadius: 8,
-                            offset: Offset(-2, -2),
-                            spreadRadius: 0,
-                          )
-                        ],
-                      ),
-                      clipBehavior: Clip.none,
-                      padding: const EdgeInsets.symmetric(horizontal: 15),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Column(
-                          //   mainAxisAlignment: MainAxisAlignment.center,
-                          //   crossAxisAlignment: CrossAxisAlignment.start,
-                          //   children: [
-                          //     Text(
-                          //       "Total Price",
-                          //       style: AppTextTheme.bold.copyWith(
-                          //           fontSize: 13,
-                          //           color: ColorConstant.grayTextColor),
-                          //     ),
-                          //     const SizedBox(height: 2),
-                          //     Text(
-                          //       "₹${(_homeController.getServiceAddCartModel.data?.price ?? 0).toStringAsFixed(2)}",
-                          //       style: AppTextTheme.bold.copyWith(
-                          //           fontSize: 19,
-                          //           color: ColorConstant.blackColor),
-                          //     ),
-                          //     const SizedBox(height: 2),
-                          //     Text(
-                          //       "GST is included",
-                          //       style: AppTextTheme.regular.copyWith(
-                          //           color: ColorConstant.blackColor,
-                          //           fontSize: 12),
-                          //     )
-                          //   ],
-                          // ),
-                          GestureDetector(
-                            onTap: _showPriceBreakdownSheet,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      "Total Payable",
-                                      style: AppTextTheme.bold.copyWith(
-                                        fontSize: 13,
-                                        color: ColorConstant.grayTextColor,
-                                      ),
-                                    ),
+        )
+    );
+  }
 
-                                  ],
-                                ),
-                                const SizedBox(height: 2),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "₹${(_homeController.getServiceAddCartModel.data?.price ?? 0).toStringAsFixed(2)}",
-                                      style: AppTextTheme.bold.copyWith(
-                                        fontSize: 19,
-                                        color: ColorConstant.blackColor,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 5),
-                                    Transform.rotate(
-                                      angle: 3.1416, // 180° in radians
-                                      child: Icon(
-                                        Icons.expand_circle_down,
-                                        size: 24,
-                                        color: Colors.black,
-                                      ),
-                                    )
-                                  ]
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  "View Breakdown",
-                                  style: AppTextTheme.regular.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 12,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              _payAndBook();
-                              //_showBookingOptionsBottomSheet(context);
-                            },
-                            child: Container(
-                              height: 45,
-                              width: Get.width * 0.35,
-                              decoration: BoxDecoration(
-                                color: changeTheme(SharedPrefs.readStringValue(
-                                    PrefConstants.gender)) ??
-                                    ColorConstant.primaryColor,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Pay & Book",
-                                    //"Book",
-                                    textScaler: const TextScaler.linear(0.85),
-                                    style: AppTextTheme.medium.copyWith(
-                                        fontSize: 20,
-                                        color: ColorConstant.whiteColor),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  const Icon(
-                                    Icons.arrow_forward,
-                                      color: ColorConstant.whiteColor, size: 20)
-                                ],
-                              ),
-                            ),
-                          )
-                        ],
-                      ),
-          ),
-        ),
-      ),
-    ));
+  List<String> generateTimeSlots() {
+    List<String> slots = [];
+
+    DateTime now = DateTime.now();
+
+    // 👉 Round to next 15-minute slot
+    int minute = now.minute;
+    int remainder = minute % 15;
+
+    if (remainder != 0) {
+      now = now.add(Duration(minutes: 15 - remainder));
+    }
+
+    // Optional: remove seconds
+    now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+
+    DateTime end = DateTime(now.year, now.month, now.day, 21, 0); // 9 PM
+
+    while (now.isBefore(end)) {
+      slots.add(DateFormat("HH:mm").format(now));
+      now = now.add(const Duration(minutes: 15));
+    }
+
+    return slots;
   }
 
   void _showPriceBreakdownSheet() {
     final data = _homeController.getServiceAddCartModel.data;
+    final double total = _homeController.getTotalPrice();
 
     /// ORIGINAL service total
     final double original =
     (data?.totalPrice ?? 0).toDouble();
+
 
     /// DISCOUNT applied
     final double discount =
@@ -866,9 +1248,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     final double gst =
     (data?.cartTaxDetails?.totalTaxAmount ?? 0).toDouble();
 
-    /// FINAL PAYABLE
-    final double total =
-    (data?.price ?? 0).toDouble();
+    // /// FINAL PAYABLE
+    // final double total =
+    // (data?.price ?? 0).toDouble();
 
     final double platformFee =
     (data?.platformFee ?? 0).toDouble();
@@ -901,13 +1283,19 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               /// TITLE
               Text(
                 "Price Breakdown",
-                style: AppTextTheme.bold.copyWith(fontSize: 16,color: ColorConstant.blackColor),
+                style: AppTextTheme.bold.copyWith(
+                  fontFamily: "Outfit",          // ✅ Figma font
+                  fontWeight: FontWeight.w600,   // ✅ SemiBold (not full bold)
+                  fontSize: 16,
+                  color: const Color(0xFF000000),
+                  height: 1,
+                ),
               ),
 
               const SizedBox(height: 16),
 
               /// ORIGINAL PRICE
-              _priceRow("Original Price", original),
+              _priceRow("If Original Price is", original),
 
               /// GST
               //_priceRow("GST", gst),
@@ -946,7 +1334,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               const Divider(height: 24),
 
               /// FINAL TOTAL
-              _priceRow("Total Payable", total, isBold: true),
+              _priceRow("Approx Payable", total, isBold: true),
             ],
           ),
         );
@@ -990,7 +1378,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _priceRow("GST", gst),
+                      _priceRow("GST (5%)", gst),
                       const SizedBox(height: 6),
                       _priceRow("Platform Fee", platformFee),
                     ],
@@ -1018,10 +1406,16 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
           Text(
             label,
             style: AppTextTheme.medium.copyWith(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              fontFamily: "Outfit",                // ✅ added
+              fontWeight: isBold
+                  ? FontWeight.w600               // ✅ SemiBold (total row)
+                  : FontWeight.w500,              // ✅ Medium (normal rows)
+              fontSize: 13,                       // ✅ consistent
               color: isDiscount
                   ? Colors.green
-                  : (isBold ? Colors.black : ColorConstant.grayTextColor),
+                  : (isBold
+                  ? Colors.black
+                  : ColorConstant.grayTextColor),
             ),
           ),
           Text(
@@ -1029,14 +1423,299 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                 ? "- ₹${value.toStringAsFixed(2)}"
                 : "₹${value.toStringAsFixed(2)}",
             style: AppTextTheme.medium.copyWith(
-              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              fontFamily: "Outfit",                // ✅ added
+              fontWeight: isBold
+                  ? FontWeight.w600
+                  : FontWeight.w500,
+              fontSize: 13,
               color: isDiscount
                   ? Colors.green
-                  : (isBold ? Colors.black : ColorConstant.blackColor),
+                  : (isBold
+                  ? Colors.black
+                  : ColorConstant.blackColor),
             ),
           ),
         ],
       ),
+    );
+  }
+  void _showPaymentInfoDialog(BuildContext context) {
+    final themeColor = changeTheme(
+      SharedPrefs.readStringValue(PrefConstants.gender),
+    ) ??
+        ColorConstant.primaryColor;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Stack(
+          alignment: Alignment.center,
+          clipBehavior: Clip.none,
+          children: [
+
+            AlertDialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+              contentPadding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
+
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start, // 🔥 IMPORTANT
+                children: [
+
+                  /// 🔥 TITLE (only this is centered)
+                  Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          color: Colors.orange,
+                          size: 26,
+                        ),
+                        SizedBox(width: 8),
+                        Text(
+                          "How It Works",
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Outfit',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 🔥 STEPS (LEFT ALIGNED)
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "1. ",
+                        style: TextStyle(
+                          fontFamily: 'Outfit',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "Book Your Appointment in the App",
+                          style: TextStyle(
+                            fontFamily: 'Outfit',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            //height: 0.8,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "2. ",
+                        style: TextStyle(
+                          fontFamily: 'Outfit',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "Visit the Salon and Get Your Services Done",
+                          style: TextStyle(
+                            fontFamily: 'Outfit',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            //height: 0.8,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text(
+                        "3. ",
+                        style: TextStyle(
+                          fontFamily: 'Outfit',
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "Enter the Bill Amount in the App and Pay the Discounted Price in the App",
+                          style: TextStyle(
+                            fontFamily: 'Outfit',
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            //height: 0.8,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 🔥 SECTION TITLE (LEFT — FIXED)
+                  Center(
+                      child: Text(
+                    "Things To Keep In Mind",
+                    style: TextStyle(
+                      fontFamily: 'Outfit',
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )),
+
+                  const SizedBox(height: 12),
+
+                  /// 🔥 BULLETS
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text("• "),
+                      Expanded(
+                        child: Text(
+                          "You can make changes (Add / Delete) to your services at the salon",
+                          style: TextStyle(
+                            fontFamily: 'Outfit',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("• "),
+                      Expanded(
+                        child: RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              fontFamily: 'Outfit',
+                              fontSize: 15,
+                              fontWeight: FontWeight.w500,
+                              height: 1.4,
+                              color: Colors.black,
+                            ),
+                            children: [
+                              const TextSpan(
+                                text: "Discount can be availed only if you ",
+                              ),
+                              TextSpan(
+                                text: "Pay in App",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: themeColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text("• "),
+                      Expanded(
+                        child: Text(
+                          "Prices may vary based on the length, density or thickness of the hair in some services",
+                          style: TextStyle(
+                            fontFamily: 'Outfit',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 20),
+
+                  /// 🔥 BUTTON
+                  Center(
+                      child: SizedBox(
+                    width: 227,//double.infinity,
+                    height: 38,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: themeColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        _bookPayAfterService();
+                      },
+                      child: const Text(
+                        textAlign: TextAlign.center,
+                        "Proceed To Book",
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontFamily: 'Outfit',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  )),
+                ],
+              ),
+            ),
+
+            /// 🔥 CLOSE BUTTON
+            Positioned(
+              top: 90,
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.close, size: 24),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -1104,33 +1783,33 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                    child: RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        children: [
-                          TextSpan(
-                            text: "Pay After Service ",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: changeTheme(
-                                SharedPrefs.readStringValue(PrefConstants.gender),
-                              ) ??
-                                  ColorConstant.primaryColor,
-                              fontWeight: FontWeight.w600,
-                            ),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text: "Pay After Service ",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender),
+                            ) ??
+                                ColorConstant.primaryColor,
+                            fontWeight: FontWeight.w600,
                           ),
+                        ),
 
-                          TextSpan(
-                            text: "   (+2.36%)",
-                            style: TextStyle(
-                              fontSize: 11, // 👈 small text
-                              color: Colors.grey[600], // 👈 subtle
-                              fontWeight: FontWeight.w500,
-                            ),
+                        TextSpan(
+                          text: "   (+2.36%)",
+                          style: TextStyle(
+                            fontSize: 11, // 👈 small text
+                            color: Colors.grey[600], // 👈 subtle
+                            fontWeight: FontWeight.w500,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
+                  ),
                 ),
               ),
             ],
@@ -1159,7 +1838,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   //       isHomeService:
   //       _homeController.getServiceAddCartModel.data?.isHomeService ??
   //           false,
-  //       salonArtistId: widget.artiestId,
+  //       salonArtistId: widget.artistIds.first,
   //       startAt: isoDateTime);
   //   var options = {
   //     'key': _homeController
@@ -1261,7 +1940,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       userAddressId: userServiceAddressIdSelect,
       isHomeService:
       _homeController.getServiceAddCartModel.data?.isHomeService ?? false,
-      salonArtistId: widget.artiestId,
+      salonArtistId: widget.artistIds.first,
       startAt: isoDateTime,
     );
 
@@ -1306,34 +1985,113 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     razorpay.open(options);
   }
 
-  Future<void> _bookPayAfterService() async {
-    if (selectTime == ""){
-      selectTime =
-          _homeController.getAvailabilitiesTimeSlotModelData.data?[0].time ??
-              "";
-    }
-    else {
-      selectTime = selectTime;
-    }
-    String inputDateTime = "$selectDate$selectTime";
-    String correctedDateTime =
-        '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
-    DateTime dateTime = DateTime.parse(correctedDateTime);
-    String isoDateTime = dateTime.toIso8601String();
+  // Future<void> _bookPayAfterService() async {
+  //   // ✅ 1. Cart validation
+  //   if (_homeController.getServiceAddCartModel.data?.items?.isEmpty ?? true) {
+  //     showMessage("Cart Service Not Found");
+  //     return;
+  //   }
+  //
+  //   // ✅ 2. Slot validation — MUST be before selectTime logic
+  //   final slots = _homeController
+  //       .getAvailabilitiesTimeSlotModelData
+  //       .data;
+  //
+  //   if (slots == null || slots.isEmpty) {
+  //     showMessage(
+  //       "No slots available for today.\nPlease select a future date.",
+  //     );
+  //     return; // 👈 VERY IMPORTANT
+  //   }
+  //
+  //   if (selectTime == ""){
+  //     selectTime =
+  //         _homeController.getAvailabilitiesTimeSlotModelData.data?[0].time ??
+  //             "";
+  //   }
+  //   else {
+  //     selectTime = selectTime;
+  //   }
+  //   String inputDateTime = "$selectDate$selectTime";
+  //   String correctedDateTime =
+  //       '${inputDateTime.substring(0, 10)}T${inputDateTime.substring(10)}';
+  //   DateTime dateTime = DateTime.parse(correctedDateTime);
+  //   String isoDateTime = dateTime.toIso8601String();
+  //
+  //   final cartItems = _homeController.getServiceAddCartModel.data?.items ?? [];
+  //
+  //   Map<String, String> serviceArtistMap = {};
+  //   print(cartItems);
+  //   print('**********************');
+  //
+  //
+  //   int artistIndex = 0;
+  //
+  //   for (var item in cartItems) {
+  //     print(item.isService);
+  //     print(item.service?.name ?? "");
+  //
+  //     if (item.isService == true) {
+  //       final serviceId = item.service?.id ?? "";
+  //
+  //       if (widget.artistIds.isNotEmpty && serviceId.isNotEmpty) {
+  //         serviceArtistMap[serviceId] =
+  //         widget.artistIds[artistIndex % widget.artistIds.length];
+  //
+  //         artistIndex++; // move to next artist
+  //       }
+  //     }
+  //   }
+  //
+  //   print(serviceArtistMap);
+  //   _homeController.doCreateBooking(
+  //       userAddressId: "",
+  //       isHomeService:
+  //       _homeController.getServiceAddCartModel.data?.isHomeService ??
+  //           false,
+  //       salonArtistId: widget.artistIds.first,
+  //       serviceArtistMap: Map<String, String>.from(serviceArtistMap),
+  //       startAt: isoDateTime,
+  //       callback: ()
+  //       {
+  //         stylistId.value = "";
+  //         stylistId.notifyListeners();
+  //         _navigateAfterBooking();
+  //       }
+  //   );
+  // }
 
+  Future<void> _bookPayAfterService() async {
+    // ✅ 1. Cart validation
+    if (_homeController.getServiceAddCartModel.data?.items?.isEmpty ?? true) {
+      showMessage("Cart Service Not Found");
+      return;
+    }
+
+    // ✅ 2. Slot validation (NEW SYSTEM)
+    if (selectedSlots.isEmpty) {
+      showMessage("Please select at least one time slot");
+      return;
+    }
+
+    // ✅ 3. Attach date to slots (IMPORTANT)
+    List<String> finalSlots = selectedSlots.map((slot) {
+      final dt = DateTime.parse("$selectDate $slot");
+      return dt.toIso8601String();
+    }).toList();
+
+    // ✅ 4. Create booking (NEW PAYLOAD)
     _homeController.doCreateBooking(
-        userAddressId: "",
-        isHomeService:
-            _homeController.getServiceAddCartModel.data?.isHomeService ??
-                false,
-        salonArtistId: widget.artiestId,
-        startAt: isoDateTime,
-        callback: ()
-        {
-          stylistId.value = "";
-          stylistId.notifyListeners();
-          _navigateAfterBooking();
-        }
+      stylistIds: selectedArtistIdsGlobal.value, // 👈 ALL selected stylists
+      selectedSlots: finalSlots,                 // 👈 date + time slots
+      isHomeService:
+      _homeController.getServiceAddCartModel.data?.isHomeService ?? false,
+      userAddressId: "",
+      callback: () {
+        stylistId.value = "";
+        stylistId.notifyListeners();
+        _navigateAfterBooking();
+      },
     );
   }
   /*================  Razor Pay ==============*/
@@ -1450,7 +2208,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     //           isHomeService:
     //               _homeController.getServiceAddCartModel.data?.isHomeService ??
     //                   false,
-    //           salonArtistId: widget.artiestId,
+    //           salonArtistId: widget.artistIds.first,
     //           startAt: isoDateTime,
     //           callback: () {
     //             stylistId.value = "";
@@ -1472,7 +2230,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     //         isHomeService:
     //             _homeController.getServiceAddCartModel.data?.isHomeService ??
     //                 false,
-    //         salonArtistId: widget.artiestId,
+    //         salonArtistId: widget.artistIds.first,
     //         startAt: isoDateTime,
     //         callback: () {
     //           stylistId.value = "";
@@ -1501,7 +2259,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     //         isHomeService:
     //             _homeController.getServiceAddCartModel.data?.isHomeService ??
     //                 false,
-    //         salonArtistId: widget.artiestId,
+    //         salonArtistId: widget.artistIds.first,
     //         startAt: isoDateTime,
     //         callback: () {
     //           stylistId.value = "";
@@ -1523,7 +2281,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     //         isHomeService:
     //             _homeController.getServiceAddCartModel.data?.isHomeService ??
     //                 false,
-    //         salonArtistId: widget.artiestId,
+    //         salonArtistId: widget.artistIds.first,
     //         startAt: isoDateTime,
     //         callback: () {
     //           // Get.to(() => YourApprovalPage(
@@ -1548,32 +2306,36 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   String selectDate = "";
 
   /*------------  Time Slot ------*/
-  _timeSlotContainerWidget(
-      {required String timeSlot,
-      required bool isSelected,
-      required VoidCallback onPress}) {
+  _timeSlotContainerWidget({
+    required String timeSlot,
+    required bool isSelected,
+    required VoidCallback onPress,
+  }) {
     return InkWell(
       onTap: onPress,
       child: Container(
-        padding: const EdgeInsets.all(14),
-        margin: const EdgeInsets.only(right: 12),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
+        margin: const EdgeInsets.only(right: 8),
         decoration: BoxDecoration(
           color: isSelected
               ? changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
-                  ColorConstant.primaryColor
-              : ColorConstant.whiteColor,
-          borderRadius: BorderRadius.circular(6),
-          border: Border.all(color: ColorConstant.grayBorderColor, width: 1),
+            SharedPrefs.readStringValue(PrefConstants.gender),
+          )
+              : Colors.black12,
+          borderRadius: BorderRadius.circular(10),
         ),
         child: Center(
           child: Text(
             timeSlot,
             style: AppTextTheme.bold.copyWith(
-                color: isSelected
-                    ? ColorConstant.whiteColor
-                    : ColorConstant.blackColor,
-                fontSize: 13),
+              fontFamily: "Outfit",           // ✅ Figma font
+              fontWeight: FontWeight.w600,    // ✅ SemiBold
+              fontSize: 14,                   // ✅ correct size
+              color: isSelected
+                  ? Colors.white
+                  : const Color(0xFF000000),
+              height: 1,
+            ),
           ),
         ),
       ),
@@ -1586,17 +2348,18 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
   /*---------------  Date Calender Time ------------*/
   EasyDateTimeLine _customBackgroundExample() {
+
     final List<Map<String, String>> unavailableDates = [];
 
     for (int i = 0;
-        i <
-            (_homeController.getUnAvailableDatesListData.data?.unavailableDates
-                    ?.length ??
-                0);
-        i++) {
+    i <
+        (_homeController.getUnAvailableDatesListData.data?.unavailableDates
+            ?.length ??
+            0);
+    i++) {
       unavailableDates.add({
         "date": _homeController
-                .getUnAvailableDatesListData.data?.unavailableDates?[i].date ??
+            .getUnAvailableDatesListData.data?.unavailableDates?[i].date ??
             ""
       });
     }
@@ -1615,55 +2378,366 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
         Iterable<RegExpMatch> matches = regExp.allMatches(inputString);
         String result = matches.map((match) => match.group(0)).join('');
         String year = DateFormat("yyyy").format(DateTime.now());
-        String finalDate =
-            "$year-${result.length == 1 ? '0$result' : result}-01";
+        // String finalDate =
+        //     "$year-${result.length == 1 ? '0$result' : result}-01";
+        final now = DateTime.now();
+
+        final selectedMonth = int.parse(result);
+        final selectedYear = now.year;
+
+        DateTime newDate;
+
+        if (selectedMonth == now.month && selectedYear == now.year) {
+          /// ✅ CURRENT MONTH → go to TODAY
+          newDate = now;
+        } else {
+          /// ✅ OTHER MONTH → go to 1st
+          newDate = DateTime(selectedYear, selectedMonth, 1);
+        }
+
+        String finalDate = DateFormat("yyyy-MM-dd").format(newDate);
 
         // Update selectDate to the first day of the new month
         setState(() {
           selectDate = finalDate;
         });
 
-        _homeController.doGetUnAvailableDatesListData(
-          artiestId: widget.artiestId,
-          date: finalDate,
-          callback: () {
-            _homeController.doGetAvailabilitiesTimeSlot(
-              artiestId: widget.artiestId,
-              date: finalDate,
-            );
-          },
-        );
+        // _homeController.doGetUnAvailableDatesListData(
+        //   artiestId: widget.artistIds.first,
+        //   date: finalDate,
+        //   callback: () {
+        //     // _homeController.doGetAvailabilitiesTimeSlot(
+        //     //   artiestId: widget.artistIds.first,
+        //     //   date: finalDate,
+        //     // );
+        //   },
+        // );
       },
       initialDate:
-          selectDate == "" ? DateTime.now() : DateTime.parse(selectDate),
+      selectDate == "" ? DateTime.now() : DateTime.parse(selectDate),
+      // initialDate: selectDate.isEmpty
+      //     ? DateTime.now()
+      //     : DateTime.parse(selectDate).subtract(const Duration(days: 3)),
       onDateChange: (selectedDate) {
         //`selectedDate` the new date selected.
         selectDate = "";
         String formatDate = DateFormat("yyyy-MM-dd").format(selectedDate);
         selectDate = formatDate;
-        _homeController.doGetAvailabilitiesTimeSlot(
-          artiestId: widget.artiestId,
-          date: formatDate,
-        );
+        // final formatDate = DateFormat("yyyy-MM-dd").format(selectedDate);
+        //
+        // setState(() {
+        //   selectDate = formatDate;
+        // });
+        // _homeController.doGetAvailabilitiesTimeSlot(
+        //   artiestId: widget.artistIds.first,
+        //   date: formatDate,
+        // );
+        /// 🔥 ADD THIS (CENTER FIX)
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final index = selectedDate.day - 1; // 🔥 key logic
+          _scrollToCenter(index);
+        });
       },
-      headerProps: const EasyHeaderProps(
-          showSelectedDate: true,
-          monthPickerType: MonthPickerType.switcher,
-          dateFormatter: DateFormatter.dayOnly()),
+      // headerProps: const EasyHeaderProps(
+      //     showSelectedDate: true,
+      //     monthPickerType: MonthPickerType.switcher,
+      //     dateFormatter: DateFormatter.dayOnly()),
+      headerProps: EasyHeaderProps(
+        showSelectedDate: true,
+        monthPickerType: MonthPickerType.switcher,
+        // ✅ THIS FIXES ALIGNMENT
+        //padding: const EdgeInsets.symmetric(horizontal: 0),
+
+        /// 🔥 Force proper layout
+        //centerAlign: false, // 👈 IMPORTANT
+
+        /// 🔥 STYLE FOR "Saturday"
+        selectedDateStyle: TextStyle(
+          fontFamily: "Outfit",
+          fontSize: 20,
+          fontWeight: FontWeight.w700, // bold
+          color: Colors.black,
+        ),
+
+        /// 🔥 STYLE FOR "Mar"
+        monthStyle: TextStyle(
+          fontFamily: "Outfit",
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: Colors.black,
+        ),
+
+        dateFormatter: DateFormatter.dayOnly(),
+      ),
       disabledDates: dateTimeList,
       dayProps: EasyDayProps(
-        height: 72,
-        width: 58,
+        height: 58,
+        width: 56,
         dayStructure: DayStructure.dayStrDayNum,
+
+        /// ✅ SELECTED DAY (Purple box)
         activeDayStyle: DayStyle(
           decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(8)),
+            borderRadius: const BorderRadius.all(Radius.circular(5)), // 🔥 slightly bigger like Figma
             color: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ??
+              SharedPrefs.readStringValue(PrefConstants.gender),
+            ) ??
                 ColorConstant.primaryColor,
+          ),
+          dayNumStyle: const TextStyle(
+            fontFamily: "Outfit",
+            fontWeight: FontWeight.w700, // ✅ Bold
+            fontSize: 22,
+            color: Colors.white,
+          ),
+          dayStrStyle: const TextStyle(
+            fontFamily: "Outfit",
+            fontWeight: FontWeight.w400, // ✅ Regular
+            fontSize: 14,
+            color: Colors.white,
+          ),
+        ),
+
+        /// ❌ UNSELECTED DAY (Grey box)
+        inactiveDayStyle: DayStyle(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            color: Colors.black.withOpacity(0.05), // 🔥 softer grey (Figma-like)
+          ),
+          dayNumStyle: const TextStyle(
+            fontFamily: "Outfit",
+            fontWeight: FontWeight.w700, // ✅ Bold
+            fontSize: 20,
+            color: Colors.black,
+          ),
+          dayStrStyle: TextStyle(
+            fontFamily: "Outfit",
+            fontWeight: FontWeight.w400, // ✅ Regular
+            fontSize: 13,
+            color: Colors.black.withOpacity(0.6), // ✅ subtle fade
+          ),
+        ),
+
+        /// 🔒 DISABLED DAYS (optional but better UX)
+        disabledDayStyle: DayStyle(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(12)),
+            color: Colors.grey.shade200,
+          ),
+          dayNumStyle: TextStyle(
+            fontFamily: "Outfit",
+            fontWeight: FontWeight.w600,
+            fontSize: 18,
+            color: Colors.grey.shade400,
+          ),
+          dayStrStyle: TextStyle(
+            fontFamily: "Outfit",
+            fontWeight: FontWeight.w400,
+            fontSize: 12,
+            color: Colors.grey.shade400,
           ),
         ),
       ),
+    );
+  }
+
+  DateTime currentMonth = DateTime.now();
+  Widget _customDateTimeline() {
+
+    final today = DateTime.now();
+    // final today = DateTime(
+    //   currentMonth.year,
+    //   currentMonth.month,
+    //   DateTime.now().day,
+    // );
+
+    final List<DateTime> dates = List.generate(
+      30,
+          (index) => today.add(Duration(days: index)),
+    );
+
+    /// 🔥 unavailable dates (same logic)
+    final unavailableDates = (_homeController
+        .getUnAvailableDatesListData.data?.unavailableDates ??
+        [])
+        .map((e) => DateFormat("yyyy-MM-dd").format(DateTime.parse(e.date ?? "")))
+        .toSet();
+
+    final selected = selectDate.isEmpty
+        ? DateTime.now()
+        : DateTime.parse(selectDate);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            /// 🔥 LEFT → DAY
+            Text(
+              DateFormat("EEEE").format(selected),
+              style: const TextStyle(
+                fontFamily: "Outfit",
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: Colors.black,
+              ),
+            ),
+
+            /// 🔥 RIGHT → MONTH (AUTO)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0), // adjust 8 → 12/16 if needed
+              child: Text(
+                DateFormat("MMM").format(currentMonth),
+                style: const TextStyle(
+                  fontFamily: "Outfit",
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black,
+                ),
+              ),
+            )
+          ],
+        ),
+        const SizedBox(height: 15),
+
+        /// 🔥 TIMELINE (EXACT UI)
+        SizedBox(
+          height: 58,
+          child: ListView.builder(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            itemCount: dates.length,
+            itemBuilder: (context, index) {
+              final date = dates[index];
+              final formatted = DateFormat("yyyy-MM-dd").format(date);
+
+              final isSelected = formatted == selectDate;
+              final isDisabled = unavailableDates.contains(formatted);
+
+              return GestureDetector(
+                onTap: isDisabled
+                    ? null
+                    : () {
+                  setState(() {
+                    selectDate = formatted;
+                    currentMonth = date;
+                  });
+
+                  // _homeController.doGetAvailabilitiesTimeSlot(
+                  //   artiestId: widget.artistIds.first,
+                  //   date: formatted,
+                  // );
+
+                  _scrollToCenter(index);
+                },
+                child: Container(
+                  width: 56,
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(
+                      isSelected ? 5 : 12,
+                    ),
+                    color: isDisabled
+                        ? Colors.grey.shade200
+                        : isSelected
+                        ? changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender),
+                    ) ??
+                        ColorConstant.primaryColor
+                        : Colors.black.withOpacity(0.05),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+
+                      /// 🔥 DAY STRING (EXACT STYLE)
+                      Text(
+                        DateFormat("EEE").format(date),
+                        style: TextStyle(
+                          fontFamily: "Outfit",
+                          fontWeight: FontWeight.w400,
+                          fontSize: isDisabled ? 12 : 13,
+                          color: isDisabled
+                              ? Colors.grey.shade400
+                              : isSelected
+                              ? Colors.white
+                              : Colors.black.withOpacity(0.6),
+                        ),
+                      ),
+
+                      /// 🔥 DATE NUMBER (EXACT STYLE)
+                      Text(
+                        DateFormat("d").format(date),
+                        style: TextStyle(
+                          fontFamily: "Outfit",
+                          fontWeight: isDisabled
+                              ? FontWeight.w600
+                              : FontWeight.w700,
+                          fontSize: isSelected ? 22 : (isDisabled ? 18 : 20),
+                          color: isDisabled
+                              ? Colors.grey.shade400
+                              : isSelected
+                              ? Colors.white
+                              : Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _onMonthChange(DateTime val) {
+    currentMonth = val;
+
+    /// 🔥 EXACT SAME LOGIC AS YOUR OLD CODE
+    String month = val.month.toString().padLeft(2, '0');
+    String year = val.year.toString();
+
+    String finalDate = "$year-$month-01";
+
+    setState(() {
+      selectDate = finalDate;
+    });
+
+    // _homeController.doGetUnAvailableDatesListData(
+    //   artiestId: widget.artistIds.first,
+    //   date: finalDate,
+    //   callback: () {
+    //     // _homeController.doGetAvailabilitiesTimeSlot(
+    //     //   artiestId: widget.artistIds.first,
+    //     //   date: finalDate,
+    //     // );
+    //   },
+    // );
+
+    /// 🔥 CENTER FIRST DAY
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scrollToCenter(0);
+    });
+  }
+
+  void _scrollToCenter(int index) {
+    final itemWidth = 72.0; // width + margin
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    final offset =
+        (index * itemWidth) - (screenWidth / 2) + (itemWidth / 2);
+
+    _scrollController.animateTo(
+      offset.clamp(
+        _scrollController.position.minScrollExtent,
+        _scrollController.position.maxScrollExtent,
+      ),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
     );
   }
 
@@ -1713,31 +2787,4 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
   }
 
-// Secret santa commented
-  // Future<void> _navigateAfterBooking() async {
-  //   final booking = _homeController.getCreateBookingAppointmentModel.data;
-  //
-  //   if (booking?.complimentaryServiceId != null &&
-  //       (booking?.complimentaryServiceName?.isNotEmpty ?? false)) {
-  //     final bool? isClaimed = await showDialog<bool>(
-  //       context: context,
-  //       barrierDismissible: false,
-  //       builder: (_) => SecretSantaScratchDialog(
-  //         rewardName: booking!.complimentaryServiceName! +
-  //             ' ' +
-  //             booking!.complimentaryServiceCategoryName!,
-  //       ),
-  //     );
-  //
-  //     Get.to(() => YourApprovalPage(
-  //       salonAppointmentId: booking?.salonAppointmentId ?? "",
-  //       isClaimed: isClaimed, // 👈 NOW IT EXISTS
-  //     ));
-  //
-  //   } else {
-  //     Get.to(() => YourApprovalPage(
-  //       salonAppointmentId: booking?.salonAppointmentId ?? "",
-  //     ));
-  //   }
-  // }
 }

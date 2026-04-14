@@ -30,6 +30,9 @@ class Data {
   double? rating;
   String? id;
   String? name;
+  String? displayName;
+  String? amenities;
+  String? serviceGender;
   String? description;
   String? email;
   String? countryCode;
@@ -37,6 +40,7 @@ class Data {
   String? address;
   String? image;
   List<String>? images;
+  List<String>? menuImages;
   String? googleplaceid;
   GeoLocationPoint? geoLocationPoint;
   String? createdAt;
@@ -56,12 +60,16 @@ class Data {
         this.id,
         this.name,
         this.description,
+        this.displayName,
+        this.amenities,
+        this.serviceGender,
         this.email,
         this.countryCode,
         this.mobile,
         this.address,
         this.image,
         this.images,
+        this.menuImages,
         this.googleplaceid,
         this.geoLocationPoint,
         this.createdAt,
@@ -82,6 +90,9 @@ class Data {
     id = json['id'];
     name = json['name'];
     description = json['description'];
+    displayName = json['displayName'];
+    amenities = json['amenities'];
+    serviceGender = json['serviceGender'];
     email = json['email'];
     countryCode = json['countryCode'];
     mobile = json['mobile'];
@@ -90,6 +101,9 @@ class Data {
     googleplaceid = json['googleplaceid'];
     if (json['images'] != null) {
       images = List<String>.from(json['images'].map((e) => e.toString()));
+    }
+    if (json['menuImages'] != null) {
+      menuImages = List<String>.from(json['menuImages'].map((e) => e.toString()));
     }
     geoLocationPoint = json['geoLocationPoint'] != null
         ? GeoLocationPoint.fromJson(json['geoLocationPoint'])
@@ -118,6 +132,9 @@ class Data {
     data['id'] = id;
     data['name'] = name;
     data['description'] = description;
+    data['displayName'] = displayName;
+    data['amenities'] = amenities;
+    data['serviceGender'] = serviceGender;
     data['email'] = email;
     data['countryCode'] = countryCode;
     data['mobile'] = mobile;

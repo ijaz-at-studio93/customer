@@ -32,8 +32,8 @@ class LocationTileWidget extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(5),
-                    topRight: Radius.circular(5),
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
                   ),
                   child: CachedNetworkImage(
                     width: Get.width,
@@ -94,11 +94,12 @@ class LocationTileWidget extends StatelessWidget {
                       SizedBox(
                         width: Get.width * 0.5,
                         child: Text(
-                          '${salonListData.salon?.name}',
+                          '${salonListData.salon?.displayName}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           textScaler: const TextScaler.linear(0.85),
                           style: AppTextTheme.bold.copyWith(
+                              fontFamily: 'Outfit',
                               fontSize: 19, color: ColorConstant.blackColor),
                         ),
                       ),
@@ -117,6 +118,7 @@ class LocationTileWidget extends StatelessWidget {
                             child: Text(
                               '${salonListData.salon?.address}',
                               style: AppTextTheme.medium.copyWith(
+                                fontFamily: 'Outfit',
                                   fontSize: 13,
                                   color: ColorConstant.grayTextColor),
                             ),

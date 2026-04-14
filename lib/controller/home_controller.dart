@@ -30,10 +30,13 @@ import 'package:salon_customer/model/un_available_dates_model.dart';
 import 'package:salon_customer/model/user_booking_qr_code_model.dart';
 import 'package:salon_customer/util/logger.dart';
 import '../model/artiest_popular_service_model.dart';
+import '../model/cart/salon_service_add_cart_model.dart';
 
 class HomeController extends GetxController {
   /*>>>>>>>>>>>>>>>>>>>> Loader <<<<<<<<<<<<<<<<<<<<<*/
   final Rx<bool> _showProgress = false.obs;
+
+  Rxn<dynamic> pendingBooking = Rxn();
 
   bool get showProgress => _showProgress.value;
 
@@ -197,6 +200,13 @@ class HomeController extends GetxController {
 
   set setServiceAddCartModel(val) => _serviceAddCartModel.value = val;
 
+  final Rx<SalonServiceAddCartModel> _salonServiceAddCartModel =
+      SalonServiceAddCartModel().obs;
+
+  SalonServiceAddCartModel get getSalonServiceAddCartModel => _salonServiceAddCartModel.value;
+
+  set setSalonServiceAddCartModel(val) => _salonServiceAddCartModel.value = val;
+
   /*--------------- Product  List Data Get  -------------*/
   final Rx<ServiceProductModel> _serviceProductModel =
       ServiceProductModel().obs;
@@ -303,7 +313,8 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _homeCategoryListModel.value =
-          await HomeAPI.homeCategoryList(gender: gender);
+      await HomeAPI.homeCategoryList(gender: gender);
+      //_homeCategoryListModel.refresh();
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -372,6 +383,8 @@ class HomeController extends GetxController {
     required VoidCallback callback,
   }) async {
     try {
+      debugPrint("\n🔴 [API START → RemovePackage]");
+      debugPrint("IDs → $serviceCategoryIds");
       _showProgress.value = true;
       bool result = await HomeAPI.removePackageCategory(
           serviceCategoryIds: serviceCategoryIds);
@@ -451,8 +464,8 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _salonDetailsListData.value =
-          await HomeAPI.getSalonDetailsCategoryServiceList(
-              salonId: salonId, serviceGender: serviceGender);
+      await HomeAPI.getSalonDetailsCategoryServiceList(
+          salonId: salonId, serviceGender: serviceGender);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -502,7 +515,7 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _salonDetailsArtiestData.value =
-          await HomeAPI.salonDetailsArtiest(salonId: salonId);
+      await HomeAPI.salonDetailsArtiest(salonId: salonId);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -537,7 +550,7 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _unAvailableDatesListData.value =
-          await HomeAPI.getUnAvailableDates(artiestId: artiestId, date: date);
+      await HomeAPI.getUnAvailableDates(artiestId: artiestId, date: date);
 
       if (_unAvailableDatesListData.value.data?.isMonthAvailable ?? false) {
         callback.call();
@@ -558,8 +571,8 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _availabilitiesTimeSlotModelData.value =
-          await HomeAPI.getAvailabilitiesTimeSlot(
-              artiestId: artiestId, date: date);
+      await HomeAPI.getAvailabilitiesTimeSlot(
+          artiestId: artiestId, date: date);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -571,36 +584,71 @@ class HomeController extends GetxController {
   }
 
   /*----------------------- Create Booking  ForCustomer -----------------*/
-  doCreateBooking({
-    required String salonArtistId,
-    required String startAt,
+  // doCreateBooking({
+  //   required String salonArtistId,
+  //   required Map<String, String> serviceArtistMap,
+  //   required String startAt,
+  //   required bool isHomeService,
+  //   required String userAddressId,
+  //   required VoidCallback callback,
+  // }) async {
+  //   try {
+  //     _showBookingProgress.value = true;
+  //     _createBookingAppointmentModel.value = await HomeAPI.userCreateBooking(
+  //         salonArtistId: salonArtistId,
+  //         serviceArtistMap: serviceArtistMap,
+  //         startAt: startAt,
+  //         isHomeService: isHomeService,
+  //         userAddressId: userAddressId);
+  //     if (_createBookingAppointmentModel
+  //         .value.data?.completionToken?.isNotEmpty ??
+  //         false) {
+  //       callback.call();
+  //     }
+  //   } catch (e) {
+  //     showError(e);
+  //     if (kDebugMode) {
+  //       print("Create Booking  ForCustomer $e");
+  //     }
+  //   } finally {
+  //     _showBookingProgress.value = false;
+  //   }
+  // }
+
+  Future<void> doCreateBooking({
+    required List<String> stylistIds,
+    required List<String> selectedSlots,
     required bool isHomeService,
     required String userAddressId,
     required VoidCallback callback,
   }) async {
     try {
       _showBookingProgress.value = true;
-      _createBookingAppointmentModel.value = await HomeAPI.userCreateBooking(
-          salonArtistId: salonArtistId,
-          startAt: startAt,
-          isHomeService: isHomeService,
-          userAddressId: userAddressId);
+
+      _createBookingAppointmentModel.value =
+      await HomeAPI.userCreateBooking(
+        stylistIds: stylistIds,
+        selectedSlots: selectedSlots,
+        isHomeService: isHomeService,
+        userAddressId: userAddressId,
+      );
+
       if (_createBookingAppointmentModel
-              .value.data?.completionToken?.isNotEmpty ??
+          .value.data?.completionToken?.isNotEmpty ??
           false) {
         callback.call();
       }
     } catch (e) {
       showError(e);
       if (kDebugMode) {
-        print("Create Booking  ForCustomer $e");
+        print("Create Booking ForCustomer $e");
       }
     } finally {
       _showBookingProgress.value = false;
     }
   }
 
-fetchBookingByRazorpayOrderId({
+  fetchBookingByRazorpayOrderId({
     required String razorpayOrderId,
   }) async {
     _createBookingAppointmentModel.value = await HomeAPI.getBookingByRazorpayOrderId(
@@ -629,7 +677,7 @@ fetchBookingByRazorpayOrderId({
     try {
       _showProgress.value = true;
       _userBookingQrCodeModel.value =
-          await HomeAPI.userBookingQrCodeDetails(appointmentId: appointmentId);
+      await HomeAPI.userBookingQrCodeDetails(appointmentId: appointmentId);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -640,21 +688,49 @@ fetchBookingByRazorpayOrderId({
     }
   }
 
-  /*------------------- Get  Current Booking List  Data --------------*/
+  // /*------------------- Get  Current Booking List  Data --------------*/
+  // doGetCurrentBookingListData() async {
+  //   try {
+  //     _showProgress.value = true;
+  //     _currentBookingListModel.value = await HomeAPI.currentBookingList();
+  //   } catch (e) {
+  //     showError(e);
+  //     if (kDebugMode) {
+  //       print("Current Booking List  Data $e");
+  //     }
+  //   } finally {
+  //     _showProgress.value = false;
+  //   }
+  // }
+
   doGetCurrentBookingListData() async {
     try {
       _showProgress.value = true;
+
       _currentBookingListModel.value = await HomeAPI.currentBookingList();
+
+      final bookings = _currentBookingListModel.value?.data ?? [];
+
+      /// Find booking where payment is pending
+      try {
+        pendingBooking.value = bookings.firstWhere(
+              (b) =>
+          b.paymentStatus == "pending" &&
+              (b.orderStatus == "pending" || b.orderStatus == "confirmed"),
+        );
+      } catch (e) {
+        pendingBooking.value = null;
+      }
+
     } catch (e) {
       showError(e);
       if (kDebugMode) {
-        print("Current Booking List  Data $e");
+        print("Current Booking List Data $e");
       }
     } finally {
       _showProgress.value = false;
     }
   }
-
   /*-----------------  Add  Favourite Salon ---------------*/
   doAddFavouriteSalon({required String salonId}) async {
     try {
@@ -708,8 +784,8 @@ fetchBookingByRazorpayOrderId({
   /*------------------------ Add Cart ----------------*/
   doAddCart(
       {required String salonServiceId,
-      required bool isHomeService,
-      required VoidCallback callback}) async {
+        required bool isHomeService,
+        required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.serviceAddCart(
@@ -733,7 +809,7 @@ fetchBookingByRazorpayOrderId({
     try {
       _showProgress.value = true;
       bool result =
-          await HomeAPI.serviceRemoveAddCart(salonServiceId: salonServiceId);
+      await HomeAPI.serviceRemoveAddCart(salonServiceId: salonServiceId);
       if (result) {
         callback.call();
       }
@@ -756,6 +832,7 @@ fetchBookingByRazorpayOrderId({
     try {
       if (useGlobalLoader) _showProgress.value = true;          // changed
       _serviceAddCartModel.value = await HomeAPI.getUserCart();
+      tempQty.clear(); // 👈 ADD THIS
       if (_serviceAddCartModel.value.data?.items?.isEmpty ?? false) {
         stylistId.value = "";
       }
@@ -765,6 +842,96 @@ fetchBookingByRazorpayOrderId({
     } finally {
       if (useGlobalLoader) _showProgress.value = false;         // changed
     }
+  }
+
+  doGetSalonCart({bool useGlobalLoader = true,required String salonId,VoidCallback? callback}) async {
+    // keep your one-shot skip if you added it
+    if (_skipNextGetCart.value) { _skipNextGetCart.value = false; callback?.call(); return; }
+
+    try {
+      if (useGlobalLoader) _showProgress.value = true;          // changed
+      _salonServiceAddCartModel.value = await HomeAPI.getUserSalonCart(salonId: salonId);
+      tempQty.clear(); // 👈 ADD THIS
+      if (_salonServiceAddCartModel.value.data?.items?.isEmpty ?? false) {
+        stylistId.value = "";
+      }
+      update(); // or refresh()
+      callback?.call();
+    } catch (e) {
+      showError(e);
+      if (kDebugMode) print("Get Cart $e");
+    } finally {
+      if (useGlobalLoader) _showProgress.value = false;         // changed
+    }
+  }
+
+  final RxMap<String, int> tempQty = <String, int>{}.obs;
+
+  int getQuantity(String serviceId) {
+    /// 🔥 TEMP UI LAYER FIRST
+    if (tempQty.containsKey(serviceId)) {
+      return tempQty[serviceId]!;
+    }
+
+    /// 🔥 BACKEND FALLBACK
+    final services = getServiceAddCartModel.data?.servicesWithProduct ?? [];
+
+    final item = services.firstWhere(
+          (e) => e.serviceId == serviceId,
+      orElse: () => ServicesWithProduct(quantity: 0),
+    );
+
+    return item.quantity ?? 0;
+  }
+
+  Future<void> doSendSalonRequest(String message) async {
+    try {
+      _showProgress.value = true;
+
+      await HomeAPI.sendSalonRequest(message);
+
+    } catch (e) {
+      showError(e);
+      if (kDebugMode) print("Salon Request Error $e");
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  int getTotalItems() {
+    final services = getServiceAddCartModel.data?.servicesWithProduct ?? [];
+
+    int total = 0;
+
+    for (var s in services) {
+      final id = s.serviceId ?? "";
+
+      if (tempQty.containsKey(id)) {
+        total += tempQty[id]!;
+      } else {
+        total += s.quantity ?? 0;
+      }
+    }
+
+    return total;
+  }
+
+  double getTotalPrice() {
+    final data = getServiceAddCartModel.data;
+
+    final double subtotal = (data?.taxAbleTotal ?? 0).toDouble(); // after discount
+    final double gst = (data?.cartTaxDetails?.totalTaxAmount ?? 0).toDouble();
+    final double platformFee = (data?.platformFee ?? 0).toDouble();
+
+    return subtotal + gst + platformFee;
+  }
+
+  double getPriceNoGST() {
+    final data = getServiceAddCartModel.data;
+
+    final double subtotal = (data?.taxAbleTotal ?? 0).toDouble(); // after discount
+
+    return subtotal;
   }
 
   /*---------- Clear Cart --------------*/
@@ -789,9 +956,9 @@ fetchBookingByRazorpayOrderId({
 
   doAddProductCart(
       {required String productId,
-      required String productSelectedServiceId,
-      required bool isHomeService,
-      required VoidCallback callback}) async {
+        required String productSelectedServiceId,
+        required bool isHomeService,
+        required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       _serviceAddCartModel.value = await HomeAPI.addProductCart(
@@ -814,8 +981,8 @@ fetchBookingByRazorpayOrderId({
   /*----------------- Remove Cart in  Product ------------------*/
   doRemoveProductCart(
       {required String productId,
-      required String productSelectedServiceId,
-      required VoidCallback callback}) async {
+        required String productSelectedServiceId,
+        required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.removeProductCart(
@@ -870,6 +1037,29 @@ fetchBookingByRazorpayOrderId({
     }
   }
 
+  createPaymentOrder({
+    required String? bookingOrderId,
+    required int billAmount,
+    required int payableAmount,
+    bool useGlobalLoader = true,
+  }) async {
+    try {
+      if (useGlobalLoader) _showProgress.value = true;
+
+      _orderIdModel.value = await HomeAPI.createPaymentOrder(
+        bookingOrderId: bookingOrderId,
+        billAmount: billAmount,
+        payableAmount: payableAmount,
+      );
+
+    } catch (e) {
+      showError(e);
+      if (kDebugMode) print("Create Payment Order $e");
+    } finally {
+      if (useGlobalLoader) _showProgress.value = false;
+    }
+  }
+
   /*----------------------------  Upload PortFolio --------------------*/
   doUploadPortFolio({
     required String appointmentId,
@@ -888,7 +1078,7 @@ fetchBookingByRazorpayOrderId({
       );
 
       if (result) {
-        showMessage("Portfolio Request Sent Successfully");
+        //showMessage("Portfolio Request Sent Successfully");
       }
     } catch (e) {
       showError(e);
@@ -900,12 +1090,34 @@ fetchBookingByRazorpayOrderId({
     }
   }
 
+  doUploadImage(
+      {required String appointmentId,
+        required List<String> multiplePath,
+        required List<String> multiplePathVideo,
+        required VoidCallback callback}) async {
+    try {
+      _showProgress.value = true;
+      String result = await HomeAPI.uploadImage(
+          appointmentId: appointmentId,
+          multiplePath: multiplePath,
+          multipleVideo: multiplePathVideo);
+      if (result != "") {
+        callback.call();
+      }
+    } catch (e) {
+      showError(e);
+      print("Error Data Show new ${e.toString()}");
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
   /*---------------------  Get Review Data List Model ----------------*/
   doGetReviewDataList({required String appointmentId}) async {
     try {
       _showProgress.value = true;
       _reviewDataListModel.value =
-          await HomeAPI.reviewListDataGet(appointmentId: appointmentId);
+      await HomeAPI.reviewListDataGet(appointmentId: appointmentId);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -917,30 +1129,82 @@ fetchBookingByRazorpayOrderId({
     }
   }
 
+  final RxBool hasPendingReview = false.obs;
+  final RxString pendingReviewBookingId = "".obs;
+  final RxString pendingReviewsalonId = "".obs;
+  RxBool isSubmittingReview = false.obs;
+
+  doCheckPendingReview() async {
+    try {
+      _showProgress.value = true;
+
+      final data = await HomeAPI.getPendingReview();
+
+      if (data["hasPendingReview"] == true) {
+        hasPendingReview.value = true;
+        pendingReviewBookingId.value = data["bookingId"];
+        pendingReviewsalonId.value = data["salonId"];
+      } else {
+        hasPendingReview.value = false;
+      }
+
+    } catch (e) {
+      showError(e);
+      if (kDebugMode) {
+        print("Pending Review Error $e");
+      }
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
   /*>>>>>>>>>>>>>>>>>>>>>> Add Review <<<<<<<<<<<<<<<<<<<<<<<*/
   /*============= Service ================*/
-  doAddServiceReview({
+  // doAddServiceReview({
+  //   required String appointmentId,
+  //   required double rate,
+  //   required String salonServiceId,
+  //   required String review,
+  //   required VoidCallback callback,
+  // }) async {
+  //   try {
+  //     _showAddProgress.value = true;
+  //     bool result = await HomeAPI.addAppointmentServiceReview(
+  //         appointmentId: appointmentId,
+  //         rate: rate,
+  //         salonServiceId: salonServiceId,
+  //         review: review);
+  //     if (result) {
+  //       callback.call();
+  //     }
+  //   } catch (e) {
+  //     showError(e);
+  //     if (kDebugMode) {
+  //       print("Add Service Review$e");
+  //     }
+  //   } finally {
+  //     _showAddProgress.value = false;
+  //   }
+  // }
+
+  Future<bool> doAddServiceReview({
     required String appointmentId,
     required double rate,
     required String salonServiceId,
     required String review,
-    required VoidCallback callback,
   }) async {
     try {
       _showAddProgress.value = true;
-      bool result = await HomeAPI.addAppointmentServiceReview(
-          appointmentId: appointmentId,
-          rate: rate,
-          salonServiceId: salonServiceId,
-          review: review);
-      if (result) {
-        callback.call();
-      }
+
+      return await HomeAPI.addAppointmentServiceReview(
+        appointmentId: appointmentId,
+        rate: rate,
+        salonServiceId: salonServiceId,
+        review: review,
+      );
     } catch (e) {
       showError(e);
-      if (kDebugMode) {
-        print("Add Service Review$e");
-      }
+      return false;
     } finally {
       _showAddProgress.value = false;
     }
@@ -975,28 +1239,51 @@ fetchBookingByRazorpayOrderId({
   }
 
 /*================ Artiest ==================*/
-  doAddArtiestReview({
+  // doAddArtiestReview({
+  //   required String appointmentId,
+  //   required double rate,
+  //   required String salonArtistId,
+  //   required String review,
+  //   required VoidCallback callback,
+  // }) async {
+  //   try {
+  //     _showAddProgress.value = true;
+  //     bool result = await HomeAPI.addAppointmentArtiestReview(
+  //         appointmentId: appointmentId,
+  //         rate: rate,
+  //         salonArtistId: salonArtistId,
+  //         review: review);
+  //     if (result) {
+  //       callback.call();
+  //     }
+  //   } catch (e) {
+  //     showError(e);
+  //     if (kDebugMode) {
+  //       print("Add Artiest Review $e");
+  //     }
+  //   } finally {
+  //     _showAddProgress.value = false;
+  //   }
+  // }
+
+  Future<bool> doAddArtistReview({
     required String appointmentId,
     required double rate,
     required String salonArtistId,
     required String review,
-    required VoidCallback callback,
   }) async {
     try {
       _showAddProgress.value = true;
-      bool result = await HomeAPI.addAppointmentArtiestReview(
-          appointmentId: appointmentId,
-          rate: rate,
-          salonArtistId: salonArtistId,
-          review: review);
-      if (result) {
-        callback.call();
-      }
+
+      return await HomeAPI.addAppointmentArtiestReview(
+        appointmentId: appointmentId,
+        rate: rate,
+        salonArtistId: salonArtistId,
+        review: review,
+      );
     } catch (e) {
       showError(e);
-      if (kDebugMode) {
-        print("Add Artiest Review $e");
-      }
+      return false;
     } finally {
       _showAddProgress.value = false;
     }
@@ -1007,7 +1294,7 @@ fetchBookingByRazorpayOrderId({
     try {
       _showProgress.value = true;
       _artiestDetailsModel.value =
-          await HomeAPI.getArtiestPortfolio(artistId: artistId);
+      await HomeAPI.getArtiestPortfolio(artistId: artistId);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -1105,7 +1392,7 @@ fetchBookingByRazorpayOrderId({
     try {
       _showProgress.value = true;
       _searchSalonModel.value =
-          await HomeAPI.searchForSalon(query: query, lat: lat, lng: lng);
+      await HomeAPI.searchForSalon(query: query, lat: lat, lng: lng);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -1119,11 +1406,11 @@ fetchBookingByRazorpayOrderId({
   /*--------------------  Save Address For User ---------------*/
   doSaveAddress(
       {required String geolocationLat,
-      required String geolocationLng,
-      required String address,
-      required String directions,
-      required String house,
-      required VoidCallback callback}) async {
+        required String geolocationLng,
+        required String address,
+        required String directions,
+        required String house,
+        required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.saveAddressUser(
@@ -1148,12 +1435,12 @@ fetchBookingByRazorpayOrderId({
   /*----------------  Edit  Save Address For User --------------*/
   doSaveEditAddress(
       {required String geolocationLat,
-      required String geolocationLng,
-      required String address,
-      required String addressID,
-      required String directions,
-      required String house,
-      required VoidCallback callback}) async {
+        required String geolocationLng,
+        required String address,
+        required String addressID,
+        required String directions,
+        required String house,
+        required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.saveEditAddressUser(
@@ -1196,7 +1483,7 @@ fetchBookingByRazorpayOrderId({
     try {
       _showProgress.value = true;
       _artistSearchModel.value =
-          await HomeAPI.searchArtiest(salonId: salonId, q: q);
+      await HomeAPI.searchArtiest(salonId: salonId, q: q);
     } catch (e) {
       if (kDebugMode) {
         print("Get Search Artiest $e");
@@ -1231,7 +1518,7 @@ fetchBookingByRazorpayOrderId({
     try {
       _showProgress.value = true;
       _artistPopularServicesModel.value =
-          await HomeAPI.getPopularServiceByYourStylist(stylistId);
+      await HomeAPI.getPopularServiceByYourStylist(stylistId);
     } catch (e) {
       if (kDebugMode) {
         print("Get Popular Service $e");
@@ -1267,7 +1554,7 @@ fetchBookingByRazorpayOrderId({
     try {
       _showProgress.value = true;
       _salonIdReviewsModel.value =
-          await HomeAPI.salonIdToReview(salonId: salonId);
+      await HomeAPI.salonIdToReview(salonId: salonId);
     } catch (e) {
       if (kDebugMode) {
         print("Get Salon Review $e");
@@ -1281,12 +1568,12 @@ fetchBookingByRazorpayOrderId({
   /*--------------------------- Get  PromoCode -------------------------*/
   doGetPromoCode(
       {required double lat,
-      required double lng,
-      required String orderBy,
-      required String serviceGender,
-      required bool nearest,
-      required bool fourPlusRating,
-      required bool homeService}) async {
+        required double lng,
+        required String orderBy,
+        required String serviceGender,
+        required bool nearest,
+        required bool fourPlusRating,
+        required bool homeService}) async {
     try {
       _showProgress.value = true;
       _promoCodeModel.value = await HomeAPI.getPromoCode(
@@ -1322,6 +1609,68 @@ fetchBookingByRazorpayOrderId({
     }
   }
 
+  Map<String, dynamic>? getBestDiscount(int amount) {
+
+    final promos = getPromoCodeModelList.data ?? [];
+
+    int bestDiscount = 0;
+    dynamic bestPromo;
+
+    final now = DateTime.now();
+
+    for (var promo in promos) {
+
+      DateTime? startDate;
+      DateTime? endDate;
+
+      if (promo.startsAt != null) {
+        startDate = DateTime.parse(promo.startsAt!.replaceAll(" ", "T"));
+      }
+
+      if (promo.endsAt != null) {
+        endDate = DateTime.parse(promo.endsAt!.replaceAll(" ", "T"));
+      }
+
+      if (startDate != null && now.isBefore(startDate)) continue;
+      if (endDate != null && now.isAfter(endDate)) continue;
+
+      int minOrder = int.tryParse(promo.minOrder?.toString() ?? '0') ?? 0;
+      if (amount < minOrder) continue;
+
+      double promoAmount =
+          double.tryParse(promo.amount?.toString() ?? '0') ?? 0;
+
+      int maxDiscount =
+          int.tryParse(promo.maxDiscount?.toString() ?? '0') ?? 0;
+
+      int discount = 0;
+
+      if (promo.type == "percentage") {
+
+        discount = ((amount * promoAmount) / 100).floor();
+
+        if (maxDiscount > 0 && discount > maxDiscount) {
+          discount = maxDiscount;
+        }
+
+      } else {
+
+        discount = promoAmount.toInt();
+      }
+
+      if (discount > bestDiscount) {
+        bestDiscount = discount;
+        bestPromo = promo;
+      }
+    }
+
+    if (bestPromo == null) return null;
+
+    return {
+      "discount": bestDiscount,
+      "promo": bestPromo,
+    };
+  }
   /*-------------------  Get PromoCode List  ----------------------*/
   doGetSalonPromoCode({required String salonId}) async {
     try {
@@ -1347,7 +1696,8 @@ fetchBookingByRazorpayOrderId({
 
       // Fetch both without toggling the loader again
       await doGetCart(useGlobalLoader: false);
-      await doGetOrderId(useGlobalLoader: false);
+      // Commenting because of Pay after Service.
+      //await doGetOrderId(useGlobalLoader: false);
 
       // Make the page's immediate doGetCart() a no-op if you added the guard earlier
       _skipNextGetCart.value = true;
@@ -1400,16 +1750,20 @@ fetchBookingByRazorpayOrderId({
 
   Future<StandardResponse> cancelBooking({
     required String bookingId,
-    required String artistId,
+    //required String artistId,
     required String status,
     //required VoidCallback callback,
+    required String cancellationReasonId,
+    required String? cancellationRemark,
   }) async {
     try {
       //_showProgress.value = true;
       bool result = await HomeAPI.approveBooking(
           bookingId: bookingId,
-          artistId: artistId,
-          status: status);
+          //artistId: artistId,
+          status: status,
+          cancellationReasonId: cancellationReasonId,
+          cancellationRemark: cancellationRemark);
 
       if (result) {
         return StandardResponse(success: true, message: "Cancelled successfully");

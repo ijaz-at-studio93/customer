@@ -93,7 +93,7 @@ class _AddAddressSheetState extends State<AddAddressSheet> {
                         const SizedBox(height: 10),
                         _address(
                             title: "Direction To Reach (Optional)",
-                            textInputAction: TextInputAction.none,
+                            textInputAction: TextInputAction.unspecified,
                             textEditingController: _description,
                             hintText: "Direction To Reach........",
                             textInputType: TextInputType.text),

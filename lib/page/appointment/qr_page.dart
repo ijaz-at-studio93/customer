@@ -1,26 +1,18 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
-import 'package:salon_customer/constant/api_constant.dart';
-import 'package:salon_customer/constant/assetsconstant.dart';
-import 'package:salon_customer/constant/color_constant.dart';
-import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
-import 'package:salon_customer/page/appointment/widget/promocode_sheet_widget.dart';
+import 'package:salon_customer/page/appointment/payment_success_page.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
-import 'package:salon_customer/project_specific/text_theme.dart';
-import 'package:salon_customer/util/SharedPrefs.dart';
-import 'package:ticket_widget/ticket_widget.dart';
+import 'package:salon_customer/constant/color_constant.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../api/dio_client.dart';
+import '../../api/home_api.dart';
+import '../../constant/variable_constant.dart';
 import '../../controller/auth_controller.dart';
-import '../../model/user_booking_qr_code_model.dart';
-import '../../util/call_wrapper.dart';
+import '../../util/SharedPrefs.dart';
 import '../bottom_navigation_bar.dart';
-import 'dart:ui';
 
 class QRCodePage extends StatefulWidget {
   final String appointmentId;
@@ -36,22 +28,32 @@ class QRCodePage extends StatefulWidget {
   State<QRCodePage> createState() => _QRCodePageState();
 }
 
-class _QRCodePageState extends State<QRCodePage> {
+class _QRCodePageState extends State<QRCodePage>
+    with TickerProviderStateMixin {
+
   late Razorpay razorpay;
-  final _authController = Get.find<AuthController>();
+  bool showBreakdown = false;
+  final FocusNode _amountFocus = FocusNode();
+
   final _homeController = Get.find<HomeController>();
-  final Rx<UserBookingQrCodeModel> getUserBookingQrCodeModel =
-      UserBookingQrCodeModel().obs;
+  final TextEditingController _amountController = TextEditingController();
+  final _authController = Get.find<AuthController>();
 
   @override
   void initState() {
     super.initState();
 
     razorpay = Razorpay();
-    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, handlePaymentSuccessResponse);
-    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, handlePaymentErrorResponse);
+
+    razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    _amountController.addListener(() {
+      setState(() {});
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+
       await _homeController.doCreateQrCode(
         appointmentId: widget.appointmentId,
       );
@@ -76,646 +78,1965 @@ class _QRCodePageState extends State<QRCodePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isPaymentPending =
-        _homeController.getUserBookingQrCodeModel.data?.paymentStatus
-            ?.toLowerCase() ==
-            "pending";
+
+    print("SHOW PROGRESS: ${_homeController.showProgress}");
     return Scaffold(
-      backgroundColor:
-      changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
-          ColorConstant.primaryColor,
+      backgroundColor: ColorConstant.whiteColor,
+
       appBar: AppBar(
-        backgroundColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
-            ColorConstant.primaryColor,
-        elevation: 0.0,
+        backgroundColor: ColorConstant.whiteColor,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
         leading: IconButton(
-            onPressed: () {
-              if (widget.isBooking) {
-                Get.offAll(() => const BottomNavBarPage());
-              } else {
-                Get.back();
-              }
-            },
-            icon: const Icon(Icons.arrow_back)),
+          onPressed: () {
+            print("CAN POP: ${Get.key.currentState?.canPop()}");
+            if (widget.isBooking) {
+              Get.offAll(() => const BottomNavBarPage());
+            } else {
+              Get.back();
+            }
+          },
+          icon: const Icon(Icons.arrow_back),
+        ),
       ),
-      body: Obx(
-            () => _homeController.showProgress
-            ? const ProgressBarView()
-            : SingleChildScrollView(
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: CachedNetworkImage(
-                  height: Get.height * 0.26,
-                  width: Get.height,
-                  fit: BoxFit.cover,
-                  imageUrl:
-                  "${APIConstants.image}${_homeController.getUserBookingQrCodeModel.data?.salon?.image ?? ""}",
-                  placeholder: (context, url) => Image(
-                    image: const AssetImage(AssetsConstant.placeHolder),
-                    height: Get.height * 0.26,
-                    width: Get.height,
-                    fit: BoxFit.cover,
-                  ),
-                  errorWidget: (context, url, error) => Image(
-                    image: const AssetImage(AssetsConstant.placeHolder),
-                    height: Get.height * 0.26,
-                    width: Get.height,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: Get.height * 0.18,
-                right: 15,
-                left: 15,
-                child: TicketWidget(
-                  isCornerRounded: true,
-                  padding: const EdgeInsets.all(23),
-                  width: Get.width,
-                  height: Get.height * 0.75,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        _homeController.getUserBookingQrCodeModel.data
-                            ?.salon?.name ??
-                            "",
-                        style: AppTextTheme.bold.copyWith(
-                            color: ColorConstant.blackColor,
-                            fontSize: 15),
-                      ),
-                      const SizedBox(height: 15),
-                      Container(
-                        width: Get.width * 0.8,
-                        height: 1,
-                        decoration: const BoxDecoration(
-                            color: ColorConstant.divider2Color),
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Date",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.grayTextColor,
-                                    fontSize: 13),
-                              ),
-                              const SizedBox(height: 10),
-                              _homeController.getUserBookingQrCodeModel
-                                  .data?.startsAt ==
-                                  null
-                                  ? const SizedBox()
-                                  : Text(
-                                convertFinalDate(
-                                    date: _homeController
-                                        .getUserBookingQrCodeModel
-                                        .data
-                                        ?.startsAt ??
-                                        ''),
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 13),
-                              ),
-                            ],
-                          ),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Time Slot",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.grayTextColor,
-                                    fontSize: 13),
-                              ),
-                              const SizedBox(height: 10),
-                              _homeController.getUserBookingQrCodeModel
-                                  .data?.startsAt ==
-                                  null &&
-                                  _homeController
-                                      .getUserBookingQrCodeModel
-                                      .data
-                                      ?.endsAt ==
-                                      null
-                                  ? const SizedBox()
-                                  : Text(
-                                "${convertDate(date: _homeController.getUserBookingQrCodeModel.data?.startsAt ?? "")} - ${convertDate(date: _homeController.getUserBookingQrCodeModel.data?.endsAt ?? "")}",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 13),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      Container(
-                        width: Get.width * 0.8,
-                        height: 1,
-                        decoration: const BoxDecoration(
-                            color: ColorConstant.divider2Color),
-                      ),
-                      const SizedBox(height: 15),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Address",
-                            style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.grayTextColor,
-                                fontSize: 13),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            _homeController.getUserBookingQrCodeModel.data
-                                ?.salon?.address ??
-                                "",
-                            style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.blackColor,
-                                fontSize: 13),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      Container(
-                        width: Get.width * 0.8,
-                        height: 1,
-                        decoration: const BoxDecoration(
-                            color: ColorConstant.divider2Color),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // LEFT – Stylist (unchanged)
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Stylist Name",
-                                style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.grayTextColor,
-                                  fontSize: 13,
-                                ),
-                              ),
-                              const SizedBox(height: 3),
-                              Text(
-                                _homeController
-                                    .getUserBookingQrCodeModel
-                                    .data
-                                    ?.appointment
-                                    ?.artist
-                                    ?.name ??
-                                    "",
-                                style: AppTextTheme.medium.copyWith(
-                                  color: ColorConstant.blackColor,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ],
-                          ),
 
-                          const SizedBox(width: 12),
+      body: SafeArea(
+        //top:false,
+          child:Obx(() {
 
-                          // RIGHT – Services (make this flexible)
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
+            if (_homeController.showProgress) {
+              return const ProgressBarView();
+            }
+
+            final data = _homeController.getUserBookingQrCodeModel.data;
+
+            return Stack(
+              children: [
+                GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  FocusScope.of(context).unfocus(); // 👈 closes keyboard
+                },
+              child: Container(
+                color: Colors.white,
+                child:  SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Column(
+
+                      children: [
+
+                        /// WAITING ICON + TEXT
+                        // Row(
+                        //   children: [
+                        //
+                        //     Image.asset(
+                        //       "assets/gifs/hourglass.gif",
+                        //       height: 86,
+                        //     ),
+                        //
+                        //     const SizedBox(width: 10),
+                        //
+                        //     Container(
+                        //       padding: const EdgeInsets.symmetric(
+                        //         horizontal: 16,
+                        //         vertical: 7,
+                        //       ),
+                        //       decoration: BoxDecoration(
+                        //         color: Colors.grey.shade200,
+                        //         borderRadius: BorderRadius.circular(14),
+                        //       ),
+                        //       child: Text(
+                        //         "Waiting For Confirmation\n(will take 10 - 15 mins)",
+                        //         textAlign: TextAlign.center,
+                        //         style: TextStyle(
+                        //           fontFamily: "Outfit",
+                        //           fontSize: 18,
+                        //           fontWeight: FontWeight.w600,
+                        //           letterSpacing: 0.2,
+                        //           color: const Color(0xFF8565D0),
+                        //         ),
+                        //       ),
+                        //     )                  ],
+                        // ),
+
+                        bookingStatusWidget(data?.orderStatus ?? "pending"),
+
+                        const SizedBox(height: 15),
+
+                        /// SALON NAME
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            data?.salon?.displayName ?? "",
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              fontFamily: 'Outfit'
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 5),
+                        const Divider(),
+
+                        /// DATE + TIME
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  "Services",
-                                  style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.grayTextColor,
-                                    fontSize: 13,
-                                  ),
-                                  textAlign: TextAlign.right,
+
+                                const Text(
+                                  "Date",
+                                  style: TextStyle(color: Colors.grey),
                                 ),
-                                const SizedBox(height: 3),
+
+                                const SizedBox(height: 5),
+
+                                // Text(
+                                //   convertFinalDate(date: data?.startsAt ?? ""),
+                                // ),
                                 Text(
-                                  _homeController
-                                      .getUserBookingQrCodeModel
-                                      .data
-                                      ?.items
-                                      ?.where((e) => e.isService == true)
-                                      .map((e) => e.service?.name ?? "")
-                                      .where((name) => name.isNotEmpty)
-                                      .join(", ") ??
-                                      "",
-                                  style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.blackColor,
-                                    fontSize: 13,
+                                  getBookingDate(data),
+                                ),
+                              ],
+                            ),
+
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+
+                                const Text(
+                                  "Time Slot",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+
+                                const SizedBox(height: 5),
+
+                                // Text(
+                                //   "${convertDate(date: data?.startsAt ?? "")}",
+                                // ),
+                                buildSlotSection(data),
+                              ],
+                            ),
+                          ],
+                        ),
+
+                        const Divider(height: 15),
+
+                        /// ADDRESS
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+
+                              const Text(
+                                "Address",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+
+                              const SizedBox(height: 5),
+
+                              Text(
+                                data?.salon?.address ?? "",
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const Divider(height: 15),
+
+                        /// STYLIST
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+
+                              const Text(
+                                "Stylist Name",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+
+                              const SizedBox(height: 5),
+
+                              // Text(
+                              //   data?.appointment?.artist?.name ?? "",
+                              // ),
+                              buildStylistSection(data),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(height: 15),
+
+                        /// ENTER AMOUNT
+                        // Center(
+                        //   child: SizedBox(
+                        //       width: 246,
+                        //       child: TextField(
+                        //         controller: _amountController,
+                        //         textAlign: TextAlign.center,
+                        //         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        //         decoration: InputDecoration(
+                        //           hintText: "Enter The Amount",
+                        //           hintStyle: const TextStyle(
+                        //             fontFamily: "Outfit",
+                        //             fontWeight: FontWeight.w800,
+                        //             fontSize: 28,
+                        //             color: Colors.black38,
+                        //           ),
+                        //           enabledBorder: const UnderlineInputBorder(
+                        //             borderSide: BorderSide(
+                        //               color: Colors.black,
+                        //               width: 1.5,
+                        //             ),
+                        //           ),
+                        //           focusedBorder: const UnderlineInputBorder(
+                        //             borderSide: BorderSide(
+                        //               color: Colors.black,
+                        //               width: 1.5,
+                        //             ),
+                        //           ),
+                        //           contentPadding: const EdgeInsets.only(bottom: 8),
+                        //         ),
+                        //       )
+                        //   ),
+                        // ),
+
+                        Center(
+                          child: SizedBox(
+                            width: 246,
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                TextField(
+                                  focusNode: _amountFocus,
+                                  controller: _amountController,
+                                  textAlign: TextAlign.center,
+                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                  style: const TextStyle( // 🔥 this is for entered text
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 28, // match hint or adjust as needed
+                                    color: Colors.black,
                                   ),
-                                  textAlign: TextAlign.right,
-                                  maxLines: 3,              // you can increase if you want
-                                  overflow: TextOverflow.ellipsis,
+                                  decoration: InputDecoration(
+                                    //hintText: "Enter The Amount",
+                                    hintText: "Enter Actual Bill",
+                                    hintStyle: const TextStyle(
+                                      fontFamily: "Outfit",
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 28,
+                                      color: Colors.black38,
+                                    ),
+                                    border: InputBorder.none, // remove default underline
+                                    contentPadding: const EdgeInsets.only(bottom: 8),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Container(
+                                  width: 200, // 👈 underline width
+                                  height: 1.5,
+                                  color: Colors.black,
                                 ),
                               ],
                             ),
                           ),
-                        ],
-                      ),
-
-                      /* old flow of showing QR to only confirmed.*/
-                      // Center(
-                      //   child: QrImageView(
-                      //     data: _homeController.getUserBookingQrCodeModel
-                      //             .data?.completionToken ??
-                      //         "",
-                      //     version: QrVersions.auto,
-                      //     size: 200.0,
-                      //   ),
-                      // ),
-
-                      // Center(
-                      //   child: Stack(
-                      //     alignment: Alignment.center,
-                      //     children: [
-                      //       ClipRRect(
-                      //         borderRadius: BorderRadius.circular(10),
-                      //         child: QrImageView(
-                      //           data: _homeController.getUserBookingQrCodeModel.data?.completionToken ?? "",
-                      //           version: QrVersions.auto,
-                      //           size: 200.0,
-                      //         ),
-                      //       ),
-                      //
-                      //       if (_homeController.getUserBookingQrCodeModel.data?.orderStatus?.toLowerCase() == "pending")
-                      //         Positioned(
-                      //           child: ClipRRect(
-                      //             borderRadius: BorderRadius.circular(10),
-                      //             child: BackdropFilter(
-                      //               filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                      //               child: Container(
-                      //                 width: 200,
-                      //                 height: 200,
-                      //                 color: Colors.black.withOpacity(0.2),
-                      //                 alignment: Alignment.center,
-                      //                 padding: const EdgeInsets.all(12),
-                      //                 child: Text(
-                      //                   "QR will be shown once stylist accepts appointment",
-                      //                   textAlign: TextAlign.center,
-                      //                   style: AppTextTheme.medium.copyWith(
-                      //                     fontSize: 12,
-                      //                     color: Colors.white,
-                      //                   ),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //         ),
-                      //     ],
-                      //   ),
-                      // ),
-
-                      const SizedBox(height: 15),
-                      Center(
-                        child: Text(
-                          _homeController
-                              .getUserBookingQrCodeModel.data?.idx ??
-                              "",
-                          style: AppTextTheme.medium.copyWith(
-                              fontSize: 13,
-                              color: ColorConstant.blackColor),
                         ),
-                      ),
 
-                      const SizedBox(height: 5)
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-    ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: Obx(() {
-        final data = _homeController.getUserBookingQrCodeModel.data;
+                        const SizedBox(height: 10),
 
-        final bool isPaymentPending =
-            data?.paymentStatus?.toLowerCase() == "pending";
+                        /// PAY NOW BUTTON
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: ColorConstant.primaryColor,
+                            elevation: 0,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          onPressed: () {
 
-        final int actualPrice =
-            data?.items
-                ?.where((e) => e.isService == true)
-                .fold<int>(0, (sum, e) => sum + (e.service?.price?.toInt() ?? 0)) ??
-                0;
+                            final enteredAmount =
+                                double.tryParse(_amountController.text.trim()) ?? 0;
 
-        final int payableAmount = (data?.orderAmount ?? 0).toInt();
+                            if (enteredAmount <= 0) {
+                              Get.snackbar(
+                                "Enter Amount",
+                                "Please enter the amount first",
+                                snackPosition: SnackPosition.BOTTOM,
+                                backgroundColor: Colors.red,
+                                colorText: Colors.white,
+                              );
+                              return;
+                            }
 
-        final bool isDiscountApplied =
-            actualPrice > 0 && payableAmount < actualPrice;
+                            print(data?.bookingId);
+                            print('*******************');
 
-        if (!isPaymentPending) {
-          return const SizedBox.shrink();
-        }
+                            _showServiceConfirmation(data?.bookingId);
+                          },
+                          child: const Text(
+                            //"Pay Now",
+                            "Apply Discount",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w700,
+                              fontSize: 18,
+                              color: Colors.white,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
 
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
+                        RichText(
+                          text: const TextSpan(
+                            children: [
+                              TextSpan(
+                                text: "* ",
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text: "Provided By Manager at Salon",
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 15,
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 15),
 
-              /// PRICE SECTION
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Text(
-                    "Actual Price: ₹$actualPrice",
-                    style: AppTextTheme.medium.copyWith(
-                      color: Colors.grey[600],
-                      decoration: isDiscountApplied
-                          ? TextDecoration.lineThrough
-                          : TextDecoration.none,
+                        /// NOTE BOX
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 18,
+                            vertical: 16,
+                          ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: ColorConstant.primaryColor,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: const Text(
+                            "Note : You Can Make Changes To Your Services At The Salon, You Can Add More Service At The Salon And Avail Your Discount Only If You Pay In The App",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                              height: 1.4,
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 13),
+
+                        /// CANCEL BUTTON
+                        if ((data?.paymentStatus ?? 'pending') == 'pending') ...[
+                          SizedBox(
+                            width: 160,
+                            height: 40,
+                            child: ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFFF96B5C),
+                                elevation: 0,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              onPressed: () {
+                                _showCancelConfirmationDialog();
+                              },
+                              icon: const Icon(
+                                Icons.close,
+                                size: 18,
+                                color: Colors.white,
+                              ),
+                              label: const Text(
+                                "Cancel",
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 12),
+                        /// BOOKING ID
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "Booking Id : ",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: ColorConstant.blackColor,
+                              ),
+                            ),
+                            Text(
+                              "${data?.idx ?? ""}",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: ColorConstant.primaryColor,
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  if (isDiscountApplied)
-                    Text(
-                      "To be Paid: ₹$payableAmount",
-                      style: AppTextTheme.bold.copyWith(
-                        color: Colors.green,
-                        fontSize: 17,
-                      ),
-                    ),
-                ],
-              ),
-
-              const SizedBox(height: 12),
-
-              /// PAY / APPLY BUTTON
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: ColorConstant.primaryColor,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
+                )
+            )
                 ),
-                onPressed: () {
-                  if (isDiscountApplied) {
-                    _startPayment(); // ✅ Pay directly
-                  } else {
-                    _openApplyOfferSheet(); // ✅ Apply offer first
-                  }
-                },
-                child: Text(
-                  isDiscountApplied
-                      ? "Pay ₹$payableAmount"
-                      : "Apply Offer & Pay",
-                  style: AppTextTheme.bold.copyWith(color: Colors.white),
-                ),
-              ),
 
-              const SizedBox(height: 12),
-
-              /// CANCEL BUTTON
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: _showCancelConfirmationDialog,
-                child: Text(
-                  "Cancel Booking",
-                  style: AppTextTheme.bold.copyWith(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
-        );
-      }),
-
+              ]
+            );
+          })
+      ),
     );
   }
 
-  /*-------------  On Payment Fail Method ------------- */
-  void handlePaymentErrorResponse(PaymentFailureResponse response) {
-    final user = _authController.userResponseModel.data?.userData;
+  Future<void> callSupport() async {
+    final Uri url = Uri.parse("tel:9347882037");
 
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (ctx) {
-        return CallWrapper( // ✅ adds your Help 24×7 call button
-          child: AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            title: const Text(
-              "Payment Failed",
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            content: SingleChildScrollView( // ✅ ensures content never overflows
-              child: ListBody(
-                children: [
-                  const Text(
-                    "You may have cancelled the payment or there was a delay in response from the UPI app.",
-                  ),
-                  const SizedBox(height: 12),
-                  Text("Mobile: +91 ${user?.mobile ?? ''}"),
-                  Text("Email: ${user?.email ?? ''}"),
-                  Text("Name: ${user?.name ?? ''}"),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                ),
-                onPressed: () {
-                  Navigator.of(ctx).pop();       // ✅ close dialog
-                  //Navigator.of(context).maybePop(); // ✅ go back if possible
-                },
-                child: const Text(
-                  "OK",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
-    );
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    }
   }
 
-  /*---------------  On Payment Success Method ------------ */
-  Future<void> handlePaymentSuccessResponse(PaymentSuccessResponse response) async {
-    print("🎯 Razorpay Success Response: $response");
-    print("PaymentId: ${response.paymentId}");
-    print("OrderId: ${response.orderId}");
-    print("Signature: ${response.signature}");
-    showMessage("Payment Successful");
-    Get.back();
+  String getBookingDate(data) {
+    final isPending = (data?.orderStatus ?? "").toLowerCase() == "pending";
+
+    if (isPending) {
+      final slots = data?.selectedSlots ?? []; // ✅ FIXED
+
+      if (slots.isNotEmpty) {
+        return convertFinalDate(date: slots.first);
+      }
+
+      return "To be confirmed";
+    }
+
+    if (data?.startsAt != null && data!.startsAt!.isNotEmpty) {
+      return convertFinalDate(date: data.startsAt!);
+    }
+
+    return "-";
+  }
+
+  Widget buildSlotSection(data) {
+    final isPending = (data?.orderStatus ?? "").toLowerCase() == "pending";
+
+    if (isPending) {
+      final slots = data?.selectedSlots ?? []; // ✅ FIXED
+
+      if (slots.isEmpty) {
+        return const Text("-");
+      }
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: slots.map<Widget>((slot) {
+          return Text("• ${convertDate(date: slot)}");
+        }).toList(),
+      );
+      // return SizedBox(
+      //   height: 35,
+      //   child: Row(
+      //     children: [
+      //       Expanded(
+      //         child: ListView.builder(
+      //           scrollDirection: Axis.horizontal,
+      //           itemCount: slots.length,
+      //           itemBuilder: (context, index) {
+      //             final slot = slots[index];
+      //
+      //             return Padding(
+      //               padding: const EdgeInsets.only(right: 8),
+      //               child: Container(
+      //                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      //                 decoration: BoxDecoration(
+      //                   borderRadius: BorderRadius.circular(20),
+      //                   color: Colors.grey.shade200,
+      //                 ),
+      //                 child: Text(
+      //                   convertDate(date: slot),
+      //                   style: const TextStyle(fontSize: 12),
+      //                 ),
+      //               ),
+      //             );
+      //           },
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // );
+    }
+
+    return Text(convertDate(date: data?.startsAt ?? ""));
+  }
+
+  Widget buildStylistSection(data) {
+    final isPending = (data?.orderStatus ?? "").toLowerCase() == "pending";
+
+    if (isPending) {
+      final stylists = data?.selectedStylists  ?? []; // ✅ FIXED
+
+      if (stylists.isEmpty) {
+        return const Text("Not Specified");
+      }
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: stylists.map<Widget>((s) {
+          return Text("• ${s.name}");
+        }).toList(),
+      );
+    }
+
+    return Text(data?.appointment?.artist?.name ?? "-");
+  }
+
+  Future<void> openWhatsapp() async {
+    final Uri url = Uri.parse("https://wa.me/919347882037");
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
   }
 
   void _startPayment() {
+
     final amount =
         (_homeController.getUserBookingQrCodeModel.data?.orderAmount ?? 0) * 100;
 
     final options = {
       'key': _homeController.getOrderIdModel.data?.razorpayKey ?? "",
       'amount': amount.toInt(),
-      'name': 'ScutS',
+      'name': 'Scuts',
       'order_id': _homeController.getOrderIdModel.data?.orderId ?? "",
-      'description': 'Pay After Service',
-      'timeout': 120,
-      'prefill': {
-        'contact': _authController.userResponseModel
-            .data?.userData?.mobile ??
-            "",
-        'email': _authController.userResponseModel
-            .data?.userData?.email ??
-            ""
-      },
     };
 
     razorpay.open(options);
   }
 
-  void _openApplyOfferSheet() async {
-    final String discountId = await showModalBottomSheet(
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
-      ),
-      context: context,
-      builder: (_) => const PromoCodeSheetWidget(),
-    );
+  Widget bookingStatusWidget(String status) {
 
-    if (discountId.isNotEmpty) {
-      _homeController.doApplyPromoCode(
-        data: {"discountId": discountId},
-        //"appointmentId": widget.appointmentId,
-        callback: () async {
-          // ✅ Just refresh booking snapshot
-          await _homeController.doCreateQrCode(
-            appointmentId: widget.appointmentId,
-          );
+    if (status == "confirmed") {
+      return Row(
+        children: [
 
-          // ❌ DO NOT start payment here
-          // User must explicitly click Pay
-        },
+          Image.asset(
+            "assets/gifs/verified.gif",
+            height: 100,
+          ),
+
+          const SizedBox(width: 5),
+
+          Center(
+            child: Text(
+              "Your Booking Is Confirmed\n(Happy Service)",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: "Outfit",
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 0.1,
+                color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+              ),
+            ),
+          )        ],
       );
     }
-  }
 
-  /*-------------- Call Function -----------*/
-  _launchPhone(String phoneNumber) async {
-    String url = 'tel:$phoneNumber';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+    /// DEFAULT → Pending
+    return Row(
+      children: [
 
-  /*---------------- convertTime ------------*/
-  String convertDate({required String date}) {
-    String dateTimeString = date;
-    DateTime dateTime = DateTime.parse(dateTimeString);
-    String formattedTime = DateFormat('hh:mm a').format(dateTime);
-    return formattedTime;
-  }
+        Image.asset(
+          "assets/gifs/hourglass.gif",
+          height: 100,
+        ),
 
-  /*--------------  convert Final  Date -----------*/
-  String convertFinalDate({required String date}) {
-    String dateTimeString = date;
-    DateTime dateTime = DateTime.parse(dateTimeString);
-    String formattedDate = DateFormat('EEE, dd MMM yyyy').format(dateTime);
-    return formattedDate;
+        const SizedBox(width: 10),
+
+        Text(
+          "Waiting For Confirmation\n(will take 10 - 15 mins)",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontFamily: "Outfit",
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.1,
+            color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+          ),
+        )      ],
+    );
   }
 
   void _showCancelConfirmationDialog() {
-    Get.defaultDialog(
-      title: "Cancel Booking?",
-      middleText: "Are you sure you want to cancel this appointment?",
-      textCancel: "No",
-      textConfirm: "Yes",
-      confirmTextColor: Colors.white,
-      buttonColor: Colors.red,
-      onConfirm: () async {
-        // close confirmation dialog
-        Get.back();
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return Center(
+          child: Container(
+            width: 382,
+            height: 193,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 22),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
+                    ?? Colors.transparent,
+                width: 2,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
 
-        // show a single loader dialog
-        Get.dialog(
-          const Center(child: CircularProgressIndicator()),
-          barrierDismissible: false,
+                  /// TITLE
+                  const Text(
+                    "Are You Sure You Want To Cancel ?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                    ),
+                  ),
+
+                  const SizedBox(height: 15),
+
+                  /// NO / YES BUTTONS
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+
+                      /// NO
+                      SizedBox(
+                        height: 27,
+                        width: 50,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero, // important to fit text
+                            backgroundColor: changeTheme(
+                                SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                                Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: const Text(
+                            "No",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16, // slightly reduced to fit
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 20),
+
+                      /// YES
+                      SizedBox(
+                        height: 27,
+                        width: 50,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero, // important
+                            backgroundColor: Colors.grey,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () async {
+                            Navigator.pop(context);
+                            _showCancelReasonDialog();
+
+                            // /// SHOW LOADER
+                            // Get.dialog(
+                            //   const Center(child: CircularProgressIndicator()),
+                            //   barrierDismissible: false,
+                            // );
+                            //
+                            // try {
+                            //   final bookingId =
+                            //       _homeController.getUserBookingQrCodeModel.data?.idx ?? "";
+                            //
+                            //   final artistId =
+                            //       _homeController.getUserBookingQrCodeModel.data?.appointment?.artist?.id ?? "";
+                            //
+                            //   final response = await _homeController.cancelBooking(
+                            //     bookingId: bookingId,
+                            //     //artistId: artistId,
+                            //     status: "user_cancelled",
+                            //   );
+                            //
+                            //   if (Get.isDialogOpen ?? false) {
+                            //     Get.back();
+                            //   }
+                            //
+                            //   if (response.success) {
+                            //     _homeController.getUserBookingQrCodeModel
+                            //         .data?.orderStatus = "user_cancelled";
+                            //     _homeController.doGetCurrentBookingListData();
+                            //
+                            //     Get.back(result: true);
+                            //
+                            //     Get.snackbar(
+                            //       "Success",
+                            //       "Your booking has been cancelled successfully",
+                            //       backgroundColor: Colors.green,
+                            //       colorText: Colors.white,
+                            //       snackPosition: SnackPosition.BOTTOM,
+                            //     );
+                            //   } else {
+                            //     Get.snackbar(
+                            //       "Failed",
+                            //       response.message ?? "Something went wrong.",
+                            //       backgroundColor: Colors.red,
+                            //       colorText: Colors.white,
+                            //       snackPosition: SnackPosition.BOTTOM,
+                            //     );
+                            //   }
+                            // } catch (e) {
+                            //   if (Get.isDialogOpen ?? false) {
+                            //     Get.back();
+                            //   }
+                            //
+                            //   Get.snackbar(
+                            //     "Error",
+                            //     "Something went wrong: ${e.toString()}",
+                            //     backgroundColor: Colors.red,
+                            //     colorText: Colors.white,
+                            //     snackPosition: SnackPosition.BOTTOM,
+                            //   );
+                            // }
+                          },
+                          child: const Text(
+                            "Yes",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+
+                  /// RESCHEDULE TEXT
+                  const Text(
+                    "Looking For Rescheduling?",
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                      fontWeight: FontWeight.w700,
+                      fontSize: 18,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+
+                  const SizedBox(height: 9),
+
+                  /// CONTACT BUTTONS
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+
+                      SizedBox(
+                        width: 90,
+                        height: 34,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          onPressed: () {
+                            callSupport();
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: const [
+                              Icon(Icons.phone, size: 18),
+                              SizedBox(width: 2), // 🔥 control spacing here (reduce/increase)
+                              Text(
+                                "Contact Us",
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 15),
+
+                      SizedBox(
+                        width: 90,
+                        height: 34,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.zero, // important
+                            backgroundColor: Colors.green,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          onPressed: () {
+                            openWhatsapp();
+                          },
+                          icon: FaIcon(
+                            FontAwesomeIcons.whatsapp,
+                            color: Colors.white, // Official WhatsApp Green
+                            size: 18,
+                          ),
+                          label: const Text(
+                            "Text Us",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+          ),
         );
-
-        try {
-          final bookingId = _homeController.getUserBookingQrCodeModel.data?.idx ?? "";
-          final artistId = _homeController.getUserBookingQrCodeModel.data?.appointment?.artist?.id ?? "";
-
-          // call cancelBooking and await the response
-          final response = await _homeController.cancelBooking(
-            bookingId: bookingId,
-            artistId: artistId,
-            status: "user_cancelled",
-            // IMPORTANT: do NOT use a callback that calls Get.back() or shows snackbars here
-            // because we will handle UI flow in this method after awaiting the response.
-            //callback: () {},
-          );
-
-          // close loader (only once)
-          if (Get.isDialogOpen ?? false) {
-            Get.back();
-          }
-
-          if (response.success) {
-            // Update local model (optional)
-            _homeController.getUserBookingQrCodeModel.data?.orderStatus = "user_cancelled";
-
-            // Pop this QR page and send result true to the previous page to trigger a refresh
-            Get.back(result: true);
-
-            // show success snackbar (this is safe; we are not trying to close a disposed snackbar)
-            Get.snackbar(
-              "Success",
-              "Your booking has been cancelled. Refund will be processed shortly, if it is paid booking",
-              backgroundColor: Colors.green,
-              colorText: Colors.white,
-              snackPosition: SnackPosition.BOTTOM,
-            );
-          } else {
-            // show failure snackbar
-            Get.snackbar(
-              "Failed",
-              response.message ?? "Something went wrong.",
-              backgroundColor: Colors.red,
-              colorText: Colors.white,
-              snackPosition: SnackPosition.BOTTOM,
-            );
-          }
-        } catch (e) {
-          // close loader (if still open)
-          if (Get.isDialogOpen ?? false) {
-            Get.back();
-          }
-
-          Get.snackbar(
-            "Error",
-            "Something went wrong: ${e.toString()}",
-            backgroundColor: Colors.red,
-            colorText: Colors.white,
-            snackPosition: SnackPosition.BOTTOM,
-          );
-        }
       },
     );
+  }
+
+  void _showCancelReasonDialog() async {
+    List reasons = [];
+
+    try {
+      reasons = await HomeAPI.getCancellationReasons();
+    } catch (e) {
+      Get.snackbar("Error", "Failed to load reasons");
+      return;
+    }
+
+    String? selectedReasonId;
+    String? selectedReasonCode;
+    TextEditingController remarkController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.purple, width: 1.5),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+
+                    /// TITLE
+                    const Text(
+                      "Reason For Cancellation",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.purple,
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    /// RADIO LIST
+                    ...reasons.map((r) {
+                      return RadioListTile<String>(
+                        value: r['id'],
+                        groupValue: selectedReasonId,
+                        title: Text(r['label']),
+                        onChanged: (value) {
+                          setStateDialog(() {
+                            selectedReasonId = value;
+                            selectedReasonCode = r['code'];
+                          });
+                        },
+                      );
+                    }).toList(),
+
+                    /// 👉 SHOW TEXTFIELD IF OTHER
+                    if (selectedReasonCode == "OTHER")
+                      Container(
+                        margin: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: TextField(
+                          controller: remarkController,
+                          decoration: const InputDecoration(
+                            hintText: "Write Your Own Remarks",
+                            border: InputBorder.none,
+                          ),
+                        ),
+                      ),
+
+                    const SizedBox(height: 15),
+
+                    /// CONFIRM BUTTON
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.purple,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        onPressed: () async {
+
+                          if (selectedReasonId == null) {
+                            Get.snackbar("Select Reason", "Please select a reason");
+                            return;
+                          }
+
+                          Navigator.pop(context);
+
+                          Get.dialog(
+                            const Center(child: CircularProgressIndicator()),
+                            barrierDismissible: false,
+                          );
+
+                          try {
+                            final bookingId =
+                                _homeController.getUserBookingQrCodeModel.data?.idx ?? "";
+
+                            final response = await _homeController.cancelBooking(
+                              bookingId: bookingId,
+                              status: "user_cancelled",
+                              cancellationReasonId: selectedReasonId!,
+                              cancellationRemark: selectedReasonCode == "OTHER"
+                                  ? remarkController.text
+                                  : null,
+                            );
+
+                            if (Get.isDialogOpen ?? false) Get.back();
+
+                            if (response.success) {
+                              Get.back(result: true);
+
+                              Get.snackbar(
+                                "Success",
+                                "Booking cancelled successfully",
+                                backgroundColor: Colors.green,
+                                colorText: Colors.white,
+                              );
+                            }
+                          } catch (e) {
+                            if (Get.isDialogOpen ?? false) Get.back();
+
+                            Get.snackbar(
+                              "Error",
+                              e.toString(),
+                              backgroundColor: Colors.red,
+                              colorText: Colors.white,
+                            );
+                          }
+                        },
+                        child: const Text("Confirm"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showServiceConfirmation(String? bookingId) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54, // fades background
+      builder: (context) {
+        return Center(
+          child: Container(
+            width: 320,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 25,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: ColorConstant.primaryColor,
+                width: 2,
+              ),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+
+                  /// QUESTION
+                  const Text(
+                    "Have You Completed Your Service ?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 25),
+
+                  /// BUTTONS
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+
+                      /// NO BUTTON
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 6,
+                          ),
+                          child: Text(
+                            "No",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 20),
+
+                      /// YES BUTTON
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorConstant.primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        onPressed: () async {
+
+                          Navigator.pop(context);
+
+                          await _homeController.doGetListPromoCode();
+                          //await _homeController.doGetOrderId();
+
+                          final enteredAmount =
+                              double.tryParse(_amountController.text.trim()) ?? 0;
+
+                          if (enteredAmount <= 0) {
+                            Get.snackbar("Invalid Amount", "Please enter amount");
+                            return;
+                          }
+                          final result =
+                          _homeController.getBestDiscount(enteredAmount.toInt());
+
+                          if (result != null) {
+
+                            int discount = result["discount"];
+
+                            int finalAmount = enteredAmount.toInt() - discount;
+                            String promoName = result["promo"].title ?? "";
+
+                            _showPaymentSummaryDialog(
+                                bookingId: bookingId,
+                                actualAmount: enteredAmount.toInt(),
+                                discount: discount,
+                                finalAmount: finalAmount,
+                                promoName: promoName
+                            );
+
+                          } else {
+
+                            _showPaymentSummaryDialog(
+                                bookingId: bookingId,
+                                actualAmount: enteredAmount.toInt(),
+                                discount: 0,
+                                finalAmount: enteredAmount.toInt(),
+                                promoName: "NA"
+                            );
+
+                          }
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 6,
+                          ),
+                          child: Text(
+                            "Yes",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showPaymentSummaryDialog({
+    String? bookingId,
+    required int actualAmount,
+    required int discount,
+    required int finalAmount,
+    required String promoName
+  }) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      barrierColor: Colors.black54,
+      builder: (context) {
+
+        bool showBreakdown = false;
+
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+
+            // return Stack(
+            //   alignment: Alignment.topCenter,
+            //   children: [
+            //
+            //     /// MAIN DIALOG
+            //     Container(
+            //       margin: const EdgeInsets.only(top: 40),
+            //       child: Dialog(
+            //         backgroundColor: Colors.transparent,
+            //         child: Container(
+            //           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            //           decoration: BoxDecoration(
+            //             color: Colors.white,
+            //             borderRadius: BorderRadius.circular(18),
+            //             border: Border.all(
+            //               color: ColorConstant.primaryColor,
+            //               width: 2,
+            //             ),
+            //           ),
+            //           child: Column(
+            //             mainAxisSize: MainAxisSize.min,
+            //             children: [
+            //
+            //               /// ACTUAL AMOUNT
+            //               const Text(
+            //                 "Actual Amount",
+            //                 style: TextStyle(
+            //                   fontFamily: "Outfit",
+            //                   fontWeight: FontWeight.bold,
+            //                   fontSize: 20,
+            //                 ),
+            //               ),
+            //
+            //               const SizedBox(height: 8),
+            //
+            //               // Text(
+            //               //   "₹$actualAmount",
+            //               //   style: TextStyle(
+            //               //     fontSize: 44,
+            //               //     height: 1.1,
+            //               //     color: Colors.grey,
+            //               //     fontWeight: FontWeight.w900,
+            //               //     fontFamily: 'Outfit',
+            //               //     decoration: TextDecoration.lineThrough,
+            //               //     decorationColor: changeTheme(
+            //               //       SharedPrefs.readStringValue(PrefConstants.gender),
+            //               //   ),
+            //               //     decorationThickness: 2.5,
+            //               //   )
+            //               // ),
+            //
+            //               Stack(
+            //                 alignment: Alignment.center,
+            //                 children: [
+            //                   Text(
+            //                     "₹$actualAmount",
+            //                     style: const TextStyle(
+            //                       fontSize: 44,
+            //                       color: Colors.grey,
+            //                       fontWeight: FontWeight.w900,
+            //                       fontFamily: 'Outfit',
+            //                     ),
+            //                   ),
+            //
+            //                   Positioned(
+            //                     left: 0,
+            //                     right: 0,
+            //                     child: Container(
+            //                       height: 2.5,
+            //                       color: changeTheme(
+            //                         SharedPrefs.readStringValue(PrefConstants.gender),
+            //                       ),
+            //                     ),
+            //                   ),
+            //                 ],
+            //               ),
+            //
+            //               const SizedBox(height: 20),
+            //
+            //               /// YOU PAY
+            //               Text(
+            //                 "You Pay",
+            //                 style: TextStyle(
+            //                   fontSize: 50,
+            //                   fontWeight: FontWeight.w900,
+            //                   fontFamily: 'Outfit',
+            //                   color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+            //                 ),
+            //               ),
+            //
+            //               const SizedBox(height: 6),
+            //
+            //               Text(
+            //                 "₹${finalAmount + 5}",
+            //                 style: const TextStyle(
+            //                   fontSize: 46,
+            //                   fontWeight: FontWeight.w900,
+            //                   fontFamily: 'Outfit',
+            //                   color: Colors.green,
+            //                 ),
+            //               ),
+            //
+            //               //const SizedBox(height: 10),
+            //
+            //               Container(
+            //                 width: 120,
+            //                 height: 1,
+            //                 color: Colors.black,
+            //               ),
+            //
+            //               const SizedBox(height: 15),
+            //
+            //               /// EDIT PRICE
+            //               SizedBox(
+            //                 width: 127,
+            //                 height: 42,
+            //                 child: ElevatedButton(
+            //                   style: ElevatedButton.styleFrom(
+            //                     backgroundColor:  changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))?.withOpacity(0.7),
+            //                     shape: RoundedRectangleBorder(
+            //                       borderRadius: BorderRadius.circular(10), // updated
+            //                     ),
+            //                   ),
+            //                   onPressed: () {
+            //                     Navigator.pop(context);
+            //                   },
+            //                   child: const Text(
+            //                     "Edit Price",
+            //                     style: TextStyle(
+            //                       fontFamily: "Outfit",
+            //                       fontWeight: FontWeight.w600, // semi-bold
+            //                       fontSize: 20,
+            //                     ),
+            //                   ),
+            //                 ),
+            //               ),
+            //               const SizedBox(height: 18),
+            //
+            //               /// VIEW BREAKDOWN
+            //               Container(
+            //                 padding: const EdgeInsets.symmetric(
+            //                   horizontal: 15,
+            //                   vertical: 12,
+            //                 ),
+            //                 decoration: BoxDecoration(
+            //                   color: Colors.white,
+            //                   boxShadow: const [
+            //                     BoxShadow(
+            //                       color: Colors.black12,
+            //                       blurRadius: 6,
+            //                     )
+            //                   ],
+            //                   borderRadius: BorderRadius.circular(10),
+            //                 ),
+            //                 child: Column(
+            //                   children: [
+            //
+            //                     /// HEADER
+            //                     InkWell(
+            //                       onTap: () {
+            //                         setStateDialog(() {
+            //                           showBreakdown = !showBreakdown;
+            //                         });
+            //                       },
+            //                       child: Container(
+            //                         width: double.infinity,
+            //                         padding: const EdgeInsets.symmetric(vertical: 4),
+            //                         child: Row(
+            //                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //                           children: [
+            //
+            //                             const Text(
+            //                               "View Breakdown",
+            //                               style: TextStyle(fontFamily: "Outfit",
+            //                                 fontWeight: FontWeight.bold,
+            //                               fontSize: 14),
+            //                             ),
+            //
+            //                             AnimatedRotation(
+            //                               turns: showBreakdown ? 0.5 : 0,
+            //                               duration: const Duration(milliseconds: 250),
+            //                               child: Icon(
+            //                                 Icons.keyboard_arrow_down,
+            //                                 color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+            //                               ),
+            //                             ),
+            //                           ],
+            //                         ),
+            //                       ),
+            //                     ),
+            //
+            //                     /// BREAKDOWN CONTENT
+            //                     AnimatedSize(
+            //                       duration: const Duration(milliseconds: 300),
+            //                       curve: Curves.easeInOut,
+            //                       child: showBreakdown
+            //                           ? Padding(
+            //                         padding: const EdgeInsets.only(top: 12),
+            //                         child: Column(
+            //                           children: [
+            //
+            //                             _row("Actual Amount", "₹$actualAmount"),
+            //
+            //                             _row(
+            //                               "Discount",
+            //                               "-₹$discount",
+            //                               color: Colors.green,
+            //                             ),
+            //
+            //                             //_row("($promoName Applied)", ""),
+            //                             Padding(
+            //                               padding: const EdgeInsets.symmetric(vertical: 4),
+            //                               child: Row(
+            //                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //                                 children: [
+            //                                   Text(
+            //                                     "($promoName Applied)",
+            //                                     style: TextStyle(
+            //                                       fontSize: 14,
+            //                                       fontWeight:  FontWeight.bold,
+            //                                       color: Colors.green,
+            //                                     ),
+            //                                   ),
+            //                                 ],
+            //                               ),
+            //                             ),
+            //
+            //
+            //                             _row("Platform Fee", "+₹5"),
+            //
+            //                             const Divider(),
+            //
+            //                             _row(
+            //                               "You Pay",
+            //                               "₹${actualAmount - discount + 5}",
+            //                               isBold: true,
+            //                             ),
+            //                           ],
+            //                         ),
+            //                       )
+            //                           : const SizedBox(),
+            //                     ),
+            //                   ],
+            //                 ),
+            //               ),
+            //
+            //               const SizedBox(height: 20),
+            //
+            //               /// PROCEED TO PAY
+            //               SizedBox(
+            //                 width: 289,
+            //                 height: 43,
+            //                 child: ElevatedButton(
+            //                   style: ElevatedButton.styleFrom(
+            //                     padding: EdgeInsets.zero,
+            //                     minimumSize: Size.zero, // overrides the previous infinity size
+            //                     backgroundColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+            //                     shape: RoundedRectangleBorder(
+            //                       borderRadius: BorderRadius.circular(10), // updated
+            //                     ),
+            //                   ),
+            //                   onPressed: () async {
+            //                     Navigator.pop(context);
+            //
+            //                     final payable = finalAmount + 5;
+            //
+            //                     print(bookingId);
+            //                     print('_____________________');
+            //
+            //                     await _homeController.createPaymentOrder(
+            //                       bookingOrderId: bookingId,
+            //                       billAmount: actualAmount,
+            //                       payableAmount: payable,
+            //                     );
+            //
+            //                     openRazorpay(payable);
+            //                   },
+            //                   child: const Text(
+            //                     "Proceed To Pay",
+            //                     style: TextStyle(
+            //                       fontFamily: "Outfit",
+            //                       fontWeight: FontWeight.bold,
+            //                       fontSize: 20,
+            //                     ),
+            //                   ),
+            //                 ),
+            //               )
+            //             ],
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //
+            //     /// ❌ CLOSE BUTTON
+            //     Positioned(
+            //       top: 50,
+            //       child: GestureDetector(
+            //         onTap: () {
+            //           Navigator.pop(context);
+            //         },
+            //         child: Container(
+            //           height: 42,
+            //           width: 42,
+            //           decoration: const BoxDecoration(
+            //             color: Colors.white,
+            //             shape: BoxShape.circle,
+            //           ),
+            //           child: const Icon(
+            //             Icons.close,
+            //             color: Colors.black,
+            //             size: 22,
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // );
+
+            return Center(
+                child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Container(
+                              height: 42,
+                              width: 42,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.close,
+                                color: Colors.black,
+                                size: 22,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 5),
+                          /// MAIN DIALOG
+                          Dialog(
+                            backgroundColor: Colors.transparent,
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(
+                                  color: ColorConstant.primaryColor,
+                                  width: 2,
+                                ),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+
+                                  /// ACTUAL AMOUNT
+                                  const Text(
+                                    "Actual Amount",
+                                    style: TextStyle(
+                                      fontFamily: "Outfit",
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 20,
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 8),
+
+                                  // Text(
+                                  //   "₹$actualAmount",
+                                  //   style: TextStyle(
+                                  //     fontSize: 44,
+                                  //     height: 1.1,
+                                  //     color: Colors.grey,
+                                  //     fontWeight: FontWeight.w900,
+                                  //     fontFamily: 'Outfit',
+                                  //     decoration: TextDecoration.lineThrough,
+                                  //     decorationColor: changeTheme(
+                                  //       SharedPrefs.readStringValue(PrefConstants.gender),
+                                  //   ),
+                                  //     decorationThickness: 2.5,
+                                  //   )
+                                  // ),
+
+                                  Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Text(
+                                        "₹$actualAmount",
+                                        style: const TextStyle(
+                                          fontSize: 44,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w900,
+                                          fontFamily: 'Outfit',
+                                        ),
+                                      ),
+
+                                      Positioned(
+                                        left: 0,
+                                        right: 0,
+                                        child: Container(
+                                          height: 2.5,
+                                          color: changeTheme(
+                                            SharedPrefs.readStringValue(PrefConstants.gender),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
+                                  const SizedBox(height: 20),
+
+                                  /// YOU PAY
+                                  Text(
+                                    "You Pay",
+                                    style: TextStyle(
+                                      fontSize: 50,
+                                      fontWeight: FontWeight.w900,
+                                      fontFamily: 'Outfit',
+                                      color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 6),
+
+                                  Text(
+                                    "₹${finalAmount + 5}",
+                                    style: const TextStyle(
+                                      fontSize: 46,
+                                      fontWeight: FontWeight.w900,
+                                      fontFamily: 'Outfit',
+                                      color: Colors.green,
+                                    ),
+                                  ),
+
+                                  //const SizedBox(height: 10),
+
+                                  Container(
+                                    width: 120,
+                                    height: 1,
+                                    color: Colors.black,
+                                  ),
+
+                                  const SizedBox(height: 15),
+
+                                  /// EDIT PRICE
+                                  SizedBox(
+                                    width: 127,
+                                    height: 42,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:  changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))?.withOpacity(0.7),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10), // updated
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text(
+                                        "Edit Price",
+                                        style: TextStyle(
+                                          fontFamily: "Outfit",
+                                          fontWeight: FontWeight.w600, // semi-bold
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 18),
+
+                                  /// VIEW BREAKDOWN
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 15,
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          blurRadius: 6,
+                                        )
+                                      ],
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                    child: Column(
+                                      children: [
+
+                                        /// HEADER
+                                        InkWell(
+                                          onTap: () {
+                                            setStateDialog(() {
+                                              showBreakdown = !showBreakdown;
+                                            });
+                                          },
+                                          child: Container(
+                                            width: double.infinity,
+                                            padding: const EdgeInsets.symmetric(vertical: 4),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              children: [
+
+                                                const Text(
+                                                  "View Breakdown",
+                                                  style: TextStyle(fontFamily: "Outfit",
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 14),
+                                                ),
+
+                                                AnimatedRotation(
+                                                  turns: showBreakdown ? 0.5 : 0,
+                                                  duration: const Duration(milliseconds: 250),
+                                                  child: Icon(
+                                                    Icons.keyboard_arrow_down,
+                                                    color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+
+                                        /// BREAKDOWN CONTENT
+                                        AnimatedSize(
+                                          duration: const Duration(milliseconds: 300),
+                                          curve: Curves.easeInOut,
+                                          child: showBreakdown
+                                              ? Padding(
+                                            padding: const EdgeInsets.only(top: 12),
+                                            child: Column(
+                                              children: [
+
+                                                _row("Actual Amount", "₹$actualAmount"),
+
+                                                _row(
+                                                  "Discount",
+                                                  "-₹$discount",
+                                                  color: Colors.green,
+                                                ),
+
+                                                //_row("($promoName Applied)", ""),
+                                                Padding(
+                                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                                  child: Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                    children: [
+                                                      Text(
+                                                        "($promoName Applied)",
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:  FontWeight.bold,
+                                                          color: Colors.green,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+
+
+                                                _row("Platform Fee", "+₹5"),
+
+                                                const Divider(),
+
+                                                _row(
+                                                  "You Pay",
+                                                  "₹${actualAmount - discount + 5}",
+                                                  isBold: true,
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                              : const SizedBox(),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 20),
+
+                                  /// PROCEED TO PAY
+                                  SizedBox(
+                                    width: 289,
+                                    height: 43,
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        padding: EdgeInsets.zero,
+                                        minimumSize: Size.zero, // overrides the previous infinity size
+                                        backgroundColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10), // updated
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        Navigator.pop(context);
+
+                                        final payable = finalAmount + 5;
+
+                                        print(bookingId);
+                                        print('_____________________');
+
+                                        await _homeController.createPaymentOrder(
+                                          bookingOrderId: bookingId,
+                                          billAmount: actualAmount,
+                                          payableAmount: payable,
+                                        );
+
+                                        openRazorpay(payable);
+                                      },
+                                      child: const Text(
+                                        "Proceed To Pay",
+                                        style: TextStyle(
+                                          fontFamily: "Outfit",
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+
+                        ],
+                      )
+                    ]
+                )
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+
+    final paidAmount =
+        double.tryParse(_amountController.text.trim()) ?? 0;
+
+    final bookingId =
+        _homeController.getUserBookingQrCodeModel.data?.idx ?? "";
+
+    Get.offAll(
+          () => PaymentSuccessPage(
+        amount: paidAmount.toInt(),
+        bookingId: bookingId,
+      ),
+    );
+
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+
+    Get.snackbar(
+      "Payment Failed",
+      response.message ?? "Something went wrong",
+      backgroundColor: Colors.red,
+      colorText: Colors.white,
+    );
+
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    print("Wallet: ${response.walletName}");
+  }
+
+  Widget _row(
+      String title,
+      String value, {
+        Color color = Colors.black,
+        bool isBold = false,
+      }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 14,
+              color: color,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void openRazorpay(int payableAmount) {
+
+    print(_homeController.getOrderIdModel.data?.orderId);
+    print(_homeController.getOrderIdModel.data?.razorpayKey);
+
+    var options = {
+      'key': _homeController.getOrderIdModel.data?.razorpayKey ?? "",
+      'amount':
+      payableAmount * 100,
+      'name': 'ScutS',
+      'timeout': 120,
+      'order_id': _homeController.getOrderIdModel.data?.orderId ?? "",
+      'description': 'Booking Appointment',
+      'retry': {'enabled': true, 'max_count': 1},
+      'send_sms_hash': true,
+      'prefill': {
+        'contact':
+        _authController.userResponseModel.data?.userData?.mobile ?? "",
+        'email':
+        _authController.userResponseModel.data?.userData?.email ?? "",
+      },
+      // 'external': {}
+      'method': {
+        'upi': true,
+        'card': true,
+        'netbanking': true,
+        'wallet': true
+      },
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+
+    razorpay.open(options);
+  }
+
+  String convertDate({required String date}) {
+    if (date.isEmpty) return "-";
+
+    try {
+      DateTime dateTime = DateTime.parse(date.replaceAll(" ", "T"));
+      return DateFormat('hh:mm a').format(dateTime);
+    } catch (e) {
+      return "-";
+    }
+  }
+
+  String convertFinalDate({required String date}) {
+    if (date.isEmpty) return "-";
+
+    try {
+      DateTime dateTime = DateTime.parse(date.replaceAll(" ", "T"));
+      return DateFormat('EEE, dd MMM yyyy').format(dateTime);
+    } catch (e) {
+      return "-";
+    }
   }
 
   @override

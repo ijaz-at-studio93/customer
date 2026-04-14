@@ -20,7 +20,7 @@ class _RemoveButtonWidgetState extends State<RemoveButtonWidget> {
       onTap: widget.onPress,
       child: Container(
         height: 39,
-        width: 110,
+        width: 70,
         decoration: BoxDecoration(
           color: ColorConstant.removeBgStroke,
           borderRadius: BorderRadius.circular(5),
@@ -28,33 +28,33 @@ class _RemoveButtonWidgetState extends State<RemoveButtonWidget> {
         ),
         child: widget.isRemoveIcon
             ? Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Remove",
-                    style: AppTextTheme.medium.copyWith(
-                        fontSize: 13, color: ColorConstant.removeStroke),
-                  ),
-                  const SizedBox(width: 2),
-                  const Icon(
-                    CupertinoIcons.minus_circle_fill,
-                    color: ColorConstant.removeStroke,
-                    size: 20,
-                  )
-                ],
-              )
-            : Container(
-              color: Colors.transparent,
-              height: 39,
-              width: 110,
-              child: Center(
-                child: Text(
-                  'Remove',
-                  style: AppTextTheme.medium.copyWith(
-                      fontSize: 13, color: ColorConstant.removeStroke),
-                ),
-              ),
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Remove",
+              style: AppTextTheme.medium.copyWith(
+                  fontSize: 13, color: ColorConstant.removeStroke),
             ),
+            const SizedBox(width: 2),
+            const Icon(
+              CupertinoIcons.minus_circle_fill,
+              color: ColorConstant.removeStroke,
+              size: 20,
+            )
+          ],
+        )
+            : Container(
+          color: Colors.transparent,
+          height: 39,
+          width: 110,
+          child: Center(
+            child: Text(
+              'Remove',
+              style: AppTextTheme.medium.copyWith(
+                  fontSize: 13, color: ColorConstant.removeStroke),
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -21,7 +21,6 @@ final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 FlutterLocalNotificationsPlugin();
 
 Future<void> _setupAndroidChannels() async {
-  // Confirm (sound)
   const AndroidNotificationChannel confirm = AndroidNotificationChannel(
     'confirm',
     'Appointment Confirmed',
@@ -29,10 +28,9 @@ Future<void> _setupAndroidChannels() async {
     importance: Importance.max,
     playSound: true,
     enableVibration: true,
-    sound: RawResourceAndroidNotificationSound('confirm'), // res/raw/confirm.wav
+    sound: RawResourceAndroidNotificationSound('confirm'),
   );
 
-  // Completed (sound)
   const AndroidNotificationChannel completed = AndroidNotificationChannel(
     'complete',
     'Appointment Completed',
@@ -40,16 +38,15 @@ Future<void> _setupAndroidChannels() async {
     importance: Importance.max,
     playSound: true,
     enableVibration: true,
-    sound: RawResourceAndroidNotificationSound('complete'), // res/raw/complete.wav
+    sound: RawResourceAndroidNotificationSound('complete'),
   );
 
-  // General/Silent (for booked)
   const AndroidNotificationChannel generalSilent = AndroidNotificationChannel(
     'general_silent',
     'General (Silent)',
     description: 'General notifications without sound',
     importance: Importance.defaultImportance,
-    playSound: false, // 👈 silent
+    playSound: false,
     enableVibration: false,
   );
 
@@ -61,17 +58,33 @@ Future<void> _setupAndroidChannels() async {
   await impl?.createNotificationChannel(generalSilent);
 }
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   DioClient.init();
   await Firebase.initializeApp();
-  // 👇 NEW: initialize local notifications plugin (safe on iOS too)
-  const AndroidInitializationSettings androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-  const InitializationSettings initSettings = InitializationSettings(android: androidInit);
+
+  // ---------------- iOS additions begin ----------------
+  // init flutter_local_notifications for iOS (and Android stays as-is)
+  const AndroidInitializationSettings androidInit =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+  const DarwinInitializationSettings iosInit = DarwinInitializationSettings();
+  const InitializationSettings initSettings =
+  InitializationSettings(android: androidInit, iOS: iosInit);
   await flutterLocalNotificationsPlugin.initialize(initSettings);
 
-  // 👇 NEW: create the channel BEFORE receiving any notifications
+  if (Platform.isIOS) {
+    // Ask iOS for alert/badge/sound permission (once)
+    await FirebaseMessaging.instance.requestPermission(
+      alert: true, badge: true, sound: true,
+    );
+    // Allow alerts/sounds while app is in foreground
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true, badge: true, sound: true,
+    );
+  }
+  // ---------------- iOS additions end ------------------
+
+  // Android channels (unchanged)
   if (Platform.isAndroid) {
     await _setupAndroidChannels();
   }
@@ -114,7 +127,8 @@ class _MyAppState extends State<MyApp> {
     debugPrint(fcmToken);
     await SharedPrefs.writeValue(PrefConstants.fcmToken, fcmToken);
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-      SharedPrefs.writeValue(PrefConstants.fcmToken, fcmToken);
+      SharedPrefs.writeValue(PrefConstants.fcmToken, newToken);
+      debugPrint('FirebaseToken (refresh): $newToken');
     });
   }
 
@@ -124,9 +138,11 @@ class _MyAppState extends State<MyApp> {
   }
 
   initNotification() async {
+    // Keep your existing logic; for iOS FCM token is also via getToken(),
+    // APNs token is optional for your use-case.
     String? token = Platform.isAndroid
         ? await FirebaseMessaging.instance.getToken()
-        : await FirebaseMessaging.instance.getAPNSToken();
+        : await FirebaseMessaging.instance.getToken(); // prefer FCM token on iOS too
 
     await SharedPrefs.writeValue(PrefConstants.fcmToken, token);
 
@@ -135,28 +151,30 @@ class _MyAppState extends State<MyApp> {
       debugPrint('FirebaseToken: $token');
     });
 
-    FirebaseMessaging.onMessage.listen(
-      (event) {
-        NotificationUtils.handleNotificationOnForeground(event);
-      },
-    );
+    FirebaseMessaging.onMessage.listen((event) {
+      NotificationUtils.handleNotificationOnForeground(event);
+    });
 
-    FirebaseMessaging.onMessageOpenedApp.listen(
-      (event) {
-        NotificationUtils.handleNotificationOnAppOpened(remoteMessage: event);
-      },
-    );
-    SchedulerBinding.instance.addPostFrameCallback(
-      (_) {
-        NotificationUtils.handleNotificationOnAppOpened();
-      },
-    );
+    FirebaseMessaging.onMessageOpenedApp.listen((event) {
+      NotificationUtils.handleNotificationOnAppOpened(remoteMessage: event);
+    });
+
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      NotificationUtils.handleNotificationOnAppOpened();
+    });
+
     FirebaseMessaging.instance.getInitialMessage().then((message) {
       NotificationUtils.handleNotificationOnAppOpened(
-          remoteMessage: message, isAppKilled: true);
+        remoteMessage: message, isAppKilled: true,
+      );
     });
-    debugPrint(
-        'GetFirebaseToken1: ${SharedPrefs.readStringValue(PrefConstants.fcmToken)}');
+
+    debugPrint('GetFirebaseToken1: ${SharedPrefs.readStringValue(PrefConstants.fcmToken)}');
+    print("APNS TOKEN ============> ${await FirebaseMessaging.instance.getAPNSToken()}");
+    final s = await FirebaseMessaging.instance.getNotificationSettings();
+    print('AUTH STATUS => ${s.authorizationStatus}');
+
+    print('PROJECT => ${Firebase.app().options.projectId}');
   }
 
   @override
@@ -171,6 +189,5 @@ class _MyAppState extends State<MyApp> {
       initialRoute: "/",
       getPages: [GetPage(name: "/", page: () => const SplashPage())],
     );
-    // added comment
   }
 }

@@ -132,6 +132,7 @@ class Salon {
   String? id;
   String? name;
   String? address;
+  String? displayName;
   int? reviewCount;
   int? distance;
   String? image;
@@ -143,6 +144,7 @@ class Salon {
         this.id,
         this.name,
         this.address,
+        this.displayName,
         this.reviewCount,
         this.distance,
         this.image,
@@ -154,6 +156,7 @@ class Salon {
     id = json['id'];
     name = json['name'];
     address = json['address'];
+    displayName = json['displayName'];
     reviewCount = json['reviewCount'];
     distance = json['distance'];
     image = json['image'];
@@ -167,6 +170,7 @@ class Salon {
     data['id'] = id;
     data['name'] = name;
     data['address'] = address;
+    data['displayName'] = displayName;
     data['reviewCount'] = reviewCount;
     data['distance'] = distance;
     data['image'] = image;

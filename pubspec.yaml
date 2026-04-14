@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.16+17
+version: 1.0.18+19
 
 environment:
   sdk: '>=3.3.3 <4.0.0'
@@ -80,6 +80,11 @@ dependencies:
   scratcher: ^2.3.0
   confetti: ^0.7.0
   visibility_detector: ^0.4.0+2
+  font_awesome_flutter: ^10.7.0
+  flutter_lucide: ^1.8.2
+  auto_size_text: ^3.0.0
+  mime: ^2.0.0
+  http_parser: ^4.1.2
 
 
 flutter_launcher_icons:
@@ -156,6 +161,26 @@ flutter:
           weight: 700
         - asset: assets/font/Inter_24pt-Medium.ttf
           weight: 500
+    - family: Outfit
+      fonts:
+          - asset: assets/font/Outfit-Thin.ttf
+            weight: 100
+          - asset: assets/font/Outfit-SemiBold.ttf
+            weight: 600
+          - asset: assets/font/Outfit-Regular.ttf
+            weight: 400
+          - asset: assets/font/Outfit-Medium.ttf
+            weight: 500
+          - asset: assets/font/Outfit-Light.ttf
+            weight: 300
+          - asset: assets/font/Outfit-ExtraLight.ttf
+            weight: 200
+          - asset: assets/font/Outfit-ExtraBold.ttf
+            weight: 800
+          - asset: assets/font/Outfit-Bold.ttf
+            weight: 700
+          - asset: assets/font/Outfit-Black.ttf
+            weight: 900
   # fonts:
   #   - family: Schyler
   #     fonts:

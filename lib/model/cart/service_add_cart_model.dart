@@ -1,5 +1,3 @@
-
-
 import 'package:salon_customer/util/logger.dart';
 
 class ServiceAddCartModel {
@@ -31,7 +29,11 @@ class ServiceAddCartModel {
 
 class Data {
   String? cartId;
+  String? gender;
+  DateTime? deletedAt;
   String? salonId;
+  Salon? salon;
+  DiscountDetails? discountDetails;
   double? discountAmount;
   bool? isDiscountApplied;
   bool? isHomeService;
@@ -47,23 +49,34 @@ class Data {
 
   Data(
       {this.cartId,
-      this.salonId,
-      this.discountAmount,
-      this.isDiscountApplied,
-      this.isHomeService,
-      this.items,
-      this.price,
-      this.previewImages,
-      this.servicesAvailableProductList,
-      this.servicesWithProduct});
+        this.salon,
+        this.gender,
+        this.deletedAt,
+        this.salonId,
+        this.discountAmount,
+        this.isDiscountApplied,
+        this.isHomeService,
+        this.items,
+        this.price,
+        this.previewImages,
+        this.servicesAvailableProductList,
+        this.servicesWithProduct});
 
   Data.fromJson(Map<String, dynamic> json) {
     cartId = json['cartId'];
+    if (json['salon'] != null) {
+      salon = Salon.fromJson(json['salon']);
+    }
+    gender = json['gender'];
+    deletedAt = json['deletedAt'];
     salonId = json['salonId'];
     discountAmount = double.parse(json['discountAmount'] ==  null ? "0.0": json['discountAmount'].toString());
     logger.e(discountAmount);
     isDiscountApplied = json['isDiscountApplied'];
     isHomeService = json['isHomeService'];
+    discountDetails = json['discountDetails'] != null
+        ? DiscountDetails.fromJson(json['discountDetails'])
+        : null;
     totalPrice = double.parse(json['totalPrice'] == null
         ? "0.0"
         : json['totalPrice'].toString());
@@ -106,10 +119,18 @@ class Data {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['cartId'] = cartId;
+    if (salon != null) {
+      data['salon'] = salon!.toJson();
+    }
+    data['gender'] = gender;
+    data['deletedAt'] = deletedAt;
     data['salonId'] = salonId;
     data['discountAmount'] = discountAmount;
     data['isDiscountApplied'] = isDiscountApplied;
     data['isHomeService'] = isHomeService;
+    if (discountDetails != null) {
+      data['discountDetails'] = discountDetails!.toJson();
+    }
     if (items != null) {
       data['items'] = items!.map((v) => v.toJson()).toList();
     }
@@ -127,6 +148,25 @@ class Data {
   }
 }
 
+class Salon {
+  String? id;
+  String? displayName;
+
+  Salon({this.id, this.displayName});
+
+  Salon.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    displayName = json['displayName'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'displayName': displayName,
+    };
+  }
+}
+
 class Items {
   String? cartItemId;
   bool? isService;
@@ -139,9 +179,9 @@ class Items {
     cartItemId = json['cartItemId'];
     isService = json['isService'];
     service =
-        json['service'] != null ? Service.fromJson(json['service']) : null;
+    json['service'] != null ? Service.fromJson(json['service']) : null;
     product =
-        json['product'] != null ? Product.fromJson(json['product']) : null;
+    json['product'] != null ? Product.fromJson(json['product']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -177,20 +217,20 @@ class Service {
 
   Service(
       {this.price,
-      this.rating,
-      this.id,
-      this.createdAt,
-      this.updatedAt,
-      this.deletedAt,
-      this.description,
-      this.duration,
-      this.gender,
-      this.image,
-      this.name,
-      this.salonId,
-      this.status,
-      this.homeService,
-      this.reviewCount});
+        this.rating,
+        this.id,
+        this.createdAt,
+        this.updatedAt,
+        this.deletedAt,
+        this.description,
+        this.duration,
+        this.gender,
+        this.image,
+        this.name,
+        this.salonId,
+        this.status,
+        this.homeService,
+        this.reviewCount});
 
   Service.fromJson(Map<String, dynamic> json) {
     price = json['price'];
@@ -247,17 +287,17 @@ class Product {
 
   Product(
       {this.price,
-      this.rating,
-      this.id,
-      this.createdAt,
-      this.updatedAt,
-      this.deletedAt,
-      this.salonId,
-      this.serviceCategoryId,
-      this.name,
-      this.description,
-      this.image,
-      this.reviewCount});
+        this.rating,
+        this.id,
+        this.createdAt,
+        this.updatedAt,
+        this.deletedAt,
+        this.salonId,
+        this.serviceCategoryId,
+        this.name,
+        this.description,
+        this.image,
+        this.reviewCount});
 
   Product.fromJson(Map<String, dynamic> json) {
     price = json['price'];
@@ -292,6 +332,22 @@ class Product {
   }
 }
 
+class DiscountDetails {
+  String? code;
+
+  DiscountDetails({this.code});
+
+  DiscountDetails.fromJson(Map<String, dynamic> json) {
+    code = json['code'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'code': code,
+    };
+  }
+}
+
 class ServicesAvailableProductList {
   String? id;
   String? createdAt;
@@ -309,18 +365,18 @@ class ServicesAvailableProductList {
 
   ServicesAvailableProductList(
       {this.id,
-      this.createdAt,
-      this.updatedAt,
-      this.serviceCategoryId,
-      this.salonId,
-      this.name,
-      this.description,
-      this.image,
-      this.price,
-      this.reviewCount,
-      this.rating,
-      this.isAdded,
-      this.count});
+        this.createdAt,
+        this.updatedAt,
+        this.serviceCategoryId,
+        this.salonId,
+        this.name,
+        this.description,
+        this.image,
+        this.price,
+        this.reviewCount,
+        this.rating,
+        this.isAdded,
+        this.count});
 
   ServicesAvailableProductList.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -359,6 +415,7 @@ class ServicesAvailableProductList {
 
 class ServicesWithProduct {
   int? price;
+  int? quantity;
   double? rating;
   String? id;
   String? createdAt;
@@ -382,29 +439,31 @@ class ServicesWithProduct {
 
   ServicesWithProduct(
       {this.price,
-      this.rating,
-      this.id,
-      this.createdAt,
-      this.updatedAt,
-      this.description,
-      this.duration,
-      this.gender,
-      this.image,
-      this.name,
-      this.salonId,
-      this.status,
-      this.homeService,
-      this.reviewCount,
-      this.products,
-      this.serviceId,
-      this.totalCost,
-      this.totalServiceCost,
-      this.totalProductCost,
-      this.totalProductCount,
-      this.productsName});
+        this.quantity,
+        this.rating,
+        this.id,
+        this.createdAt,
+        this.updatedAt,
+        this.description,
+        this.duration,
+        this.gender,
+        this.image,
+        this.name,
+        this.salonId,
+        this.status,
+        this.homeService,
+        this.reviewCount,
+        this.products,
+        this.serviceId,
+        this.totalCost,
+        this.totalServiceCost,
+        this.totalProductCost,
+        this.totalProductCount,
+        this.productsName});
 
   ServicesWithProduct.fromJson(Map<String, dynamic> json) {
     price = json['price'];
+    quantity = json['quantity'] ?? 0;
     rating = double.parse(json['rating'].toString());
     id = json['id'];
     createdAt = json['createdAt'];
@@ -435,6 +494,7 @@ class ServicesWithProduct {
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['price'] = price;
+    data['quantity'] = quantity;
     data['rating'] = rating;
     data['id'] = id;
     data['createdAt'] = createdAt;
@@ -477,4 +537,3 @@ class CartTaxDetails {
     return data;
   }
 }
-

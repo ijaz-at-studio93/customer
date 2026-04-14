@@ -47,18 +47,18 @@ class PromoCode {
 
   PromoCode(
       {this.amount,
-      this.maxDiscount,
-      this.minOrder,
-      this.id,
-      this.title,
-      this.description,
-      this.image,
-      this.startsAt,
-      this.endsAt,
-      this.code,
-      this.type,
-      this.salon,
-      this.salonId});
+        this.maxDiscount,
+        this.minOrder,
+        this.id,
+        this.title,
+        this.description,
+        this.image,
+        this.startsAt,
+        this.endsAt,
+        this.code,
+        this.type,
+        this.salon,
+        this.salonId});
 
   PromoCode.fromJson(Map<String, dynamic> json) {
     amount = json['amount'];

@@ -52,9 +52,9 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                 ],
               ),
               Text(
-                "${convertDate(date: widget.bookingData.startsAt ?? "")} - ${convertDate(date: widget.bookingData.endsAt ?? "")}",
-                style: AppTextTheme.regular
-                    .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
+                "${convertDate(date: widget.bookingData.startsAt ?? "")}",
+                style: AppTextTheme.bold
+                    .copyWith(fontSize: 13, color: ColorConstant.blackColor),
               )
             ],
           ),
@@ -86,13 +86,13 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
           Row(
             children: [
               Text(
-                "Total : ",
+                "Approx Total : ",
                 style: AppTextTheme.medium
                     .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
               ),
               const SizedBox(height: 5),
               Text(
-                "₹${widget.bookingData.orderAmount}/-",
+                "₹${widget.bookingData.orderAmount}",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
@@ -109,7 +109,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                widget.bookingData.salon?.name ?? "",
+                widget.bookingData.salon?.displayName ?? "",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
@@ -147,6 +147,10 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                     ? "Rejected"
                     : widget.bookingData.orderStatus == "user_cancelled"
                     ? "Cancelled"
+                    : widget.bookingData.orderStatus == "pending"
+                    ? "Awaiting Confirmation"
+                    : widget.bookingData.orderStatus == "confirmed"
+                    ? "Confirmed"
                     : widget.bookingData.orderStatus ?? "",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold.copyWith(
@@ -162,25 +166,66 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
           ),
           const SizedBox(height: 10),
           Text(
-            "Service",
+            "Service : ",
             style: AppTextTheme.medium
                 .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
           ),
           const SizedBox(height: 10),
-          Wrap(
-            spacing: 8.0, // gap between adjacent chips
-            runSpacing: 4.0, // gap between lines
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(
               widget.bookingData.items?.length ?? 0,
-              (index) => widget.bookingData.items?[index].isService ?? false
-                  ? Text(
-                      index == 0
-                          ? "${widget.bookingData.items?[index].service?.name ?? ""}"
-                          : " •  ${widget.bookingData.items?[index].service?.name ?? ""}",
-                      style: AppTextTheme.medium.copyWith(
-                          color: ColorConstant.grayTextColor, fontSize: 13),
-                    )
-                  : const SizedBox(),
+                  (index) {
+                final item = widget.bookingData.items?[index];
+
+                if (item?.isService ?? false) {
+                  // return Padding(
+                  //   padding: const EdgeInsets.only(bottom: 4),
+                  //   child: Text(
+                  //     "${item?.service?.name ?? ""}",
+                  //     style: AppTextTheme.bold.copyWith(
+                  //       color: changeTheme(
+                  //         SharedPrefs.readStringValue(PrefConstants.gender),
+                  //       ),
+                  //       fontSize: 13,
+                  //     ),
+                  //   ),
+                  // );
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+
+                        /// BULLET
+                        const Text(
+                          "• ",
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        /// TEXT (MULTILINE SAFE)
+                        Expanded(
+                          child: Text(
+                            item?.service?.name ?? "",
+                            style: AppTextTheme.bold.copyWith(
+                              color: changeTheme(
+                                SharedPrefs.readStringValue(PrefConstants.gender),
+                              ),
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+
+                }
+
+                return const SizedBox();
+              },
             ),
           ),
           const SizedBox(height: 10),
@@ -188,26 +233,26 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ? Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.bookingData.orderStatus == "pending"
-                          ? "Waiting for confirmation, will get back to you with good news."
-                          : widget.bookingData.orderStatus == "confirmed"
-                          ? "So thrilled! Your appointment is now a reality."
-                          : widget.bookingData.orderStatus == "salon_rejected" ||
-                          widget.bookingData.orderStatus == "salon_artist_rejected"
-                          ? "Heartfelt apologies. Salon couldn't confirm this time."
-                          : widget.bookingData.orderStatus == "user_cancelled"
-                          ? "We understand. You've successfully changed your plans."
-                          : "Awaiting acceptance from stylist", // Default if status is unknown or needs a generic phrase
-                      style: AppTextTheme.bold.copyWith(
-                          fontSize: 18,
-                          color: widget.bookingData.orderStatus == "salon_rejected" ||
-                              widget.bookingData.orderStatus == "salon_artist_rejected" ||
-                              widget.bookingData.orderStatus == "user_cancelled"
-                              ? ColorConstant.redBgColor // Apply red for rejected/cancelled
-                              : changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender))),
-                    ),
+                    // Text(
+                    //   widget.bookingData.orderStatus == "pending"
+                    //       ? "Waiting for confirmation, will get back to you with good news."
+                    //       : widget.bookingData.orderStatus == "confirmed"
+                    //       ? "So thrilled! Your appointment is now a reality."
+                    //       : widget.bookingData.orderStatus == "salon_rejected" ||
+                    //       widget.bookingData.orderStatus == "salon_artist_rejected"
+                    //       ? "Heartfelt apologies. Salon couldn't confirm this time."
+                    //       : widget.bookingData.orderStatus == "user_cancelled"
+                    //       ? "We understand. You've successfully changed your plans."
+                    //       : "Awaiting acceptance from stylist", // Default if status is unknown or needs a generic phrase
+                    //   style: AppTextTheme.bold.copyWith(
+                    //       fontSize: 18,
+                    //       color: widget.bookingData.orderStatus == "salon_rejected" ||
+                    //           widget.bookingData.orderStatus == "salon_artist_rejected" ||
+                    //           widget.bookingData.orderStatus == "user_cancelled"
+                    //           ? ColorConstant.redBgColor // Apply red for rejected/cancelled
+                    //           : changeTheme(
+                    //           SharedPrefs.readStringValue(PrefConstants.gender))),
+                    // ),
                     // SizedBox(height: 10),
                     // Column(
                     //   children: [
@@ -292,13 +337,14 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                 width: Get.width,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
-                  color: const Color(0xffEAEAEA),
+                  color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)),
                 ),
                 child: Center(
                   child: Text(
                     "VIEW",
                     style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 16),
+                        color: ColorConstant.whiteColor, fontSize: 16),
                   ),
                 ),
               ),
@@ -337,23 +383,51 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
     }
   }
   /*---------------- convertTime ------------*/
+  // String convertDate({required String date}) {
+  //   String dateTimeString = date;
+  //   DateTime dateTime = DateTime.parse(dateTimeString);
+  //   String formattedTime = DateFormat('h:mm a').format(dateTime);
+  //   return formattedTime;
+  // }
+
   String convertDate({required String date}) {
-    String dateTimeString = date;
-    DateTime dateTime = DateTime.parse(dateTimeString);
-    String formattedTime = DateFormat('h:mm a').format(dateTime);
-    return formattedTime;
+    if (date.isEmpty) return "-";
+
+    try {
+      final parsed = DateTime.tryParse(date);
+
+      if (parsed == null) return "-";
+
+      return DateFormat('h:mm a').format(parsed);
+    } catch (e) {
+      return "-";
+    }
   }
 
   /*---------------- Date Convert Fun  -------------*/
-  String convertFinalDate({required String date}) {
-    if (date.isEmpty) {
-      return "";
-    } else {
-      String dateTimeString = date;
-      DateTime dateTime = DateTime.parse(dateTimeString);
-      String formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
+  // String convertFinalDate({required String date}) {
+  //   if (date.isEmpty) {
+  //     return "";
+  //   } else {
+  //     String dateTimeString = date;
+  //     DateTime dateTime = DateTime.parse(dateTimeString);
+  //     String formattedDate = DateFormat('dd-MM-yyyy').format(dateTime);
+  //
+  //     return formattedDate;
+  //   }
+  // }
 
-      return formattedDate;
+  String convertFinalDate({required String date}) {
+    if (date.isEmpty) return "-";
+
+    try {
+      final parsed = DateTime.tryParse(date);
+
+      if (parsed == null) return "-";
+
+      return DateFormat('dd-MM-yyyy').format(parsed);
+    } catch (e) {
+      return "-";
     }
   }
 }

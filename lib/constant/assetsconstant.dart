@@ -30,6 +30,9 @@ class AssetsConstant {
   static const String editIcon = "assets/icon/edit.png";
   static const String arrowLeftIcon = "assets/icon/arrow-left.png";
   static const String newOfferIcon = "assets/icon/new_offer_icon.png";
+  static const String genderSwitchIcon = "assets/icon/gender_switch.png";
+  static const String genderSwitchIcon1 = "assets/icon/gender_switch_1.png";
+  static const String waiting = "assets/icon/waiting.png";
   static const String starIcon = "assets/icon/star.png";
 
   /*--------------- Image -------------------*/

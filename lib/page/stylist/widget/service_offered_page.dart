@@ -145,7 +145,7 @@ class _ServiceAndOfferedPageState extends State<ServiceAndOfferedPage> {
                                     "",
                                 isHomeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
                                 callback: () {
-                                  _homeController.doGetCart();
+                                  //_homeController.doGetCart();
                                 });
                           } else {
                             _homeController.doRemoveCart(
@@ -157,7 +157,7 @@ class _ServiceAndOfferedPageState extends State<ServiceAndOfferedPage> {
                                         .id ??
                                     "",
                                 callback: () {
-                                  _homeController.doGetCart();
+                                  //_homeController.doGetCart();
                                 });
                           }
                         },

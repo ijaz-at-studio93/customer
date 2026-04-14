@@ -31,147 +31,270 @@ class StylistListGridWidget extends StatefulWidget {
 class _StylistListGridWidgetState extends State<StylistListGridWidget> {
   @override
   Widget build(BuildContext context) {
+    final themeColor = changeTheme(
+      SharedPrefs.readStringValue(PrefConstants.gender),
+    ) ??
+        ColorConstant.primaryColor;
     return GestureDetector(
       onTap: widget.onPress,
       child: Container(
+        // height: 180,
+        // width: 138,
         decoration: ShapeDecoration(
           shape: RoundedRectangleBorder(
-            side: const BorderSide(width: 1, color: Color(0xFFF1F1F1)),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(15),
+            side: BorderSide(
+              color: themeColor.withOpacity(0.6),
+              width: 1,
+            ),
           ),
         ),
+    //     child: Column(
+    //       children: [
+    //         Stack(
+    //           children: [
+    //             ClipRRect(
+    //               borderRadius: const BorderRadius.only(
+    //                 topLeft: Radius.circular(15),
+    //                 topRight: Radius.circular(15),
+    //               ),
+    //               child: CachedNetworkImage(
+    //                 width: 106,//Get.width,
+    //                 height: 100,
+    //                 fit: BoxFit.fitHeight,
+    //                 imageUrl:
+    //                     "${APIConstants.image}${widget.salonArtiestListModel.profileImage}",
+    //                 placeholder: (context, url) => Image(
+    //                   image: const AssetImage(AssetsConstant.placeHolder),
+    //                   width: 106,//Get.width,
+    //                   height: 100,
+    //                   fit: BoxFit.cover,
+    //                 ),
+    //                 errorWidget: (context, url, error) => Image(
+    //                   image: const AssetImage(AssetsConstant.placeHolder),
+    //                   width: 106,//Get.width,
+    //                   height: 100,
+    //                   fit: BoxFit.cover,
+    //                 ),
+    //               ),
+    //             ), /*  Positioned(
+    //               top: 10,
+    //               left: 12,
+    //               child: Container(
+    //                 height: 25,
+    //                 width: Get.width * 0.22,
+    //                 decoration: BoxDecoration(
+    //                     color: ColorConstant.topRatedColor,
+    //                     borderRadius: BorderRadius.circular(6)),
+    //                 child: Center(
+    //                   child: Text(
+    //                     "TOP RATED",
+    //                     style: AppTextTheme.medium.copyWith(
+    //                         color: ColorConstant.whiteColor, fontSize: 11),
+    //                   ),
+    //                 ),
+    //               ),
+    //             )*/
+    //           ],
+    //         ),
+    //         Padding(
+    //           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+    //           child: Row(
+    //             mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //             children: [
+    //               Text(
+    //                 widget.salonArtiestListModel.name ?? "",
+    //                 maxLines: 1,
+    //                 overflow: TextOverflow.ellipsis,
+    //                 style: AppTextTheme.bold.copyWith(
+    //                   fontFamily: 'Outfit',
+    //                   fontWeight: FontWeight.w700,
+    //                   fontSize: 13, // ✅ reduced
+    //                   color: Colors.black,
+    //                 ),
+    //               ),
+    //               Row(
+    //                 children: [
+    //                   const Icon(
+    //                     Icons.star,
+    //                     color: Colors.red,
+    //                     size: 13,
+    //                   ),
+    //                   const SizedBox(width: 3),
+    //                   Text(
+    //                     widget.salonArtiestListModel.rating.toString(),
+    //                     style: const TextStyle(
+    //                       fontSize: 11,
+    //                       fontWeight: FontWeight.w500,
+    //                       color: Colors.red,
+    //                     ),
+    //                   ),
+    //                 ],
+    //               )
+    //             ],
+    //           ),
+    //         ),
+    //         /* !widget.isView
+    //             ? const SizedBox()
+    //             : GestureDetector(
+    //                 onTap: () {
+    //                   setState(() {
+    //                     widget.salonArtiestListModel.isSelected =
+    //                         !(widget.salonArtiestListModel.isSelected ?? false);
+    //                   });
+    //                 },
+    //                 child: widget.salonArtiestListModel.isSelected ?? false
+    //                     ? RemoveButtonWidget(onPress: () {
+    //                         setState(() {
+    //                           widget.salonArtiestListModel.isSelected = false;
+    //                         });
+    //                       })
+    //                     : Container(
+    //                         height: 39,
+    //                         width: 110,
+    //                         decoration: BoxDecoration(
+    //                             borderRadius: BorderRadius.circular(56),
+    //                             border: Border.all(
+    //                               color: changeTheme(
+    //                                       SharedPrefs.readStringValue(
+    //                                           PrefConstants.gender)) ??
+    //                                   ColorConstant.primaryColor,
+    //                             )),
+    //                         child: Center(
+    //                           child: Text(
+    //                             "Select Artist",
+    //                             style: AppTextTheme.medium.copyWith(
+    //                                 color: changeTheme(
+    //                                         SharedPrefs.readStringValue(
+    //                                             PrefConstants.gender)) ??
+    //                                     ColorConstant.primaryColor,
+    //                                 fontSize: 13),
+    //                           ),
+    //                         ),
+    //                       ),
+    //               ),*/
+    //         /*!widget.isView ? const SizedBox() : const SizedBox(),*/
+    //         TextButton(
+    //           onPressed: () {
+    //             Get.to(() => StylistSaloonDetailsPage(
+    //                   isViewDetails: true,
+    //                   salonId: widget.id,
+    //                   artiestId: widget.salonArtiestListModel.id ?? "",
+    //                 ));
+    //           },
+    //           child: Text(
+    //             "View Profile",
+    //             style: TextStyle(
+    //               fontFamily: 'Outfit',
+    //               fontSize: 12,
+    //               fontWeight: FontWeight.w600,
+    //               color: changeTheme(
+    // SharedPrefs.readStringValue(PrefConstants.gender)),
+    //               decoration: TextDecoration.underline,
+    //               decorationColor: changeTheme(
+    // SharedPrefs.readStringValue(PrefConstants.gender)), // same color as text
+    //               decorationThickness: 2,    // 🔥 thickness like design
+    //               decorationStyle: TextDecorationStyle.solid,
+    //
+    //             ),
+    //           ),
+    //         ),
+    //       ],
+    //     ),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween, // 🔥 KEY
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(12),
-                    topRight: Radius.circular(12),
-                  ),
-                  child: CachedNetworkImage(
-                    width: Get.width,
-                    height: 135,
-                    fit: BoxFit.fitHeight,
-                    imageUrl:
-                        "${APIConstants.image}${widget.salonArtiestListModel.profileImage}",
-                    placeholder: (context, url) => Image(
-                      image: const AssetImage(AssetsConstant.placeHolder),
-                      width: Get.width,
-                      height: 135,
-                      fit: BoxFit.cover,
-                    ),
-                    errorWidget: (context, url, error) => Image(
-                      image: const AssetImage(AssetsConstant.placeHolder),
-                      width: Get.width,
-                      height: 135,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ), /*  Positioned(
-                  top: 10,
-                  left: 12,
-                  child: Container(
-                    height: 25,
-                    width: Get.width * 0.22,
-                    decoration: BoxDecoration(
-                        color: ColorConstant.topRatedColor,
-                        borderRadius: BorderRadius.circular(6)),
-                    child: Center(
-                      child: Text(
-                        "TOP RATED",
-                        style: AppTextTheme.medium.copyWith(
-                            color: ColorConstant.whiteColor, fontSize: 11),
-                      ),
-                    ),
-                  ),
-                )*/
-              ],
+
+            /// IMAGE
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(15),
+                topRight: Radius.circular(15),
+              ),
+              child: CachedNetworkImage(
+                width: double.infinity,
+                height: 100,
+                fit: BoxFit.cover,
+                imageUrl:
+                "${APIConstants.image}${widget.salonArtiestListModel.profileImage}",
+                placeholder: (context, url) => Image.asset(
+                  AssetsConstant.placeHolder,
+                  height: 100,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+                errorWidget: (context, url, error) => Image.asset(
+                  AssetsConstant.placeHolder,
+                  height: 100,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
+
+            /// NAME + RATING
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    widget.salonArtiestListModel.name ?? "",
-                    textScaler: const TextScaler.linear(0.85),
-                    style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 15),
+                  Expanded(
+                    child: Text(
+                      widget.salonArtiestListModel.name ?? "",
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextTheme.bold.copyWith(
+                        fontFamily: 'Outfit',
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: Colors.black,
+                      ),
+                    ),
                   ),
                   Row(
                     children: [
-                      const Icon(
-                        Icons.star,
-                        color: ColorConstant.yellowColor,
-                        size: 20,
-                      ),
+                      const Icon(Icons.star, color: Colors.red, size: 13),
                       const SizedBox(width: 3),
                       Text(
                         widget.salonArtiestListModel.rating.toString(),
-                        style: AppTextTheme.medium.copyWith(
-                            fontSize: 11, color: ColorConstant.yellowColor),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.red,
+                        ),
                       ),
                     ],
                   )
                 ],
               ),
             ),
-            /* !widget.isView
-                ? const SizedBox()
-                : GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        widget.salonArtiestListModel.isSelected =
-                            !(widget.salonArtiestListModel.isSelected ?? false);
-                      });
-                    },
-                    child: widget.salonArtiestListModel.isSelected ?? false
-                        ? RemoveButtonWidget(onPress: () {
-                            setState(() {
-                              widget.salonArtiestListModel.isSelected = false;
-                            });
-                          })
-                        : Container(
-                            height: 39,
-                            width: 110,
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(56),
-                                border: Border.all(
-                                  color: changeTheme(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.gender)) ??
-                                      ColorConstant.primaryColor,
-                                )),
-                            child: Center(
-                              child: Text(
-                                "Select Artist",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: changeTheme(
-                                            SharedPrefs.readStringValue(
-                                                PrefConstants.gender)) ??
-                                        ColorConstant.primaryColor,
-                                    fontSize: 13),
-                              ),
-                            ),
-                          ),
-                  ),*/
-            /*!widget.isView ? const SizedBox() : const SizedBox(),*/
-            TextButton(
-              onPressed: () {
-                Get.to(() => StylistSaloonDetailsPage(
-                      isViewDetails: true,
-                      salonId: widget.id,
-                      artiestId: widget.salonArtiestListModel.id ?? "",
-                    ));
-              },
-              child: Text(
-                "View Profile",
-                style: AppTextTheme.medium.copyWith(
-                    fontSize: 13,
-                    color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),
-                    decoration: TextDecoration.underline),
+
+            /// VIEW PROFILE (TIGHT)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10,vertical: 6),
+              child: GestureDetector(
+                onTap: () {
+                  Get.to(() => StylistSaloonDetailsPage(
+                    isViewDetails: true,
+                    salonId: widget.id,
+                    artiestId: widget.salonArtiestListModel.id ?? "",
+                  ));
+                },
+                child: Center(
+                  child: Text(
+                    "View Profile",
+                    style: TextStyle(
+                      fontFamily: 'Outfit',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: themeColor,
+                      decoration: TextDecoration.underline,
+                      decorationColor: themeColor,
+                      decorationThickness: 1.5,
+                    ),
+                  ),
+                ),
               ),
             ),
           ],

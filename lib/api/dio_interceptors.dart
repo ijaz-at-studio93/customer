@@ -16,6 +16,15 @@ class RetryOnConnectionChangeInterceptor extends Interceptor {
 
   @override
   Future onError(DioException err, ErrorInterceptorHandler handler) async {
+    // 🔥 ADD THIS BLOCK HERE (TOP)
+    debugPrint("❌ DIO ERROR =======================");
+    debugPrint("TYPE: ${err.type}");
+    debugPrint("MESSAGE: ${err.message}");
+    debugPrint("ERROR: ${err.error}");
+    debugPrint("STATUS CODE: ${err.response?.statusCode}");
+    debugPrint("RESPONSE: ${err.response?.data}");
+    debugPrint("URL: ${err.requestOptions.uri}");
+    debugPrint("====================================");
     if (_shouldRetry(err)) {
       try {
         Get.find<AuthController>().setShowProgress = false;
