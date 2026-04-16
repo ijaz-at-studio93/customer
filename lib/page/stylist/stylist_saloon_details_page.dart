@@ -29,9 +29,9 @@ class StylistSaloonDetailsPage extends StatefulWidget {
 
   const StylistSaloonDetailsPage(
       {super.key,
-        required this.artiestId,
-        required this.salonId,
-        required this.isViewDetails});
+      required this.artiestId,
+      required this.salonId,
+      required this.isViewDetails});
 
   @override
   State<StylistSaloonDetailsPage> createState() =>
@@ -62,556 +62,559 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
       appBar: statusBarTheme(context),
       backgroundColor: ColorConstant.bgColor,
       body: Obx(
-            () => _homeController.showProgress
+        () => _homeController.showProgress
             ? const ProgressBarView()
             : SingleChildScrollView(
-          child: Column(
-            children: [
-              _imageHeaderWidget(),
-              _nameContainColum(),
-              _tabBarView(),
-              isSelectedTab == 0
-                  ? ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: EdgeInsets.only(bottom: Get.height * 0.16),
-                  itemCount: _homeController.getArtiestDetailsModel
-                      .data?.categorizedServiceList?.length ??
-                      0,
-                  itemBuilder: (context, index) {
-                    return ExpansionTile(
-                      initiallyExpanded: index == 0 ? true : false,
-                      title: Text(
-                        _homeController
-                            .getArtiestDetailsModel
-                            .data
-                            ?.categorizedServiceList?[index]
-                            .name ??
-                            "",
-                        style: AppTextTheme.bold.copyWith(
-                          fontSize: 17.5,
-                          fontFamily: 'Outfit',
-                          fontWeight: FontWeight.w800,
-                          color: Colors.black// female
-                        ),
-                      ),
-                      children: [
-                        ListView.separated(
-                            separatorBuilder: (context, i) {
-                              return Container(
-                                margin: const EdgeInsets.only(
-                                    top: 25, bottom: 10),
-                                height: 1,
-                                width: Get.width,
-                                color: ColorConstant.dividerColor,
-                              );
-                            },
+                child: Column(
+                  children: [
+                    _imageHeaderWidget(),
+                    _nameContainColum(),
+                    _tabBarView(),
+                    isSelectedTab == 0
+                        ? ListView.builder(
                             shrinkWrap: true,
-                            itemCount: _homeController
-                                .getArtiestDetailsModel
-                                .data
-                                ?.categorizedServiceList?[index]
-                                .services
-                                ?.length ??
+                            physics: const NeverScrollableScrollPhysics(),
+                            padding: EdgeInsets.only(bottom: Get.height * 0.16),
+                            itemCount: _homeController.getArtiestDetailsModel
+                                    .data?.categorizedServiceList?.length ??
                                 0,
-                            physics:
-                            const NeverScrollableScrollPhysics(),
-                            itemBuilder: (context, i) {
-                              return ServiceOfferListTileWidget(
-                                rate: _homeController
-                                    .getArtiestDetailsModel
-                                    .data
-                                    ?.categorizedServiceList?[
-                                index]
-                                    .services?[i]
-                                    .rating ??
-                                    0.0,
-                                image:
-                                "${APIConstants.image}${_homeController.getArtiestDetailsModel.data?.categorizedServiceList?[index].services?[i].image ?? 0.0}",
-                                name: _homeController
-                                    .getArtiestDetailsModel
-                                    .data
-                                    ?.categorizedServiceList?[
-                                index]
-                                    .services?[i]
-                                    .name ??
-                                    "",
-                                description: _homeController
-                                    .getArtiestDetailsModel
-                                    .data
-                                    ?.categorizedServiceList?[
-                                index]
-                                    .services?[i]
-                                    .description ??
-                                    "",
-                                price: _homeController
-                                    .getArtiestDetailsModel
-                                    .data
-                                    ?.categorizedServiceList?[
-                                index]
-                                    .services?[i]
-                                    .price
-                                    .toString() ??
-                                    "",
-                                duration: _homeController
-                                    .getArtiestDetailsModel
-                                    .data
-                                    ?.categorizedServiceList?[
-                                index]
-                                    .services?[i]
-                                    .duration
-                                    .toString() ??
-                                    "",
-                                reviewCount: _homeController
-                                    .getArtiestDetailsModel
-                                    .data
-                                    ?.categorizedServiceList?[
-                                index]
-                                    .services?[i]
-                                    .reviewCount
-                                    .toString() ??
-                                    "",
-                                isSelect: _homeController
-                                    .getArtiestDetailsModel
-                                    .data
-                                    ?.categorizedServiceList?[
-                                index]
-                                    .services?[i]
-                                    .isAddedToCart ??
-                                    false,
-                                addButtonTap: () async {
-                                  if (stylistId.value.isEmpty) {
-                                    _homeController
-                                        .getArtiestDetailsModel
-                                        .data
-                                        ?.categorizedServiceList?[
-                                    index]
-                                        .services?[i]
-                                        .isAddedToCart = !(_homeController
-                                        .getArtiestDetailsModel
-                                        .data
-                                        ?.categorizedServiceList?[
-                                    index]
-                                        .services?[i]
-                                        .isAddedToCart ??
-                                        false);
-
-                                    if (_homeController
-                                        .getArtiestDetailsModel
-                                        .data
-                                        ?.categorizedServiceList?[
-                                    index]
-                                        .services?[i]
-                                        .isAddedToCart ??
-                                        false) {
-                                      // showModalBottomSheet(
-                                      //     context: context,
-                                      //     isScrollControlled: true,
-                                      //     shape:
-                                      //     const RoundedRectangleBorder(
-                                      //         borderRadius:
-                                      //         BorderRadius
-                                      //             .only(
-                                      //           topLeft:
-                                      //           Radius.circular(32),
-                                      //           topRight:
-                                      //           Radius.circular(32),
-                                      //         )),
-                                      //     builder: (context) {
-                                      //       return AddProductSheetWidget(
-                                      //         price: _homeController
-                                      //             .getArtiestDetailsModel
-                                      //             .data
-                                      //             ?.categorizedServiceList?[
-                                      //         index]
-                                      //             .services?[i]
-                                      //             .price ??
-                                      //             0,
-                                      //         rating: _homeController
-                                      //             .getArtiestDetailsModel
-                                      //             .data
-                                      //             ?.categorizedServiceList?[
-                                      //         index]
-                                      //             .services?[i]
-                                      //             .rating ??
-                                      //             0.0,
-                                      //         review: _homeController
-                                      //             .getArtiestDetailsModel
-                                      //             .data
-                                      //             ?.categorizedServiceList?[
-                                      //         index]
-                                      //             .services?[i]
-                                      //             .reviewCount
-                                      //             ?.toInt() ??
-                                      //             0,
-                                      //         nameOfService: _homeController
-                                      //             .getArtiestDetailsModel
-                                      //             .data
-                                      //             ?.categorizedServiceList?[
-                                      //         index]
-                                      //             .services?[i]
-                                      //             .name ??
-                                      //             "",
-                                      //         serviceId: _homeController
-                                      //             .getArtiestDetailsModel
-                                      //             .data
-                                      //             ?.categorizedServiceList?[
-                                      //         index]
-                                      //             .services?[i]
-                                      //             .id ??
-                                      //             "",
-                                      //       );
-                                      //     });
-                                      _homeController.doAddCart(
-                                          salonServiceId: _homeController
+                            itemBuilder: (context, index) {
+                              return ExpansionTile(
+                                initiallyExpanded: index == 0 ? true : false,
+                                title: Text(
+                                  _homeController
+                                          .getArtiestDetailsModel
+                                          .data
+                                          ?.categorizedServiceList?[index]
+                                          .name ??
+                                      "",
+                                  style: AppTextTheme.bold.copyWith(
+                                      fontSize: 17.5,
+                                      fontFamily: 'Outfit',
+                                      fontWeight: FontWeight.w800,
+                                      color: Colors.black // female
+                                      ),
+                                ),
+                                children: [
+                                  ListView.separated(
+                                      separatorBuilder: (context, i) {
+                                        return Container(
+                                          margin: const EdgeInsets.only(
+                                              top: 25, bottom: 10),
+                                          height: 1,
+                                          width: Get.width,
+                                          color: ColorConstant.dividerColor,
+                                        );
+                                      },
+                                      shrinkWrap: true,
+                                      itemCount: _homeController
                                               .getArtiestDetailsModel
                                               .data
-                                              ?.categorizedServiceList?[
-                                          index]
-                                              .services?[i]
-                                              .id ??
+                                              ?.categorizedServiceList?[index]
+                                              .services
+                                              ?.length ??
+                                          0,
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      itemBuilder: (context, i) {
+                                        return ServiceOfferListTileWidget(
+                                          rate: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .rating ??
+                                              0.0,
+                                          image:
+                                              "${APIConstants.image}${_homeController.getArtiestDetailsModel.data?.categorizedServiceList?[index].services?[i].image ?? 0.0}",
+                                          name: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .name ??
                                               "",
-                                          isHomeService: SharedPrefs
-                                              .readBoolValue(
-                                              PrefConstants
-                                                  .isHomeService),
-                                          callback: () {
-                                            stylistId.value =
-                                                widget.artiestId;
-                                            // _homeController
-                                            //     .doGetCart();
-                                            _homeController.doGetSalonDetailsService(
-                                                serviceGender:
-                                                SharedPrefs.readStringValue(
-                                                    PrefConstants
-                                                        .gender) ==
-                                                    "0"
-                                                    ? "male"
-                                                    : "female",
-                                                salonId:
-                                                widget.salonId);
-
-                                            // showModalBottomSheet(
-                                            //     context: context,
-                                            //     isScrollControlled:
-                                            //     true,
-                                            //     shape:
-                                            //     const RoundedRectangleBorder(
-                                            //         borderRadius:
-                                            //         BorderRadius
-                                            //             .only(
-                                            //           topLeft:
-                                            //           Radius.circular(
-                                            //               32),
-                                            //           topRight:
-                                            //           Radius.circular(
-                                            //               32),
-                                            //         )),
-                                            //     builder: (context) {
-                                            //       return AddProductSheetWidget(
-                                            //         price: _homeController
-                                            //             .getArtiestDetailsModel
-                                            //             .data
-                                            //             ?.categorizedServiceList?[
-                                            //         index]
-                                            //             .services?[
-                                            //         i]
-                                            //             .price ??
-                                            //             0,
-                                            //         rating: _homeController
-                                            //             .getArtiestDetailsModel
-                                            //             .data
-                                            //             ?.categorizedServiceList?[
-                                            //         index]
-                                            //             .services?[
-                                            //         i]
-                                            //             .rating ??
-                                            //             0.0,
-                                            //         review: _homeController
-                                            //             .getArtiestDetailsModel
-                                            //             .data
-                                            //             ?.categorizedServiceList?[
-                                            //         index]
-                                            //             .services?[
-                                            //         i]
-                                            //             .reviewCount
-                                            //             ?.toInt() ??
-                                            //             0,
-                                            //         nameOfService: _homeController
-                                            //             .getArtiestDetailsModel
-                                            //             .data
-                                            //             ?.categorizedServiceList?[
-                                            //         index]
-                                            //             .services?[
-                                            //         i]
-                                            //             .name ??
-                                            //             "",
-                                            //         serviceId: _homeController
-                                            //             .getArtiestDetailsModel
-                                            //             .data
-                                            //             ?.categorizedServiceList?[
-                                            //         index]
-                                            //             .services?[
-                                            //         i]
-                                            //             .id ??
-                                            //             "",
-                                            //       );
-                                            //     });
-                                          });
-                                    } else {
-                                      _homeController.doRemoveCart(
-                                          salonServiceId: _homeController
-                                              .getArtiestDetailsModel
-                                              .data
-                                              ?.categorizedServiceList?[
-                                          index]
-                                              .services?[i]
-                                              .id ??
+                                          description: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .description ??
                                               "",
-                                          callback: () {
-                                            // _homeController
-                                            //     .doGetCart();
-                                          });
-                                    }
-                                  } else {
-                                    if (stylistId.value ==
-                                        widget.artiestId) {
-                                      _homeController
-                                          .getArtiestDetailsModel
-                                          .data
-                                          ?.categorizedServiceList?[
-                                      index]
-                                          .services?[i]
-                                          .isAddedToCart = !(_homeController
-                                          .getArtiestDetailsModel
-                                          .data
-                                          ?.categorizedServiceList?[
-                                      index]
-                                          .services?[i]
-                                          .isAddedToCart ??
-                                          false);
-
-                                      if (_homeController
-                                          .getArtiestDetailsModel
-                                          .data
-                                          ?.categorizedServiceList?[
-                                      index]
-                                          .services?[i]
-                                          .isAddedToCart ??
-                                          false) {
-                                        // showModalBottomSheet(
-                                        //     context: context,
-                                        //     isScrollControlled: true,
-                                        //     shape:
-                                        //     const RoundedRectangleBorder(
-                                        //         borderRadius:
-                                        //         BorderRadius
-                                        //             .only(
-                                        //           topLeft:
-                                        //           Radius.circular(32),
-                                        //           topRight:
-                                        //           Radius.circular(32),
-                                        //         )),
-                                        //     builder: (context) {
-                                        //       return AddProductSheetWidget(
-                                        //         price: _homeController
-                                        //             .getArtiestDetailsModel
-                                        //             .data
-                                        //             ?.categorizedServiceList?[
-                                        //         index]
-                                        //             .services?[i]
-                                        //             .price ??
-                                        //             0,
-                                        //         rating: _homeController
-                                        //             .getArtiestDetailsModel
-                                        //             .data
-                                        //             ?.categorizedServiceList?[
-                                        //         index]
-                                        //             .services?[i]
-                                        //             .rating ??
-                                        //             0.0,
-                                        //         review: _homeController
-                                        //             .getArtiestDetailsModel
-                                        //             .data
-                                        //             ?.categorizedServiceList?[
-                                        //         index]
-                                        //             .services?[i]
-                                        //             .reviewCount
-                                        //             ?.toInt() ??
-                                        //             0,
-                                        //         nameOfService: _homeController
-                                        //             .getArtiestDetailsModel
-                                        //             .data
-                                        //             ?.categorizedServiceList?[
-                                        //         index]
-                                        //             .services?[i]
-                                        //             .name ??
-                                        //             "",
-                                        //         serviceId: _homeController
-                                        //             .getArtiestDetailsModel
-                                        //             .data
-                                        //             ?.categorizedServiceList?[
-                                        //         index]
-                                        //             .services?[i]
-                                        //             .id ??
-                                        //             "",
-                                        //       );
-                                        //     });
-                                        _homeController.doAddCart(
-                                            salonServiceId: _homeController
-                                                .getArtiestDetailsModel
-                                                .data
-                                                ?.categorizedServiceList?[
-                                            index]
-                                                .services?[i]
-                                                .id ??
-                                                "",
-                                            isHomeService: SharedPrefs
-                                                .readBoolValue(
-                                                PrefConstants
-                                                    .isHomeService),
-                                            callback: () {
-                                              stylistId.value =
-                                                  widget.artiestId;
-                                              // _homeController
-                                              //     .doGetCart();
+                                          price: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .price
+                                                  .toString() ??
+                                              "",
+                                          duration: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .duration
+                                                  .toString() ??
+                                              "",
+                                          reviewCount: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .reviewCount
+                                                  .toString() ??
+                                              "",
+                                          isSelect: _homeController
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .isAddedToCart ??
+                                              false,
+                                          addButtonTap: () async {
+                                            if (stylistId.value.isEmpty) {
                                               _homeController
-                                                  .doGetSalonDetailsService(
-                                                  serviceGender:
-                                                  SharedPrefs.readStringValue(PrefConstants.gender) ==
-                                                      "0"
-                                                      ? "male"
-                                                      : "female",
-                                                  salonId: widget
-                                                      .salonId);
+                                                  .getArtiestDetailsModel
+                                                  .data
+                                                  ?.categorizedServiceList?[
+                                                      index]
+                                                  .services?[i]
+                                                  .isAddedToCart = !(_homeController
+                                                      .getArtiestDetailsModel
+                                                      .data
+                                                      ?.categorizedServiceList?[
+                                                          index]
+                                                      .services?[i]
+                                                      .isAddedToCart ??
+                                                  false);
 
-                                              // showModalBottomSheet(
-                                              //     context: context,
-                                              //     isScrollControlled:
-                                              //     true,
-                                              //     shape:
-                                              //     const RoundedRectangleBorder(
-                                              //         borderRadius:
-                                              //         BorderRadius
-                                              //             .only(
-                                              //           topLeft: Radius
-                                              //               .circular(32),
-                                              //           topRight: Radius
-                                              //               .circular(32),
-                                              //         )),
-                                              //     builder: (context) {
-                                              //       return AddProductSheetWidget(
-                                              //         price: _homeController
-                                              //             .getArtiestDetailsModel
-                                              //             .data
-                                              //             ?.categorizedServiceList?[
-                                              //         index]
-                                              //             .services?[
-                                              //         i]
-                                              //             .price ??
-                                              //             0,
-                                              //         rating: _homeController
-                                              //             .getArtiestDetailsModel
-                                              //             .data
-                                              //             ?.categorizedServiceList?[
-                                              //         index]
-                                              //             .services?[
-                                              //         i]
-                                              //             .rating ??
-                                              //             0.0,
-                                              //         review: _homeController
-                                              //             .getArtiestDetailsModel
-                                              //             .data
-                                              //             ?.categorizedServiceList?[
-                                              //         index]
-                                              //             .services?[
-                                              //         i]
-                                              //             .reviewCount
-                                              //             ?.toInt() ??
-                                              //             0,
-                                              //         nameOfService: _homeController
-                                              //             .getArtiestDetailsModel
-                                              //             .data
-                                              //             ?.categorizedServiceList?[
-                                              //         index]
-                                              //             .services?[
-                                              //         i]
-                                              //             .name ??
-                                              //             "",
-                                              //         serviceId: _homeController
-                                              //             .getArtiestDetailsModel
-                                              //             .data
-                                              //             ?.categorizedServiceList?[
-                                              //         index]
-                                              //             .services?[
-                                              //         i]
-                                              //             .id ??
-                                              //             "",
-                                              //       );
-                                              //     });
-                                            });
-                                      } else {
-                                        _homeController.doRemoveCart(
-                                            salonServiceId: _homeController
-                                                .getArtiestDetailsModel
-                                                .data
-                                                ?.categorizedServiceList?[
-                                            index]
-                                                .services?[i]
-                                                .id ??
-                                                "",
-                                            callback: () {
-                                              // _homeController
-                                              //     .doGetCart();
-                                            });
-                                      }
-                                    } else {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return RemoveAndAddServiceDialog(
-                                                noPress: () {
-                                                  Get.back();
-                                                }, yesPress: () {
-                                              setState(() {
-                                                _homeController
-                                                    .doClearCart(
+                                              if (_homeController
+                                                      .getArtiestDetailsModel
+                                                      .data
+                                                      ?.categorizedServiceList?[
+                                                          index]
+                                                      .services?[i]
+                                                      .isAddedToCart ??
+                                                  false) {
+                                                // showModalBottomSheet(
+                                                //     context: context,
+                                                //     isScrollControlled: true,
+                                                //     shape:
+                                                //     const RoundedRectangleBorder(
+                                                //         borderRadius:
+                                                //         BorderRadius
+                                                //             .only(
+                                                //           topLeft:
+                                                //           Radius.circular(32),
+                                                //           topRight:
+                                                //           Radius.circular(32),
+                                                //         )),
+                                                //     builder: (context) {
+                                                //       return AddProductSheetWidget(
+                                                //         price: _homeController
+                                                //             .getArtiestDetailsModel
+                                                //             .data
+                                                //             ?.categorizedServiceList?[
+                                                //         index]
+                                                //             .services?[i]
+                                                //             .price ??
+                                                //             0,
+                                                //         rating: _homeController
+                                                //             .getArtiestDetailsModel
+                                                //             .data
+                                                //             ?.categorizedServiceList?[
+                                                //         index]
+                                                //             .services?[i]
+                                                //             .rating ??
+                                                //             0.0,
+                                                //         review: _homeController
+                                                //             .getArtiestDetailsModel
+                                                //             .data
+                                                //             ?.categorizedServiceList?[
+                                                //         index]
+                                                //             .services?[i]
+                                                //             .reviewCount
+                                                //             ?.toInt() ??
+                                                //             0,
+                                                //         nameOfService: _homeController
+                                                //             .getArtiestDetailsModel
+                                                //             .data
+                                                //             ?.categorizedServiceList?[
+                                                //         index]
+                                                //             .services?[i]
+                                                //             .name ??
+                                                //             "",
+                                                //         serviceId: _homeController
+                                                //             .getArtiestDetailsModel
+                                                //             .data
+                                                //             ?.categorizedServiceList?[
+                                                //         index]
+                                                //             .services?[i]
+                                                //             .id ??
+                                                //             "",
+                                                //       );
+                                                //     });
+                                                _homeController.doAddCart(
+                                                    salonServiceId: _homeController
+                                                            .getArtiestDetailsModel
+                                                            .data
+                                                            ?.categorizedServiceList?[
+                                                                index]
+                                                            .services?[i]
+                                                            .id ??
+                                                        "",
+                                                    isHomeService: SharedPrefs
+                                                        .readBoolValue(
+                                                            PrefConstants
+                                                                .isHomeService),
                                                     callback: () {
-                                                      _homeController
-                                                          .doGetArtiestPortfolio(
-                                                          artistId: widget
-                                                              .artiestId);
+                                                      stylistId.value =
+                                                          widget.artiestId;
                                                       // _homeController
                                                       //     .doGetCart();
-                                                      serviceId = "";
-                                                      stylistId.value =
-                                                      "";
-                                                      Get.back();
+                                                      _homeController.doGetSalonDetailsService(
+                                                          serviceGender:
+                                                              SharedPrefs.readStringValue(
+                                                                          PrefConstants
+                                                                              .gender) ==
+                                                                      "0"
+                                                                  ? "male"
+                                                                  : "female",
+                                                          salonId:
+                                                              widget.salonId);
+
+                                                      // showModalBottomSheet(
+                                                      //     context: context,
+                                                      //     isScrollControlled:
+                                                      //     true,
+                                                      //     shape:
+                                                      //     const RoundedRectangleBorder(
+                                                      //         borderRadius:
+                                                      //         BorderRadius
+                                                      //             .only(
+                                                      //           topLeft:
+                                                      //           Radius.circular(
+                                                      //               32),
+                                                      //           topRight:
+                                                      //           Radius.circular(
+                                                      //               32),
+                                                      //         )),
+                                                      //     builder: (context) {
+                                                      //       return AddProductSheetWidget(
+                                                      //         price: _homeController
+                                                      //             .getArtiestDetailsModel
+                                                      //             .data
+                                                      //             ?.categorizedServiceList?[
+                                                      //         index]
+                                                      //             .services?[
+                                                      //         i]
+                                                      //             .price ??
+                                                      //             0,
+                                                      //         rating: _homeController
+                                                      //             .getArtiestDetailsModel
+                                                      //             .data
+                                                      //             ?.categorizedServiceList?[
+                                                      //         index]
+                                                      //             .services?[
+                                                      //         i]
+                                                      //             .rating ??
+                                                      //             0.0,
+                                                      //         review: _homeController
+                                                      //             .getArtiestDetailsModel
+                                                      //             .data
+                                                      //             ?.categorizedServiceList?[
+                                                      //         index]
+                                                      //             .services?[
+                                                      //         i]
+                                                      //             .reviewCount
+                                                      //             ?.toInt() ??
+                                                      //             0,
+                                                      //         nameOfService: _homeController
+                                                      //             .getArtiestDetailsModel
+                                                      //             .data
+                                                      //             ?.categorizedServiceList?[
+                                                      //         index]
+                                                      //             .services?[
+                                                      //         i]
+                                                      //             .name ??
+                                                      //             "",
+                                                      //         serviceId: _homeController
+                                                      //             .getArtiestDetailsModel
+                                                      //             .data
+                                                      //             ?.categorizedServiceList?[
+                                                      //         index]
+                                                      //             .services?[
+                                                      //         i]
+                                                      //             .id ??
+                                                      //             "",
+                                                      //       );
+                                                      //     });
                                                     });
-                                              });
-                                            });
-                                          });
-                                    }
-                                  }
-                                },
+                                              } else {
+                                                _homeController.doRemoveCart(
+                                                    salonServiceId: _homeController
+                                                            .getArtiestDetailsModel
+                                                            .data
+                                                            ?.categorizedServiceList?[
+                                                                index]
+                                                            .services?[i]
+                                                            .id ??
+                                                        "",
+                                                    callback: () {
+                                                      // _homeController
+                                                      //     .doGetCart();
+                                                    });
+                                              }
+                                            } else {
+                                              if (stylistId.value ==
+                                                  widget.artiestId) {
+                                                _homeController
+                                                    .getArtiestDetailsModel
+                                                    .data
+                                                    ?.categorizedServiceList?[
+                                                        index]
+                                                    .services?[i]
+                                                    .isAddedToCart = !(_homeController
+                                                        .getArtiestDetailsModel
+                                                        .data
+                                                        ?.categorizedServiceList?[
+                                                            index]
+                                                        .services?[i]
+                                                        .isAddedToCart ??
+                                                    false);
+
+                                                if (_homeController
+                                                        .getArtiestDetailsModel
+                                                        .data
+                                                        ?.categorizedServiceList?[
+                                                            index]
+                                                        .services?[i]
+                                                        .isAddedToCart ??
+                                                    false) {
+                                                  // showModalBottomSheet(
+                                                  //     context: context,
+                                                  //     isScrollControlled: true,
+                                                  //     shape:
+                                                  //     const RoundedRectangleBorder(
+                                                  //         borderRadius:
+                                                  //         BorderRadius
+                                                  //             .only(
+                                                  //           topLeft:
+                                                  //           Radius.circular(32),
+                                                  //           topRight:
+                                                  //           Radius.circular(32),
+                                                  //         )),
+                                                  //     builder: (context) {
+                                                  //       return AddProductSheetWidget(
+                                                  //         price: _homeController
+                                                  //             .getArtiestDetailsModel
+                                                  //             .data
+                                                  //             ?.categorizedServiceList?[
+                                                  //         index]
+                                                  //             .services?[i]
+                                                  //             .price ??
+                                                  //             0,
+                                                  //         rating: _homeController
+                                                  //             .getArtiestDetailsModel
+                                                  //             .data
+                                                  //             ?.categorizedServiceList?[
+                                                  //         index]
+                                                  //             .services?[i]
+                                                  //             .rating ??
+                                                  //             0.0,
+                                                  //         review: _homeController
+                                                  //             .getArtiestDetailsModel
+                                                  //             .data
+                                                  //             ?.categorizedServiceList?[
+                                                  //         index]
+                                                  //             .services?[i]
+                                                  //             .reviewCount
+                                                  //             ?.toInt() ??
+                                                  //             0,
+                                                  //         nameOfService: _homeController
+                                                  //             .getArtiestDetailsModel
+                                                  //             .data
+                                                  //             ?.categorizedServiceList?[
+                                                  //         index]
+                                                  //             .services?[i]
+                                                  //             .name ??
+                                                  //             "",
+                                                  //         serviceId: _homeController
+                                                  //             .getArtiestDetailsModel
+                                                  //             .data
+                                                  //             ?.categorizedServiceList?[
+                                                  //         index]
+                                                  //             .services?[i]
+                                                  //             .id ??
+                                                  //             "",
+                                                  //       );
+                                                  //     });
+                                                  _homeController.doAddCart(
+                                                      salonServiceId: _homeController
+                                                              .getArtiestDetailsModel
+                                                              .data
+                                                              ?.categorizedServiceList?[
+                                                                  index]
+                                                              .services?[i]
+                                                              .id ??
+                                                          "",
+                                                      isHomeService: SharedPrefs
+                                                          .readBoolValue(
+                                                              PrefConstants
+                                                                  .isHomeService),
+                                                      callback: () {
+                                                        stylistId.value =
+                                                            widget.artiestId;
+                                                        // _homeController
+                                                        //     .doGetCart();
+                                                        _homeController
+                                                            .doGetSalonDetailsService(
+                                                                serviceGender:
+                                                                    SharedPrefs.readStringValue(PrefConstants.gender) ==
+                                                                            "0"
+                                                                        ? "male"
+                                                                        : "female",
+                                                                salonId: widget
+                                                                    .salonId);
+
+                                                        // showModalBottomSheet(
+                                                        //     context: context,
+                                                        //     isScrollControlled:
+                                                        //     true,
+                                                        //     shape:
+                                                        //     const RoundedRectangleBorder(
+                                                        //         borderRadius:
+                                                        //         BorderRadius
+                                                        //             .only(
+                                                        //           topLeft: Radius
+                                                        //               .circular(32),
+                                                        //           topRight: Radius
+                                                        //               .circular(32),
+                                                        //         )),
+                                                        //     builder: (context) {
+                                                        //       return AddProductSheetWidget(
+                                                        //         price: _homeController
+                                                        //             .getArtiestDetailsModel
+                                                        //             .data
+                                                        //             ?.categorizedServiceList?[
+                                                        //         index]
+                                                        //             .services?[
+                                                        //         i]
+                                                        //             .price ??
+                                                        //             0,
+                                                        //         rating: _homeController
+                                                        //             .getArtiestDetailsModel
+                                                        //             .data
+                                                        //             ?.categorizedServiceList?[
+                                                        //         index]
+                                                        //             .services?[
+                                                        //         i]
+                                                        //             .rating ??
+                                                        //             0.0,
+                                                        //         review: _homeController
+                                                        //             .getArtiestDetailsModel
+                                                        //             .data
+                                                        //             ?.categorizedServiceList?[
+                                                        //         index]
+                                                        //             .services?[
+                                                        //         i]
+                                                        //             .reviewCount
+                                                        //             ?.toInt() ??
+                                                        //             0,
+                                                        //         nameOfService: _homeController
+                                                        //             .getArtiestDetailsModel
+                                                        //             .data
+                                                        //             ?.categorizedServiceList?[
+                                                        //         index]
+                                                        //             .services?[
+                                                        //         i]
+                                                        //             .name ??
+                                                        //             "",
+                                                        //         serviceId: _homeController
+                                                        //             .getArtiestDetailsModel
+                                                        //             .data
+                                                        //             ?.categorizedServiceList?[
+                                                        //         index]
+                                                        //             .services?[
+                                                        //         i]
+                                                        //             .id ??
+                                                        //             "",
+                                                        //       );
+                                                        //     });
+                                                      });
+                                                } else {
+                                                  _homeController.doRemoveCart(
+                                                      salonServiceId: _homeController
+                                                              .getArtiestDetailsModel
+                                                              .data
+                                                              ?.categorizedServiceList?[
+                                                                  index]
+                                                              .services?[i]
+                                                              .id ??
+                                                          "",
+                                                      callback: () {
+                                                        // _homeController
+                                                        //     .doGetCart();
+                                                      });
+                                                }
+                                              } else {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return RemoveAndAddServiceDialog(
+                                                          noPress: () {
+                                                        Navigator.of(context)
+                                                            .maybePop();
+                                                      }, yesPress: () {
+                                                        setState(() {
+                                                          _homeController
+                                                              .doClearCart(
+                                                                  callback: () {
+                                                            _homeController
+                                                                .doGetArtiestPortfolio(
+                                                                    artistId: widget
+                                                                        .artiestId);
+                                                            // _homeController
+                                                            //     .doGetCart();
+                                                            serviceId = "";
+                                                            stylistId.value =
+                                                                "";
+                                                            Navigator.of(
+                                                                    context)
+                                                                .maybePop();
+                                                          });
+                                                        });
+                                                      });
+                                                    });
+                                              }
+                                            }
+                                          },
+                                        );
+                                      }),
+                                  const SizedBox(height: 22),
+                                ],
                               );
-                            }),
-                        const SizedBox(height: 22),
-                      ],
-                    );
-                  })
-                  : isSelectedTab == 1
-                  ? StylistPortfolioGridview(
-                artiestPortfolio:
-                _homeController.getArtiestDetailsModel,
-              )
-                  : ReviewAndRating(
-                artiestPortfolio:
-                _homeController.getArtiestDetailsModel,
-              )
-            ],
-          ),
-        ),
+                            })
+                        : isSelectedTab == 1
+                            ? StylistPortfolioGridview(
+                                artiestPortfolio:
+                                    _homeController.getArtiestDetailsModel,
+                              )
+                            : ReviewAndRating(
+                                artiestPortfolio:
+                                    _homeController.getArtiestDetailsModel,
+                              )
+                  ],
+                ),
+              ),
       ),
       // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       // floatingActionButton: Obx(
@@ -961,7 +964,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
       //                               builder: (context) {
       //                                 return RemoveAndAddServiceDialog(
       //                                     noPress: () {
-      //                                   Get.back();
+      //                                   Navigator.of(context).maybePop();
       //                                 }, yesPress: () {
       //                                   setState(() {
       //                                     _homeController.doClearCart(
@@ -1003,7 +1006,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
   }
 
   /*-------------- Image header Widget ------------*/
-  _imageHeaderWidget() {
+  Stack _imageHeaderWidget() {
     return Stack(
       clipBehavior: Clip.none,
       children: [
@@ -1012,7 +1015,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
           height: Get.height * 0.28,
           fit: BoxFit.fitWidth,
           imageUrl:
-          "${APIConstants.image}${_homeController.getArtiestDetailsModel.data?.salon?.image ?? ""}",
+              "${APIConstants.image}${_homeController.getArtiestDetailsModel.data?.salon?.image ?? ""}",
           placeholder: (context, url) => Image(
             image: const AssetImage(AssetsConstant.placeHolder),
             width: Get.width,
@@ -1028,16 +1031,16 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
         ),
         Positioned(
             child: Container(
-              width: Get.width,
-              height: Get.height * 0.28,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment(0.02, 1.00),
-                  end: Alignment(-0.02, -1),
-                  colors: [Colors.black, Color(0x003D3636)],
-                ),
-              ),
-            )),
+          width: Get.width,
+          height: Get.height * 0.28,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment(0.02, 1.00),
+              end: Alignment(-0.02, -1),
+              colors: [Colors.black, Color(0x003D3636)],
+            ),
+          ),
+        )),
         Positioned(
           top: 12,
           left: 16,
@@ -1048,7 +1051,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
               buttonWidget(
                 imageUrl: AssetsConstant.backArrow,
                 onPress: () {
-                  Get.back();
+                  Navigator.of(context).maybePop();
                 },
                 h: 15,
                 w: 15,
@@ -1108,7 +1111,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                   height: 100,
                   fit: BoxFit.cover,
                   imageUrl:
-                  "${APIConstants.image}${_homeController.getArtiestDetailsModel.data?.profileImage ?? ""}",
+                      "${APIConstants.image}${_homeController.getArtiestDetailsModel.data?.profileImage ?? ""}",
                   placeholder: (context, url) => const Image(
                     image: AssetImage(AssetsConstant.placeHolder),
                     width: 100,
@@ -1131,11 +1134,11 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
   }
 
   /*------------ Back Button --------------*/
-  buttonWidget(
+  GestureDetector buttonWidget(
       {required String imageUrl,
-        required VoidCallback onPress,
-        required double h,
-        required double w}) {
+      required VoidCallback onPress,
+      required double h,
+      required double w}) {
     return GestureDetector(
       onTap: onPress,
       child: Container(
@@ -1157,7 +1160,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
   }
 
   /*------------ Naming Contain Colum --------*/
-  _nameContainColum() {
+  Column _nameContainColum() {
     return Column(
       children: [
         SizedBox(height: Get.height * 0.07),
@@ -1177,12 +1180,10 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-
               /// 🔥 ROW → RATING + STARS
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-
                   /// 🔥 RATING NUMBER
                   Text(
                     "${_homeController.getArtiestDetailsModel.data?.rating ?? 0}",
@@ -1199,7 +1200,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                   /// 🔥 STARS
                   RatingBar.builder(
                     initialRating:
-                    _homeController.getArtiestDetailsModel.data?.rating ?? 0.0,
+                        _homeController.getArtiestDetailsModel.data?.rating ??
+                            0.0,
                     minRating: 1,
                     direction: Axis.horizontal,
                     allowHalfRating: true,
@@ -1208,8 +1210,8 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
                     ignoreGestures: true,
                     itemBuilder: (context, _) => Icon(
                       Icons.star,
-                      color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      color: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender)) ??
                           ColorConstant.primaryColor,
                     ),
                     onRatingUpdate: (rating) {},
@@ -1237,7 +1239,7 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
   /*------------- Tab Bar View ------------*/
   int isSelectedTab = 0;
 
-  _tabBarView() {
+  TabBar _tabBarView() {
     return TabBar(
       labelPadding: EdgeInsets.zero,
       controller: _tabController,

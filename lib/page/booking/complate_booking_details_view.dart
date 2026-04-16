@@ -50,7 +50,7 @@ class _CompleteBookingDetailsViewState
           ),
           leading: IconButton(
               onPressed: () {
-                Get.back();
+                Navigator.of(context).maybePop();
               },
               icon: const Icon(
                 Icons.arrow_back,
@@ -61,86 +61,91 @@ class _CompleteBookingDetailsViewState
           children: [
             _stylistAndSalon(),
             Obx(
-                  () => Expanded(
+              () => Expanded(
                 child: _homeController.showProgress
                     ? const ProgressBarView()
                     : overall == "0"
-                    ? _homeController.getReviewDataListModel.data?.artists
-                    ?.isEmpty ??
-                    false
-                    ? const NoItemsWidget(
-                    text: "No Any Artists Found")
-                    : ListView.builder(
-                    padding: EdgeInsets.zero,
-                    shrinkWrap: true,
-                    itemCount: _homeController
-                        .getReviewDataListModel
-                        .data
-                        ?.artists
-                        ?.length ??
-                        0,
-                    itemBuilder: (context, i) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 5),
-                        child: ArtistRatingListTile(
-                          artists: _homeController
-                              .getReviewDataListModel
-                              .data!
-                              .artists![i],
-                          services: _homeController
-                              .getReviewDataListModel
-                              .data!
-                              .services ?? [],
-                          appointmentId: widget.appointmentId,
-                        ),
-                      );
-                    })
-                    : overall == "1"
-                    ? ((_homeController.getReviewDataListModel.data?.services?.isEmpty ?? true)
-                    ? const NoItemsWidget(text: "No Any Service Data Found")
-                    : SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5),
-                    child: ServiceRatingListTile(
-                      appointmentId: widget.appointmentId,
-                      // just take first service as carrier of salon info
-                      servicesModel: _homeController
-                          .getReviewDataListModel.data!.services!.first,
-                    ),
-                  ),
-                ))
+                        ? _homeController.getReviewDataListModel.data?.artists
+                                    ?.isEmpty ??
+                                false
+                            ? const NoItemsWidget(text: "No Any Artists Found")
+                            : ListView.builder(
+                                padding: EdgeInsets.zero,
+                                shrinkWrap: true,
+                                itemCount: _homeController
+                                        .getReviewDataListModel
+                                        .data
+                                        ?.artists
+                                        ?.length ??
+                                    0,
+                                itemBuilder: (context, i) {
+                                  return Padding(
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 5),
+                                    child: ArtistRatingListTile(
+                                      artists: _homeController
+                                          .getReviewDataListModel
+                                          .data!
+                                          .artists![i],
+                                      services: _homeController
+                                              .getReviewDataListModel
+                                              .data!
+                                              .services ??
+                                          [],
+                                      appointmentId: widget.appointmentId,
+                                    ),
+                                  );
+                                })
+                        : overall == "1"
+                            ? ((_homeController.getReviewDataListModel.data
+                                        ?.services?.isEmpty ??
+                                    true)
+                                ? const NoItemsWidget(
+                                    text: "No Any Service Data Found")
+                                : SingleChildScrollView(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 5),
+                                      child: ServiceRatingListTile(
+                                        appointmentId: widget.appointmentId,
+                                        // just take first service as carrier of salon info
+                                        servicesModel: _homeController
+                                            .getReviewDataListModel
+                                            .data!
+                                            .services!
+                                            .first,
+                                      ),
+                                    ),
+                                  ))
 
-
-
-                // : _homeController.getReviewDataListModel.data
-                //                     ?.products?.isEmpty ??
-                //                 false
-                //             ? const NoItemsWidget(
-                //                 text: "No Any Product Data Found")
-                //             : ListView.builder(
-                //                 padding: EdgeInsets.zero,
-                //                 shrinkWrap: true,
-                //                 itemCount: _homeController
-                //                         .getReviewDataListModel
-                //                         .data
-                //                         ?.products
-                //                         ?.length ??
-                //                     0,
-                //                 itemBuilder: (context, i) {
-                //                   return Padding(
-                //                     padding: const EdgeInsets.symmetric(
-                //                         vertical: 5),
-                //                     child: ProductRatingListTile(
-                //                       appointmentId: widget.appointmentId,
-                //                       products: _homeController
-                //                           .getReviewDataListModel
-                //                           .data!
-                //                           .products![i],
-                //                     ),
-                //                   );
-                //                 })
-                    : const SizedBox(),
+                            // : _homeController.getReviewDataListModel.data
+                            //                     ?.products?.isEmpty ??
+                            //                 false
+                            //             ? const NoItemsWidget(
+                            //                 text: "No Any Product Data Found")
+                            //             : ListView.builder(
+                            //                 padding: EdgeInsets.zero,
+                            //                 shrinkWrap: true,
+                            //                 itemCount: _homeController
+                            //                         .getReviewDataListModel
+                            //                         .data
+                            //                         ?.products
+                            //                         ?.length ??
+                            //                     0,
+                            //                 itemBuilder: (context, i) {
+                            //                   return Padding(
+                            //                     padding: const EdgeInsets.symmetric(
+                            //                         vertical: 5),
+                            //                     child: ProductRatingListTile(
+                            //                       appointmentId: widget.appointmentId,
+                            //                       products: _homeController
+                            //                           .getReviewDataListModel
+                            //                           .data!
+                            //                           .products![i],
+                            //                     ),
+                            //                   );
+                            //                 })
+                            : const SizedBox(),
               ),
             )
           ],
@@ -151,7 +156,7 @@ class _CompleteBookingDetailsViewState
   String? overall = "0";
 
   /*------------------- Switch Tab Stylist & Salon -------------------*/
-  _stylistAndSalon() {
+  Container _stylistAndSalon() {
     return Container(
       color: ColorConstant.whiteColor,
       width: Get.width,

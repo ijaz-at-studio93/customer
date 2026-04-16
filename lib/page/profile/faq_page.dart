@@ -22,7 +22,7 @@ class _FaqPageState extends State<FaqPage> {
         backgroundColor: ColorConstant.whiteColor,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            Navigator.of(context).maybePop();
           },
           icon: const Icon(
             Icons.arrow_back_ios,

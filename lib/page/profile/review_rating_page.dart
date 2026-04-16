@@ -36,7 +36,7 @@ class _ReviewAndRatingPageState extends State<ReviewAndRatingPage> {
         backgroundColor: ColorConstant.whiteColor,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            Navigator.of(context).maybePop();
           },
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -86,7 +86,7 @@ class _ReviewAndRatingPageState extends State<ReviewAndRatingPage> {
   }
 
   /*----------------- ReviewAndRating List Tile Widget  --------------*/
-  _listTileWidget(
+  Column _listTileWidget(
       {required double rate, required String title, required String userName}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -120,10 +120,10 @@ class _ReviewAndRatingPageState extends State<ReviewAndRatingPage> {
             itemCount: 5,
             itemSize: 25.0,
             ignoreGestures: true,
-            itemBuilder: (context, _) =>   Icon(
+            itemBuilder: (context, _) => Icon(
               Icons.star,
-              color: changeTheme(SharedPrefs.readStringValue(
-                  PrefConstants.gender)) ??
+              color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
                   ColorConstant.primaryColor,
               size: 25,
             ),

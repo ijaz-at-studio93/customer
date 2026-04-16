@@ -46,176 +46,173 @@ class KnowWhatYouWidget extends StatelessWidget {
 
       final double totalServiceCost = unitServiceCost * qty;
 
-      return Stack(
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /// ROW 1: Title + Duration
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                "${items.name}",
-                                style: AppTextTheme.bold.copyWith(
-                                  fontFamily: "Outfit",          // ✅ Figma font
-                                  fontWeight: FontWeight.w600,   // ✅ Bold
-                                  fontSize: 18,                  // ✅ exact size from Figma
-                                  color: const Color(0xFF000000),
-                                  height: 1,                     // ✅ tight like design
-                                ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-
-                            Text(
-                              "${items.duration} min",
-                              style: AppTextTheme.medium.copyWith(
-                                fontFamily: "Outfit",           // ✅ Figma font
-                                fontWeight: FontWeight.w800,    // ✅ Medium (not bold)
-                                fontSize: 14,                   // ✅ smaller like Figma
-                                color: Colors.black.withOpacity(0.4), // ✅ soft grey
-                                height: 1,
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 4), // 🔥 reduced gap
-
-                        /// ROW 2: Price + Remove
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "₹${unitPrice.toStringAsFixed(0)}",
+      return Stack(children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      /// ROW 1: Title + Duration
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              "${items.name}",
                               style: AppTextTheme.bold.copyWith(
-                                fontFamily: "Outfit",          // ✅ Figma font
-                                fontWeight: FontWeight.w700,   // ✅ Bold
-                                fontSize: 14,                  // ✅ correct size
+                                fontFamily: "Outfit", // ✅ Figma font
+                                fontWeight: FontWeight.w600, // ✅ Bold
+                                fontSize: 18, // ✅ exact size from Figma
                                 color: const Color(0xFF000000),
-                                height: 1,
+                                height: 1, // ✅ tight like design
                               ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                             ),
+                          ),
+                          Text(
+                            "${items.duration} min",
+                            style: AppTextTheme.medium.copyWith(
+                              fontFamily: "Outfit", // ✅ Figma font
+                              fontWeight:
+                                  FontWeight.w800, // ✅ Medium (not bold)
+                              fontSize: 14, // ✅ smaller like Figma
+                              color:
+                                  Colors.black.withOpacity(0.4), // ✅ soft grey
+                              height: 1,
+                            ),
+                          ),
+                        ],
+                      ),
 
-                            SizedBox(
+                      const SizedBox(height: 4), // 🔥 reduced gap
+
+                      /// ROW 2: Price + Remove
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "₹${unitPrice.toStringAsFixed(0)}",
+                            style: AppTextTheme.bold.copyWith(
+                              fontFamily: "Outfit", // ✅ Figma font
+                              fontWeight: FontWeight.w700, // ✅ Bold
+                              fontSize: 14, // ✅ correct size
+                              color: const Color(0xFF000000),
+                              height: 1,
+                            ),
+                          ),
+                          SizedBox(
                               width: 80,
                               height: 30, // 🔥 control button height
                               //child: RemoveButtonWidget(onPress: removeBtn),
-                                child: Container(
-                                  //height: 30,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.red),
-                                    borderRadius: BorderRadius.circular(6),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: removeBtn, // 👈 decrease
-                                        child: const Padding(
-                                          padding: EdgeInsets.only(left: 5),
-                                          child: Icon(Icons.remove, size: 16, color: Colors.red),
-                                        ),
+                              child: Container(
+                                //height: 30,
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.red),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: removeBtn, // 👈 decrease
+                                      child: const Padding(
+                                        padding: EdgeInsets.only(left: 5),
+                                        child: Icon(Icons.remove,
+                                            size: 16, color: Colors.red),
                                       ),
-                                      const SizedBox(width: 13),
-
-                                      Text(
-                                        "$qty",
-                                        style: const TextStyle(
-                                          fontFamily: "Outfit",
-                                          fontWeight: FontWeight.w600,
-                                        ),
+                                    ),
+                                    const SizedBox(width: 13),
+                                    Text(
+                                      "$qty",
+                                      style: const TextStyle(
+                                        fontFamily: "Outfit",
+                                        fontWeight: FontWeight.w600,
                                       ),
-                                      const SizedBox(width: 13),
-
-                                      GestureDetector(
-                                        onTap: addBtn, // 👈 increase
-                                        child: const Padding(
-                                          padding: EdgeInsets.only(right: 5),
-                                          child: Icon(Icons.add, size: 16, color: Colors.green),
-                                        ),
+                                    ),
+                                    const SizedBox(width: 13),
+                                    GestureDetector(
+                                      onTap: addBtn, // 👈 increase
+                                      child: const Padding(
+                                        padding: EdgeInsets.only(right: 5),
+                                        child: Icon(Icons.add,
+                                            size: 16, color: Colors.green),
                                       ),
-                                    ],
-                                  ),
-                                )
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 6),
-
-              // Dash(
-              //   direction: Axis.horizontal,
-              //   length: Get.width * 0.85,
-              //   dashLength: 3,
-              //   dashColor: ColorConstant.grayBorderColor,
-              // ),
-              //
-              // const SizedBox(height: 6),
-              //
-              // /// 🔥 UPDATED SERVICE COST
-              // Text(
-              //   "Service Cost: ₹${totalServiceCost.toStringAsFixed(0)}",
-              //   style: AppTextTheme.medium.copyWith(
-              //     color: ColorConstant.grayTextColor,
-              //     fontSize: 13,
-              //   ),
-              // ),
-            ],
-          ),
-          Positioned(
-            bottom: 90, // 👈 adjust based on bottom bar
-            left: 0,
-            right: 0,
-            child: Center(
-              child: GestureDetector(
-                onTap: () {
-                  Get.back(); // stylist
-                  Get.back(); // salon
-                },
-                child: Container(
-                  height: 32,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFF01AB4D), // green from figma
-                      width: 1.5,
-                    ),
-                    color: const Color(0x1401AB4D), // light green bg
-                  ),
-                  child: const Center(
-                    child: Text(
-                      "Add More",
-                      style: TextStyle(
-                        fontFamily: "Outfit",
-                        fontWeight: FontWeight.w600,
-                        fontSize: 13,
-                        color: Color(0xFF01AB4D),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        ],
                       ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 6),
+
+            // Dash(
+            //   direction: Axis.horizontal,
+            //   length: Get.width * 0.85,
+            //   dashLength: 3,
+            //   dashColor: ColorConstant.grayBorderColor,
+            // ),
+            //
+            // const SizedBox(height: 6),
+            //
+            // /// 🔥 UPDATED SERVICE COST
+            // Text(
+            //   "Service Cost: ₹${totalServiceCost.toStringAsFixed(0)}",
+            //   style: AppTextTheme.medium.copyWith(
+            //     color: ColorConstant.grayTextColor,
+            //     fontSize: 13,
+            //   ),
+            // ),
+          ],
+        ),
+        Positioned(
+          bottom: 90, // 👈 adjust based on bottom bar
+          left: 0,
+          right: 0,
+          child: Center(
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).maybePop(); // stylist
+                Navigator.of(context).maybePop(); // salon
+              },
+              child: Container(
+                height: 32,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: const Color(0xFF01AB4D), // green from figma
+                    width: 1.5,
+                  ),
+                  color: const Color(0x1401AB4D), // light green bg
+                ),
+                child: const Center(
+                  child: Text(
+                    "Add More",
+                    style: TextStyle(
+                      fontFamily: "Outfit",
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                      color: Color(0xFF01AB4D),
                     ),
                   ),
                 ),
               ),
             ),
           ),
-        ]
-      );
+        ),
+      ]);
     });
   }
 }

@@ -37,11 +37,9 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
   });
 
   String getTagText() {
-    final hasHair =
-        serviceMeta.hasMaleHair || serviceMeta.hasFemaleHair;
+    final hasHair = serviceMeta.hasMaleHair || serviceMeta.hasFemaleHair;
 
-    final hasBeauty =
-        serviceMeta.hasMaleBeauty || serviceMeta.hasFemaleBeauty;
+    final hasBeauty = serviceMeta.hasMaleBeauty || serviceMeta.hasFemaleBeauty;
 
     /// 🔥 CASE 1: Only Hair
     if (hasHair && !hasBeauty) {
@@ -60,8 +58,8 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeColor = changeTheme(
-      SharedPrefs.readStringValue(PrefConstants.gender),
-    ) ??
+          SharedPrefs.readStringValue(PrefConstants.gender),
+        ) ??
         ColorConstant.primaryColor;
 
     //final isSelected = artiest.isSelectArtist ?? false;
@@ -88,7 +86,6 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min, // ✅ prevents overflow
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-
           ClipRRect(
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(15),
@@ -99,7 +96,6 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
               width: double.infinity,
               child: Stack(
                 children: [
-
                   /// IMAGE
                   Positioned.fill(
                     child: CachedNetworkImage(
@@ -189,7 +185,8 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
                         textDirection: TextDirection.ltr,
                       )..layout(maxWidth: constraints.maxWidth);
 
-                      final isTwoLines = textPainter.computeLineMetrics().length > 1;
+                      final isTwoLines =
+                          textPainter.computeLineMetrics().length > 1;
 
                       return Text(
                         text,
@@ -265,7 +262,7 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
           //       /// VIEW PROFILE
           //       GestureDetector(
           //         onTap: () {
-          //           //Get.back();
+          //           //Navigator.of(context).maybePop();
           //           Get.to(() => StylistSaloonDetailsPage(
           //             isViewDetails: true,
           //             salonId: salonId,
@@ -294,7 +291,6 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
                 /// 🔥 SELECT BUTTON (FIXED)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -334,10 +330,10 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(6),
                     onTap: () {
                       Get.to(() => StylistSaloonDetailsPage(
-                        isViewDetails: true,
-                        salonId: salonId,
-                        artiestId: artiest.id ?? "",
-                      ));
+                            isViewDetails: true,
+                            salonId: salonId,
+                            artiestId: artiest.id ?? "",
+                          ));
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

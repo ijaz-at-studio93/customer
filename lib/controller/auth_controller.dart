@@ -293,6 +293,7 @@ class AuthController extends GetxController {
     await SharedPrefs.writeValue(PrefConstants.gender, "0");
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, false);
     await SharedPrefs.writeValue(PrefConstants.isFirstTime, false);
+    await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
     Get.offAll(() => const LoginPage(splashPage: false));
   }
 }

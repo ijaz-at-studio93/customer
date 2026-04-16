@@ -14,6 +14,10 @@ class AppTextTheme {
       fontWeight: FontWeight.w500,
       color: ColorConstant.whiteColor,
       fontSize: 16);
+  static TextStyle semibold = const TextStyle(
+      fontWeight: FontWeight.w600,
+      color: ColorConstant.whiteColor,
+      fontSize: 16);
   static TextStyle regular = const TextStyle(
       fontWeight: FontWeight.w400,
       color: ColorConstant.whiteColor,

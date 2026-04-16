@@ -47,7 +47,8 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
   LatLng _initialPosition = const LatLng(0.0, 0.0);
   bool _locationLoaded = false;
   //PolylinePoints polylinePoints = PolylinePoints();
-  PolylinePoints polylinePoints = PolylinePoints(apiKey: "AIzaSyClfJgsQEwO0zO6io_TuR-TDUsVwGT3ex0");
+  PolylinePoints polylinePoints =
+      PolylinePoints(apiKey: "AIzaSyClfJgsQEwO0zO6io_TuR-TDUsVwGT3ex0");
   Map<PolylineId, Polyline> polylines = {};
   List<LatLng> polylineCoordinates = [];
 
@@ -68,7 +69,7 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
     mapController.dispose();
   }
 
-  addPolyLine() {
+  void addPolyLine() {
     PolylineId id = const PolylineId("poly");
     Polyline polyline = Polyline(
         polylineId: id,
@@ -91,10 +92,10 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
           ? GoogleMap(
               myLocationButtonEnabled: false,
               myLocationEnabled: true,
-        zoomControlsEnabled: false,
-        mapType: MapType.normal,
-        tiltGesturesEnabled: true,
-        initialCameraPosition: CameraPosition(
+              zoomControlsEnabled: false,
+              mapType: MapType.normal,
+              tiltGesturesEnabled: true,
+              initialCameraPosition: CameraPosition(
                 target: _initialPosition,
                 zoom: 12.0,
               ),
@@ -102,9 +103,9 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
                 _controller = controller;
               },
               polylines: Set<Polyline>.of(polylines.values),
-        markers: Set<Marker>.of(
-          _marker,
-        ),
+              markers: Set<Marker>.of(
+                _marker,
+              ),
             )
           : const ProgressBarView(),
     );
@@ -115,7 +116,7 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission;
     if (!serviceEnabled) {
-      Get.back();
+      Navigator.of(context).maybePop();
       await Permission.location.request();
       showMessage("Location services are disabled.");
       return Future.error('Location services are disabled.');
@@ -124,14 +125,14 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        Get.back();
+        Navigator.of(context).maybePop();
         await Permission.location.request();
         showMessage("Location permissions are denied");
         return Future.error('Location permissions are denied');
       }
     }
     if (permission == LocationPermission.deniedForever) {
-      Get.back();
+      Navigator.of(context).maybePop();
       showMessage(
           "Location permissions are permanently denied, we cannot request permissions.");
       return Future.error(
@@ -225,9 +226,9 @@ class _StylistToUserLocationState extends State<StylistToUserLocation> {
 
   void makeLines(
       {required double currentLat,
-        required double currentLng,
-        required double destLat,
-        required double destLng}) async {
+      required double currentLng,
+      required double destLat,
+      required double destLng}) async {
     PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
       request: PolylineRequest(
         origin: PointLatLng(currentLat, currentLng),

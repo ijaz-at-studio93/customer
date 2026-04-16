@@ -42,7 +42,7 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
     return Scaffold(
       backgroundColor: ColorConstant.whiteColor,
       body: Obx(
-            () => ProgressContainerView(
+        () => ProgressContainerView(
           isProgressRunning: _authController.showProgress,
           child: SafeArea(
             child: SingleChildScrollView(
@@ -55,107 +55,109 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
                     SizedBox(
                       height: 250,
                       width: 250,
-                      child: Image.asset("assets/gifs/login_gif.gif",fit: BoxFit.cover),
+                      child: Image.asset("assets/gifs/login_gif.gif",
+                          fit: BoxFit.cover),
                     ),
 
                     /// 🎯 TITLE
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    RichText(
-                      textAlign: TextAlign.center,
-                      text: TextSpan(
-                        style: const TextStyle(
-                          fontFamily: "Outfit",
-                          fontSize: 20, // ✅ same size for both lines
-                          fontWeight: FontWeight.w700, // ✅ Bold
-                          height: 1.2, // ✅ tight line spacing
-                          color: Colors.black,
-                        ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const TextSpan(text: "Enter the OTP\n"),
-                          const TextSpan(text: "Sent to +91 "),
-                          TextSpan(
-                            text: widget.mobileNumber,
-                            style: const TextStyle(
-                              color: Color(0xFF8B5CF6), // ✅ purple highlight
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              style: const TextStyle(
+                                fontFamily: "Outfit",
+                                fontSize: 20, // ✅ same size for both lines
+                                fontWeight: FontWeight.w700, // ✅ Bold
+                                height: 1.2, // ✅ tight line spacing
+                                color: Colors.black,
+                              ),
+                              children: [
+                                const TextSpan(text: "Enter the OTP\n"),
+                                const TextSpan(text: "Sent to +91 "),
+                                TextSpan(
+                                  text: widget.mobileNumber,
+                                  style: const TextStyle(
+                                    color:
+                                        Color(0xFF8B5CF6), // ✅ purple highlight
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-
-                    Transform.translate(
-                        offset: const Offset(0, 10),
-                        child: GestureDetector(
-                          onTap: () {
-                            Get.back(); // 🔥 go to login page
-                          },
-                          child: const Icon(
-                            Icons.edit, // ✅ edit icon
-                            size: 20,   // 🔥 small & clean
-                            color: Color(0xFF8B5CF6), // match your theme
-                          ),
-                        ),
-                    )
-                  ]
-                ),
+                          const SizedBox(width: 6),
+                          Transform.translate(
+                            offset: const Offset(0, 10),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context)
+                                    .maybePop(); // 🔥 go to login page
+                              },
+                              child: const Icon(
+                                Icons.edit, // ✅ edit icon
+                                size: 20, // 🔥 small & clean
+                                color: Color(0xFF8B5CF6), // match your theme
+                              ),
+                            ),
+                          )
+                        ]),
 
                     const SizedBox(height: 30),
 
                     /// 🔢 OTP FIELD (UNCHANGED LOGIC)
                     Center(
                         child: SizedBox(
-                          width: 44 * 6 + 15 * 5,
-                          child: PinCodeTextField(
-                            autoDisposeControllers: false,
-                            appContext: context,
-                            length: 6,
-                            controller: _otpTextEditingController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                            //spacing: 12,
-                            textStyle: const TextStyle(
-                              fontFamily: "Outfit",
-                              fontSize: 18,
-                              fontWeight: FontWeight.w600,
-                            ),
+                      width: 44 * 6 + 15 * 5,
+                      child: PinCodeTextField(
+                        autoDisposeControllers: false,
+                        appContext: context,
+                        length: 6,
+                        controller: _otpTextEditingController,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        //spacing: 12,
+                        textStyle: const TextStyle(
+                          fontFamily: "Outfit",
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                        ),
 
-                            onChanged: (value) {},
+                        onChanged: (value) {},
 
-                            /// ✅ SAME LOGIC
-                            onCompleted: (val) {
-                              _otpTextEditingController.text = val;
-                              doOtp();
-                            },
+                        /// ✅ SAME LOGIC
+                        onCompleted: (val) {
+                          _otpTextEditingController.text = val;
+                          doOtp();
+                        },
 
-                            pinTheme: PinTheme(
-                              shape: PinCodeFieldShape.box,
+                        pinTheme: PinTheme(
+                          shape: PinCodeFieldShape.box,
 
-                              /// 🎯 SIZE MATCH
-                              fieldHeight: 44, // ✅ exact
-                              fieldWidth: 44,  // ✅ exact
+                          /// 🎯 SIZE MATCH
+                          fieldHeight: 44, // ✅ exact
+                          fieldWidth: 44, // ✅ exact
 
-                              /// 🎯 BORDER
-                              borderWidth: 1,
-                              borderRadius: BorderRadius.circular(5), // ✅ exact
+                          /// 🎯 BORDER
+                          borderWidth: 1,
+                          borderRadius: BorderRadius.circular(5), // ✅ exact
 
-                              /// 🎯 COLORS
-                              inactiveColor: Colors.black,
-                              activeColor: Colors.black,
-                              selectedColor: const Color(0xFF8B5CF6),
+                          /// 🎯 COLORS
+                          inactiveColor: Colors.black,
+                          activeColor: Colors.black,
+                          selectedColor: const Color(0xFF8B5CF6),
 
-                              inactiveFillColor: Colors.transparent,
-                              activeFillColor: const Color(0xFFEDE9FE),
-                              selectedFillColor: Colors.transparent,
-                            ),
+                          inactiveFillColor: Colors.transparent,
+                          activeFillColor: const Color(0xFFEDE9FE),
+                          selectedFillColor: Colors.transparent,
+                        ),
 
-                            enableActiveFill: true,
-                          ),
-                        )
-                    ),
+                        enableActiveFill: true,
+                      ),
+                    )),
 
                     const SizedBox(height: 15),
 
@@ -175,41 +177,41 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
                                     color: Colors.black,
                                   ),
                                 ),
-
                                 isResendOTp
                                     ? GestureDetector(
-                                  onTap: () {
-                                    _authController.doResendOTP(
-                                        mobileNo: widget.mobileNumber, cc: "91");
-                                    setState(() {
-                                      _start = 60;
-                                      isResendOTp = false;
-                                      startTimer();
-                                    });
-                                  },
-                                  child: const Text(
-                                    "Resend",
-                                    style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      fontSize: 18, // ✅ Figma
-                                      fontWeight: FontWeight.w800, // ✅ ExtraBold
-                                      color: Color(0xFF8B5CF6),
-                                    ),
-                                  ),
-                                )
+                                        onTap: () {
+                                          _authController.doResendOTP(
+                                              mobileNo: widget.mobileNumber,
+                                              cc: "91");
+                                          setState(() {
+                                            _start = 60;
+                                            isResendOTp = false;
+                                            startTimer();
+                                          });
+                                        },
+                                        child: const Text(
+                                          "Resend",
+                                          style: TextStyle(
+                                            fontFamily: "Outfit",
+                                            fontSize: 18, // ✅ Figma
+                                            fontWeight:
+                                                FontWeight.w800, // ✅ ExtraBold
+                                            color: Color(0xFF8B5CF6),
+                                          ),
+                                        ),
+                                      )
                                     : Text(
-                                  "00:${_start.toString().padLeft(2, '0')}",
-                                  style: const TextStyle(
-                                    fontFamily: "Outfit",
-                                    fontSize: 18, // ✅ match
-                                    fontWeight: FontWeight.w800, // ✅ ExtraBold
-                                    color: Color(0xFF8B5CF6),
-                                  ),
-                                ),
+                                        "00:${_start.toString().padLeft(2, '0')}",
+                                        style: const TextStyle(
+                                          fontFamily: "Outfit",
+                                          fontSize: 18, // ✅ match
+                                          fontWeight:
+                                              FontWeight.w800, // ✅ ExtraBold
+                                          color: Color(0xFF8B5CF6),
+                                        ),
+                                      ),
                               ],
-                            )
-                        )
-                    ),
+                            ))),
 
                     const SizedBox(height: 20),
 
@@ -227,8 +229,8 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
                         borderRadius: BorderRadius.circular(12),
                       ),
                       buttonTitleText: "Continue",
-                      color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      color: changeTheme(SharedPrefs.readStringValue(
+                              PrefConstants.gender)) ??
                           ColorConstant.primaryColor,
                       onPress: () {
                         doOtp(); // ✅ SAME FUNCTION
@@ -247,7 +249,7 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
   }
 
   /*---------- header widget ---------*/
-  _headerWidget() {
+  Container _headerWidget() {
     return Container(
       width: Get.width,
       padding: const EdgeInsets.only(top: 50, left: 21, right: 21, bottom: 35),
@@ -263,7 +265,7 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
             children: [
               InkWell(
                 onTap: () {
-                  Get.back();
+                  Navigator.of(context).maybePop();
                 },
                 child: Container(
                   height: 34,
@@ -297,7 +299,7 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
   }
 
   /*-------------  OTP  Code  -------*/
-  _otpCodeField() {
+  Padding _otpCodeField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -326,7 +328,7 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
             animationType: AnimationType.fade,
             textStyle: AppTextTheme.bold.copyWith(
                 color: changeTheme(
-                    SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
                     ColorConstant.primaryColor,
                 fontSize: 16),
             animationDuration: const Duration(milliseconds: 300),
@@ -337,13 +339,13 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
               inactiveFillColor: Colors.transparent,
               borderRadius: BorderRadius.circular(8),
               selectedColor: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
                   ColorConstant.primaryColor,
               activeFillColor: const Color(0xffE0D3FF),
               selectedFillColor: Colors.transparent,
               inactiveColor: ColorConstant.grayColor,
               activeColor: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      SharedPrefs.readStringValue(PrefConstants.gender)) ??
                   ColorConstant.primaryColor,
             ),
             //onCompleted: (val) {},
@@ -363,33 +365,33 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
               ),
               isResendOTp
                   ? TextButton(
-                  onPressed: () {
-                    _authController.doResendOTP(
-                        mobileNo: widget.mobileNumber, cc: "91");
-                    setState(() {
-                      _start = 60;
-                      isResendOTp = false;
-                      startTimer();
-                    });
-                  },
-                  child: Text(
-                    "Resend",
-                    style: AppTextTheme.bold.copyWith(
-                      fontSize: 16,
-                      color: changeTheme(SharedPrefs.readStringValue(
-                          PrefConstants.gender)) ??
-                          ColorConstant.primaryColor,
-                    ),
-                  ))
+                      onPressed: () {
+                        _authController.doResendOTP(
+                            mobileNo: widget.mobileNumber, cc: "91");
+                        setState(() {
+                          _start = 60;
+                          isResendOTp = false;
+                          startTimer();
+                        });
+                      },
+                      child: Text(
+                        "Resend",
+                        style: AppTextTheme.bold.copyWith(
+                          fontSize: 16,
+                          color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)) ??
+                              ColorConstant.primaryColor,
+                        ),
+                      ))
                   : Text(
-                "Retry in 00:${_start.toString()}",
-                style: AppTextTheme.bold.copyWith(
-                  fontSize: 16,
-                  color: changeTheme(SharedPrefs.readStringValue(
-                      PrefConstants.gender)) ??
-                      ColorConstant.primaryColor,
-                ),
-              ),
+                      "Retry in 00:${_start.toString()}",
+                      style: AppTextTheme.bold.copyWith(
+                        fontSize: 16,
+                        color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender)) ??
+                            ColorConstant.primaryColor,
+                      ),
+                    ),
             ],
           )
         ],
@@ -398,7 +400,7 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
   }
 
   /*--------------  Start Timer --------------*/
-  startTimer() {
+  void startTimer() {
     Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_start == 0) {
         timer.cancel();
@@ -414,7 +416,7 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
   }
 
   /*------------- doOtp --------*/
-  doOtp() {
+  void doOtp() {
     if (_otpTextEditingController.text.isEmpty) {
       showMessage("Please enter OTP");
     } else if (_otpTextEditingController.text.length != 6) {
@@ -425,9 +427,8 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
           cc: "91",
           verificationCode: _otpTextEditingController.text,
           callback: () {
-            Get.to(()=> const BottomNavBarPage());
+            Get.to(() => const BottomNavBarPage());
           });
-
     }
   }
 }

@@ -6,7 +6,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 
 class FileUtils {
-  static openPlatformImagePicker(
+  static Future<void> openPlatformImagePicker(
       {required Function(File) onSelectImage}) async {
     if (Platform.isAndroid) {
       showDialog(
@@ -26,7 +26,7 @@ class FileUtils {
                       Expanded(
                         child: InkWell(
                           onTap: () async {
-                            Get.back();
+                            Navigator.of(context).maybePop();
                             File selectedImage = await openCameraForImage();
                             onSelectImage.call(selectedImage);
                           },
@@ -51,7 +51,7 @@ class FileUtils {
                       Expanded(
                         child: InkWell(
                           onTap: () async {
-                            Get.back();
+                            Navigator.of(context).maybePop();
                             File selectedImage = await pickImageFromGallery();
                             onSelectImage.call(selectedImage);
                           },
@@ -78,15 +78,14 @@ class FileUtils {
     } else {
       await showCupertinoDialog(
           context: Get.context!,
-          builder: (context) =>
-              CupertinoAlertDialog(
+          builder: (context) => CupertinoAlertDialog(
                 title: const Text("Choose Option"),
                 content:
-                const Text("Choose photo from gallery or Capture new ..."),
+                    const Text("Choose photo from gallery or Capture new ..."),
                 actions: [
                   CupertinoDialogAction(
                     onPressed: () async {
-                      Get.back();
+                      Navigator.of(context).maybePop();
                       File selectedImage = await openCameraForImage();
                       onSelectImage.call(selectedImage);
                     },
@@ -94,7 +93,7 @@ class FileUtils {
                   ),
                   CupertinoDialogAction(
                     onPressed: () async {
-                      Get.back();
+                      Navigator.of(context).maybePop();
                       File selectedImage = await pickImageFromGallery();
                       onSelectImage.call(selectedImage);
                     },
@@ -102,7 +101,7 @@ class FileUtils {
                   ),
                   CupertinoDialogAction(
                     onPressed: () {
-                      Get.back();
+                      Navigator.of(context).maybePop();
                     },
                     child: const Text(
                       "Cancel",

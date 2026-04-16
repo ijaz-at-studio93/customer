@@ -13,10 +13,12 @@ import flutter_local_notifications
   ) -> Bool {
       FirebaseApp.configure()
       if #available(iOS 12.0, *) {
-        UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+        UNUserNotificationCenter.current().delegate = self
       }
     GMSServices.provideAPIKey("AIzaSyDdvZgn2cnPXchnUDNLIl1WA6HFPhwt8WI")
     GeneratedPluginRegistrant.register(with: self)
+    // Ensures APNs registration runs early so FCM can resolve a device token.
+    application.registerForRemoteNotifications()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }

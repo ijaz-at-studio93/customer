@@ -57,7 +57,7 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
         backgroundColor: ColorConstant.whiteColor,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            Navigator.of(context).maybePop();
           },
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -76,7 +76,7 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                 SharedPrefs.writeValue(PrefConstants.longitude, lng.toString());
                 SharedPrefs.writeValue(PrefConstants.latitude, lat.toString());
                 widget.callback.call();
-                Get.back();
+                Navigator.of(context).maybePop();
               },
               icon: const Icon(
                 Icons.check_circle,
@@ -272,19 +272,28 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                                               // code of coming to home page automatically when i clicked on any location result
                                               // Save to controller
                                               _authController.userCity = city;
-                                              _authController.userCurrentLocation = address;
+                                              _authController
+                                                      .userCurrentLocation =
+                                                  address;
 
                                               // Save to shared prefs
-                                              SharedPrefs.writeValue(PrefConstants.userCity, city);
-                                              SharedPrefs.writeValue(PrefConstants.address, address);
-                                              SharedPrefs.writeValue(PrefConstants.latitude, lat.toString());
-                                              SharedPrefs.writeValue(PrefConstants.longitude, lng.toString());
+                                              SharedPrefs.writeValue(
+                                                  PrefConstants.userCity, city);
+                                              SharedPrefs.writeValue(
+                                                  PrefConstants.address,
+                                                  address);
+                                              SharedPrefs.writeValue(
+                                                  PrefConstants.latitude,
+                                                  lat.toString());
+                                              SharedPrefs.writeValue(
+                                                  PrefConstants.longitude,
+                                                  lng.toString());
 
                                               // Notify home page
                                               widget.callback.call();
 
                                               // Go back automatically
-                                              Get.back();
+                                              Navigator.of(context).maybePop();
                                             }
                                           },
                                           child: Container(
@@ -358,18 +367,21 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
       // 2) check & request permission using Geolocator APIs
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission(); // triggers iOS system dialog
+        permission =
+            await Geolocator.requestPermission(); // triggers iOS system dialog
       }
 
       if (permission == LocationPermission.denied) {
         // user denied (not permanent) -> show friendly message
-        showMessage('Location permission denied. Please allow location to continue.');
+        showMessage(
+            'Location permission denied. Please allow location to continue.');
         return;
       }
 
       if (permission == LocationPermission.deniedForever) {
         // permissions are permanently denied, open app settings
-        showMessage('Location permission is permanently denied. Please enable it from Settings.');
+        showMessage(
+            'Location permission is permanently denied. Please enable it from Settings.');
         await openAppSettings();
         return;
       }
@@ -401,12 +413,13 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
       });
 
       // reverse geocode
-      final placeMarks = await placemarkFromCoordinates(position.latitude, position.longitude);
+      final placeMarks =
+          await placemarkFromCoordinates(position.latitude, position.longitude);
       if (placeMarks.isNotEmpty) {
         final place = placeMarks.first;
         city = place.locality ?? "";
         address =
-        "${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.postalCode ?? ''}, ${place.country ?? ''}";
+            "${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.postalCode ?? ''}, ${place.country ?? ''}";
         lat = position.latitude;
         lng = position.longitude;
       }
@@ -468,5 +481,4 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
       desiredAccuracy: LocationAccuracy.high,
     );
   }
-
 }

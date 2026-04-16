@@ -124,7 +124,7 @@ class _GetLocationPageState extends State<GetLocationPage> {
         backgroundColor: ColorConstant.whiteColor,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            Navigator.of(context).maybePop();
           },
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -137,7 +137,6 @@ class _GetLocationPageState extends State<GetLocationPage> {
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
-
       ),
       resizeToAvoidBottomInset: true,
       body: _locationLoaded
@@ -289,15 +288,15 @@ class _GetLocationPageState extends State<GetLocationPage> {
                                               // lng = location[0].longitude;
 
                                               _markers.add(Marker(
-                                      markerId: const MarkerId('new'),
-                                      position: LatLng(
-                                          location[0].latitude,
-                                          location[0].longitude),
-                                      icon: BitmapDescriptor
-                                          .defaultMarkerWithHue(
-                                        BitmapDescriptor.hueViolet,
-                                      ),
-                                    ));
+                                                markerId: const MarkerId('new'),
+                                                position: LatLng(
+                                                    location[0].latitude,
+                                                    location[0].longitude),
+                                                icon: BitmapDescriptor
+                                                    .defaultMarkerWithHue(
+                                                  BitmapDescriptor.hueViolet,
+                                                ),
+                                              ));
 
                                               _authController
                                                   .googleMapProgress = true;

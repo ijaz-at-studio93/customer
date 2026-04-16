@@ -23,12 +23,19 @@ class FavSalonCardWidget extends StatefulWidget {
 class _FavSalonCardWidgetState extends State<FavSalonCardWidget> {
   final _homeController = Get.find<HomeController>();
 
+  Future<void> _markSalonVisited() async {
+    await SharedPrefs.writeBoolValue(PrefConstants.hasVisitedSalon, true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
       child: GestureDetector(
-        onTap: () {
+        onTap: () async {
+          // Mark that user has visited a salon
+          await _markSalonVisited();
+          
           Get.to(() => SaloonAfterSelectingServicesPage(
                 id: widget.favSalon.id ?? "",
                 callback: () {},

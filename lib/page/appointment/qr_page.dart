@@ -7,6 +7,7 @@ import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/appointment/payment_success_page.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/constant/color_constant.dart';
+import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../api/home_api.dart';
 import '../../constant/variable_constant.dart';
@@ -28,9 +29,7 @@ class QRCodePage extends StatefulWidget {
   State<QRCodePage> createState() => _QRCodePageState();
 }
 
-class _QRCodePageState extends State<QRCodePage>
-    with TickerProviderStateMixin {
-
+class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
   late Razorpay razorpay;
   bool showBreakdown = false;
   final FocusNode _amountFocus = FocusNode();
@@ -43,6 +42,11 @@ class _QRCodePageState extends State<QRCodePage>
   void initState() {
     super.initState();
 
+    SharedPrefs.writeValue(
+      PrefConstants.resumePayBillAppointmentId,
+      widget.appointmentId,
+    );
+
     razorpay = Razorpay();
 
     razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
@@ -53,18 +57,16 @@ class _QRCodePageState extends State<QRCodePage>
     });
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-
       await _homeController.doCreateQrCode(
         appointmentId: widget.appointmentId,
       );
 
       final paymentStatus = _homeController
-          .getUserBookingQrCodeModel
-          .data
-          ?.paymentStatus
+          .getUserBookingQrCodeModel.data?.paymentStatus
           ?.toLowerCase();
 
       if (paymentStatus == 'paid') {
+        await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
         _homeController.doClearCart(
           callback: () {
             stylistId.value = "";
@@ -78,447 +80,437 @@ class _QRCodePageState extends State<QRCodePage>
 
   @override
   Widget build(BuildContext context) {
-
     print("SHOW PROGRESS: ${_homeController.showProgress}");
     return Scaffold(
       backgroundColor: ColorConstant.whiteColor,
-
       appBar: AppBar(
         backgroundColor: ColorConstant.whiteColor,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black),
         leading: IconButton(
-          onPressed: () {
-            print("CAN POP: ${Get.key.currentState?.canPop()}");
+          onPressed: () async {
+            await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
+            if (!mounted) return;
             if (widget.isBooking) {
               Get.offAll(() => const BottomNavBarPage());
+            } else if (Navigator.of(context).canPop()) {
+              Navigator.of(context).maybePop();
             } else {
-              Get.back();
+              Get.offAll(() => const BottomNavBarPage());
             }
           },
           icon: const Icon(Icons.arrow_back),
         ),
       ),
-
       body: SafeArea(
-        //top:false,
-          child:Obx(() {
+          //top:false,
+          child: Obx(() {
+        if (_homeController.showProgress) {
+          return const ProgressBarView();
+        }
 
-            if (_homeController.showProgress) {
-              return const ProgressBarView();
-            }
+        final data = _homeController.getUserBookingQrCodeModel.data;
 
-            final data = _homeController.getUserBookingQrCodeModel.data;
-
-            return Stack(
-              children: [
-                GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () {
-                  FocusScope.of(context).unfocus(); // 👈 closes keyboard
-                },
+        return Stack(children: [
+          GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                FocusScope.of(context).unfocus(); // 👈 closes keyboard
+              },
               child: Container(
-                color: Colors.white,
-                child:  SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
+                  color: Colors.white,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        children: [
+                          /// WAITING ICON + TEXT
+                          // Row(
+                          //   children: [
+                          //
+                          //     Image.asset(
+                          //       "assets/gifs/hourglass.gif",
+                          //       height: 86,
+                          //     ),
+                          //
+                          //     const SizedBox(width: 10),
+                          //
+                          //     Container(
+                          //       padding: const EdgeInsets.symmetric(
+                          //         horizontal: 16,
+                          //         vertical: 7,
+                          //       ),
+                          //       decoration: BoxDecoration(
+                          //         color: Colors.grey.shade200,
+                          //         borderRadius: BorderRadius.circular(14),
+                          //       ),
+                          //       child: Text(
+                          //         "Waiting For Confirmation\n(will take 10 - 15 mins)",
+                          //         textAlign: TextAlign.center,
+                          //         style: TextStyle(
+                          //           fontFamily: "Outfit",
+                          //           fontSize: 18,
+                          //           fontWeight: FontWeight.w600,
+                          //           letterSpacing: 0.2,
+                          //           color: const Color(0xFF8565D0),
+                          //         ),
+                          //       ),
+                          //     )                  ],
+                          // ),
 
-                      children: [
+                          bookingStatusWidget(data?.orderStatus ?? "pending"),
 
-                        /// WAITING ICON + TEXT
-                        // Row(
-                        //   children: [
-                        //
-                        //     Image.asset(
-                        //       "assets/gifs/hourglass.gif",
-                        //       height: 86,
-                        //     ),
-                        //
-                        //     const SizedBox(width: 10),
-                        //
-                        //     Container(
-                        //       padding: const EdgeInsets.symmetric(
-                        //         horizontal: 16,
-                        //         vertical: 7,
-                        //       ),
-                        //       decoration: BoxDecoration(
-                        //         color: Colors.grey.shade200,
-                        //         borderRadius: BorderRadius.circular(14),
-                        //       ),
-                        //       child: Text(
-                        //         "Waiting For Confirmation\n(will take 10 - 15 mins)",
-                        //         textAlign: TextAlign.center,
-                        //         style: TextStyle(
-                        //           fontFamily: "Outfit",
-                        //           fontSize: 18,
-                        //           fontWeight: FontWeight.w600,
-                        //           letterSpacing: 0.2,
-                        //           color: const Color(0xFF8565D0),
-                        //         ),
-                        //       ),
-                        //     )                  ],
-                        // ),
+                          const SizedBox(height: 15),
 
-                        bookingStatusWidget(data?.orderStatus ?? "pending"),
-
-                        const SizedBox(height: 15),
-
-                        /// SALON NAME
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            data?.salon?.displayName ?? "",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: 'Outfit'
+                          /// SALON NAME
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              data?.salon?.displayName ?? "",
+                              style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: 'Outfit'),
                             ),
                           ),
-                        ),
 
-                        const SizedBox(height: 5),
-                        const Divider(),
+                          const SizedBox(height: 5),
+                          const Divider(),
 
-                        /// DATE + TIME
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-
-                                const Text(
-                                  "Date",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-
-                                const SizedBox(height: 5),
-
-                                // Text(
-                                //   convertFinalDate(date: data?.startsAt ?? ""),
-                                // ),
-                                Text(
-                                  getBookingDate(data),
-                                ),
-                              ],
-                            ),
-
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-
-                                const Text(
-                                  "Time Slot",
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-
-                                const SizedBox(height: 5),
-
-                                // Text(
-                                //   "${convertDate(date: data?.startsAt ?? "")}",
-                                // ),
-                                buildSlotSection(data),
-                              ],
-                            ),
-                          ],
-                        ),
-
-                        const Divider(height: 15),
-
-                        /// ADDRESS
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          /// DATE + TIME
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Date",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
 
-                              const Text(
-                                "Address",
-                                style: TextStyle(color: Colors.grey),
+                                  const SizedBox(height: 5),
+
+                                  // Text(
+                                  //   convertFinalDate(date: data?.startsAt ?? ""),
+                                  // ),
+                                  Text(
+                                    getBookingDate(data),
+                                  ),
+                                ],
                               ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    "Time Slot",
+                                    style: TextStyle(color: Colors.grey),
+                                  ),
 
-                              const SizedBox(height: 5),
+                                  const SizedBox(height: 5),
 
-                              Text(
-                                data?.salon?.address ?? "",
+                                  // Text(
+                                  //   "${convertDate(date: data?.startsAt ?? "")}",
+                                  // ),
+                                  buildSlotSection(data),
+                                ],
                               ),
                             ],
                           ),
-                        ),
 
-                        const Divider(height: 15),
+                          const Divider(height: 15),
 
-                        /// STYLIST
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-
-                              const Text(
-                                "Stylist Name",
-                                style: TextStyle(color: Colors.grey),
-                              ),
-
-                              const SizedBox(height: 5),
-
-                              // Text(
-                              //   data?.appointment?.artist?.name ?? "",
-                              // ),
-                              buildStylistSection(data),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 15),
-
-                        /// ENTER AMOUNT
-                        // Center(
-                        //   child: SizedBox(
-                        //       width: 246,
-                        //       child: TextField(
-                        //         controller: _amountController,
-                        //         textAlign: TextAlign.center,
-                        //         keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                        //         decoration: InputDecoration(
-                        //           hintText: "Enter The Amount",
-                        //           hintStyle: const TextStyle(
-                        //             fontFamily: "Outfit",
-                        //             fontWeight: FontWeight.w800,
-                        //             fontSize: 28,
-                        //             color: Colors.black38,
-                        //           ),
-                        //           enabledBorder: const UnderlineInputBorder(
-                        //             borderSide: BorderSide(
-                        //               color: Colors.black,
-                        //               width: 1.5,
-                        //             ),
-                        //           ),
-                        //           focusedBorder: const UnderlineInputBorder(
-                        //             borderSide: BorderSide(
-                        //               color: Colors.black,
-                        //               width: 1.5,
-                        //             ),
-                        //           ),
-                        //           contentPadding: const EdgeInsets.only(bottom: 8),
-                        //         ),
-                        //       )
-                        //   ),
-                        // ),
-
-                        Center(
-                          child: SizedBox(
-                            width: 246,
+                          /// ADDRESS
+                          Align(
+                            alignment: Alignment.centerLeft,
                             child: Column(
-                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                TextField(
-                                  focusNode: _amountFocus,
-                                  controller: _amountController,
-                                  textAlign: TextAlign.center,
-                                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                                  style: const TextStyle( // 🔥 this is for entered text
-                                    fontFamily: "Outfit",
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 28, // match hint or adjust as needed
+                                const Text(
+                                  "Address",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  data?.salon?.address ?? "",
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const Divider(height: 15),
+
+                          /// STYLIST
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  "Stylist Name",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+
+                                const SizedBox(height: 5),
+
+                                // Text(
+                                //   data?.appointment?.artist?.name ?? "",
+                                // ),
+                                buildStylistSection(data),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 15),
+
+                          /// ENTER AMOUNT
+                          // Center(
+                          //   child: SizedBox(
+                          //       width: 246,
+                          //       child: TextField(
+                          //         controller: _amountController,
+                          //         textAlign: TextAlign.center,
+                          //         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                          //         decoration: InputDecoration(
+                          //           hintText: "Enter The Amount",
+                          //           hintStyle: const TextStyle(
+                          //             fontFamily: "Outfit",
+                          //             fontWeight: FontWeight.w800,
+                          //             fontSize: 28,
+                          //             color: Colors.black38,
+                          //           ),
+                          //           enabledBorder: const UnderlineInputBorder(
+                          //             borderSide: BorderSide(
+                          //               color: Colors.black,
+                          //               width: 1.5,
+                          //             ),
+                          //           ),
+                          //           focusedBorder: const UnderlineInputBorder(
+                          //             borderSide: BorderSide(
+                          //               color: Colors.black,
+                          //               width: 1.5,
+                          //             ),
+                          //           ),
+                          //           contentPadding: const EdgeInsets.only(bottom: 8),
+                          //         ),
+                          //       )
+                          //   ),
+                          // ),
+
+                          Center(
+                            child: SizedBox(
+                              width: 246,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextField(
+                                    focusNode: _amountFocus,
+                                    controller: _amountController,
+                                    textAlign: TextAlign.center,
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
+                                    style: const TextStyle(
+                                      // 🔥 this is for entered text
+                                      fontFamily: "Outfit",
+                                      fontWeight: FontWeight.bold,
+                                      fontSize:
+                                          28, // match hint or adjust as needed
+                                      color: Colors.black,
+                                    ),
+                                    decoration: InputDecoration(
+                                      //hintText: "Enter The Amount",
+                                      hintText: "Enter Actual Bill",
+                                      hintStyle: const TextStyle(
+                                        fontFamily: "Outfit",
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 28,
+                                        color: Colors.black38,
+                                      ),
+                                      border: InputBorder
+                                          .none, // remove default underline
+                                      contentPadding:
+                                          const EdgeInsets.only(bottom: 8),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Container(
+                                    width: 200, // 👈 underline width
+                                    height: 1.5,
                                     color: Colors.black,
                                   ),
-                                  decoration: InputDecoration(
-                                    //hintText: "Enter The Amount",
-                                    hintText: "Enter Actual Bill",
-                                    hintStyle: const TextStyle(
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.w800,
-                                      fontSize: 28,
-                                      color: Colors.black38,
-                                    ),
-                                    border: InputBorder.none, // remove default underline
-                                    contentPadding: const EdgeInsets.only(bottom: 8),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          /// PAY NOW BUTTON
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: ColorConstant.primaryColor,
+                              elevation: 0,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 12,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                            onPressed: () {
+                              final enteredAmount = double.tryParse(
+                                      _amountController.text.trim()) ??
+                                  0;
+
+                              if (enteredAmount <= 0) {
+                                Get.snackbar(
+                                  "Enter Amount",
+                                  "Please enter the amount first",
+                                  snackPosition: SnackPosition.BOTTOM,
+                                  backgroundColor: Colors.red,
+                                  colorText: Colors.white,
+                                );
+                                return;
+                              }
+
+                              print(data?.bookingId);
+                              print('*******************');
+
+                              _showServiceConfirmation(data?.bookingId);
+                            },
+                            child: const Text(
+                              //"Pay Now",
+                              "Apply Discount",
+                              style: TextStyle(
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w700,
+                                fontSize: 18,
+                                color: Colors.white,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+
+                          RichText(
+                            text: const TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "* ",
+                                  style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(height: 2),
-                                Container(
-                                  width: 200, // 👈 underline width
-                                  height: 1.5,
-                                  color: Colors.black,
+                                TextSpan(
+                                  text: "Provided By Manager at Salon",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 15,
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 15),
 
-                        const SizedBox(height: 10),
-
-                        /// PAY NOW BUTTON
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: ColorConstant.primaryColor,
-                            elevation: 0,
+                          /// NOTE BOX
+                          Container(
+                            width: double.infinity,
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 12,
+                              horizontal: 18,
+                              vertical: 16,
                             ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: ColorConstant.primaryColor,
+                                width: 1.5,
+                              ),
                             ),
-                          ),
-                          onPressed: () {
-
-                            final enteredAmount =
-                                double.tryParse(_amountController.text.trim()) ?? 0;
-
-                            if (enteredAmount <= 0) {
-                              Get.snackbar(
-                                "Enter Amount",
-                                "Please enter the amount first",
-                                snackPosition: SnackPosition.BOTTOM,
-                                backgroundColor: Colors.red,
-                                colorText: Colors.white,
-                              );
-                              return;
-                            }
-
-                            print(data?.bookingId);
-                            print('*******************');
-
-                            _showServiceConfirmation(data?.bookingId);
-                          },
-                          child: const Text(
-                            //"Pay Now",
-                            "Apply Discount",
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w700,
-                              fontSize: 18,
-                              color: Colors.white,
-                              letterSpacing: 0.3,
+                            child: const Text(
+                              "Note : You Can Make Changes To Your Services At The Salon, You Can Add More Service At The Salon And Avail Your Discount Only If You Pay In The App",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                                height: 1.4,
+                                color: Colors.black,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 10),
 
-                        RichText(
-                          text: const TextSpan(
-                            children: [
-                              TextSpan(
-                                text: "* ",
-                                style: TextStyle(
-                                  color: Colors.red,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
+                          const SizedBox(height: 13),
+
+                          /// CANCEL BUTTON
+                          if ((data?.paymentStatus ?? 'pending') ==
+                              'pending') ...[
+                            SizedBox(
+                              width: 160,
+                              height: 40,
+                              child: ElevatedButton.icon(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFF96B5C),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
-                              ),
-                              TextSpan(
-                                text: "Provided By Manager at Salon",
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 15,
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-
-                        /// NOTE BOX
-                        Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 18,
-                            vertical: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
-                            border: Border.all(
-                              color: ColorConstant.primaryColor,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: const Text(
-                            "Note : You Can Make Changes To Your Services At The Salon, You Can Add More Service At The Salon And Avail Your Discount Only If You Pay In The App",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontFamily: "Outfit",
-                              fontWeight: FontWeight.w600,
-                              fontSize: 15,
-                              height: 1.4,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 13),
-
-                        /// CANCEL BUTTON
-                        if ((data?.paymentStatus ?? 'pending') == 'pending') ...[
-                          SizedBox(
-                            width: 160,
-                            height: 40,
-                            child: ElevatedButton.icon(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFF96B5C),
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              onPressed: () {
-                                _showCancelConfirmationDialog();
-                              },
-                              icon: const Icon(
-                                Icons.close,
-                                size: 18,
-                                color: Colors.white,
-                              ),
-                              label: const Text(
-                                "Cancel",
-                                style: TextStyle(
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 16,
+                                onPressed: () {
+                                  _showCancelConfirmationDialog();
+                                },
+                                icon: const Icon(
+                                  Icons.close,
+                                  size: 18,
                                   color: Colors.white,
                                 ),
-                              ),
-                            ),
-                          ),
-                        ],
-                        const SizedBox(height: 12),
-                        /// BOOKING ID
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              "Booking Id : ",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: ColorConstant.blackColor,
-                              ),
-                            ),
-                            Text(
-                              "${data?.idx ?? ""}",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: ColorConstant.primaryColor,
+                                label: const Text(
+                                  "Cancel",
+                                  style: TextStyle(
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ),
                           ],
-                        )
-                      ],
-                    ),
-                  ),
-                )
-            )
-                ),
+                          const SizedBox(height: 12),
 
-              ]
-            );
-          })
-      ),
+                          /// BOOKING ID
+
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Booking Id : ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorConstant.blackColor,
+                                ),
+                              ),
+                              Text(
+                                data?.idx ?? "",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: ColorConstant.primaryColor,
+                                ),
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                    ),
+                  ))),
+        ]);
+      })),
     );
   }
 
@@ -606,7 +598,7 @@ class _QRCodePageState extends State<QRCodePage>
     final isPending = (data?.orderStatus ?? "").toLowerCase() == "pending";
 
     if (isPending) {
-      final stylists = data?.selectedStylists  ?? []; // ✅ FIXED
+      final stylists = data?.selectedStylists ?? []; // ✅ FIXED
 
       if (stylists.isEmpty) {
         return const Text("Not Specified");
@@ -632,9 +624,9 @@ class _QRCodePageState extends State<QRCodePage>
   }
 
   void _startPayment() {
-
     final amount =
-        (_homeController.getUserBookingQrCodeModel.data?.orderAmount ?? 0) * 100;
+        (_homeController.getUserBookingQrCodeModel.data?.orderAmount ?? 0) *
+            100;
 
     final options = {
       'key': _homeController.getOrderIdModel.data?.razorpayKey ?? "",
@@ -647,18 +639,14 @@ class _QRCodePageState extends State<QRCodePage>
   }
 
   Widget bookingStatusWidget(String status) {
-
     if (status == "confirmed") {
       return Row(
         children: [
-
           Image.asset(
             "assets/gifs/verified.gif",
             height: 100,
           ),
-
           const SizedBox(width: 5),
-
           Center(
             child: Text(
               "Your Booking Is Confirmed\n(Happy Service)",
@@ -668,24 +656,23 @@ class _QRCodePageState extends State<QRCodePage>
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
                 letterSpacing: 0.1,
-                color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+                color: changeTheme(
+                    SharedPrefs.readStringValue(PrefConstants.gender)),
               ),
             ),
-          )        ],
+          )
+        ],
       );
     }
 
     /// DEFAULT → Pending
     return Row(
       children: [
-
         Image.asset(
           "assets/gifs/hourglass.gif",
           height: 100,
         ),
-
         const SizedBox(width: 10),
-
         Text(
           "Waiting For Confirmation\n(will take 10 - 15 mins)",
           textAlign: TextAlign.center,
@@ -694,9 +681,11 @@ class _QRCodePageState extends State<QRCodePage>
             fontSize: 20,
             fontWeight: FontWeight.w700,
             letterSpacing: 0.1,
-            color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+            color:
+                changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
           ),
-        )      ],
+        )
+      ],
     );
   }
 
@@ -714,8 +703,9 @@ class _QRCodePageState extends State<QRCodePage>
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
               border: Border.all(
-                color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
-                    ?? Colors.transparent,
+                color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                    Colors.transparent,
                 width: 2,
               ),
             ),
@@ -724,7 +714,6 @@ class _QRCodePageState extends State<QRCodePage>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-
                   /// TITLE
                   const Text(
                     "Are You Sure You Want To Cancel ?",
@@ -742,7 +731,6 @@ class _QRCodePageState extends State<QRCodePage>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
                       /// NO
                       SizedBox(
                         height: 27,
@@ -751,7 +739,8 @@ class _QRCodePageState extends State<QRCodePage>
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero, // important to fit text
                             backgroundColor: changeTheme(
-                                SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                                    SharedPrefs.readStringValue(
+                                        PrefConstants.gender)) ??
                                 Colors.transparent,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
@@ -809,7 +798,7 @@ class _QRCodePageState extends State<QRCodePage>
                             //   );
                             //
                             //   if (Get.isDialogOpen ?? false) {
-                            //     Get.back();
+                            //     Navigator.of(context).maybePop();
                             //   }
                             //
                             //   if (response.success) {
@@ -837,7 +826,7 @@ class _QRCodePageState extends State<QRCodePage>
                             //   }
                             // } catch (e) {
                             //   if (Get.isDialogOpen ?? false) {
-                            //     Get.back();
+                            //     Navigator.of(context).maybePop();
                             //   }
                             //
                             //   Get.snackbar(
@@ -880,7 +869,6 @@ class _QRCodePageState extends State<QRCodePage>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
                       SizedBox(
                         width: 90,
                         height: 34,
@@ -899,7 +887,9 @@ class _QRCodePageState extends State<QRCodePage>
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: const [
                               Icon(Icons.phone, size: 18),
-                              SizedBox(width: 2), // 🔥 control spacing here (reduce/increase)
+                              SizedBox(
+                                  width:
+                                      2), // 🔥 control spacing here (reduce/increase)
                               Text(
                                 "Contact Us",
                                 style: TextStyle(
@@ -912,9 +902,7 @@ class _QRCodePageState extends State<QRCodePage>
                           ),
                         ),
                       ),
-
                       const SizedBox(width: 15),
-
                       SizedBox(
                         width: 90,
                         height: 34,
@@ -967,89 +955,137 @@ class _QRCodePageState extends State<QRCodePage>
 
     String? selectedReasonId;
     String? selectedReasonCode;
-    TextEditingController remarkController = TextEditingController();
+    final TextEditingController remarkController = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) {
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-
             return Dialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-              ),
+              backgroundColor: Colors.transparent,
+              insetPadding: const EdgeInsets.symmetric(horizontal: 24),
               child: Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.purple, width: 1.5),
-                  borderRadius: BorderRadius.circular(16),
+                  color: ColorConstant.whiteColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: ColorConstant.primaryColor2,
+                    width: 2,
+                  ),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-                    /// TITLE
-                    const Text(
-                      "Reason For Cancellation",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.purple,
+                    Center(
+                      child: Text(
+                        'Reason For Cancellation',
+                        textAlign: TextAlign.center,
+                        style: AppTextTheme.bold.copyWith(
+                          color: ColorConstant.primaryColor2,
+                          fontSize: 20,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    ...reasons.map<Widget>((dynamic r) {
+                      final idStr = r['id'].toString();
+                      final code = (r['code'] ?? '').toString();
+                      final label = (r['label'] ?? '').toString();
 
-                    const SizedBox(height: 10),
-
-                    /// RADIO LIST
-                    ...reasons.map((r) {
-                      return RadioListTile<String>(
-                        value: r['id'],
-                        groupValue: selectedReasonId,
-                        title: Text(r['label']),
-                        onChanged: (value) {
-                          setStateDialog(() {
-                            selectedReasonId = value;
-                            selectedReasonCode = r['code'];
-                          });
-                        },
-                      );
-                    }).toList(),
-
-                    /// 👉 SHOW TEXTFIELD IF OTHER
-                    if (selectedReasonCode == "OTHER")
-                      Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade300,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: TextField(
-                          controller: remarkController,
-                          decoration: const InputDecoration(
-                            hintText: "Write Your Own Remarks",
-                            border: InputBorder.none,
+                      if (code == 'OTHER') {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            children: [
+                              _CancelRadioCircle(
+                                selected: selectedReasonId == idStr,
+                                onTap: () => setStateDialog(() {
+                                  selectedReasonId = idStr;
+                                  selectedReasonCode = code;
+                                }),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => setStateDialog(() {
+                                    selectedReasonId = idStr;
+                                    selectedReasonCode = code;
+                                  }),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: ColorConstant.grayColor
+                                          .withValues(alpha: 0.35),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: selectedReasonId == idStr
+                                        ? TextField(
+                                            controller: remarkController,
+                                            autofocus: true,
+                                            onChanged: (_) =>
+                                                setStateDialog(() {}),
+                                            style:
+                                                AppTextTheme.semibold.copyWith(
+                                              color: ColorConstant.blackColor,
+                                              fontSize: 14,
+                                            ),
+                                            decoration:
+                                                InputDecoration.collapsed(
+                                              hintText:
+                                                  'Write Your Own Remarks',
+                                              hintStyle: AppTextTheme.semibold
+                                                  .copyWith(
+                                                color:
+                                                    ColorConstant.grayTextColor,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                          )
+                                        : Text(
+                                            remarkController.text.isEmpty
+                                                ? 'Write Your Own Remarks'
+                                                : remarkController.text,
+                                            style:
+                                                AppTextTheme.semibold.copyWith(
+                                              color:
+                                                  ColorConstant.grayTextColor,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
-                        ),
-                      ),
+                        );
+                      }
 
-                    const SizedBox(height: 15),
-
-                    /// CONFIRM BUTTON
+                      return _CancelRadioOption(
+                        label: label,
+                        selected: selectedReasonId == idStr,
+                        onTap: () => setStateDialog(() {
+                          selectedReasonId = idStr;
+                          selectedReasonCode = code;
+                        }),
+                      );
+                    }),
+                    const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.purple,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
                         onPressed: () async {
-
                           if (selectedReasonId == null) {
-                            Get.snackbar("Select Reason", "Please select a reason");
+                            Get.snackbar(
+                              "Select Reason",
+                              "Please select a reason",
+                            );
                             return;
                           }
 
@@ -1061,10 +1097,12 @@ class _QRCodePageState extends State<QRCodePage>
                           );
 
                           try {
-                            final bookingId =
-                                _homeController.getUserBookingQrCodeModel.data?.idx ?? "";
+                            final bookingId = _homeController
+                                    .getUserBookingQrCodeModel.data?.idx ??
+                                "";
 
-                            final response = await _homeController.cancelBooking(
+                            final response =
+                                await _homeController.cancelBooking(
                               bookingId: bookingId,
                               status: "user_cancelled",
                               cancellationReasonId: selectedReasonId!,
@@ -1073,7 +1111,9 @@ class _QRCodePageState extends State<QRCodePage>
                                   : null,
                             );
 
-                            if (Get.isDialogOpen ?? false) Get.back();
+                            if (Get.isDialogOpen ?? false) {
+                              Navigator.of(context).maybePop();
+                            }
 
                             if (response.success) {
                               Get.back(result: true);
@@ -1086,7 +1126,9 @@ class _QRCodePageState extends State<QRCodePage>
                               );
                             }
                           } catch (e) {
-                            if (Get.isDialogOpen ?? false) Get.back();
+                            if (Get.isDialogOpen ?? false) {
+                              Navigator.of(context).maybePop();
+                            }
 
                             Get.snackbar(
                               "Error",
@@ -1096,7 +1138,21 @@ class _QRCodePageState extends State<QRCodePage>
                             );
                           }
                         },
-                        child: const Text("Confirm"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: ColorConstant.primaryColor2,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Text(
+                          'Confirm',
+                          style: AppTextTheme.bold.copyWith(
+                            color: ColorConstant.whiteColor,
+                            fontSize: 16,
+                          ),
+                        ),
                       ),
                     ),
                   ],
@@ -1106,7 +1162,7 @@ class _QRCodePageState extends State<QRCodePage>
           },
         );
       },
-    );
+    ).then((_) => remarkController.dispose());
   }
 
   void _showServiceConfirmation(String? bookingId) {
@@ -1135,7 +1191,6 @@ class _QRCodePageState extends State<QRCodePage>
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-
                   /// QUESTION
                   const Text(
                     "Have You Completed Your Service ?",
@@ -1153,7 +1208,6 @@ class _QRCodePageState extends State<QRCodePage>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-
                       /// NO BUTTON
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -1191,24 +1245,24 @@ class _QRCodePageState extends State<QRCodePage>
                           ),
                         ),
                         onPressed: () async {
-
                           Navigator.pop(context);
 
                           await _homeController.doGetListPromoCode();
                           //await _homeController.doGetOrderId();
 
                           final enteredAmount =
-                              double.tryParse(_amountController.text.trim()) ?? 0;
+                              double.tryParse(_amountController.text.trim()) ??
+                                  0;
 
                           if (enteredAmount <= 0) {
-                            Get.snackbar("Invalid Amount", "Please enter amount");
+                            Get.snackbar(
+                                "Invalid Amount", "Please enter amount");
                             return;
                           }
-                          final result =
-                          _homeController.getBestDiscount(enteredAmount.toInt());
+                          final result = _homeController
+                              .getBestDiscount(enteredAmount.toInt());
 
                           if (result != null) {
-
                             int discount = result["discount"];
 
                             int finalAmount = enteredAmount.toInt() - discount;
@@ -1219,19 +1273,14 @@ class _QRCodePageState extends State<QRCodePage>
                                 actualAmount: enteredAmount.toInt(),
                                 discount: discount,
                                 finalAmount: finalAmount,
-                                promoName: promoName
-                            );
-
+                                promoName: promoName);
                           } else {
-
                             _showPaymentSummaryDialog(
                                 bookingId: bookingId,
                                 actualAmount: enteredAmount.toInt(),
                                 discount: 0,
                                 finalAmount: enteredAmount.toInt(),
-                                promoName: "NA"
-                            );
-
+                                promoName: "NA");
                           }
                         },
                         child: const Padding(
@@ -1259,24 +1308,21 @@ class _QRCodePageState extends State<QRCodePage>
     );
   }
 
-  void _showPaymentSummaryDialog({
-    String? bookingId,
-    required int actualAmount,
-    required int discount,
-    required int finalAmount,
-    required String promoName
-  }) {
+  void _showPaymentSummaryDialog(
+      {String? bookingId,
+      required int actualAmount,
+      required int discount,
+      required int finalAmount,
+      required String promoName}) {
     showDialog(
       context: context,
       barrierDismissible: false,
       barrierColor: Colors.black54,
       builder: (context) {
-
         bool showBreakdown = false;
 
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-
             // return Stack(
             //   alignment: Alignment.topCenter,
             //   children: [
@@ -1596,354 +1642,362 @@ class _QRCodePageState extends State<QRCodePage>
             // );
 
             return Center(
-                child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Column(
+                child: Stack(alignment: Alignment.center, children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Container(
+                      height: 42,
+                      width: 42,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        color: Colors.black,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+
+                  /// MAIN DIALOG
+                  Dialog(
+                    backgroundColor: Colors.transparent,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        border: Border.all(
+                          color: ColorConstant.primaryColor,
+                          width: 2,
+                        ),
+                      ),
+                      child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                            child: Container(
-                              height: 42,
-                              width: 42,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                Icons.close,
-                                color: Colors.black,
-                                size: 22,
-                              ),
+                          /// ACTUAL AMOUNT
+                          const Text(
+                            "Actual Amount",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
                             ),
                           ),
-                          const SizedBox(height: 5),
-                          /// MAIN DIALOG
-                          Dialog(
-                            backgroundColor: Colors.transparent,
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(18),
-                                border: Border.all(
-                                  color: ColorConstant.primaryColor,
-                                  width: 2,
+
+                          const SizedBox(height: 8),
+
+                          // Text(
+                          //   "₹$actualAmount",
+                          //   style: TextStyle(
+                          //     fontSize: 44,
+                          //     height: 1.1,
+                          //     color: Colors.grey,
+                          //     fontWeight: FontWeight.w900,
+                          //     fontFamily: 'Outfit',
+                          //     decoration: TextDecoration.lineThrough,
+                          //     decorationColor: changeTheme(
+                          //       SharedPrefs.readStringValue(PrefConstants.gender),
+                          //   ),
+                          //     decorationThickness: 2.5,
+                          //   )
+                          // ),
+
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Text(
+                                "₹$actualAmount",
+                                style: const TextStyle(
+                                  fontSize: 44,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w900,
+                                  fontFamily: 'Outfit',
                                 ),
                               ),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-
-                                  /// ACTUAL AMOUNT
-                                  const Text(
-                                    "Actual Amount",
-                                    style: TextStyle(
-                                      fontFamily: "Outfit",
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
-                                    ),
+                              Positioned(
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  height: 2.5,
+                                  color: changeTheme(
+                                    SharedPrefs.readStringValue(
+                                        PrefConstants.gender),
                                   ),
-
-                                  const SizedBox(height: 8),
-
-                                  // Text(
-                                  //   "₹$actualAmount",
-                                  //   style: TextStyle(
-                                  //     fontSize: 44,
-                                  //     height: 1.1,
-                                  //     color: Colors.grey,
-                                  //     fontWeight: FontWeight.w900,
-                                  //     fontFamily: 'Outfit',
-                                  //     decoration: TextDecoration.lineThrough,
-                                  //     decorationColor: changeTheme(
-                                  //       SharedPrefs.readStringValue(PrefConstants.gender),
-                                  //   ),
-                                  //     decorationThickness: 2.5,
-                                  //   )
-                                  // ),
-
-                                  Stack(
-                                    alignment: Alignment.center,
-                                    children: [
-                                      Text(
-                                        "₹$actualAmount",
-                                        style: const TextStyle(
-                                          fontSize: 44,
-                                          color: Colors.grey,
-                                          fontWeight: FontWeight.w900,
-                                          fontFamily: 'Outfit',
-                                        ),
-                                      ),
-
-                                      Positioned(
-                                        left: 0,
-                                        right: 0,
-                                        child: Container(
-                                          height: 2.5,
-                                          color: changeTheme(
-                                            SharedPrefs.readStringValue(PrefConstants.gender),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  const SizedBox(height: 20),
-
-                                  /// YOU PAY
-                                  Text(
-                                    "You Pay",
-                                    style: TextStyle(
-                                      fontSize: 50,
-                                      fontWeight: FontWeight.w900,
-                                      fontFamily: 'Outfit',
-                                      color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 6),
-
-                                  Text(
-                                    "₹${finalAmount + 5}",
-                                    style: const TextStyle(
-                                      fontSize: 46,
-                                      fontWeight: FontWeight.w900,
-                                      fontFamily: 'Outfit',
-                                      color: Colors.green,
-                                    ),
-                                  ),
-
-                                  //const SizedBox(height: 10),
-
-                                  Container(
-                                    width: 120,
-                                    height: 1,
-                                    color: Colors.black,
-                                  ),
-
-                                  const SizedBox(height: 15),
-
-                                  /// EDIT PRICE
-                                  SizedBox(
-                                    width: 127,
-                                    height: 42,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:  changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))?.withOpacity(0.7),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10), // updated
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: const Text(
-                                        "Edit Price",
-                                        style: TextStyle(
-                                          fontFamily: "Outfit",
-                                          fontWeight: FontWeight.w600, // semi-bold
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 18),
-
-                                  /// VIEW BREAKDOWN
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 15,
-                                      vertical: 12,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      boxShadow: const [
-                                        BoxShadow(
-                                          color: Colors.black12,
-                                          blurRadius: 6,
-                                        )
-                                      ],
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                    child: Column(
-                                      children: [
-
-                                        /// HEADER
-                                        InkWell(
-                                          onTap: () {
-                                            setStateDialog(() {
-                                              showBreakdown = !showBreakdown;
-                                            });
-                                          },
-                                          child: Container(
-                                            width: double.infinity,
-                                            padding: const EdgeInsets.symmetric(vertical: 4),
-                                            child: Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-
-                                                const Text(
-                                                  "View Breakdown",
-                                                  style: TextStyle(fontFamily: "Outfit",
-                                                      fontWeight: FontWeight.bold,
-                                                      fontSize: 14),
-                                                ),
-
-                                                AnimatedRotation(
-                                                  turns: showBreakdown ? 0.5 : 0,
-                                                  duration: const Duration(milliseconds: 250),
-                                                  child: Icon(
-                                                    Icons.keyboard_arrow_down,
-                                                    color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-
-                                        /// BREAKDOWN CONTENT
-                                        AnimatedSize(
-                                          duration: const Duration(milliseconds: 300),
-                                          curve: Curves.easeInOut,
-                                          child: showBreakdown
-                                              ? Padding(
-                                            padding: const EdgeInsets.only(top: 12),
-                                            child: Column(
-                                              children: [
-
-                                                _row("Actual Amount", "₹$actualAmount"),
-
-                                                _row(
-                                                  "Discount",
-                                                  "-₹$discount",
-                                                  color: Colors.green,
-                                                ),
-
-                                                //_row("($promoName Applied)", ""),
-                                                Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 4),
-                                                  child: Row(
-                                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                                    children: [
-                                                      Text(
-                                                        "($promoName Applied)",
-                                                        style: TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:  FontWeight.bold,
-                                                          color: Colors.green,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-
-
-                                                _row("Platform Fee", "+₹5"),
-
-                                                const Divider(),
-
-                                                _row(
-                                                  "You Pay",
-                                                  "₹${actualAmount - discount + 5}",
-                                                  isBold: true,
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                              : const SizedBox(),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-
-                                  const SizedBox(height: 20),
-
-                                  /// PROCEED TO PAY
-                                  SizedBox(
-                                    width: 289,
-                                    height: 43,
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        padding: EdgeInsets.zero,
-                                        minimumSize: Size.zero, // overrides the previous infinity size
-                                        backgroundColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10), // updated
-                                        ),
-                                      ),
-                                      onPressed: () async {
-                                        Navigator.pop(context);
-
-                                        final payable = finalAmount + 5;
-
-                                        print(bookingId);
-                                        print('_____________________');
-
-                                        await _homeController.createPaymentOrder(
-                                          bookingOrderId: bookingId,
-                                          billAmount: actualAmount,
-                                          payableAmount: payable,
-                                        );
-
-                                        openRazorpay(payable);
-                                      },
-                                      child: const Text(
-                                        "Proceed To Pay",
-                                        style: TextStyle(
-                                          fontFamily: "Outfit",
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20,
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                ],
+                                ),
                               ),
+                            ],
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          /// YOU PAY
+                          Text(
+                            "You Pay",
+                            style: TextStyle(
+                              fontSize: 50,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Outfit',
+                              color: changeTheme(SharedPrefs.readStringValue(
+                                  PrefConstants.gender)),
                             ),
                           ),
 
+                          const SizedBox(height: 6),
+
+                          Text(
+                            "₹${finalAmount + 5}",
+                            style: const TextStyle(
+                              fontSize: 46,
+                              fontWeight: FontWeight.w900,
+                              fontFamily: 'Outfit',
+                              color: Colors.green,
+                            ),
+                          ),
+
+                          //const SizedBox(height: 10),
+
+                          Container(
+                            width: 120,
+                            height: 1,
+                            color: Colors.black,
+                          ),
+
+                          const SizedBox(height: 15),
+
+                          /// EDIT PRICE
+                          SizedBox(
+                            width: 127,
+                            height: 42,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: changeTheme(
+                                        SharedPrefs.readStringValue(
+                                            PrefConstants.gender))
+                                    ?.withOpacity(0.7),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(10), // updated
+                                ),
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              child: const Text(
+                                "Edit Price",
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w600, // semi-bold
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 18),
+
+                          /// VIEW BREAKDOWN
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 15,
+                              vertical: 12,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  blurRadius: 6,
+                                )
+                              ],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Column(
+                              children: [
+                                /// HEADER
+                                InkWell(
+                                  onTap: () {
+                                    setStateDialog(() {
+                                      showBreakdown = !showBreakdown;
+                                    });
+                                  },
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding:
+                                        const EdgeInsets.symmetric(vertical: 4),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "View Breakdown",
+                                          style: TextStyle(
+                                              fontFamily: "Outfit",
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 14),
+                                        ),
+                                        AnimatedRotation(
+                                          turns: showBreakdown ? 0.5 : 0,
+                                          duration:
+                                              const Duration(milliseconds: 250),
+                                          child: Icon(
+                                            Icons.keyboard_arrow_down,
+                                            color: changeTheme(
+                                                SharedPrefs.readStringValue(
+                                                    PrefConstants.gender)),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+
+                                /// BREAKDOWN CONTENT
+                                AnimatedSize(
+                                  duration: const Duration(milliseconds: 300),
+                                  curve: Curves.easeInOut,
+                                  child: showBreakdown
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 12),
+                                          child: Column(
+                                            children: [
+                                              _row("Actual Amount",
+                                                  "₹$actualAmount"),
+
+                                              _row(
+                                                "Discount",
+                                                "-₹$discount",
+                                                color: Colors.green,
+                                              ),
+
+                                              //_row("($promoName Applied)", ""),
+                                              Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        vertical: 4),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      "($promoName Applied)",
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.green,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+
+                                              _row("Platform Fee", "+₹5"),
+
+                                              const Divider(),
+
+                                              _row(
+                                                "You Pay",
+                                                "₹${actualAmount - discount + 5}",
+                                                isBold: true,
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : const SizedBox(),
+                                ),
+                              ],
+                            ),
+                          ),
+
+                          const SizedBox(height: 20),
+
+                          /// PROCEED TO PAY
+                          SizedBox(
+                            width: 289,
+                            height: 43,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                padding: EdgeInsets.zero,
+                                minimumSize: Size
+                                    .zero, // overrides the previous infinity size
+                                backgroundColor: changeTheme(
+                                    SharedPrefs.readStringValue(
+                                        PrefConstants.gender)),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(10), // updated
+                                ),
+                              ),
+                              onPressed: () async {
+                                Navigator.pop(context);
+
+                                final payable = finalAmount + 5;
+
+                                print(bookingId);
+                                print('_____________________');
+
+                                await _homeController.createPaymentOrder(
+                                  bookingOrderId: bookingId,
+                                  billAmount: actualAmount,
+                                  payableAmount: payable,
+                                );
+
+                                openRazorpay(payable);
+                              },
+                              child: const Text(
+                                "Proceed To Pay",
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ),
+                          )
                         ],
-                      )
-                    ]
-                )
-            );
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            ]));
           },
         );
       },
     );
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+  Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    final paidAmount = double.tryParse(_amountController.text.trim()) ?? 0;
 
-    final paidAmount =
-        double.tryParse(_amountController.text.trim()) ?? 0;
+    final bookingId = _homeController.getUserBookingQrCodeModel.data?.idx ?? "";
 
-    final bookingId =
-        _homeController.getUserBookingQrCodeModel.data?.idx ?? "";
-
+    await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
     Get.offAll(
-          () => PaymentSuccessPage(
+      () => PaymentSuccessPage(
         amount: paidAmount.toInt(),
         bookingId: bookingId,
       ),
     );
-
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-
     Get.snackbar(
       "Payment Failed",
       response.message ?? "Something went wrong",
       backgroundColor: Colors.red,
       colorText: Colors.white,
     );
-
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -1951,11 +2005,11 @@ class _QRCodePageState extends State<QRCodePage>
   }
 
   Widget _row(
-      String title,
-      String value, {
-        Color color = Colors.black,
-        bool isBold = false,
-      }) {
+    String title,
+    String value, {
+    Color color = Colors.black,
+    bool isBold = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -1982,14 +2036,12 @@ class _QRCodePageState extends State<QRCodePage>
   }
 
   void openRazorpay(int payableAmount) {
-
     print(_homeController.getOrderIdModel.data?.orderId);
     print(_homeController.getOrderIdModel.data?.razorpayKey);
 
     var options = {
       'key': _homeController.getOrderIdModel.data?.razorpayKey ?? "",
-      'amount':
-      payableAmount * 100,
+      'amount': payableAmount * 100,
       'name': 'ScutS',
       'timeout': 120,
       'order_id': _homeController.getOrderIdModel.data?.orderId ?? "",
@@ -1998,17 +2050,11 @@ class _QRCodePageState extends State<QRCodePage>
       'send_sms_hash': true,
       'prefill': {
         'contact':
-        _authController.userResponseModel.data?.userData?.mobile ?? "",
-        'email':
-        _authController.userResponseModel.data?.userData?.email ?? "",
+            _authController.userResponseModel.data?.userData?.mobile ?? "",
+        'email': _authController.userResponseModel.data?.userData?.email ?? "",
       },
       // 'external': {}
-      'method': {
-        'upi': true,
-        'card': true,
-        'netbanking': true,
-        'wallet': true
-      },
+      'method': {'upi': true, 'card': true, 'netbanking': true, 'wallet': true},
       'external': {
         'wallets': ['paytm']
       }
@@ -2043,5 +2089,79 @@ class _QRCodePageState extends State<QRCodePage>
   void dispose() {
     razorpay.clear();
     super.dispose();
+  }
+}
+
+class _CancelRadioOption extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _CancelRadioOption({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        children: [
+          _CancelRadioCircle(selected: selected, onTap: onTap),
+          const SizedBox(width: 12),
+          GestureDetector(
+            onTap: onTap,
+            child: Text(
+              label,
+              style: AppTextTheme.medium.copyWith(
+                color: ColorConstant.primaryColor2,
+                fontSize: 15,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CancelRadioCircle extends StatelessWidget {
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _CancelRadioCircle({required this.selected, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 22,
+        height: 22,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: selected
+                ? ColorConstant.primaryColor2
+                : ColorConstant.grayColor,
+            width: 2,
+          ),
+        ),
+        child: selected
+            ? Center(
+                child: Container(
+                  width: 12,
+                  height: 12,
+                  decoration: const BoxDecoration(
+                    color: ColorConstant.primaryColor2,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              )
+            : null,
+      ),
+    );
   }
 }

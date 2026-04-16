@@ -57,7 +57,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         backgroundColor: ColorConstant.whiteColor,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            Navigator.of(context).maybePop();
           },
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -119,13 +119,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 fit: BoxFit.cover,
                               ),
                       ),
-                        Positioned(
+                      Positioned(
                           bottom: 10,
                           right: 2,
                           child: Icon(
                             CupertinoIcons.pencil_circle_fill,
-                            color: changeTheme(
-                              SharedPrefs.readStringValue(PrefConstants.gender)),
+                            color: changeTheme(SharedPrefs.readStringValue(
+                                PrefConstants.gender)),
                           ))
                     ],
                   ),
@@ -211,7 +211,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   /*--------------   Phone Number TextField -----------*/
   bool isOtpEnable = false;
   bool isVerifyOtp = false;
-  _columPhoneWithTextField() {
+  Padding _columPhoneWithTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -296,7 +296,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   /*--------------  Name TextField -------------*/
-  _columWithNameTextField() {
+  Padding _columWithNameTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -335,7 +335,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
 /*--------------  Email TextField -------------*/
-  _columWithEmailTextField() {
+  Padding _columWithEmailTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -374,7 +374,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   /*-------------------  Do  Create Profile ----------------*/
-  _doEditProfile() {
+  void _doEditProfile() {
     if (_nameTextEditingController.text.isEmpty) {
       showMessage("Please enter your name");
       return;
@@ -405,10 +405,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
             image: imagePath,
             callback: () {
               _authController.doGetProfile(callback: () {
-                Get.back();
+                Navigator.of(context).maybePop();
                 showMessage("Profile Update SuccessFully");
               });
-            }); 
+            });
       }
     } else {
       _authController.doEditProfile(
@@ -424,7 +424,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           callback: () {
             setState(() {
               _authController.doGetProfile(callback: () {
-                Get.back();
+                Navigator.of(context).maybePop();
                 showMessage("Profile Update SuccessFully");
               });
             });
@@ -437,7 +437,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   bool isResendOTp = false;
 
   /*--------------  Start Timer --------------*/
-  startTimer() {
+  void startTimer() {
     Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_start == 0) {
         setState(() {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dash/flutter_dash.dart';
@@ -63,8 +64,9 @@ class _HomePageState extends State<HomePage>
       _startOfferAutoScroll();
     });
 
-    getCurrentLatLng();
-
+    if (!kDebugMode) {
+      getCurrentLatLng();
+    }
     ever(_homeController.hasPendingReview, (value) async {
       if (value == true) {
         /// 🔥 WAIT FOR BOOKING HISTORY
@@ -131,7 +133,7 @@ class _HomePageState extends State<HomePage>
   void dispose() {
     _offerAutoScrollTimer?.cancel();
     _offerPageController.dispose();
-    _mainScrollController.dispose();
+    // _mainScrollController.dispose();
     super.dispose();
   }
 
@@ -141,8 +143,13 @@ class _HomePageState extends State<HomePage>
     return CallWrapper(
         child: WillPopScope(
             onWillPop: () async {
-              _showExitDialog(context);
-              return false;
+              if (_shouldShowSalonDialog()) {
+                _showExitDialog(context);
+                return false;
+              } else {
+                SystemNavigator.pop();
+                return false;
+              }
             },
             child: Scaffold(
               appBar: statusBarTheme(context),
@@ -189,6 +196,9 @@ class _HomePageState extends State<HomePage>
                                               .data!
                                               .rows![index],
                                           onPress: () async {
+                                            // Mark that user has visited a salon
+                                            await _markSalonVisited();
+
                                             final changed = await Get.to(
                                               () =>
                                                   SaloonAfterSelectingServicesPage(
@@ -470,9 +480,28 @@ class _HomePageState extends State<HomePage>
     _homeController.update();
   }
 
+  Future<void> _markSalonVisited() async {
+    await SharedPrefs.writeBoolValue(PrefConstants.hasVisitedSalon, true);
+  }
+
+  bool _shouldShowSalonDialog() {
+    final hasVisitedSalon =
+        SharedPrefs.readBoolValue(PrefConstants.hasVisitedSalon);
+    final hasShownDialog =
+        SharedPrefs.readBoolValue(PrefConstants.hasShownSalonDialog);
+    return hasVisitedSalon && !hasShownDialog;
+  }
+
+  Future<void> _markSalonDialogShown() async {
+    await SharedPrefs.writeBoolValue(PrefConstants.hasShownSalonDialog, true);
+  }
+
   void _showExitDialog(BuildContext context) {
     final controller = TextEditingController();
     final homeController = Get.find<HomeController>();
+
+    // Mark that we've shown the dialog
+    _markSalonDialogShown();
 
     showDialog(
       context: context,
@@ -1482,7 +1511,10 @@ class _HomePageState extends State<HomePage>
                   itemCount: _homeController.getPromoCodeModel.data?.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                        onTap: () {
+                        onTap: () async {
+                          // Mark that user has visited a salon
+                          await _markSalonVisited();
+
                           Get.to(() => SaloonAfterSelectingServicesPage(
                                 id: _homeController.getPromoCodeModel
                                         .data?[index].salon?.id ??
@@ -2308,7 +2340,7 @@ class _HomePageState extends State<HomePage>
               nearest: false,
               fourPlusRating: false)
           .then((_) {
-        if (mounted) setState(() => _isInitialLoad = false);
+        // if (mounted) setState(() => _isInitialLoad = false);
       });
       SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
     }).onPermanentlyDeniedCallback(() async {

@@ -42,6 +42,10 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
     super.dispose();
   }
 
+  Future<void> _markSalonVisited() async {
+    await SharedPrefs.writeBoolValue(PrefConstants.hasVisitedSalon, true);
+  }
+
   void _onSearchChanged() {
     if (_debounce?.isActive ?? false) {
       _debounce!.cancel();
@@ -113,7 +117,10 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                           .data?[index].isService ??
                           false
                           ? ServiceListTile(
-                        onPress: () {
+                        onPress: () async {
+                          // Mark that user has visited a salon
+                          await _markSalonVisited();
+                          
                           Get.to(() =>
                               SaloonAfterSelectingServicesPage(
                                   id: _homeController
@@ -231,7 +238,10 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                         salonListData: _homeController
                             .getSearchSalonModel
                             .data![index],
-                        onPress: () {
+                        onPress: () async {
+                          // Mark that user has visited a salon
+                          await _markSalonVisited();
+                          
                           Get.to(() =>
                               SaloonAfterSelectingServicesPage(
                                   id: _homeController

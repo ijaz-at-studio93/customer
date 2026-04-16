@@ -19,7 +19,7 @@ class DioConnectivityRequestRetrier {
     final responseCompleter = Completer<Response>();
 
     streamSubscription = connectivity.onConnectivityChanged.listen(
-          (connectivityResult) async {
+      (connectivityResult) async {
         if (connectivityResult != ConnectivityResult.none) {
           streamSubscription?.cancel();
           // Complete the completer instead of returning
@@ -31,7 +31,10 @@ class DioConnectivityRequestRetrier {
               onReceiveProgress: requestOptions.onReceiveProgress,
               onSendProgress: requestOptions.onSendProgress,
               queryParameters: requestOptions.queryParameters,
-              options: Options(headers: requestOptions.headers, method: requestOptions.method, extra: requestOptions.extra),
+              options: Options(
+                  headers: requestOptions.headers,
+                  method: requestOptions.method,
+                  extra: requestOptions.extra),
             ),
           );
           debugPrint('ConnectedGetBack');

@@ -39,7 +39,7 @@ class _SalonRatingPageState extends State<SalonRatingPage> {
         backgroundColor: ColorConstant.whiteColor,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            Navigator.of(context).maybePop();
           },
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -54,45 +54,44 @@ class _SalonRatingPageState extends State<SalonRatingPage> {
         ),
       ),
       body: Obx(
-            () => _homeController.showProgress
+        () => _homeController.showProgress
             ? const ProgressBarView()
             : _homeController.getSalonIdReviewsModel.data?.isEmpty ?? false
-            ? const NoItemsWidget(
-            text: "Be the first to try!")
-            : ListView.builder(
-            shrinkWrap: true,
-            itemCount:
-            _homeController.getSalonIdReviewsModel.data?.length ??
-                0,
-            itemBuilder: (context, index) {
-              return (_homeController.getSalonIdReviewsModel
-                  .data?[index].isServices ==
-                  true)
-                  ? Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 10),
-                child: _listTileWidget(
-                    rate: _homeController.getSalonIdReviewsModel
-                        .data?[index].rating ??
-                        0.0,
-                    title: _homeController.getSalonIdReviewsModel
-                        .data?[index].review ??
-                        "",
-                    userName: _homeController
-                        .getSalonIdReviewsModel
-                        .data?[index]
-                        .user
-                        ?.name ??
-                        ""),
-              )
-                  : const SizedBox();
-            }),
+                ? const NoItemsWidget(text: "Be the first to try!")
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount:
+                        _homeController.getSalonIdReviewsModel.data?.length ??
+                            0,
+                    itemBuilder: (context, index) {
+                      return (_homeController.getSalonIdReviewsModel
+                                  .data?[index].isServices ==
+                              true)
+                          ? Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 10),
+                              child: _listTileWidget(
+                                  rate: _homeController.getSalonIdReviewsModel
+                                          .data?[index].rating ??
+                                      0.0,
+                                  title: _homeController.getSalonIdReviewsModel
+                                          .data?[index].review ??
+                                      "",
+                                  userName: _homeController
+                                          .getSalonIdReviewsModel
+                                          .data?[index]
+                                          .user
+                                          ?.name ??
+                                      ""),
+                            )
+                          : const SizedBox();
+                    }),
       ),
     );
   }
 
   /*----------------- ReviewAndRating List Tile Widget  --------------*/
-  _listTileWidget(
+  Container _listTileWidget(
       {required double rate, required String title, required String userName}) {
     return Container(
       padding: const EdgeInsets.all(15),
@@ -125,9 +124,8 @@ class _SalonRatingPageState extends State<SalonRatingPage> {
             ignoreGestures: true,
             itemBuilder: (context, _) => Icon(
               Icons.star,
-              color:  changeTheme(
-                  SharedPrefs.readStringValue(
-                      PrefConstants.gender)),
+              color: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender)),
               size: 25,
             ),
             onRatingUpdate: (rating) {},

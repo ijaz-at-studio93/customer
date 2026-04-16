@@ -39,7 +39,7 @@ class _FavouriteSalonPageState extends State<FavouriteSalonPage> {
           backgroundColor: ColorConstant.whiteColor,
           leading: IconButton(
             onPressed: () {
-              Get.back();
+              Navigator.of(context).maybePop();
               widget.callback.call();
             },
             icon: const Icon(

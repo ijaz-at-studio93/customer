@@ -25,7 +25,7 @@ class PermissionDialog extends StatelessWidget {
                 children: [
                   InkWell(
                       onTap: () {
-                        Get.back(result:  true);
+                        Get.back(result: true);
                       },
                       splashColor: Colors.grey.withOpacity(0.7),
                       child: Container(
@@ -42,7 +42,7 @@ class PermissionDialog extends StatelessWidget {
                   const SizedBox(width: 20),
                   InkWell(
                       onTap: () async {
-                        Get.back();
+                        Navigator.of(context).maybePop();
                         await openAppSettings();
                       },
                       splashColor: Colors.grey.withOpacity(0.7),
@@ -69,7 +69,7 @@ class PermissionDialog extends StatelessWidget {
             actions: [
               CupertinoDialogAction(
                 onPressed: () async {
-                  Get.back();
+                  Navigator.of(context).maybePop();
                   await openAppSettings();
                 },
                 child: const Text(
@@ -78,9 +78,8 @@ class PermissionDialog extends StatelessWidget {
                 ),
               ),
               CupertinoDialogAction(
-
                 onPressed: () {
-                  Get.back(result:  true);
+                  Get.back(result: true);
                 },
                 child: const Text(
                   "Cancel",

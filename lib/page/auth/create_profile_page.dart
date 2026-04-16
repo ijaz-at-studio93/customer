@@ -38,7 +38,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
     return Scaffold(
       backgroundColor: ColorConstant.whiteColor,
       body: Obx(
-            () => ProgressContainerView(
+        () => ProgressContainerView(
           isProgressRunning: _authController.showProgress,
           child: SafeArea(
             child: SingleChildScrollView(
@@ -47,14 +47,14 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-
                     const SizedBox(height: 10),
+
                     /// 🔙 BACK BUTTON
                     Align(
                       alignment: Alignment.centerLeft,
                       child: GestureDetector(
                         onTap: () {
-                          Get.back();
+                          Navigator.of(context).maybePop();
                         },
                         child: const Icon(
                           Icons.arrow_back_ios,
@@ -110,16 +110,12 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                             fontWeight: FontWeight.w600,
                           ),
                         ),
-
                         const SizedBox(height: 15),
-
                         Row(
                           children: [
-
                             _genderOption("Male", 1),
                             const SizedBox(width: 20),
                             _genderOption("Female", 2),
-
                           ],
                         ),
                       ],
@@ -158,7 +154,6 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                       ),
                     ),
 
-
                     const SizedBox(height: 30),
                   ],
                 ),
@@ -189,10 +184,9 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
           ),
         ),
         const SizedBox(height: 8),
-
         Container(
           height: 45,
-          padding: const EdgeInsets.symmetric(horizontal: 12,vertical: 3),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 3),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.grey.shade400),
@@ -200,26 +194,23 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
           child: Row(
             children: [
               if (prefix != null)
-                Text(prefix, style: const TextStyle(fontWeight: FontWeight.w600)),
-
+                Text(prefix,
+                    style: const TextStyle(fontWeight: FontWeight.w600)),
               Expanded(
                 child: TextField(
                   controller: controller,
                   readOnly: isReadOnly,
                   keyboardType: TextInputType.text,
                   textAlignVertical: TextAlignVertical.center,
-
                   style: const TextStyle(
                     fontFamily: "Outfit",
                     fontSize: 14,
                     fontWeight: FontWeight.w600, // SemiBold
                     color: Colors.black,
                   ),
-
                   decoration: InputDecoration(
                     hintText: hint,
                     border: InputBorder.none,
-
                     hintStyle: const TextStyle(
                       fontFamily: "Outfit",
                       fontSize: 14,
@@ -239,9 +230,8 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   Widget _genderOption(String title, int value) {
     final isSelected = selectGender == value;
 
-    final selectedColor = value == 1
-        ? ColorConstant.primaryColor
-        : ColorConstant.primary2;
+    final selectedColor =
+        value == 1 ? ColorConstant.primaryColor : ColorConstant.primary2;
 
     return GestureDetector(
       onTap: () {
@@ -259,7 +249,6 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
             ),
           ),
           const SizedBox(width: 8),
-
           Container(
             height: 18,
             width: 18,
@@ -267,17 +256,13 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: isSelected
-                    ? selectedColor
-                    : Colors.grey,
+                color: isSelected ? selectedColor : Colors.grey,
               ),
             ),
             child: Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isSelected
-                    ? selectedColor
-                    : Colors.transparent,
+                color: isSelected ? selectedColor : Colors.transparent,
               ),
             ),
           ),
@@ -287,7 +272,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   }
 
   /*--------------   Phone Number TextField -----------*/
-  _columPhoneWithTextField() {
+  Padding _columPhoneWithTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -347,7 +332,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   }
 
   /*--------------  Name TextField -------------*/
-  _columWithNameTextField() {
+  Padding _columWithNameTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -378,7 +363,9 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
                     border: InputBorder.none,
                     hintText: "Enter Your Name",
                     hintStyle: AppTextTheme.medium.copyWith(
-                        color: ColorConstant.grayColor, fontFamily: 'Outfit', fontSize: 13)),
+                        color: ColorConstant.grayColor,
+                        fontFamily: 'Outfit',
+                        fontSize: 13)),
               )),
         ],
       ),
@@ -412,7 +399,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   }
 
   /*--------------  Email TextField -------------*/
-  _columWithEmailTextField() {
+  Padding _columWithEmailTextField() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
@@ -420,8 +407,10 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
         children: [
           Text(
             "Enter Your Email",
-            style: AppTextTheme.regular
-                .copyWith(fontSize: 12, fontFamily: 'Outfit',color: ColorConstant.blackColor),
+            style: AppTextTheme.regular.copyWith(
+                fontSize: 12,
+                fontFamily: 'Outfit',
+                color: ColorConstant.blackColor),
           ),
           const SizedBox(height: 12),
           Container(
@@ -451,7 +440,7 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   }
 
   /*------------  Do  Create Profile ----*/
-  _doCreateProfile() {
+  void _doCreateProfile() {
     final name = _nameTextEditingController.text.trim();
     final mobile = _mobileTextEditingController.text.trim();
 
@@ -501,9 +490,9 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
       email: _emailTextEditingController.text.trim(),
       callback: () {
         Get.to(() => OtpScreenPage(
-          mobileNumber: mobile,
-          isLogin: false,
-        ));
+              mobileNumber: mobile,
+              isLogin: false,
+            ));
       },
     );
   }

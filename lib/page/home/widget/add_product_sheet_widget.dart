@@ -148,9 +148,9 @@ class _AddProductSheetWidgetState extends State<AddProductSheetWidget> {
                                     0,
                                 itemBuilder: (context, index) {
                                   isAddForProduct = _homeController
-                                      .getServiceProductModel
-                                      .data?[index]
-                                      .isAddedToCart ??
+                                          .getServiceProductModel
+                                          .data?[index]
+                                          .isAddedToCart ??
                                       false;
                                   return Padding(
                                     padding: const EdgeInsets.symmetric(
@@ -284,7 +284,7 @@ class _AddProductSheetWidgetState extends State<AddProductSheetWidget> {
                                 : const SizedBox(),
                             GestureDetector(
                               onTap: () {
-                                Get.back();
+                                Navigator.of(context).maybePop();
                               },
                               child: Container(
                                 height: 45,

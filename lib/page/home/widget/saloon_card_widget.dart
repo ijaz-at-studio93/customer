@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +13,6 @@ import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'dart:async';
 import 'package:flutter/gestures.dart';
-import 'package:salon_customer/util/cached_image_widget.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class SaloonCardWidget extends StatefulWidget {
@@ -49,32 +46,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0, viewportFraction: 1.0);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _maybeStartAutoPlay();
-      _precacheImages();
-    });
-  }
-
-  /// Pre-load the first 2 images into memory cache so they appear instantly.
-  /// Must use ResizeImage with the same dimensions that CachedNetworkImage
-  /// uses internally (via memCacheHeight / memCacheWidth), otherwise the
-  /// cache keys won't match and the precache is wasted.
-  void _precacheImages() {
-    final images = _getImageList(widget.homeSalonModel);
-    final imageHeight = Get.height * 0.30;
-    final toPrefetch = images.length >= 2 ? 2 : images.length;
-    for (int i = 0; i < toPrefetch; i++) {
-      try {
-        precacheImage(
-          ResizeImage(
-            CachedNetworkImageProvider(images[i]),
-            height: (imageHeight * 2).toInt(),
-            width: 500,
-          ),
-          context,
-        );
-      } catch (_) {}
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartAutoPlay());
   }
 
   @override
@@ -99,7 +71,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   // --- helpers ---
   List<String> _getImageList(HomeSalonDataList model) {
     final imgs = <String>[];
-    // prefer a list property `images` if exists
+    // prefer a list property ⁠ images ⁠ if exists
     try {
       final dynamic candidate = model.images;
       if (candidate is List && candidate.isNotEmpty) {
@@ -170,7 +142,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
 
   Widget _buildImageCarousel(BuildContext context) {
     final images = _getImageList(widget.homeSalonModel);
-    final imageHeight = 183.0;//Get.height * 0.30; // EXACT original height
+    final imageHeight = 183.0; //Get.height * 0.30; // EXACT original height
 
     if (images.isEmpty) {
       return ClipRRect(
@@ -212,7 +184,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                 },
                 itemBuilder: (context, index) {
                   final imageUrl = images[index];
-                  // replace the existing `return SizedBox(...)` inside itemBuilder with this:
+                  // replace the existing ⁠ return SizedBox(...) ⁠ inside itemBuilder with this:
                   return GestureDetector(
                     onTap: widget
                         .onPress, // restore image tap (calls same callback as whole card)
@@ -223,59 +195,53 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     child: SizedBox(
                       width: Get.width,
                       height: imageHeight,
-                      child: ExtendedCachedNetworkImage(
-                          key: ValueKey(imageUrl),
-                          imageUrl: imageUrl,
+                      child: CachedNetworkImage(
+                        imageUrl: imageUrl,
+                        width: Get.width,
+                        height: imageHeight,
+                        fit: BoxFit.fitWidth,
+                        placeholder: (c, u) => Image.asset(
+                          AssetsConstant.placeHolder,
+                          width: Get.width,
                           height: imageHeight,
-                          fit: BoxFit.cover,
-                          cacheKey: imageUrl,
-                          memoryManagementLevel:
-                              MemoryManagementLevel.aggressive,
-                          placeholder: (c, u) {
-                            log('placeholder: $u');
-                            return Image.asset(
-                              AssetsConstant.placeHolder,
-                              height: imageHeight,
-                              fit: BoxFit.fitWidth,
-                            );
-                          },
-                          errorWidget: (c, u, e) {
-                            log('errorWidget: $u');
-                            return Image.asset(
-                              AssetsConstant.placeHolder,
-                              height: imageHeight,
-                              fit: BoxFit.fitWidth,
-                            );
-                          }),
+                          fit: BoxFit.fitWidth,
+                        ),
+                        errorWidget: (c, u, e) => Image.asset(
+                          AssetsConstant.placeHolder,
+                          width: Get.width,
+                          height: imageHeight,
+                          fit: BoxFit.fitWidth,
+                        ),
+                      ),
                     ),
                   );
                 },
               ),
 
               // gradient overlay (single copy inside carousel)
-              // Positioned.fill(
-              //   child: IgnorePointer(
-              //     ignoring: true,
-              //     child: Container(
-              //       alignment: Alignment.bottomCenter,
-              //       child: Container(
-              //         width: Get.width,
-              //         height: Get.height * 0.25, // same overlay as original
-              //         decoration: BoxDecoration(
-              //           gradient: LinearGradient(
-              //             begin: Alignment.bottomCenter,
-              //             end: Alignment.topCenter,
-              //             colors: [
-              //               ColorConstant.blackColor,
-              //               Colors.black.withOpacity(0),
-              //               Colors.black.withOpacity(0),
-              //             ],
-              //           ),
-              //         ),
-              //       ),
-              //     ),
-              //   ),
-              // ),
+              Positioned.fill(
+                child: IgnorePointer(
+                  ignoring: true,
+                  child: Container(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      width: Get.width,
+                      height: Get.height * 0.25, // same overlay as original
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.bottomCenter,
+                          end: Alignment.topCenter,
+                          colors: [
+                            ColorConstant.blackColor,
+                            Colors.black.withOpacity(0),
+                            Colors.black.withOpacity(0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
               // dots indicator
               if (images.length > 1)
                 Positioned(
@@ -366,7 +332,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   //     context: context,
   //     barrierDismissible: true,
   //     barrierColor: Colors.black.withOpacity(0.35),
-  //     pageBuilder: (_, __, ___) {
+  //     pageBuilder: (, _, _) {
   //       return Center(
   //         child: Container(
   //           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -391,7 +357,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   //   );
   //
   //   Future.delayed(const Duration(seconds: 3), () {
-  //     if (Get.isDialogOpen == true) Get.back();
+  //     if (Get.isDialogOpen == true) Navigator.of(context).maybePop();
   //   });
   // }
 
@@ -416,32 +382,23 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
         child: GestureDetector(
           onTap: widget.onPress,
           child: Container(
-            width: Get.width,
+            width: 368, //Get.width,
+            height: 265,
             decoration: BoxDecoration(
               color: ColorConstant.crossMarkColor,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: ColorConstant.strokeColor, width: 1.5),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender),
+                )!,
+                width: 1.5,
+              ),
             ),
             child: Column(
               children: [
                 Stack(
                   children: [
                     _buildImageCarousel(context),
-                    // Container(
-                    //   decoration: BoxDecoration(
-                    //     gradient: LinearGradient(
-                    //       begin: Alignment.bottomCenter,
-                    //       end: Alignment.topCenter,
-                    //       colors: [
-                    //         ColorConstant.blackColor,
-                    //         Colors.black.withOpacity(0),
-                    //         Colors.black.withOpacity(0),
-                    //       ],
-                    //     ),
-                    //   ),
-                    //   width: Get.width,
-                    //   height: Get.height * 0.25,
-                    // ),
                     Positioned(
                       top: 10,
                       right: 10,
@@ -483,279 +440,20 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                       ),
                     ),
                     Positioned(
-                      bottom: 10,
-                      left: 15,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.star,
-                            color: ColorConstant.yellowColor,
-                            size: 20,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            (widget.homeSalonModel.averageArtistRatings ?? 0)
-                                .toStringAsFixed(2),
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 11, color: ColorConstant.yellowColor),
-                          ),
-                          const SizedBox(width: 5),
-                          Text(
-                            'Average Stylist Rating',
-                            style: AppTextTheme.medium.copyWith(
-                                fontSize: 13, color: ColorConstant.whiteColor),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            width: Get.width * 0.5,
-                            child: Text(
-                              '${widget.homeSalonModel.name}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              textScaler: const TextScaler.linear(0.85),
-                              style: AppTextTheme.bold.copyWith(
-                                  fontSize: 19,
-                                  color: ColorConstant.blackColor),
-                            ),
-                          ),
-                          const SizedBox(height: 5),
-                          Text(
-                            "${(widget.homeSalonModel.distance! / 1000 * 10).roundToDouble() / 10} K.M. • ${widget.homeSalonModel.homeService == true ? "Available for Home" : "Available at Salon"}",
-                            style: AppTextTheme.medium.copyWith(
-                                color: ColorConstant.grayTextColor,
-                                fontSize: 13),
-                          ),
-                          const SizedBox(height: 5),
-                          Row(
-                            children: [
-                              Text(
-                                "Starting From",
-                                style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.grayTextColor,
-                                    fontSize: 13),
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                "₹${widget.homeSalonModel.serviceStartingPrice} Onwards",
-                                style: AppTextTheme.bold.copyWith(
-                                    color: changeTheme(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.gender)),
-                                    fontSize: 13),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(
-                              height:
-                                  5), /* Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Image.asset(
-                              AssetsConstant.locationNewIcon,
-                              height: 15,
-                              width: 15,
-                              color: changeTheme(SharedPrefs.readStringValue(
-                                  PrefConstants.gender)),
-                            ),
-                            const SizedBox(width: 8),
-                            SizedBox(
-                              width: Get.width * 0.75,
-                              child: Text(
-                                '${widget.homeSalonModel.address}',
-                                style: AppTextTheme.medium.copyWith(
-                                    fontSize: 13,
-                                    color: ColorConstant.grayTextColor),
-                              ),
-                            ),
-                          ],
-                        ),*/
-                        ],
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            height: 28,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
-                            decoration: BoxDecoration(
-                              color: ColorConstant.greenColor,
-                              borderRadius:
-                                  BorderRadius.circular(14), // 👈 pill shape
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                const Icon(
-                                  Icons.star,
-                                  color: ColorConstant.whiteColor,
-                                  size: 14,
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  widget.homeSalonModel.rating
-                                          ?.toStringAsFixed(1) ??
-                                      "0.0",
-                                  style: AppTextTheme.medium.copyWith(
-                                    color: ColorConstant.whiteColor,
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            " ${_formatReviewCount(widget.homeSalonModel.reviewCount ?? 0)} Reviews",
-                            style: AppTextTheme.medium.copyWith(
-                              fontSize: 12,
-                              color: ColorConstant.blackColor,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Dash(
-                  direction: Axis.horizontal,
-                  length: Get.width * 0.8,
-                  dashLength: 2,
-                  dashColor: ColorConstant.grayTextColor,
-                ),
-                Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 10),
-                    child: Row(
-                      children: [
-                        Image.asset(
-                          AssetsConstant.newOfferIcon,
-                          width: 20,
-                          height: 20,
-                        ),
-                        const SizedBox(width: 8),
-                        Builder(
-                          builder: (_) {
-                            final discountText = _getHighestDiscountForSalon();
-
-                            if (discountText.isEmpty) return const SizedBox();
-
-                            return Text(
-                              discountText,
-                              style: AppTextTheme.bold.copyWith(
-                                color: ColorConstant.offerTextColor,
-                                fontSize: 13,
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ))
-              ],
-            ),
-          ),
-        ),
-      ),
-        if (visiblePercentage > 80) {
-          // ✅ Mostly visible → allow autoplay
-          _maybeStartAutoPlay();
-          //_maybeShowLongPressHint(context);
-        } else {
-          // ❌ Partially visible → stop autoplay
-          _stopAutoPlay();
-        }
-      },
-      child: void Padding(
-        padding = const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
-        child = GestureDetector(
-          onTap: widget.onPress,
-          child: Container(
-            width: 368,//Get.width,
-            height: 265,
-            decoration: BoxDecoration(
-              color: ColorConstant.crossMarkColor,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender),
-                )!,
-                width: 1.5,
-              ),
-            ),
-            child: Column(
-              children: [
-                Stack(
-                  children: [
-                    _buildImageCarousel(context),
-                    Positioned(
-                      top: 10,
-                      right: 10,
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            widget.homeSalonModel.isFavourite =
-                            !(widget.homeSalonModel.isFavourite ?? false);
-                            if (widget.homeSalonModel.isFavourite ?? false) {
-                              _homeController.doAddFavouriteSalon(
-                                  salonId: widget.homeSalonModel.id ?? "");
-                            } else {
-                              _homeController.doRemoveFavouriteSalon(
-                                  callback: () {},
-                                  salonId: widget.homeSalonModel.id ?? "");
-                            }
-                          });
-                        },
-                        child: Container(
-                          width: 38,
-                          height: 38,
-                          decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: ColorConstant.blackColor),
-                          child: Center(
-                            child: widget.homeSalonModel.isFavourite ?? false
-                                ? const Icon(
-                              CupertinoIcons.heart_fill,
-                              color: Colors.red,
-                            )
-                                : Image.asset(
-                              AssetsConstant.likeBlank,
-                              height: 20,
-                              width: 20,
-                              color: ColorConstant.whiteColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
                       top: 17,
                       left: 1,
                       child: Container(
                         //height: 18,
-                        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 5),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.7), // ✅ Figma color
-                          borderRadius: BorderRadius.circular(4), // ✅ pill shape
+                          borderRadius:
+                              BorderRadius.circular(4), // ✅ pill shape
                         ),
                         child: Row(
-                          mainAxisSize: MainAxisSize.min, // ✅ important (no full width)
+                          mainAxisSize:
+                              MainAxisSize.min, // ✅ important (no full width)
                           children: [
                             Image.asset(
                               AssetsConstant.newOfferIcon,
@@ -763,20 +461,23 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                               height: 18,
                             ),
                             const SizedBox(width: 4),
-
                             Builder(
                               builder: (_) {
-                                final discountText = _getHighestDiscountForSalon();
+                                final discountText =
+                                    _getHighestDiscountForSalon();
 
-                                if (discountText.isEmpty) return const SizedBox();
+                                if (discountText.isEmpty)
+                                  return const SizedBox();
 
                                 return Text(
                                   discountText,
                                   style: AppTextTheme.bold.copyWith(
-                                    fontFamily: "Inter",           // ✅ Figma font
-                                    fontWeight: FontWeight.w900,   // ✅ Black weight
-                                    fontSize: 12,                  // ✅ exact size
-                                    color: const Color(0xFFE800E4), // ✅ exact color
+                                    fontFamily: "Inter", // ✅ Figma font
+                                    fontWeight:
+                                        FontWeight.w900, // ✅ Black weight
+                                    fontSize: 12, // ✅ exact size
+                                    color: const Color(
+                                        0xFFE800E4), // ✅ exact color
                                   ),
                                 );
                               },
@@ -796,7 +497,6 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-
                           /// TOP CONTENT
                           SizedBox(
                             width: Get.width * 0.65,
@@ -875,7 +575,8 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                                   fontWeight: FontWeight.w700,
                                   fontSize: 14,
                                   color: changeTheme(
-                                    SharedPrefs.readStringValue(PrefConstants.gender),
+                                    SharedPrefs.readStringValue(
+                                        PrefConstants.gender),
                                   ),
                                 ),
                               ),
@@ -883,7 +584,6 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           ),
                         ],
                       ),
-
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -892,7 +592,8 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                             padding: const EdgeInsets.symmetric(horizontal: 12),
                             decoration: BoxDecoration(
                               color: ColorConstant.greenColor,
-                              borderRadius: BorderRadius.circular(10), // 👈 pill shape
+                              borderRadius:
+                                  BorderRadius.circular(10), // 👈 pill shape
                             ),
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
@@ -906,13 +607,15 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                                 ),
                                 const SizedBox(width: 2),
                                 Text(
-                                  widget.homeSalonModel.rating?.toStringAsFixed(1) ?? "0.0",
+                                  widget.homeSalonModel.rating
+                                          ?.toStringAsFixed(1) ??
+                                      "0.0",
                                   style: AppTextTheme.medium.copyWith(
-                                    fontFamily: "Outfit",        // ✅ Figma font
+                                    fontFamily: "Outfit", // ✅ Figma font
                                     fontWeight: FontWeight.w600, // ✅ SemiBold
-                                    fontSize: 16,                // ✅ correct size
+                                    fontSize: 16, // ✅ correct size
                                     color: ColorConstant.whiteColor,
-                                    height: 1.2,                   // ✅ keeps it vertically tight
+                                    height: 1.2, // ✅ keeps it vertically tight
                                   ),
                                 ),
                               ],
@@ -920,7 +623,6 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           ),
 
                           const SizedBox(height: 4),
-
 
                           Center(
                             child: Text(
@@ -941,9 +643,11 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                             width: 40, // 🔥 adjust based on text width
                             decoration: BoxDecoration(
                               color: changeTheme(
-                                SharedPrefs.readStringValue(PrefConstants.gender),
+                                SharedPrefs.readStringValue(
+                                    PrefConstants.gender),
                               ), // ✅ Figma purple
-                              borderRadius: BorderRadius.circular(10), // 👈 rounded ends
+                              borderRadius:
+                                  BorderRadius.circular(10), // 👈 rounded ends
                             ),
                           ),
                         ],

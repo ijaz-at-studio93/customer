@@ -39,7 +39,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
         backgroundColor: ColorConstant.whiteColor,
         leading: IconButton(
           onPressed: () {
-            Get.back();
+            Navigator.of(context).maybePop();
           },
           icon: const Icon(
             Icons.arrow_back_ios,
@@ -63,8 +63,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
                 child: Container(
                   height: 1,
                   width: Get.width,
-                  color: changeTheme(SharedPrefs.readStringValue(
-                      PrefConstants.gender)) ??
+                  color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
                       ColorConstant.primaryColor,
                 ),
               ),
@@ -77,8 +77,8 @@ class _AddAddressPageState extends State<AddAddressPage> {
                 child: Container(
                   height: 1,
                   width: Get.width,
-                  color: changeTheme(SharedPrefs.readStringValue(
-                      PrefConstants.gender)) ??
+                  color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
                       ColorConstant.primaryColor,
                 ),
               ),
@@ -104,7 +104,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
                                           .data?[index]
                                           .id ??
                                       "";
-                                  Get.back();
+                                  Navigator.of(context).maybePop();
                                 }
                               },
                               saveAddressList: _homeController
@@ -119,7 +119,7 @@ class _AddAddressPageState extends State<AddAddressPage> {
   }
 
   /*-----------   Add Address --------------*/
-  addAddress() {
+  GestureDetector addAddress() {
     return GestureDetector(
       onTap: () {
         Get.to(() => GetLocationPage(
@@ -146,16 +146,20 @@ class _AddAddressPageState extends State<AddAddressPage> {
           children: [
             Row(
               children: [
-                  Icon(Icons.add, color: changeTheme(SharedPrefs.readStringValue(
-                    PrefConstants.gender)) ??
-                    ColorConstant.primaryColor,),
+                Icon(
+                  Icons.add,
+                  color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
+                ),
                 const SizedBox(width: 10),
                 Text(
                   "Add Address",
-                  style: AppTextTheme.medium
-                      .copyWith(color: changeTheme(SharedPrefs.readStringValue(
-                      PrefConstants.gender)) ??
-                      ColorConstant.primaryColor,),
+                  style: AppTextTheme.medium.copyWith(
+                    color: changeTheme(SharedPrefs.readStringValue(
+                            PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
+                  ),
                 ),
               ],
             ),

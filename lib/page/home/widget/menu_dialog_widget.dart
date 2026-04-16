@@ -26,6 +26,7 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
   void initState() {
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -81,9 +82,10 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
                 /// 🔹 GRID
                 Expanded(
                   child: GridView.builder(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 80), // 👈 bottom safe space
+                    padding: const EdgeInsets.fromLTRB(
+                        20, 10, 20, 80), // 👈 bottom safe space
                     gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 4,
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 15,
@@ -97,22 +99,21 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
                           setState(() {
                             final item = widget.categoryListData.data![index];
                             item.isSelectCategory =
-                            !(item.isSelectCategory ?? false);
+                                !(item.isSelectCategory ?? false);
 
                             if (item.isSelectCategory ?? false) {
                               _homeController.categoryId.add(item.id);
                             } else {
                               _homeController.categoryId.remove(item.id);
                               _homeController.doRemovePackageData(
-                              serviceCategoryIds: [item.id ?? ""],
-                              callback: () {
-                                _homeController.doGetMakePackageData();
-                              },
+                                serviceCategoryIds: [item.id ?? ""],
+                                callback: () {
+                                  _homeController.doGetMakePackageData();
+                                },
                               );
                             }
                           });
                         },
-
                       );
                     },
                   ),
@@ -128,55 +129,56 @@ class _MenuDialogWidgetState extends State<MenuDialogWidget> {
               child: Center(
                 child: _homeController.categoryId.isNotEmpty
                     ? GestureDetector(
-                  onTap: () {
-                    widget.callback.call();
-                    Get.back();
-                  },
-                  child: Container(
-                    width: 124,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender),
-                      ),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Center(
-                      child: Text(
-                        "Done",
-                        style: TextStyle(
-                          fontFamily: "Outfit",
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: Colors.white,
+                        onTap: () {
+                          widget.callback.call();
+                          Navigator.of(context).maybePop();
+                        },
+                        child: Container(
+                          width: 124,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender),
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              "Done",
+                              style: TextStyle(
+                                fontFamily: "Outfit",
+                                fontWeight: FontWeight.w600,
+                                fontSize: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : GestureDetector(
+                        onTap: () {
+                          _homeController.categoryId.clear();
+                          debugPrint(
+                              "categoryId AFTER → ${_homeController.categoryId}");
+                          Navigator.of(context).maybePop();
+                        },
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender),
+                            ),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              CupertinoIcons.xmark,
+                              color: ColorConstant.whiteColor,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                  ),
-                )
-                    : GestureDetector(
-                  onTap: () {
-                    _homeController.categoryId.clear();
-                    debugPrint("categoryId AFTER → ${_homeController.categoryId}");
-                    Get.back();
-                  },
-                  child: Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender),
-                      ),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        CupertinoIcons.xmark,
-                        color: ColorConstant.whiteColor,
-                      ),
-                    ),
-                  ),
-                ),
               ),
             ),
           ],

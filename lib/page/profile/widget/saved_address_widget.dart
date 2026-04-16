@@ -115,13 +115,13 @@ class _SavedAddressWidgetState extends State<SavedAddressWidget> {
                                   descriptionText:
                                       "Are You Sure You Want to Remove this Address.",
                                   noPress: () {
-                                    Get.back();
+                                    Navigator.of(context).maybePop();
                                   },
                                   yesPress: () {
                                     _homeController.doDeleteSaveAddress(
                                         id: widget.saveAddressList.id ?? "",
                                         callback: () {
-                                          Get.back();
+                                          Navigator.of(context).maybePop();
                                           _homeController.doGetSaveAddress();
                                         });
                                   });

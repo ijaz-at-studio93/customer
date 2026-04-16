@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 
 class ColorConstant {
   static const Color primaryColor =  Color(0xFF8466CF);
+  /// Design-spec name used in shared dialog layouts (same accent as [primaryColor]).
+  static const Color primaryColor2 = primaryColor;
   static const Color blackColor = Color(0xFF222222);
   static const Color whiteColor = Colors.white;
   static const Color borderColor = Color(0xffE5E5E5);

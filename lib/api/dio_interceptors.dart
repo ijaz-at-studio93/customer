@@ -8,7 +8,6 @@ import 'package:salon_customer/project_specific/no_internet_connection.dart';
 import '../controller/auth_controller.dart';
 import 'dio_connectivity_request_retrier.dart';
 
-
 class RetryOnConnectionChangeInterceptor extends Interceptor {
   final DioConnectivityRequestRetrier requestRetrier;
 
@@ -33,13 +32,14 @@ class RetryOnConnectionChangeInterceptor extends Interceptor {
           /*Get.dialog(
             NoInternetConnectionDialog(callbackPosBtn: () {
               Get.find<AuthController>().setIsDialogShow = true;
-              Get.back();
+              Navigator.of(context).maybePop();
             }),
             barrierDismissible: false,
           );*/
           Get.find<AuthController>().setIsDialogShow = false;
         }
-        Response response = await requestRetrier.scheduleRequestRetry(err.requestOptions);
+        Response response =
+            await requestRetrier.scheduleRequestRetry(err.requestOptions);
         return handler.resolve(response);
       } catch (e) {
         debugPrint(e.toString());
@@ -53,8 +53,8 @@ class RetryOnConnectionChangeInterceptor extends Interceptor {
   }
 
   bool _shouldRetry(DioException err) {
-    return  err.type == DioExceptionType.connectionError ||
-        err.error != null || 
+    return err.type == DioExceptionType.connectionError ||
+        err.error != null ||
         err.error is SocketException;
   }
 }

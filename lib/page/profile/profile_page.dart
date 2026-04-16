@@ -42,7 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return CallWrapper(
-      child:PopScope(
+      child: PopScope(
         canPop: true,
         onPopInvoked: (didPop) {
           widget.callback.call();
@@ -54,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
             backgroundColor: ColorConstant.whiteColor,
             leading: IconButton(
               onPressed: () {
-                Get.back();
+                Navigator.of(context).maybePop();
                 widget.callback.call();
               },
               icon: const Icon(
@@ -70,7 +70,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           body: Obx(
-                () => ProgressContainerView(
+            () => ProgressContainerView(
               isProgressRunning: _authController.showProgress,
               child: SingleChildScrollView(
                 child: Column(
@@ -87,10 +87,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         name: "Favourite Salon",
                         onPress: () {
                           Get.to(() => FavouriteSalonPage(
-                            callback: () {
-                              widget.callback.call();
-                            },
-                          ));
+                                callback: () {
+                                  widget.callback.call();
+                                },
+                              ));
                         }),
                     const Divider(
                         color: ColorConstant.garyDividerColor,
@@ -124,8 +124,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         name: "Address",
                         onPress: () {
                           Get.to(() => const AddAddressPage(
-                            isSelect: false,
-                          ));
+                                isSelect: false,
+                              ));
                         }),
                     const Divider(
                         color: ColorConstant.garyDividerColor,
@@ -163,7 +163,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               builder: (context) {
                                 return LogOutDialog(
                                   noPress: () {
-                                    Get.back();
+                                    Navigator.of(context).maybePop();
                                   },
                                   yesPress: () {
                                     _authController.resetApp();
@@ -182,7 +182,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   /*------------ Image Row Widget -----------*/
-  _imageRowWidget() {
+  Padding _imageRowWidget() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Row(
@@ -194,7 +194,7 @@ class _ProfilePageState extends State<ProfilePage> {
               height: 66,
               fit: BoxFit.cover,
               imageUrl:
-              "${APIConstants.image}${_authController.getUserProfile.data?.profileImage ?? ""}",
+                  "${APIConstants.image}${_authController.getUserProfile.data?.profileImage ?? ""}",
               placeholder: (context, url) => const Image(
                 image: AssetImage(AssetsConstant.placeHolder),
                 width: 66,
@@ -230,7 +230,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     borderRadius: BorderRadius.circular(68),
                     border: Border.all(
                         color: changeTheme(SharedPrefs.readStringValue(
-                            PrefConstants.gender)) ??
+                                PrefConstants.gender)) ??
                             ColorConstant.primaryColor,
                         width: 1),
                   ),
@@ -249,7 +249,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         "Edit Details",
                         style: AppTextTheme.regular.copyWith(
                             color: changeTheme(SharedPrefs.readStringValue(
-                                PrefConstants.gender)) ??
+                                    PrefConstants.gender)) ??
                                 ColorConstant.primaryColor,
                             fontSize: 13),
                       )
@@ -265,7 +265,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   /*--------------- List Tile Widget ------------- */
-  _listTitleWidget({
+  Padding _listTitleWidget({
     required String image,
     required String name,
     required VoidCallback onPress,

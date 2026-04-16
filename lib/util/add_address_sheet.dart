@@ -25,7 +25,9 @@ class AddAddressSheet extends StatefulWidget {
       required this.longitude,
       required this.callback,
       required this.addressId,
-      required this.isEdit, required this.house, required this.direction});
+      required this.isEdit,
+      required this.house,
+      required this.direction});
 
   @override
   State<AddAddressSheet> createState() => _AddAddressSheetState();
@@ -36,13 +38,12 @@ class _AddAddressSheetState extends State<AddAddressSheet> {
   final _description = TextEditingController();
   final _homeController = Get.find<HomeController>();
 
-
   @override
   void initState() {
     super.initState();
-    if(widget.isEdit){
-      _flatHouseNo.text  =  widget.house;
-      _description.text  =  widget.direction;
+    if (widget.isEdit) {
+      _flatHouseNo.text = widget.house;
+      _description.text = widget.direction;
     }
   }
 
@@ -117,8 +118,8 @@ class _AddAddressSheetState extends State<AddAddressSheet> {
                                             widget.latitude.toString(),
                                         house: _flatHouseNo.text,
                                         callback: () {
-                                          Get.back();
-                                          Get.back();
+                                          Navigator.of(context).maybePop();
+                                          Navigator.of(context).maybePop();
                                           widget.callback.call();
                                         });
                                   } else {
@@ -131,8 +132,8 @@ class _AddAddressSheetState extends State<AddAddressSheet> {
                                             widget.latitude.toString(),
                                         house: _flatHouseNo.text,
                                         callback: () {
-                                          Get.back();
-                                          Get.back();
+                                          Navigator.of(context).maybePop();
+                                          Navigator.of(context).maybePop();
                                           widget.callback.call();
                                         });
                                   }
@@ -175,7 +176,7 @@ class _AddAddressSheetState extends State<AddAddressSheet> {
   }
 
   /*------------ Saloon Address TextField -----------*/
-  _address({
+  Padding _address({
     required TextEditingController textEditingController,
     required String hintText,
     required String title,

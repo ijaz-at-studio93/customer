@@ -6,6 +6,8 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
+import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/page/appointment/qr_page.dart';
 import 'package:salon_customer/page/auth/login_page.dart';
 import 'package:salon_customer/page/bottom_navigation_bar.dart';
 import 'package:salon_customer/project_specific/ProgressContainerView.dart';
@@ -37,13 +39,13 @@ class _SplashPageState extends State<SplashPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Obx(
-            () => ProgressContainerView(
+        () => ProgressContainerView(
           isProgressRunning: _authController.showProgress,
           child: Container(
             height: Get.height,
             width: Get.width,
             color:
-            changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+                changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
             child: Center(
               child: Text(
                 "SCUTS",
@@ -58,20 +60,65 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   /*-------------- Route For Welcome Page -----------------*/
-  route() {
+  Future<void> route() async {
+    if (!SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
+      _pushLaunchPage(
+        const LoginPage(
+          splashPage: true,
+        ),
+      );
+      return;
+    }
+
+    final saved =
+        SharedPrefs.readStringValue(PrefConstants.resumePayBillAppointmentId);
+    if (saved.isEmpty) {
+      _pushLaunchPage(const BottomNavBarPage());
+      return;
+    }
+
+    final homeController = Get.find<HomeController>();
+    await homeController.doGetCurrentBookingListData();
+
+    if (!mounted) return;
+
+    if (!_savedBookingStillPendingPay(homeController, saved)) {
+      await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
+      _pushLaunchPage(const BottomNavBarPage());
+      return;
+    }
+
+    _pushLaunchPage(
+      QRCodePage(
+        appointmentId: saved,
+        isBooking: false,
+      ),
+    );
+  }
+
+  bool _savedBookingStillPendingPay(HomeController c, String appointmentId) {
+    final bookings = c.getCurrentBookingListModel.data ?? [];
+    for (final b in bookings) {
+      if (b.appointmentId == appointmentId &&
+          b.paymentStatus == "pending" &&
+          (b.orderStatus == "pending" || b.orderStatus == "confirmed")) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  void _pushLaunchPage(Widget child) {
     Navigator.pushAndRemoveUntil(
-        context,
-        PageTransition(
-            child: SharedPrefs.readBoolValue(PrefConstants.isUserLogin)
-                ? const BottomNavBarPage()
-                : const LoginPage(
-              splashPage: true,
-            ),
-            alignment: Alignment.center,
-            duration: const Duration(milliseconds: 800),
-            // type: PageTransitionType.rightToLeftWithFade
-            type: PageTransitionType.size),
-            (route) => false);
+      context,
+      PageTransition(
+        child: child,
+        alignment: Alignment.center,
+        duration: const Duration(milliseconds: 800),
+        type: PageTransitionType.size,
+      ),
+      (route) => false,
+    );
   }
 
   /*-------------- GET VERSION  APP -------------------*/
@@ -108,22 +155,21 @@ class _SplashPageState extends State<SplashPage> {
       final serverVersion =
           _authController.getAppUpdateModel.data?.userAppLatestVersion;
 
-      if (serverVersion != null &&
-          isUpdateRequired(data, serverVersion)) {
-
-        if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ?? false) {
+      if (serverVersion != null && isUpdateRequired(data, serverVersion)) {
+        if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ??
+            false) {
           _forceUpdateDialog();
         } else {
           _normalUpdateDialog();
         }
-
       } else {
         route();
       }
     });
   }
+
   /*---------------  Force Update Widget ---------------*/
-  _forceUpdateDialog() async {
+  Future<dynamic> _forceUpdateDialog() async {
     return Get.defaultDialog(
         title: "ABOUT UPDATE",
         barrierDismissible: false,
@@ -211,7 +257,7 @@ class _SplashPageState extends State<SplashPage> {
               child: ButtonWidget(
                   buttonTitleText: "UPDATE",
                   onPress: () {
-                    Get.back();
+                    Navigator.of(context).maybePop();
                     _launchURL();
                   }),
             )
@@ -220,7 +266,7 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   /*---------------  Force Update Dialog -------------*/
-  _normalUpdateDialog() async {
+  Future<dynamic> _normalUpdateDialog() async {
     return Get.defaultDialog(
       barrierDismissible: false,
       title: "Update Info",
@@ -231,7 +277,7 @@ class _SplashPageState extends State<SplashPage> {
       ),
       confirm: TextButton(
           onPressed: () {
-            Get.back();
+            Navigator.of(context).maybePop();
             _launchURL();
           },
           child: Text(

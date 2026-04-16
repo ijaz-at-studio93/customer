@@ -49,5 +49,8 @@ class PrefConstants {
   static const String isHomeService = "homeService";
   static const String latitude = "latitude";
   static const String longitude = "longitude";
-
+  static const String hasVisitedSalon = "hasVisitedSalon";
+  static const String hasShownSalonDialog = "hasShownSalonDialog";
+  /// Set while user is on pay bill (`QRCodePage`); used to resume after app kill.
+  static const String resumePayBillAppointmentId = "resumePayBillAppointmentId";
 }
