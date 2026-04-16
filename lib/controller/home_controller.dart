@@ -920,6 +920,11 @@ class HomeController extends GetxController {
     return total;
   }
 
+  /// When the cart salon is not GST-registered, service GST is not applied.
+  /// If `isGSTRegistered` is absent (null), GST is included for backward compatibility.
+  bool get isCartSalonGstRegistered =>
+      getServiceAddCartModel.data?.salon?.isGSTRegistered ?? true;
+
   double getTotalPrice() {
     final data = getServiceAddCartModel.data;
 
@@ -927,7 +932,7 @@ class HomeController extends GetxController {
     final double gst = (data?.cartTaxDetails?.totalTaxAmount ?? 0).toDouble();
     final double platformFee = (data?.platformFee ?? 0).toDouble();
 
-    return subtotal + gst + platformFee;
+    return subtotal + (isCartSalonGstRegistered ? gst : 0.0) + platformFee;
   }
 
   double getPriceNoGST() {

@@ -10,6 +10,7 @@ import 'package:salon_customer/util/NoItemsWidget.dart';
 
 import '../../project_specific/progressbar_view.dart';
 import 'widget/artist_rating_list_tile.dart';
+import 'package:salon_customer/service/analytics_service.dart';
 
 class CompleteBookingDetailsView extends StatefulWidget {
   final String appointmentId;
@@ -32,6 +33,16 @@ class _CompleteBookingDetailsViewState
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doGetReviewDataList(appointmentId: widget.appointmentId);
+
+      // 📊 service_completed — booking is already done when this screen opens
+      try {
+        final qrData = _homeController.getUserBookingQrCodeModel.data;
+        AnalyticsService.instance.logServiceCompleted(
+          bookingId: qrData?.idx ?? widget.appointmentId,
+          finalAmount: (qrData?.orderAmount ?? 0).toDouble(),
+          paymentMode: qrData?.paymentStatus ?? 'unknown',
+        );
+      } catch (_) {}
     });
   }
 

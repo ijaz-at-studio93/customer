@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -104,6 +105,16 @@ void main() async {
   Get.put(HomeController());
   await GetStorage.init();
   await Get.find<AuthController>().initUserData();
+
+  // Set Firebase Analytics user ID once auth is loaded
+  try {
+    final userId =
+        Get.find<AuthController>().userResponseModel.data?.userData?.userId;
+    if (userId != null && userId.isNotEmpty) {
+      await FirebaseAnalytics.instance.setUserId(id: userId);
+    }
+  } catch (_) {}
+
   await FirebaseMessaging.instance.setAutoInitEnabled(true);
   FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
   await PushNotificationService().setupInteractedMessage();
@@ -169,17 +180,19 @@ class _MyAppState extends State<MyApp> {
         }
       }
 
-      final token = await FirebaseMessaging.instance.getToken();
-      if (token != null) {
-        await SharedPrefs.writeValue(PrefConstants.fcmToken, token);
-        print('FCM Token: $token');
-      } else {
-        debugPrint(
-          'FCM Token: null — iOS: enable Push Notifications + upload APNs key in '
-          'Firebase Console; use a real device or simulator with push support; '
-          'Android: use an emulator image with Google Play.',
-        );
-      }
+      try {
+        final token = await FirebaseMessaging.instance.getToken();
+        if (token != null) {
+          await SharedPrefs.writeValue(PrefConstants.fcmToken, token);
+          print('FCM Token: $token');
+        } else {
+          debugPrint(
+            'FCM Token: null — iOS: enable Push Notifications + upload APNs key in '
+            'Firebase Console; use a real device or simulator with push support; '
+            'Android: use an emulator image with Google Play.',
+          );
+        }
+      } catch (e) {}
     } catch (e, st) {
       debugPrint('FCM getToken failed: $e');
       debugPrint('$st');

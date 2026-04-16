@@ -96,6 +96,8 @@ class AuthAPI {
       {required String mobile,
       required String cc,
       required String verificationCode}) async {
+    print(
+        '🔥 AuthAPI: login: ${SharedPrefs.readStringValue(PrefConstants.fcmToken)}');
     final response = await DioClient.client
         .post('auth/user/login/mobile-verification-code', data: {
       "mobile": mobile,

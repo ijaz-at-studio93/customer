@@ -30,6 +30,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:salon_customer/service/analytics_service.dart';
 
 class SaloonAfterSelectingServicesPage extends StatefulWidget {
   final String id;
@@ -94,6 +95,15 @@ class _SaloonAfterSelectingServicesPageState
       } catch (_) {
         // ignore fetch error here; still attempt to parse whatever is available
       }
+
+      // 📊 view_item — salon page opened
+      try {
+        final salonData = _homeController.homeSalonDetailsData.data;
+        AnalyticsService.instance.logViewItem(
+          salonId: widget.id,
+          salonName: salonData?.displayName ?? salonData?.name ?? '',
+        );
+      } catch (_) {}
 
       // load other data (you can await these too if they return futures)
       try {
@@ -2256,6 +2266,27 @@ class _SaloonAfterSelectingServicesPageState
                                                                     salonId:
                                                                         widget
                                                                             .id);
+                                                            // 📊 select_item
+                                                            try {
+                                                              final svc = _homeController
+                                                                  .salonDetailsListData
+                                                                  .data!
+                                                                  .selectedCategories![
+                                                                      index]
+                                                                  .services![i];
+                                                              AnalyticsService
+                                                                  .instance
+                                                                  .logSelectItem(
+                                                                serviceId:
+                                                                    svc.id ??
+                                                                        '',
+                                                                serviceName:
+                                                                    svc.name ??
+                                                                        '',
+                                                                salonId:
+                                                                    widget.id,
+                                                              );
+                                                            } catch (_) {}
                                                             final items =
                                                                 _homeController
                                                                     .getServiceAddCartModel
@@ -2568,6 +2599,27 @@ class _SaloonAfterSelectingServicesPageState
                                                                     salonId:
                                                                         widget
                                                                             .id);
+                                                            // 📊 select_item
+                                                            try {
+                                                              final svc = _homeController
+                                                                  .salonDetailsListData
+                                                                  .data!
+                                                                  .recommendedCategories![
+                                                                      index]
+                                                                  .services![i];
+                                                              AnalyticsService
+                                                                  .instance
+                                                                  .logSelectItem(
+                                                                serviceId:
+                                                                    svc.id ??
+                                                                        '',
+                                                                serviceName:
+                                                                    svc.name ??
+                                                                        '',
+                                                                salonId:
+                                                                    widget.id,
+                                                              );
+                                                            } catch (_) {}
                                                             final items =
                                                                 _homeController
                                                                     .getServiceAddCartModel

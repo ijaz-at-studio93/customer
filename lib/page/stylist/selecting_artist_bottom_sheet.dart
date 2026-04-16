@@ -11,6 +11,7 @@ import 'package:salon_customer/util/NoItemsWidget.dart';
 import '../../constant/assetsconstant.dart';
 import '../../model/artiest_list_model.dart';
 import '../../util/SharedPrefs.dart';
+import 'package:salon_customer/service/analytics_service.dart';
 
 class SelectingArtistBottomSheetWidget extends StatefulWidget {
   final String serviceId;
@@ -113,6 +114,11 @@ class _SelectingArtistBottomSheetWidgetState
 
                         //Navigator.pop(context);
 
+                        // 📊 select_stylist (skipped)
+                        AnalyticsService.instance.logSelectStylist(
+                          stylistIds: const [],
+                          salonId: widget.salonId,
+                        );
                         Get.to(() => AppointmentBookingPage(
                           artistIds: artistIds,
                         ));
@@ -450,6 +456,11 @@ class _SelectingArtistBottomSheetWidgetState
                           //   artistIds: finalIds,
                           // ));
 
+                          // 📊 select_stylist
+                          AnalyticsService.instance.logSelectStylist(
+                            stylistIds: finalIds,
+                            salonId: widget.salonId,
+                          );
                           Get.to(() => AppointmentBookingPage(
                             artistIds: finalIds,
                           ))?.then((_) {

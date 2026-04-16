@@ -14,6 +14,7 @@ import '../../constant/variable_constant.dart';
 import '../../controller/auth_controller.dart';
 import '../../util/SharedPrefs.dart';
 import '../bottom_navigation_bar.dart';
+import 'package:salon_customer/service/analytics_service.dart';
 
 class QRCodePage extends StatefulWidget {
   final String appointmentId;
@@ -1116,6 +1117,23 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                             }
 
                             if (response.success) {
+                              // 📊 booking_cancelled
+                              try {
+                                final qrData = _homeController
+                                    .getUserBookingQrCodeModel.data;
+                                int minutesBefore = 0;
+                                if (qrData?.startsAt != null) {
+                                  minutesBefore = DateTime.parse(qrData!.startsAt!)
+                                      .difference(DateTime.now())
+                                      .inMinutes;
+                                }
+                                AnalyticsService.instance.logBookingCancelled(
+                                  bookingId: bookingId,
+                                  reason: selectedReasonCode ?? '',
+                                  timeBeforeSlotMinutes: minutesBefore,
+                                );
+                              } catch (_) {}
+
                               Get.back(result: true);
 
                               Get.snackbar(

@@ -28,6 +28,7 @@ import '../home/saloon_after_selecting_page.dart';
 import '../home/widget/add_product_sheet_widget.dart';
 import '../profile/add_address_page.dart';
 import '../stylist/selecting_artist_bottom_sheet.dart';
+import 'package:salon_customer/service/analytics_service.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
   //final String artiestId;
@@ -461,6 +462,17 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                       if (selectedSlots.length <
                                                           3) {
                                                         selectedSlots.add(slot);
+                                                        // 📊 select_slot
+                                                        AnalyticsService
+                                                            .instance
+                                                            .logSelectSlot(
+                                                          slotTime: slot,
+                                                          salonId: _homeController
+                                                                  .getServiceAddCartModel
+                                                                  .data
+                                                                  ?.salonId ??
+                                                              '',
+                                                        );
                                                       } else {
                                                         showMessage(
                                                             "You can select up to 3 slots only");
@@ -1302,10 +1314,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     /// DISCOUNT applied
     final double discount = (data?.discountAmount ?? 0).toDouble();
 
-    /// AFTER DISCOUNT (before GST)
-    final double subtotal = (data?.taxAbleTotal ?? 0).toDouble();
-
-    /// GST
+    /// GST amount from cart (omitted from totals/UI when salon is not GST-registered).
     final double gst = (data?.cartTaxDetails?.totalTaxAmount ?? 0).toDouble();
 
     // /// FINAL PAYABLE
@@ -1313,6 +1322,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     // (data?.price ?? 0).toDouble();
 
     final double platformFee = (data?.platformFee ?? 0).toDouble();
+    final bool gstRegistered = _homeController.isCartSalonGstRegistered;
 
     showModalBottomSheet(
       context: Get.context!,
@@ -1354,35 +1364,35 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               /// ORIGINAL PRICE
               _priceRow("If Original Price is", original),
 
-              /// GST
-              //_priceRow("GST", gst),
-              GestureDetector(
-                onTap: _showChargesPopup,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _priceRow("GST & Other Charges", gst + platformFee),
-
-                    /// dotted underline
-                    Container(
-                      margin: const EdgeInsets.only(top: 2),
-                      width: 150,
-                      child: Row(
-                        children: List.generate(
-                          30,
-                          (_) => Expanded(
-                            child: Container(
-                              height: 1,
-                              margin: const EdgeInsets.symmetric(horizontal: 1),
-                              color: Colors.grey.shade400,
+              if (gstRegistered)
+                GestureDetector(
+                  onTap: _showChargesPopup,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _priceRow("GST & Other Charges", gst + platformFee),
+                      Container(
+                        margin: const EdgeInsets.only(top: 2),
+                        width: 150,
+                        child: Row(
+                          children: List.generate(
+                            30,
+                            (_) => Expanded(
+                              child: Container(
+                                height: 1,
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 1),
+                                color: Colors.grey.shade400,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
+                    ],
+                  ),
+                )
+              else
+                _priceRow("Platform Fee", platformFee),
 
               /// DISCOUNT
               if (discount > 0)
@@ -1406,6 +1416,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
     final double platformFee =
         data?.platformFee ?? 0; // replace when backend sends
+    final bool gstRegistered = _homeController.isCartSalonGstRegistered;
 
     showDialog(
       context: context,
@@ -1435,8 +1446,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      _priceRow("GST (5%)", gst),
-                      const SizedBox(height: 6),
+                      if (gstRegistered) ...[
+                        _priceRow("GST (5%)", gst),
+                        const SizedBox(height: 6),
+                      ],
                       _priceRow("Platform Fee", platformFee),
                     ],
                   ),
@@ -2024,6 +2037,19 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
     // ✅ 9. Open Razorpay
     log("Opening Razorpay for booking");
+
+    // 📊 begin_checkout
+    AnalyticsService.instance.logBeginCheckout(
+      eventId: _homeController.getOrderIdModel.data?.orderId ?? '',
+      value:
+          (_homeController.getServiceAddCartModel.data?.price ?? 0).toDouble(),
+      numberOfServices:
+          _homeController.getServiceAddCartModel.data?.items?.length ?? 0,
+      stylistSelected: selectedArtistIdsGlobal.value.isNotEmpty,
+      slotSelected: selectedSlots.isNotEmpty,
+      salonId: _homeController.getServiceAddCartModel.data?.salonId ?? '',
+    );
+
     razorpay.open(options);
   }
 
@@ -2230,6 +2256,27 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       showMessage("Booking is being processed. Please wait.");
       return;
     }
+
+    // 📊 purchase — fires on confirmed booking
+    try {
+      final bookingData = _homeController.getCreateBookingAppointmentModel.data;
+      final cartData = _homeController.getServiceAddCartModel.data;
+      final serviceNames = cartData?.items
+              ?.where((i) => i.isService == true)
+              .map((i) => i.service?.name ?? '')
+              .toList() ??
+          [];
+      AnalyticsService.instance.logPurchase(
+        bookingId: bookingData?.idx ?? bookingData?.id ?? '',
+        value: (bookingData?.orderAmount ?? 0).toDouble(),
+        salonId: bookingData?.salonId ?? '',
+        serviceNames: serviceNames,
+        stylistId: selectedArtistIdsGlobal.value.isNotEmpty
+            ? selectedArtistIdsGlobal.value.first
+            : '',
+        slotTime: selectedSlots.isNotEmpty ? selectedSlots.first : '',
+      );
+    } catch (_) {}
 
     _navigateAfterBooking(); // ✅ runs ONLY after data is ready
 
