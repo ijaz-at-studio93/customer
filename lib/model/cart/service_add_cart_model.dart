@@ -153,18 +153,21 @@ class Data {
 class Salon {
   String? id;
   String? displayName;
+  bool? isGSTRegistered;
 
-  Salon({this.id, this.displayName});
+  Salon({this.id, this.displayName, this.isGSTRegistered});
 
   Salon.fromJson(Map<String, dynamic> json) {
     id = json['id'];
     displayName = json['displayName'];
+    isGSTRegistered = json['isGSTRegistered'];
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
       'displayName': displayName,
+      'isGSTRegistered': isGSTRegistered,
     };
   }
 }

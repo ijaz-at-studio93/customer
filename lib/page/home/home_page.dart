@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dash/flutter_dash.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
@@ -26,9 +25,7 @@ import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
-import 'package:salon_customer/util/cached_image_widget.dart';
 import '../../constant/variable_constant.dart';
-import '../../model/home_category_list_model.dart';
 import '../../util/call_wrapper.dart';
 import '../../util/logger.dart';
 import '../appointment/widget/pending_payment_bar.dart';
@@ -167,6 +164,7 @@ class _HomePageState extends State<HomePage>
                               _headerWidget(),
                               //const SizedBox(height: 10),
                               _searchWidget(),
+
                               //const SizedBox(height: 10),
                               _ourService(),
                               const SizedBox(height: 5),
