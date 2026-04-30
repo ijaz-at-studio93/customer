@@ -642,13 +642,14 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
   Widget bookingStatusWidget(String status) {
     if (status == "confirmed") {
       return Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Image.asset(
             "assets/gifs/verified.gif",
             height: 100,
           ),
           const SizedBox(width: 5),
-          Center(
+          Expanded(
             child: Text(
               "Your Booking Is Confirmed\n(Happy Service)",
               textAlign: TextAlign.center,
@@ -668,22 +669,25 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
 
     /// DEFAULT → Pending
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Image.asset(
           "assets/gifs/hourglass.gif",
           height: 100,
         ),
-        const SizedBox(width: 10),
-        Text(
-          "Waiting For Confirmation\n(will take 10 - 15 mins)",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            fontFamily: "Outfit",
-            fontSize: 20,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.1,
-            color:
-                changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
+        // const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            "Waiting For Confirmation\n(will take 10 - 15 mins)",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontFamily: "Outfit",
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+              letterSpacing: 0.1,
+              color: changeTheme(
+                  SharedPrefs.readStringValue(PrefConstants.gender)),
+            ),
           ),
         )
       ],
@@ -1113,7 +1117,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                             );
 
                             if (Get.isDialogOpen ?? false) {
-                              Navigator.of(context).maybePop();
+                              Get.back();
                             }
 
                             if (response.success) {
@@ -1123,29 +1127,36 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                                     .getUserBookingQrCodeModel.data;
                                 int minutesBefore = 0;
                                 if (qrData?.startsAt != null) {
-                                  minutesBefore = DateTime.parse(qrData!.startsAt!)
-                                      .difference(DateTime.now())
-                                      .inMinutes;
+                                  minutesBefore =
+                                      DateTime.parse(qrData!.startsAt!)
+                                          .difference(DateTime.now())
+                                          .inMinutes;
                                 }
                                 AnalyticsService.instance.logBookingCancelled(
                                   bookingId: bookingId,
                                   reason: selectedReasonCode ?? '',
                                   timeBeforeSlotMinutes: minutesBefore,
                                 );
+                                Get.snackbar(
+                                  "Success",
+                                  "Booking cancelled successfully",
+                                  backgroundColor: Colors.green,
+                                  colorText: Colors.white,
+                                );
                               } catch (_) {}
 
-                              Get.back(result: true);
-
-                              Get.snackbar(
-                                "Success",
-                                "Booking cancelled successfully",
-                                backgroundColor: Colors.green,
-                                colorText: Colors.white,
+                              await SharedPrefs.remove(
+                                PrefConstants.resumePayBillAppointmentId,
+                              );
+                              Get.offAll(() => const BottomNavBarPage());
+                              Future.microtask(
+                                () => _homeController
+                                    .doGetCurrentBookingListData(),
                               );
                             }
                           } catch (e) {
                             if (Get.isDialogOpen ?? false) {
-                              Navigator.of(context).maybePop();
+                              Get.back();
                             }
 
                             Get.snackbar(

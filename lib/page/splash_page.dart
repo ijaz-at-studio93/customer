@@ -70,30 +70,42 @@ class _SplashPageState extends State<SplashPage> {
       return;
     }
 
-    final saved =
-        SharedPrefs.readStringValue(PrefConstants.resumePayBillAppointmentId);
-    if (saved.isEmpty) {
-      _pushLaunchPage(const BottomNavBarPage());
-      return;
-    }
-
     final homeController = Get.find<HomeController>();
     await homeController.doGetCurrentBookingListData();
 
     if (!mounted) return;
 
-    if (!_savedBookingStillPendingPay(homeController, saved)) {
-      await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
-      _pushLaunchPage(const BottomNavBarPage());
+    final saved =
+        SharedPrefs.readStringValue(PrefConstants.resumePayBillAppointmentId);
+
+    if (saved.isNotEmpty &&
+        _savedBookingStillPendingPay(homeController, saved)) {
+      _pushLaunchPage(
+        QRCodePage(
+          appointmentId: saved,
+          isBooking: false,
+        ),
+      );
       return;
     }
 
-    _pushLaunchPage(
-      QRCodePage(
-        appointmentId: saved,
-        isBooking: false,
-      ),
-    );
+    if (saved.isNotEmpty) {
+      await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
+    }
+
+    final activeAppointmentId =
+        _firstPendingOrConfirmedAppointmentId(homeController);
+    if (activeAppointmentId != null) {
+      _pushLaunchPage(
+        QRCodePage(
+          appointmentId: activeAppointmentId,
+          isBooking: false,
+        ),
+      );
+      return;
+    }
+
+    _pushLaunchPage(const BottomNavBarPage());
   }
 
   bool _savedBookingStillPendingPay(HomeController c, String appointmentId) {
@@ -106,6 +118,20 @@ class _SplashPageState extends State<SplashPage> {
       }
     }
     return false;
+  }
+
+  /// Active booking: salon has not finished the visit (`completed`) and it is
+  /// still awaiting confirmation or already confirmed.
+  String? _firstPendingOrConfirmedAppointmentId(HomeController c) {
+    final bookings = c.getCurrentBookingListModel.data ?? [];
+    for (final b in bookings) {
+      final status = b.orderStatus;
+      if (status == "pending" || status == "confirmed") {
+        final id = b.appointmentId;
+        if (id != null && id.isNotEmpty) return id;
+      }
+    }
+    return null;
   }
 
   void _pushLaunchPage(Widget child) {
