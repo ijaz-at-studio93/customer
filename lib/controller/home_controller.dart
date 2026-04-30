@@ -856,9 +856,7 @@ class HomeController extends GetxController {
       if (useGlobalLoader) _showProgress.value = true;          // changed
       _salonServiceAddCartModel.value = await HomeAPI.getUserSalonCart(salonId: salonId);
       tempQty.clear(); // 👈 ADD THIS
-      if (_salonServiceAddCartModel.value.data?.items?.isEmpty ?? false) {
-        stylistId.value = "";
-      }
+      
       update(); // or refresh()
       callback?.call();
     } catch (e) {

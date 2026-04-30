@@ -971,11 +971,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                               .notifyListeners();
 
                                                           //print('going back to salon page');
-
-                                                          Navigator.of(context)
-                                                              .maybePop(); // cart page
-                                                          Navigator.of(context)
-                                                              .maybePop(); // salon page
+                                                          Get.back();
                                                         }
                                                       },
                                                     );

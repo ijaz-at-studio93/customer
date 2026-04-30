@@ -293,6 +293,7 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                                               widget.callback.call();
 
                                               // Go back automatically
+                                              if(!context.mounted) return;
                                               Navigator.of(context).maybePop();
                                             }
                                           },
