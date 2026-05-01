@@ -1,12 +1,15 @@
 import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart' hide Response, FormData, MultipartFile;
 import 'package:mime/mime.dart';
 import 'package:dio/dio.dart';
-import 'package:salon_customer/model/app_update_model.dart';
-import 'package:salon_customer/model/user_profile.dart';
+import 'package:salon_customer/controller/auth_controller.dart';
+import 'package:salon_customer/model/app_update_model.dart' hide Data;
+import 'package:salon_customer/model/user_profile.dart' hide Data;
 import 'package:salon_customer/model/user_response_model.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:http_parser/http_parser.dart';
-import '../model/otp_verify_model.dart';
+import '../model/otp_verify_model.dart' hide Data;
 import 'dio_client.dart';
 
 class AuthAPI {
@@ -154,6 +157,48 @@ class AuthAPI {
       return OtpVerifyModel.fromJson(response.data);
     } else {
       throw response.data;
+    }
+  }
+
+  /*--------------- Refresh Access Token --------------*/
+  static Future<bool> refreshAccessToken() async {
+    try {
+      final storedJson = SharedPrefs.read(PrefConstants.userModel);
+      if (storedJson == null) return false;
+
+      final model = UserResponseModel.fromJson(storedJson);
+      final refreshToken = model.data?.refreshToken ?? "";
+      debugPrint("refreshAccessToken: $refreshToken");
+      if (refreshToken.isEmpty) return false;
+
+      final response = await DioClient.client.get(
+        'auth/refresh',
+        options: Options(
+          headers: {'Cookie': 'refresh-token=$refreshToken'},
+          extra: {'skipAuth': true},
+        ),
+      );
+
+      final data = Data.fromJson(response.data['data']);
+      model.data = Data(
+        id: model.data?.id,
+        accessToken: data.accessToken,
+        accessTokenValidTill: data.accessTokenValidTill,
+        refreshToken: data.refreshToken,
+        refreshTokenValidTill: data.refreshTokenValidTill,
+        userData: model.data?.userData,
+        isNewUser: model.data?.isNewUser,
+      );
+      await Get.find<AuthController>().userDataStoreToSharedPrefs(model);
+      return true;
+    } on DioException catch (e) {
+      if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
+        // Refresh token itself is expired — force logout
+        Get.find<AuthController>().resetApp();
+        return false;
+      }
+      // Transient network error — let the caller decide, do not logout
+      rethrow;
     }
   }
 

@@ -181,6 +181,8 @@
 //   }
 // }
 
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -191,6 +193,7 @@ import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
 import '../constant/api_constant.dart';
 import '../util/SharedPrefs.dart';
+import 'auth_api.dart';
 import 'dio_connectivity_request_retrier.dart';
 import 'dio_interceptors.dart';
 export 'package:salon_customer/util/Extensions.dart' show DioResponseExtension;
@@ -199,12 +202,8 @@ class DioClient {
   static CancelToken? cancelToken;
   static Dio? _dio;
 
-  // Separate Dio instance ONLY for refresh calls
-  // This prevents infinite loop through the main interceptor
-  static final Dio _refreshDio = Dio(BaseOptions(
-    baseUrl: APIConstants.baseUrl,
-    validateStatus: (status) => status! <= 500,
-  ));
+  static bool _isRefreshing = false;
+  static Completer<bool>? _refreshCompleter;
 
   static Dio get client {
     return Get.find<Dio>();
@@ -214,8 +213,9 @@ class DioClient {
     if (_dio == null) {
       _dio = Dio(BaseOptions(
         baseUrl: APIConstants.baseUrl,
+        // Only 2xx goes to onResponse — 401/403 properly routes to onError
         validateStatus: (status) {
-          return status! <= 500;
+          return status != null && status < 300;
         },
         headers: {
           'Accept': 'application/json',
@@ -228,83 +228,100 @@ class DioClient {
           requestBody: true,
           responseBody: true,
           responseHeader: false,
+          error: true,
           compact: false,
         ),
       );
 
       _dio!.interceptors.add(
         InterceptorsWrapper(
-          onRequest: (RequestOptions req, RequestInterceptorHandler handler) async {
-            String token = SharedPrefs.readStringValue(PrefConstants.token);
-            debugPrint("x-access-token $token");
-            debugPrint('DioClientPrint');
-            if (token.isNotEmpty) {
-              req.headers['x-access-token'] = token;
+          /// ---------------------------
+          /// REQUEST — attach token
+          /// ---------------------------
+          onRequest: (RequestOptions options, RequestInterceptorHandler handler) async {
+            if (options.extra['skipAuth'] == true) {
+              return handler.next(options);
             }
-            return handler.next(req);
+            String token = SharedPrefs.readStringValue(PrefConstants.token);
+            if (token.isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $token';
+              options.headers['x-access-token'] = token;
+            }
+            return handler.next(options);
           },
-          onResponse: (Response<dynamic> resp, ResponseInterceptorHandler handler) async {
-            try {
-              if (resp.statusCode == 401) {
 
-                // ISSUE 2 FIX — Retry guard
-                // If this request was already retried once, don't retry again → logout
-                if (resp.requestOptions.extra['retried'] == true) {
-                  Get.find<AuthController>().resetApp();
-                  return handler.next(resp);
-                }
-
-                final refreshToken = SharedPrefs.readStringValue(PrefConstants.refreshToken);
-
-                if (refreshToken.isEmpty) {
-                  Get.find<AuthController>().resetApp();
-                  return handler.next(resp);
-                }
-
-                try {
-                  // ISSUE 1 FIX — Use separate Dio instance for refresh
-                  // _refreshDio does NOT have the interceptor, so no infinite loop
-                  final refreshResponse = await _refreshDio.get(
-                    'auth/refresh',
-                    options: Options(
-                      headers: {'Authorization': 'Bearer $refreshToken'},
-                    ),
-                  );
-
-                  if (refreshResponse.statusCode == 200) {
-                    final newAccessToken = refreshResponse.data['data']['accessToken'];
-                    final newRefreshToken = refreshResponse.data['data']['refreshToken'];
-
-                    await SharedPrefs.writeValue(PrefConstants.token, newAccessToken);
-                    await SharedPrefs.writeValue(PrefConstants.refreshToken, newRefreshToken);
-
-                    // ISSUE 2 FIX — Mark this request as retried
-                    // So if it fails again, we logout instead of looping
-                    resp.requestOptions.extra['retried'] = true;
-                    resp.requestOptions.headers['x-access-token'] = newAccessToken;
-
-                    final retryResponse = await _dio!.fetch(resp.requestOptions);
-                    return handler.resolve(retryResponse);
-
-                  } else {
-                    Get.find<AuthController>().resetApp();
-                  }
-
-                } catch (e) {
-                  Get.find<AuthController>().resetApp();
-                }
-              }
-
-              if (resp.statusCode == 500 || resp.statusCode == 502) {
-                showMessage("Internal Server Error Bad Gateway");
-              }
-
-            } catch (e) {
-              return handler.next(resp);
+          /// ---------------------------
+          /// RESPONSE — server-side errors only
+          /// ---------------------------
+          onResponse: (Response<dynamic> resp, ResponseInterceptorHandler handler) {
+            if (resp.statusCode == 500) {
+              showMessage("Please wait, server under maintenance");
             }
             return handler.next(resp);
           },
+
+          /// ---------------------------
+          /// ERROR — token refresh flow
+          /// ---------------------------
           onError: (DioException error, ErrorInterceptorHandler handler) async {
+            final int? statusCode = error.response?.statusCode;
+
+            if (statusCode == 401 || statusCode == 403) {
+              try {
+                final RequestOptions requestOptions = error.requestOptions;
+
+                // Prevent infinite retry loop on the same request
+                if (requestOptions.extra["retried"] == true) {
+                  return handler.next(error);
+                }
+
+                bool refreshSuccess;
+
+                if (!_isRefreshing) {
+                  // This request owns the refresh; concurrent 401s will wait
+                  _isRefreshing = true;
+                  _refreshCompleter = Completer<bool>();
+
+                  bool result = false;
+                  try {
+                    result = await AuthAPI.refreshAccessToken();
+                  } catch (_) {
+                    result = false;
+                  }
+
+                  _isRefreshing = false;
+                  _refreshCompleter!.complete(result);
+                  _refreshCompleter = null;
+                  refreshSuccess = result;
+                } else {
+                  // Another request is already refreshing — wait for its result
+                  refreshSuccess = await _refreshCompleter!.future;
+                }
+
+                if (!refreshSuccess) {
+                  Get.find<AuthController>().resetApp();
+                  return handler.next(error);
+                }
+
+                // Retry original request with the new token
+                final String newToken = SharedPrefs.readStringValue(PrefConstants.token);
+                requestOptions.headers['Authorization'] = 'Bearer $newToken';
+                requestOptions.headers['x-access-token'] = newToken;
+                requestOptions.extra["retried"] = true;
+
+                final Response retryResponse = await _dio!.fetch(requestOptions);
+                return handler.resolve(retryResponse);
+              } catch (e) {
+                // Transient error during refresh (e.g. SocketException) — do NOT logout
+                _isRefreshing = false;
+                if (_refreshCompleter != null && !_refreshCompleter!.isCompleted) {
+                  _refreshCompleter!.complete(false);
+                  _refreshCompleter = null;
+                }
+                return handler.next(error);
+              }
+            }
+
             return handler.next(error);
           },
         ),

@@ -353,8 +353,11 @@ class AuthController extends GetxController {
 
   /*-------------  Reset App ---------------*/
   resetApp() async {
-    await SharedPrefs.writeValue(PrefConstants.gender, "0");
+    await SharedPrefs.remove(PrefConstants.token);
+    await SharedPrefs.remove(PrefConstants.refreshToken);
+    await SharedPrefs.remove(PrefConstants.userModel);
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, false);
+    await SharedPrefs.writeValue(PrefConstants.gender, "0");
     await SharedPrefs.writeValue(PrefConstants.isFirstTime, false);
     await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
     Get.offAll(() => const LoginPage(splashPage: false));
