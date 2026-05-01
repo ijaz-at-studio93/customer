@@ -11,6 +11,8 @@ import 'package:salon_customer/util/NoItemsWidget.dart';
 import '../../project_specific/progressbar_view.dart';
 import 'widget/artist_rating_list_tile.dart';
 import 'package:salon_customer/service/analytics_service.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/util/app_icon_helper.dart';
 
 class CompleteBookingDetailsView extends StatefulWidget {
   final String appointmentId;
@@ -31,7 +33,7 @@ class _CompleteBookingDetailsViewState
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       _homeController.doGetReviewDataList(appointmentId: widget.appointmentId);
 
       // 📊 service_completed — booking is already done when this screen opens
@@ -43,6 +45,11 @@ class _CompleteBookingDetailsViewState
           paymentMode: qrData?.paymentStatus ?? 'unknown',
         );
       } catch (_) {}
+
+      final now = DateTime.now();
+      await SharedPrefs.writeValue(
+          PrefConstants.bookingDate, now.toIso8601String());
+      await AppIconHelper.updateCustomerAppIcon(now);
     });
   }
 

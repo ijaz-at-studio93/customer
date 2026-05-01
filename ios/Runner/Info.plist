@@ -60,6 +60,57 @@
         <string>Do you allow this app to know your current location?</string>
         <key>NSPhotoLibraryUsageDescription</key>
         <string>You need to provide photo album access to upload profile image or you can directly upload using camera.</string>
+	<key>CFBundleIcons</key>
+	<dict>
+		<key>CFBundlePrimaryIcon</key>
+		<dict>
+			<key>CFBundleIconFiles</key>
+			<array>
+				<string>AppIcon</string>
+			</array>
+			<key>UIPrerenderedIcon</key>
+			<false/>
+		</dict>
+		<key>CFBundleAlternateIcons</key>
+		<dict>
+			<key>CustomerOpen</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>CustomerOpen</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>CustomerBook</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>CustomerBook</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>Customer3Weeks</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>Customer3Weeks</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+			<key>Customer4Weeks</key>
+			<dict>
+				<key>CFBundleIconFiles</key>
+				<array>
+					<string>Customer4Weeks</string>
+				</array>
+				<key>UIPrerenderedIcon</key>
+				<false/>
+			</dict>
+		</dict>
+	</dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

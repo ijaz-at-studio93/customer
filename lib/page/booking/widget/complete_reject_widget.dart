@@ -31,6 +31,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
 
     loadSalonStylists();
   }
+
   void loadSalonStylists() async {
     final salonId = widget.historyList.salon?.id;
 
@@ -42,6 +43,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
 
     setState(() {}); // 🔥 refresh UI after loading
   }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -74,7 +76,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                 ],
               ),
               Text(
-                "${convertDate(date: widget.historyList.startsAt ?? "")}",
+                convertDate(date: widget.historyList.startsAt ?? ""),
                 style: AppTextTheme.regular
                     .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
               )
@@ -134,8 +136,8 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                 widget.historyList.orderStatus == "salon_artist_rejected"
                     ? "Rejected"
                     : widget.historyList.orderStatus == "completed"
-                    ? "Completed"
-                    : widget.historyList.orderStatus ?? "",
+                        ? "Completed"
+                        : widget.historyList.orderStatus ?? "",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold.copyWith(
                     fontSize: 16,
@@ -193,7 +195,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: List.generate(
               widget.historyList.items?.length ?? 0,
-                  (index) {
+              (index) {
                 final item = widget.historyList.items?[index];
 
                 if (item?.isService ?? false) {
@@ -202,7 +204,6 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-
                         /// 🔥 BULLET
                         const Text(
                           "•",
@@ -220,9 +221,10 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                           child: Text(
                             item?.service?.name ?? "",
                             style: AppTextTheme.medium.copyWith(
-                              color:  changeTheme(
-                                SharedPrefs.readStringValue(PrefConstants.gender),
-                          ),
+                              color: changeTheme(
+                                SharedPrefs.readStringValue(
+                                    PrefConstants.gender),
+                              ),
                               fontSize: 13,
                             ),
                           ),
@@ -288,10 +290,14 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
 
   /*---------------- convertTime ------------*/
   String convertDate({required String date}) {
-    String dateTimeString = date;
-    DateTime dateTime = DateTime.parse(dateTimeString);
-    String formattedTime = DateFormat('h:mm a').format(dateTime);
-    return formattedTime;
+    if (date.isEmpty) {
+      return "N/A";
+    } else {
+      String dateTimeString = date;
+      DateTime dateTime = DateTime.parse(dateTimeString);
+      String formattedTime = DateFormat('h:mm a').format(dateTime);
+      return formattedTime;
+    }
   }
 
   /*---------------- Date Convert Fun  -------------*/

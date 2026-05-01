@@ -190,26 +190,9 @@ class _SplashPageState extends State<SplashPage> {
           _normalUpdateDialog();
         }
       } else {
-        DateTime? bookingDate;
-
-        // if (SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
-        //   final homeController = Get.find<HomeController>();
-        //
-        //   await homeController.doGetCurrentBookingListData();
-        //
-        //   final bookings =
-        //       homeController.getCurrentBookingListModel.data ?? [];
-        //
-        //   if (bookings.isNotEmpty) {
-        //     final latestBooking = bookings.first;
-        //
-        //     if (latestBooking.finalizedAt != null) {
-        //       bookingDate = DateTime.parse(latestBooking.finalizedAt!);
-        //     }
-        //   }
-        // }
-        //
-        // await AppIconHelper.updateCustomerAppIcon(bookingDate);
+        final raw = SharedPrefs.readStringValue(PrefConstants.bookingDate);
+        final bookingDate = raw.isNotEmpty ? DateTime.tryParse(raw) : null;
+        await AppIconHelper.updateCustomerAppIcon(bookingDate);
         route();
       }
     });

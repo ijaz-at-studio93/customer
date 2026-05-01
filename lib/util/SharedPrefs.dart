@@ -54,4 +54,6 @@ class PrefConstants {
   static const String hasShownSalonDialog = "hasShownSalonDialog";
   /// Set while user is on pay bill (`QRCodePage`); used to resume after app kill.
   static const String resumePayBillAppointmentId = "resumePayBillAppointmentId";
+  /// ISO-8601 date saved when a booking is marked complete; drives app icon selection.
+  static const String bookingDate = "bookingDate";
 }
