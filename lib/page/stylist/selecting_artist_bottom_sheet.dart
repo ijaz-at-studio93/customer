@@ -19,7 +19,10 @@ class SelectingArtistBottomSheetWidget extends StatefulWidget {
   final VoidCallback callback;
 
   const SelectingArtistBottomSheetWidget(
-      {super.key, required this.serviceId, required this.callback, required this.salonId});
+      {super.key,
+      required this.serviceId,
+      required this.callback,
+      required this.salonId});
 
   @override
   State<SelectingArtistBottomSheetWidget> createState() =>
@@ -30,7 +33,7 @@ class _SelectingArtistBottomSheetWidgetState
     extends State<SelectingArtistBottomSheetWidget> {
   final _homeController = Get.find<HomeController>();
   final ValueNotifier<Map<String, String>> selectedArtistMap =
-  ValueNotifier({});
+      ValueNotifier({});
   @override
   void initState() {
     super.initState();
@@ -39,14 +42,11 @@ class _SelectingArtistBottomSheetWidgetState
     });
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 575,//Get.height * 0.7,
-      width: 402,//Get.width,
+      height: 575, //Get.height * 0.7,
+      width: 402, //Get.width,
       decoration: const BoxDecoration(
         color: ColorConstant.whiteColor,
         borderRadius: BorderRadius.only(
@@ -56,14 +56,13 @@ class _SelectingArtistBottomSheetWidgetState
       ),
       child: Stack(
         children: [
-
           /// 🔥 MAIN CONTENT (SCROLLABLE)
           Column(
             children: [
-
               /// 🔹 HEADER (UNCHANGED)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -114,14 +113,9 @@ class _SelectingArtistBottomSheetWidgetState
 
                         //Navigator.pop(context);
 
-                        // 📊 select_stylist (skipped)
-                        AnalyticsService.instance.logSelectStylist(
-                          stylistIds: const [],
-                          salonId: widget.salonId,
-                        );
                         Get.to(() => AppointmentBookingPage(
-                          artistIds: artistIds,
-                        ));
+                              artistIds: artistIds,
+                            ));
                       },
                       child: Container(
                         width: 94,
@@ -170,90 +164,96 @@ class _SelectingArtistBottomSheetWidgetState
                       meta.hasMaleServices && meta.hasFemaleServices;
 
                   return SingleChildScrollView(
-                      physics: const NeverScrollableScrollPhysics(), // 🔥 disables scroll
-                  child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                      physics:
+                          const NeverScrollableScrollPhysics(), // 🔥 disables scroll
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          /// ================= CASE 1 =================
+                          // final themeColor = changeTheme(
+                          // SharedPrefs.readStringValue(PrefConstants.gender),
+                          // ) ??
+                          // ColorConstant.primaryColor;
+                          if (!isBothGender) ...[
+                            if (maleHair.isNotEmpty ||
+                                femaleHair.isNotEmpty) ...[
+                              buildTitle(
+                                  "Select Stylist",
+                                  changeTheme(
+                                    SharedPrefs.readStringValue(
+                                        PrefConstants.gender),
+                                  )),
+                              const SizedBox(height: 2),
 
-                      /// ================= CASE 1 =================
-                  // final themeColor = changeTheme(
-                  // SharedPrefs.readStringValue(PrefConstants.gender),
-                  // ) ??
-                  // ColorConstant.primaryColor;
-                      if (!isBothGender) ...[
-                        if (maleHair.isNotEmpty || femaleHair.isNotEmpty) ...[
-                          buildTitle("Select Stylist", changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender),
-                          )),
-                          const SizedBox(height: 2),
+                              /// ✅ stylist section
+                              buildSection(
+                                [...maleHair, ...femaleHair],
+                                "stylist",
+                              ),
+                            ],
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Divider(
+                                thickness: 1,
+                                color: Color(0xFFE5E5E5),
+                              ),
+                            ),
+                            if (maleBeauty.isNotEmpty ||
+                                femaleBeauty.isNotEmpty) ...[
+                              buildTitle(
+                                  "Select Beautician",
+                                  changeTheme(
+                                    SharedPrefs.readStringValue(
+                                        PrefConstants.gender),
+                                  )),
+                              const SizedBox(height: 2),
 
-                          /// ✅ stylist section
-                          buildSection(
-                            [...maleHair, ...femaleHair],
-                            "stylist",
-                          ),
+                              /// ✅ beautician section
+                              buildSection(
+                                [...maleBeauty, ...femaleBeauty],
+                                "beautician",
+                              ),
+                            ],
+                          ],
+
+                          /// ================= CASE 2 =================
+                          if (isBothGender) ...[
+                            buildTitle("For Men Services", changeTheme("0")),
+                            const SizedBox(height: 2),
+
+                            /// ✅ men section
+                            buildSection(
+                              getMenPriorityArtists(
+                                maleHair: maleHair,
+                                maleBeauty: maleBeauty,
+                                meta: meta,
+                              ),
+                              "male",
+                            ),
+
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Divider(
+                                thickness: 1,
+                                color: Color(0xFFE5E5E5),
+                              ),
+                            ),
+
+                            buildTitle("For Women Services", changeTheme("1")),
+                            const SizedBox(height: 2),
+
+                            /// ✅ women section
+                            buildSection(
+                              getWomenPriorityArtists(
+                                femaleHair: femaleHair,
+                                femaleBeauty: femaleBeauty,
+                                meta: meta,
+                              ),
+                              "female",
+                            ),
+                          ],
                         ],
-
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Divider(
-                            thickness: 1,
-                            color: Color(0xFFE5E5E5),
-                          ),
-                        ),
-
-                        if (maleBeauty.isNotEmpty || femaleBeauty.isNotEmpty) ...[
-                          buildTitle("Select Beautician", changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender),
-                          )),
-                          const SizedBox(height: 2),
-
-                          /// ✅ beautician section
-                          buildSection(
-                            [...maleBeauty, ...femaleBeauty],
-                            "beautician",
-                          ),
-                        ],
-                      ],
-
-                      /// ================= CASE 2 =================
-                      if (isBothGender) ...[
-                        buildTitle("For Men Services", changeTheme("0")),
-                        const SizedBox(height: 2),
-
-                        /// ✅ men section
-                        buildSection(
-                          getMenPriorityArtists(
-                            maleHair: maleHair,
-                            maleBeauty: maleBeauty,
-                            meta: meta,
-                          ),
-                          "male",
-                        ),
-
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16),
-                          child: Divider(
-                            thickness: 1,
-                            color: Color(0xFFE5E5E5),
-                          ),
-                        ),
-
-                        buildTitle("For Women Services", changeTheme("1")),
-                        const SizedBox(height: 2),
-
-                        /// ✅ women section
-                        buildSection(
-                          getWomenPriorityArtists(
-                            femaleHair: femaleHair,
-                            femaleBeauty: femaleBeauty,
-                            meta: meta,
-                          ),
-                          "female",
-                        ),
-                      ],
-                    ],
-                  ));
+                      ));
                 }),
               ),
             ],
@@ -337,6 +337,7 @@ class _SelectingArtistBottomSheetWidgetState
     // fallback
     return getUniqueArtists([...femaleHair, ...femaleBeauty]);
   }
+
   List<Artiest> getMenPriorityArtists({
     required List<Artiest> maleHair,
     required List<Artiest> maleBeauty,
@@ -362,50 +363,50 @@ class _SelectingArtistBottomSheetWidgetState
             padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: list.length,
             separatorBuilder: (_, __) => const SizedBox(width: 12),
-
             itemBuilder: (context, index) {
               final artist = list[index];
               final id = artist.id ?? "";
-              final data = _homeController.getArtiestListData;   // ✅ ADD
-              final meta = data.serviceMeta;                     // ✅ AD
+              final data = _homeController.getArtiestListData; // ✅ ADD
+              final meta = data.serviceMeta; // ✅ AD
 
               return SizedBox(
                 width: 138,
                 child: ValueListenableBuilder<Map<String, String>>(
                   valueListenable: selectedArtistMap,
                   builder: (context, selectedMap, _) {
-
                     /// ✅ section-based selection
                     final isSelected = selectedMap[sectionType] == id;
                     //artist.isSelectArtist = isSelected;
                     bool isAllRounder = false;
 
                     if (sectionType == "male") {
-                      isAllRounder =
-                          (data.maleHairArtists ?? []).any((e) => e.id == artist.id) &&
-                              (data.maleBeautyArtists ?? []).any((e) => e.id == artist.id);
+                      isAllRounder = (data.maleHairArtists ?? [])
+                              .any((e) => e.id == artist.id) &&
+                          (data.maleBeautyArtists ?? [])
+                              .any((e) => e.id == artist.id);
                     } else if (sectionType == "female") {
-                      isAllRounder =
-                          (data.femaleHairArtists ?? []).any((e) => e.id == artist.id) &&
-                              (data.femaleBeautyArtists ?? []).any((e) => e.id == artist.id);
+                      isAllRounder = (data.femaleHairArtists ?? [])
+                              .any((e) => e.id == artist.id) &&
+                          (data.femaleBeautyArtists ?? [])
+                              .any((e) => e.id == artist.id);
                     }
 
                     /// ❌ DO NOT show in stylist/beautician sections
-                    final showAllRounder =
-                        isAllRounder && (sectionType == "male" || sectionType == "female");
+                    final showAllRounder = isAllRounder &&
+                        (sectionType == "male" || sectionType == "female");
 
                     return SelectedFavArtistCardWidget(
                       artiest: artist,
                       isSelected: isSelected, // ✅ ADD THIS LINE
                       salonId: widget.salonId,
                       serviceMeta: meta!,
-                      sectionType: sectionType,// ✅ ADD
-                      isFromBeauty: isBeautyArtist(artist, sectionType, data), // ✅ ADD
+                      sectionType: sectionType, // ✅ ADD
+                      isFromBeauty:
+                          isBeautyArtist(artist, sectionType, data), // ✅ ADD
                       isAllRounder: showAllRounder, // ✅ ONLY ADD THIS LINE
 
                       callback: () {
-                        final current =
-                        Map<String, String>.from(selectedMap);
+                        final current = Map<String, String>.from(selectedMap);
 
                         /// toggle only within section
                         if (current[sectionType] == id) {
@@ -439,7 +440,8 @@ class _SelectingArtistBottomSheetWidgetState
 
                           final hasBeautician =
                               (data.maleBeautyArtists?.isNotEmpty ?? false) ||
-                                  (data.femaleBeautyArtists?.isNotEmpty ?? false);
+                                  (data.femaleBeautyArtists?.isNotEmpty ??
+                                      false);
 
                           if (hasStylist && hasBeautician) {
                             requiredSelections = 2;
@@ -450,20 +452,11 @@ class _SelectingArtistBottomSheetWidgetState
                         if (current.length == requiredSelections) {
                           selectedArtistIdsGlobal.value = finalIds;
 
-                          //Navigator.pop(context);
+                          Navigator.pop(context);
 
-                          // Get.to(() => AppointmentBookingPage(
-                          //   artistIds: finalIds,
-                          // ));
-
-                          // 📊 select_stylist
-                          AnalyticsService.instance.logSelectStylist(
-                            stylistIds: finalIds,
-                            salonId: widget.salonId,
-                          );
                           Get.to(() => AppointmentBookingPage(
-                            artistIds: finalIds,
-                          ))?.then((_) {
+                                artistIds: finalIds,
+                              ))?.then((_) {
                             selectedArtistMap.value = {};
                             selectedArtistIdsGlobal.value = [];
                           });
@@ -484,11 +477,9 @@ class _SelectingArtistBottomSheetWidgetState
 
   bool isBeautyArtist(Artiest artist, String sectionType, dynamic data) {
     if (sectionType == "male") {
-      return (data.maleBeautyArtists ?? [])
-          .any((e) => e.id == artist.id);
+      return (data.maleBeautyArtists ?? []).any((e) => e.id == artist.id);
     } else if (sectionType == "female") {
-      return (data.femaleBeautyArtists ?? [])
-          .any((e) => e.id == artist.id);
+      return (data.femaleBeautyArtists ?? []).any((e) => e.id == artist.id);
     } else if (sectionType == "beautician") {
       return true;
     }
@@ -508,8 +499,7 @@ class _SelectingArtistBottomSheetWidgetState
 
     final List<String> selected = [];
 
-    final isBothGender =
-        meta.hasMaleServices && meta.hasFemaleServices;
+    final isBothGender = meta.hasMaleServices && meta.hasFemaleServices;
 
     /// ✅ CASE 1: BOTH GENDER
     if (isBothGender) {

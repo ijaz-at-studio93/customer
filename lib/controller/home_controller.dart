@@ -199,6 +199,9 @@ class HomeController extends GetxController {
 
   ServiceAddCartModel get getServiceAddCartModel => _serviceAddCartModel.value;
 
+  /// Reactive reference for listeners (e.g. redirect when cart empties).
+  Rx<ServiceAddCartModel> get serviceAddCartModelRx => _serviceAddCartModel;
+
   set setServiceAddCartModel(val) => _serviceAddCartModel.value = val;
 
   final Rx<SalonServiceAddCartModel> _salonServiceAddCartModel =

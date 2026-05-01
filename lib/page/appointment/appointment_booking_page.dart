@@ -28,6 +28,7 @@ import '../home/saloon_after_selecting_page.dart';
 import '../home/widget/add_product_sheet_widget.dart';
 import '../profile/add_address_page.dart';
 import '../stylist/selecting_artist_bottom_sheet.dart';
+import 'package:salon_customer/model/cart/service_add_cart_model.dart';
 import 'package:salon_customer/service/analytics_service.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
@@ -45,10 +46,42 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   final _authController = Get.find<AuthController>();
   final ScrollController _scrollController = ScrollController();
   List<String> selectedSlots = [];
+  Worker? _cartEmptyWorker;
+  bool _sawNonEmptyCartOnBookingPage = false;
+
+  bool _isBookingCartEmpty(ServiceAddCartModel cart) {
+    final data = cart.data;
+    final items = data?.items;
+    final services = data?.servicesWithProduct;
+    return (items == null || items.isEmpty) ||
+        (services == null || services.isEmpty) ||
+        _homeController.getTotalItems() == 0;
+  }
+
+  void _popToSalonDetailWhenCartEmpty() {
+    stylistId.value = "";
+    stylistId.notifyListeners();
+    if (!mounted) return;
+    Get.back();
+  }
 
   @override
   void initState() {
     super.initState();
+    _cartEmptyWorker = ever(_homeController.serviceAddCartModelRx, (cart) {
+      final empty = _isBookingCartEmpty(cart);
+      if (!empty) {
+        _sawNonEmptyCartOnBookingPage = true;
+        return;
+      }
+      if (_sawNonEmptyCartOnBookingPage && mounted) {
+        _popToSalonDetailWhenCartEmpty();
+      }
+    });
+    // If cart was already loaded before this route (no Rx emission yet), seed flag.
+    if (!_isBookingCartEmpty(_homeController.getServiceAddCartModel)) {
+      _sawNonEmptyCartOnBookingPage = true;
+    }
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       userServiceAddressIdSelect = "";
       DateTime date = DateTime.now();
@@ -118,8 +151,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
   @override
   void dispose() {
-    super.dispose();
+    _cartEmptyWorker?.dispose();
     razorpay.clear();
+    super.dispose();
   }
 
   @override
@@ -957,23 +991,6 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                               .data
                                                               ?.salonId ??
                                                           "",
-                                                      callback: () {
-                                                        final items =
-                                                            _homeController
-                                                                .getServiceAddCartModel
-                                                                .data
-                                                                ?.items;
-
-                                                        if (items == null ||
-                                                            items.isEmpty) {
-                                                          stylistId.value = "";
-                                                          stylistId
-                                                              .notifyListeners();
-
-                                                          //print('going back to salon page');
-                                                          Get.back();
-                                                        }
-                                                      },
                                                     );
                                                     //Commenting because of Pay after service
                                                     // No need to creating razorpay order

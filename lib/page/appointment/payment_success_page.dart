@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../constant/variable_constant.dart';
+import '../../service/analytics_service.dart';
 import '../../util/SharedPrefs.dart';
 import '../bottom_navigation_bar.dart';
 
@@ -19,6 +20,15 @@ class PaymentSuccessPage extends StatefulWidget {
 }
 
 class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
+
+  @override
+  void initState() {
+    super.initState();
+    AnalyticsService.instance.logPaymentSuccessful(
+      bookingId: widget.bookingId,
+      value: widget.amount.toDouble(),
+    );
+  }
 
   @override
   void didChangeDependencies() {

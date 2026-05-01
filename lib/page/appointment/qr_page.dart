@@ -2008,8 +2008,15 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
 
   Future<void> _handlePaymentSuccess(PaymentSuccessResponse response) async {
     final paidAmount = double.tryParse(_amountController.text.trim()) ?? 0;
-
     final bookingId = _homeController.getUserBookingQrCodeModel.data?.idx ?? "";
+    final salonId = _homeController.getUserBookingQrCodeModel.data?.salon?.id ?? "";
+
+    // 📊 book_and_pay_after_service
+    AnalyticsService.instance.logBookAndPayAfterService(
+      bookingId: bookingId,
+      value: paidAmount,
+      salonId: salonId,
+    );
 
     await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
     Get.offAll(
