@@ -40,22 +40,25 @@ class BlogData {
   String? body;
   String? externalLink;
   int? viewCount;
-  Artist? artist;
-  bool?  isFavourite;
+  bool? isFavourite;
 
-  BlogData(
-      {this.id,
-      this.title,
-      this.description,
-      this.image,
-      this.video,
-      this.createdAt,
-      this.body,
-      this.externalLink,
-      this.viewCount,
-      this.artist,
-      this.isFavourite
-      });
+  Artist? artist;
+  Salon? salon; // ✅ ADD THIS
+
+  BlogData({
+    this.id,
+    this.title,
+    this.description,
+    this.image,
+    this.video,
+    this.createdAt,
+    this.body,
+    this.externalLink,
+    this.viewCount,
+    this.artist,
+    this.salon,
+    this.isFavourite,
+  });
 
   BlogData.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -67,12 +70,20 @@ class BlogData {
     body = json['body'];
     externalLink = json['externalLink'];
     viewCount = json['viewCount'];
-    isFavourite =  json['isFavourite'];
-    artist = json['artist'] != null ? Artist.fromJson(json['artist']) : null;
+    isFavourite = json['isFavourite'];
+
+    artist = json['artist'] != null
+        ? Artist.fromJson(json['artist'])
+        : null;
+
+    salon = json['salon'] != null
+        ? Salon.fromJson(json['salon'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
+    final data = <String, dynamic>{};
+
     data['id'] = id;
     data['title'] = title;
     data['description'] = description;
@@ -83,9 +94,10 @@ class BlogData {
     data['externalLink'] = externalLink;
     data['viewCount'] = viewCount;
     data['isFavourite'] = isFavourite;
-    if (artist != null) {
-      data['artist'] = artist!.toJson();
-    }
+
+    if (artist != null) data['artist'] = artist!.toJson();
+    if (salon != null) data['salon'] = salon!.toJson();
+
     return data;
   }
 }
@@ -119,21 +131,21 @@ class Artist {
 
 class Salon {
   String? id;
-  String? name;
+  String? displayName;
   String? image;
 
-  Salon({this.id, this.name, this.image});
+  Salon({this.id, this.displayName, this.image});
 
   Salon.fromJson(Map<String, dynamic> json) {
     id = json['id'];
-    name = json['name'];
+    displayName = json['displayName'];
     image = json['image'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
-    data['name'] = name;
+    data['displayName'] = displayName;
     data['image'] = image;
     return data;
   }

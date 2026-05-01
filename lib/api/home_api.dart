@@ -218,6 +218,20 @@ class HomeAPI {
     }
   }
 
+  static Future<dynamic> getSalonAvailability({
+    required String salonId,
+  }) async {
+    final response = await DioClient.client.get(
+      "user/salon/$salonId/availability",
+    );
+
+    if (response.isSuccess) {
+      return response.data; // later convert to model
+    } else {
+      throw response.data;
+    }
+  }
+
   /*--------------------------- User Booking Create --------------------------*/
   // static Future<CreateBookingAppointmentModel> userCreateBooking({
   //   required String salonArtistId,
@@ -258,6 +272,24 @@ class HomeAPI {
         "selectedSlots": selectedSlots, // 👈 NEW
         "isHomeService": isHomeService,
         "userAddressId": userAddressId,
+      },
+    );
+
+    if (response.isSuccess) {
+      return CreateBookingAppointmentModel.fromJson(response.data);
+    } else {
+      throw response.data;
+    }
+  }
+
+  static Future<CreateBookingAppointmentModel> userCreateNonMandatoryBooking({
+    required String salonId,
+  }) async {
+
+    final response = await DioClient.client.post(
+      "user/booking/non-mandatory",
+      data: {
+        "salonId": salonId,
       },
     );
 

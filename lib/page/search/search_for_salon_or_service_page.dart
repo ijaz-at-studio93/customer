@@ -123,6 +123,7 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                           
                           Get.to(() =>
                               SaloonAfterSelectingServicesPage(
+                                  isPayNowMode: true,
                                   id: _homeController
                                       .getSearchSalonModel
                                       .data?[index]
@@ -244,6 +245,7 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                           
                           Get.to(() =>
                               SaloonAfterSelectingServicesPage(
+                                  isPayNowMode: true,
                                   id: _homeController
                                       .getSearchSalonModel
                                       .data?[index]

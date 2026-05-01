@@ -70,6 +70,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       //     artiestId: widget.artistIds.first, date: formatDate, callback: () {});
 
       _homeController.doGetCart();
+      _homeController.doGetSalonAvailability(
+        salonId: _homeController.getServiceAddCartModel.data?.salonId ?? "",
+      );
       //Commenting because of Pay after service
       // No need to creating razorpay order
       //     .whenComplete(() {
@@ -354,7 +357,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      "Select Time Slot",
+                                      "Select Upto 3 Slots",
                                       style: AppTextTheme.bold.copyWith(
                                         fontFamily: "Outfit",
                                         fontWeight: FontWeight.w700, // ✅ Bold
@@ -432,7 +435,24 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
                                     Builder(
                                       builder: (context) {
-                                        final slots = generateTimeSlots();
+                                        //final slots = generateTimeSlots();
+                                        final workPlan = _homeController.salonAvailability?['data'];
+                                        final slots = generateTimeSlots(workPlan);
+                                        if (slots.isEmpty) {
+                                          return SizedBox(
+                                            height: 90,
+                                            child: Center(
+                                              child: Text(
+                                                "No Slots available for today\nPlease choose another date",
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontFamily: 'Outfit',
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }
 
                                         return SizedBox(
                                           height: 90,
@@ -769,64 +789,48 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                         ),
 
                                         /// RIGHT → EDIT STYLIST BUTTON
-                                        GestureDetector(
-                                          // onTap: () {
-                                          //   selectedArtistIdsGlobal.value = []; // 🔥 reset selection
-                                          //   _homeController.doGetArtiestListData();
-                                          //   Navigator.of(context).maybePop(); // 👈 go back to stylist selection
-                                          // },
-                                          onTap: () {
-                                            //selectedArtistIdsGlobal.value = [];
+                                        if (selectedArtistIdsGlobal.value.isNotEmpty)
+                                          GestureDetector(
+                                            // onTap: () {
+                                            //   selectedArtistIdsGlobal.value = []; // 🔥 reset selection
+                                            //   _homeController.doGetArtiestListData();
+                                            //   Navigator.of(context).maybePop(); // 👈 go back to stylist selection
+                                            // },
+                                            onTap: () {
+                                              //selectedArtistIdsGlobal.value = [];
 
-                                            /// 🔥 CLOSE BOTH SCREENS
-                                            Navigator.of(context)
-                                                .maybePop(); // appointment
-                                            Navigator.of(context)
-                                                .maybePop(); // bottom sheet
+                                              /// 🔥 CLOSE BOTH SCREENS
+                                              Navigator.of(context)
+                                                  .maybePop(); // appointment
+                                              Navigator.of(context)
+                                                  .maybePop(); // bottom sheet
 
-                                            /// 🔥 REOPEN FRESH BOTTOM SHEET
-                                            Get.bottomSheet(
-                                              SelectingArtistBottomSheetWidget(
-                                                serviceId: _homeController
-                                                        .getServiceAddCartModel
-                                                        .data
-                                                        ?.salonId ??
-                                                    "",
-                                                salonId: _homeController
-                                                        .getServiceAddCartModel
-                                                        .data
-                                                        ?.salonId ??
-                                                    "",
-                                                callback: () {},
-                                              ),
-                                              isScrollControlled: true,
-                                            );
-                                          },
-                                          child: Container(
-                                            height: 30,
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 12),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              border: Border.all(
-                                                color: changeTheme(
-                                                      SharedPrefs
-                                                          .readStringValue(
-                                                              PrefConstants
-                                                                  .gender),
-                                                    ) ??
-                                                    const Color(0xFF8565D0),
-                                                width: 1.5, // Figma color
-                                              ),
-                                            ),
-                                            child: Center(
-                                              child: Text(
-                                                "Edit Stylist",
-                                                style: TextStyle(
-                                                  fontFamily: "Outfit",
-                                                  fontSize: 13,
-                                                  fontWeight: FontWeight.w600,
+                                              /// 🔥 REOPEN FRESH BOTTOM SHEET
+                                              Get.bottomSheet(
+                                                SelectingArtistBottomSheetWidget(
+                                                  serviceId: _homeController
+                                                          .getServiceAddCartModel
+                                                          .data
+                                                          ?.salonId ??
+                                                      "",
+                                                  salonId: _homeController
+                                                          .getServiceAddCartModel
+                                                          .data
+                                                          ?.salonId ??
+                                                      "",
+                                                  callback: () {},
+                                                ),
+                                                isScrollControlled: true,
+                                              );
+                                            },
+                                            child: Container(
+                                              height: 30,
+                                              padding: const EdgeInsets.symmetric(
+                                                  horizontal: 12),
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                                border: Border.all(
                                                   color: changeTheme(
                                                         SharedPrefs
                                                             .readStringValue(
@@ -834,11 +838,28 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                                     .gender),
                                                       ) ??
                                                       const Color(0xFF8565D0),
+                                                  width: 1.5, // Figma color
+                                                ),
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  "Edit Stylist",
+                                                  style: TextStyle(
+                                                    fontFamily: "Outfit",
+                                                    fontSize: 13,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: changeTheme(
+                                                          SharedPrefs
+                                                              .readStringValue(
+                                                                  PrefConstants
+                                                                      .gender),
+                                                        ) ??
+                                                        const Color(0xFF8565D0),
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
-                                        ),
                                       ],
                                     ),
                                     const SizedBox(height: 5),
@@ -1083,6 +1104,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                       await _markSalonVisited();
 
                       Get.to(() => SaloonAfterSelectingServicesPage(
+                            isPayNowMode: false,
                             id: _homeController
                                     .getServiceAddCartModel.data?.salonId ??
                                 "",
@@ -1217,6 +1239,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                             onTap: () {
                               // _payAndBook();
                               //_showBookingOptionsBottomSheet(context);
+                              if (selectedSlots.isEmpty) {
+                                showMessage("Please select atleast one Time slot");
+                                return;
+                              }
                               _showPaymentInfoDialog(context);
                             },
                             child: Container(
@@ -1278,27 +1304,92 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     ));
   }
 
-  List<String> generateTimeSlots() {
+  // List<String> generateTimeSlots() {
+  //   List<String> slots = [];
+  //
+  //   DateTime now = DateTime.now();
+  //
+  //   // 👉 Round to next 15-minute slot
+  //   int minute = now.minute;
+  //   int remainder = minute % 15;
+  //
+  //   if (remainder != 0) {
+  //     now = now.add(Duration(minutes: 15 - remainder));
+  //   }
+  //
+  //   // Optional: remove seconds
+  //   now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+  //
+  //   DateTime end = DateTime(now.year, now.month, now.day, 21, 0); // 9 PM
+  //
+  //   while (now.isBefore(end)) {
+  //     slots.add(DateFormat("HH:mm").format(now));
+  //     now = now.add(const Duration(minutes: 15));
+  //   }
+  //
+  //   return slots;
+  // }
+
+  String getWeekDayKey(DateTime date) {
+    switch (date.weekday) {
+      case 1: return "monday";
+      case 2: return "tuesday";
+      case 3: return "wednesday";
+      case 4: return "thursday";
+      case 5: return "friday";
+      case 6: return "saturday";
+      case 7: return "sunday";
+      default: return "";
+    }
+  }
+
+  List<String> generateTimeSlots(dynamic workPlan) {
     List<String> slots = [];
 
-    DateTime now = DateTime.now();
-
-    // 👉 Round to next 15-minute slot
-    int minute = now.minute;
-    int remainder = minute % 15;
-
-    if (remainder != 0) {
-      now = now.add(Duration(minutes: 15 - remainder));
+    if (selectDate.isEmpty || workPlan == null) {
+      return slots;
     }
 
-    // Optional: remove seconds
-    now = DateTime(now.year, now.month, now.day, now.hour, now.minute);
+    DateTime now = DateTime.now();
+    DateTime selectedDateTime = DateTime.parse(selectDate);
 
-    DateTime end = DateTime(now.year, now.month, now.day, 21, 0); // 9 PM
+    /// ✅ Get weekday key
+    String dayKey = getWeekDayKey(selectedDateTime);
 
-    while (now.isBefore(end)) {
-      slots.add(DateFormat("HH:mm").format(now));
-      now = now.add(const Duration(minutes: 15));
+    final dayPlan = workPlan[dayKey];
+
+    /// ❌ DAY OFF
+    if (dayPlan == null) {
+      return [];
+    }
+
+    /// ✅ Backend start & end
+    DateTime startTime = DateTime.parse("$selectDate ${dayPlan['start']}");
+    DateTime endTime   = DateTime.parse("$selectDate ${dayPlan['end']}");
+
+    /// ✅ TODAY → skip past time
+    if (DateFormat("yyyy-MM-dd").format(now) == selectDate) {
+      if (startTime.isBefore(now)) {
+        int remainder = now.minute % 15;
+
+        if (remainder != 0) {
+          now = now.add(Duration(minutes: 15 - remainder));
+        }
+
+        startTime = DateTime(
+          now.year,
+          now.month,
+          now.day,
+          now.hour,
+          now.minute,
+        );
+      }
+    }
+
+    /// ✅ Generate slots
+    while (startTime.isBefore(endTime)) {
+      slots.add(DateFormat("HH:mm").format(startTime));
+      startTime = startTime.add(const Duration(minutes: 15));
     }
 
     return slots;
@@ -1373,16 +1464,16 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                       _priceRow("GST & Other Charges", gst + platformFee),
                       Container(
                         margin: const EdgeInsets.only(top: 2),
-                        width: 150,
+                        width: 125,
                         child: Row(
                           children: List.generate(
-                            30,
+                            20,
                             (_) => Expanded(
                               child: Container(
                                 height: 1,
                                 margin:
                                     const EdgeInsets.symmetric(horizontal: 1),
-                                color: Colors.grey.shade400,
+                                color: Colors.grey.shade500,
                               ),
                             ),
                           ),
@@ -1709,6 +1800,26 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                       Text("• "),
                       Expanded(
                         child: Text(
+                          "Busy schedules may cause occasional variations in staff availability.",
+                          style: TextStyle(
+                            fontFamily: 'Outfit',
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: const [
+                      Text("• "),
+                      Expanded(
+                        child: Text(
                           "Prices may vary based on the length, density or thickness of the hair in some services",
                           style: TextStyle(
                             fontFamily: 'Outfit',
@@ -1756,7 +1867,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
             /// 🔥 CLOSE BUTTON
             Positioned(
-              top: 90,
+              top: 50,
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
                 child: Container(
@@ -2130,6 +2241,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   // }
 
   Future<void> _bookPayAfterService() async {
+    SharedPrefs.writeBoolValue(PrefConstants.hasShownSalonDialog, true);
     // ✅ 1. Cart validation
     if (_homeController.getServiceAddCartModel.data?.items?.isEmpty ?? true) {
       showMessage("Cart Service Not Found");

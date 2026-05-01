@@ -43,6 +43,8 @@ class Data {
   Address? address;
   List<String>? selectedSlots;
   List<Artist>? selectedStylists;
+  String? rejectionDisplayReason;
+  String? cancellationDisplayReason;
 
   Salon? salon;
   Appointment? appointment;
@@ -113,6 +115,8 @@ class Data {
         selectedStylists!.add(Artist.fromJson(v));
       });
     }
+    rejectionDisplayReason = json['rejectionDisplayReason'];
+    cancellationDisplayReason = json['cancellationDisplayReason'];
   }
 
   Map<String, dynamic> toJson() {
@@ -132,6 +136,8 @@ class Data {
     data['allowPortfolioUpload'] = allowPortfolioUpload;
     data['startsAt'] = startsAt;
     data['endsAt'] = endsAt;
+    data['rejectionDisplayReason'] = rejectionDisplayReason;
+    data['cancellationDisplayReason'] = cancellationDisplayReason;
     if (address != null) {
       data['address'] = address!.toJson();
     }

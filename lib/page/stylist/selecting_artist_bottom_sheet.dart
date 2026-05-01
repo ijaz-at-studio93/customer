@@ -108,7 +108,7 @@ class _SelectingArtistBottomSheetWidgetState
                         //final artistIds = getDefaultArtistIds();
 
                         // if (artistIds.isEmpty) {
-                        //   Get.snackbar("Error", "No artists available");
+                        //   SnackbarUtil.show("Error", "No artists available");
                         //   return;
                         // }
 
@@ -162,12 +162,60 @@ class _SelectingArtistBottomSheetWidgetState
                   final femaleBeauty = data.femaleBeautyArtists ?? [];
                   final meta = data.serviceMeta;
 
-                  if (meta == null) {
-                    return const NoItemsWidget(text: "No Artist Available");
+                  // if (meta == null) {
+                  //   return const NoItemsWidget(text: "No Artist Available");
+                  // }
+                  if (_homeController.showProgress) {
+                    return const ProgressBarView();
+                  }
+
+                  final hasNoArtist =
+                  (maleHair.isEmpty &&
+                      femaleHair.isEmpty &&
+                      maleBeauty.isEmpty &&
+                      femaleBeauty.isEmpty);
+
+                  if (meta != null && hasNoArtist) {
+                    return SizedBox.expand(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.groups_2_outlined, size: 60, color: Colors.grey),
+                          const SizedBox(height: 20),
+                          const Text(
+                            "Optional Staff Selection",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          const Text(
+                            "Best staff will be assigned at the salon",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          const Text(
+                            "Tap 'Skip' to continue",
+                            style: TextStyle(
+                              fontFamily: "Outfit",
+                              fontSize: 13,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
                   }
 
                   final isBothGender =
-                      meta.hasMaleServices && meta.hasFemaleServices;
+                  (meta?.hasMaleServices ?? false) && (meta?.hasFemaleServices ?? false);
 
                   return SingleChildScrollView(
                       physics: const NeverScrollableScrollPhysics(), // 🔥 disables scroll
@@ -226,7 +274,7 @@ class _SelectingArtistBottomSheetWidgetState
                           getMenPriorityArtists(
                             maleHair: maleHair,
                             maleBeauty: maleBeauty,
-                            meta: meta,
+                            meta: meta!,
                           ),
                           "male",
                         ),

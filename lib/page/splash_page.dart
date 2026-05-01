@@ -17,6 +17,7 @@ import 'package:salon_customer/util/app_conctant.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../project_specific/button_widget.dart';
+import '../util/app_icon_helper.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -151,7 +152,7 @@ class _SplashPageState extends State<SplashPage> {
     //     route();
     //   }
     // });
-    _authController.doAppUpdate(callback: () {
+    _authController.doAppUpdate(callback: () async {
       final serverVersion =
           _authController.getAppUpdateModel.data?.userAppLatestVersion;
 
@@ -163,6 +164,26 @@ class _SplashPageState extends State<SplashPage> {
           _normalUpdateDialog();
         }
       } else {
+        DateTime? bookingDate;
+
+        // if (SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
+        //   final homeController = Get.find<HomeController>();
+        //
+        //   await homeController.doGetCurrentBookingListData();
+        //
+        //   final bookings =
+        //       homeController.getCurrentBookingListModel.data ?? [];
+        //
+        //   if (bookings.isNotEmpty) {
+        //     final latestBooking = bookings.first;
+        //
+        //     if (latestBooking.finalizedAt != null) {
+        //       bookingDate = DateTime.parse(latestBooking.finalizedAt!);
+        //     }
+        //   }
+        // }
+        //
+        // await AppIconHelper.updateCustomerAppIcon(bookingDate);
         route();
       }
     });

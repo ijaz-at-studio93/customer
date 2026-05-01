@@ -37,6 +37,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   late final PageController _pageController;
   Timer? _autoPlayTimer;
   int _currentPage = 0;
+  late List<String> _images;
   static const Duration _autoPlayInterval = Duration(seconds: 4);
   static const Duration _autoPlayResumeDelay = Duration(seconds: 2);
   bool _isUserInteracting = false;
@@ -45,18 +46,37 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   @override
   void initState() {
     super.initState();
+    _images = _getImageList(widget.homeSalonModel); // ← add this line
     _pageController = PageController(initialPage: 0, viewportFraction: 1.0);
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartAutoPlay());
   }
 
+  // @override
+  // void didUpdateWidget(covariant SaloonCardWidget oldWidget) {
+  //   super.didUpdateWidget(oldWidget);
+  //   // If images changed, reset page and timer
+  //   if (_getImageList(oldWidget.homeSalonModel) !=
+  //       _getImageList(widget.homeSalonModel)) {
+  //     _currentPage = 0;
+  //     if (_pageController.hasClients) _pageController.jumpToPage(0);
+  //     _restartAutoPlay();
+  //   }
+  // }
+
   @override
   void didUpdateWidget(covariant SaloonCardWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // If images changed, reset page and timer
-    if (_getImageList(oldWidget.homeSalonModel) !=
-        _getImageList(widget.homeSalonModel)) {
+
+    /// 🔥 FIX: compare by ID (not list)
+    if (oldWidget.homeSalonModel.id != widget.homeSalonModel.id) {
+      _images = _getImageList(widget.homeSalonModel);
+
       _currentPage = 0;
-      if (_pageController.hasClients) _pageController.jumpToPage(0);
+
+      if (_pageController.hasClients) {
+        _pageController.jumpToPage(0);
+      }
+
       _restartAutoPlay();
     }
   }
@@ -96,8 +116,8 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   void _maybeStartAutoPlay() {
     if (_autoPlayTimer != null) return; // prevent duplicate timers
 
-    final images = _getImageList(widget.homeSalonModel);
-    if (images.length > 1) {
+    //final images = _getImageList(widget.homeSalonModel);
+    if (_images.length > 1) {
       _startAutoPlay();
     }
   }
@@ -106,9 +126,9 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
     _autoPlayTimer?.cancel();
     _autoPlayTimer = Timer.periodic(_autoPlayInterval, (_) {
       if (_isUserInteracting) return;
-      final images = _getImageList(widget.homeSalonModel);
-      if (images.length <= 1) return;
-      final nextPage = (_currentPage + 1) % images.length;
+      //final images = _getImageList(widget.homeSalonModel);
+      if (_images.length <= 1) return;
+      final nextPage = (_currentPage + 1) % _images.length;
       if (!_pageController.hasClients) return;
       _pageController.animateToPage(
         nextPage,
@@ -141,32 +161,174 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   }
 
   Widget _buildImageCarousel(BuildContext context) {
-    final images = _getImageList(widget.homeSalonModel);
-    final imageHeight = 183.0; //Get.height * 0.30; // EXACT original height
+    final images = _images;
+    //final imageHeight = 183.0; //Get.height * 0.30; // EXACT original height
 
     if (images.isEmpty) {
+      // return ClipRRect(
+      //   borderRadius: const BorderRadius.only(
+      //     topLeft: Radius.circular(10),
+      //     topRight: Radius.circular(10),
+      //   ),
+      //   child: Image.asset(
+      //     AssetsConstant.placeHolder,
+      //     width: Get.width,
+      //     height: imageHeight,
+      //     fit: BoxFit.cover,
+      //   ),
+      // );
       return ClipRRect(
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(10),
           topRight: Radius.circular(10),
         ),
-        child: Image.asset(
-          AssetsConstant.placeHolder,
-          width: Get.width,
-          height: imageHeight,
-          fit: BoxFit.fitWidth,
+        child: AspectRatio(
+          aspectRatio: 16 / 9, // 🔥 THIS FIXES YOUR ISSUE
+          child: PageView.builder(
+            controller: _pageController,
+            itemCount: images.length,
+            onPageChanged: (index) {
+              setState(() => _currentPage = index);
+            },
+            itemBuilder: (context, index) {
+              final imageUrl = images[index];
+
+              return CachedNetworkImage(
+                imageUrl: imageUrl,
+                width: Get.width,
+                fit: BoxFit.cover, // keep this
+              );
+            },
+          ),
         ),
       );
     }
 
+    // return ClipRRect(
+    //   borderRadius: const BorderRadius.only(
+    //     topLeft: Radius.circular(10),
+    //     topRight: Radius.circular(10),
+    //   ),
+    //   child: SizedBox(
+    //     width: Get.width,
+    //     //height: imageHeight, // FORCE same height
+    //     child: GestureDetector(
+    //       behavior: HitTestBehavior.opaque,
+    //       onPanDown: (_) => _onUserInteractionStart(),
+    //       onPanCancel: _onUserInteractionEnd,
+    //       onPanEnd: (_) => _onUserInteractionEnd(),
+    //       onTapDown: (_) => _onUserInteractionStart(),
+    //       onTapUp: (_) => _onUserInteractionEnd(),
+    //       child: Stack(
+    //         children: [
+    //           PageView.builder(
+    //             controller: _pageController,
+    //             itemCount: images.length,
+    //             onPageChanged: (index) {
+    //               setState(() => _currentPage = index);
+    //             },
+    //             itemBuilder: (context, index) {
+    //               final imageUrl = images[index];
+    //               // replace the existing ⁠ return SizedBox(...) ⁠ inside itemBuilder with this:
+    //               return GestureDetector(
+    //                 onTap: widget
+    //                     .onPress, // restore image tap (calls same callback as whole card)
+    //                 onLongPress: () {
+    //                   _showImagePreview(context, imageUrl);
+    //                 },
+    //                 behavior: HitTestBehavior.opaque,
+    //                 child: SizedBox(
+    //                   width: Get.width,
+    //                   //height: imageHeight,
+    //                   child: CachedNetworkImage(
+    //                     imageUrl: imageUrl,
+    //                     width: Get.width,
+    //                     //height: imageHeight,
+    //                     fit: BoxFit.cover,
+    //                     memCacheWidth: Get.width.toInt(),  // ← add this
+    //                     //memCacheHeight: imageHeight.toInt(),
+    //                     placeholder: (c, u) => Image.asset(
+    //                       AssetsConstant.placeHolder,
+    //                       width: Get.width,
+    //                       //height: imageHeight,
+    //                       fit: BoxFit.cover,
+    //                     ),
+    //                     errorWidget: (c, u, e) => Image.asset(
+    //                       AssetsConstant.placeHolder,
+    //                       width: Get.width,
+    //                       //height: imageHeight,
+    //                       fit: BoxFit.cover,
+    //                     ),
+    //                   ),
+    //                 ),
+    //               );
+    //             },
+    //           ),
+    //
+    //           // gradient overlay (single copy inside carousel)
+    //           Positioned.fill(
+    //             child: IgnorePointer(
+    //               ignoring: true,
+    //               child: Container(
+    //                 alignment: Alignment.bottomCenter,
+    //                 child: Container(
+    //                   width: Get.width,
+    //                   height: Get.height * 0.25, // same overlay as original
+    //                   decoration: BoxDecoration(
+    //                     gradient: LinearGradient(
+    //                       begin: Alignment.bottomCenter,
+    //                       end: Alignment.topCenter,
+    //                       colors: [
+    //                         ColorConstant.blackColor,
+    //                         Colors.black.withOpacity(0),
+    //                         Colors.black.withOpacity(0),
+    //                       ],
+    //                     ),
+    //                   ),
+    //                 ),
+    //               ),
+    //             ),
+    //           ),
+    //           // dots indicator
+    //           if (images.length > 1)
+    //             Positioned(
+    //               bottom: 8,
+    //               left: 0,
+    //               right: 0,
+    //               child: Row(
+    //                 mainAxisAlignment: MainAxisAlignment.end,
+    //                 children: List.generate(images.length, (i) {
+    //                   final isActive = i == _currentPage;
+    //                   return AnimatedContainer(
+    //                     duration: const Duration(milliseconds: 250),
+    //                     margin: const EdgeInsets.symmetric(horizontal: 4),
+    //                     width: isActive ? 10 : 7,
+    //                     height: isActive ? 10 : 7,
+    //                     decoration: BoxDecoration(
+    //                       color: isActive
+    //                           ? ColorConstant.whiteColor
+    //                           : Colors.white54,
+    //                       shape: BoxShape.circle,
+    //                     ),
+    //                   );
+    //                 }),
+    //               ),
+    //             ),
+    //         ],
+    //       ),
+    //     ),
+    //   ),
+    // );
     return ClipRRect(
       borderRadius: const BorderRadius.only(
         topLeft: Radius.circular(10),
         topRight: Radius.circular(10),
       ),
-      child: SizedBox(
-        width: Get.width,
-        height: imageHeight, // FORCE same height
+
+      /// 🔥 MAIN FIX: use AspectRatio instead of SizedBox height
+      child: AspectRatio(
+        aspectRatio: 16 / 9,
+
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onPanDown: (_) => _onUserInteractionStart(),
@@ -174,8 +336,11 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
           onPanEnd: (_) => _onUserInteractionEnd(),
           onTapDown: (_) => _onUserInteractionStart(),
           onTapUp: (_) => _onUserInteractionEnd(),
+
           child: Stack(
             children: [
+
+              /// 🔥 IMAGE CAROUSEL
               PageView.builder(
                 controller: _pageController,
                 itemCount: images.length,
@@ -184,49 +349,46 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                 },
                 itemBuilder: (context, index) {
                   final imageUrl = images[index];
-                  // replace the existing ⁠ return SizedBox(...) ⁠ inside itemBuilder with this:
+
                   return GestureDetector(
-                    onTap: widget
-                        .onPress, // restore image tap (calls same callback as whole card)
+                    onTap: widget.onPress,
                     onLongPress: () {
                       _showImagePreview(context, imageUrl);
                     },
                     behavior: HitTestBehavior.opaque,
-                    child: SizedBox(
+
+                    child: CachedNetworkImage(
+                      imageUrl: imageUrl,
                       width: Get.width,
-                      height: imageHeight,
-                      child: CachedNetworkImage(
-                        imageUrl: imageUrl,
+                      fit: BoxFit.cover, // ✅ correct
+
+                      memCacheWidth: (Get.width * 2).toInt(),
+
+                      placeholder: (c, u) => Image.asset(
+                        AssetsConstant.placeHolder,
                         width: Get.width,
-                        height: imageHeight,
-                        fit: BoxFit.fitWidth,
-                        placeholder: (c, u) => Image.asset(
-                          AssetsConstant.placeHolder,
-                          width: Get.width,
-                          height: imageHeight,
-                          fit: BoxFit.fitWidth,
-                        ),
-                        errorWidget: (c, u, e) => Image.asset(
-                          AssetsConstant.placeHolder,
-                          width: Get.width,
-                          height: imageHeight,
-                          fit: BoxFit.fitWidth,
-                        ),
+                        fit: BoxFit.cover,
+                      ),
+
+                      errorWidget: (c, u, e) => Image.asset(
+                        AssetsConstant.placeHolder,
+                        width: Get.width,
+                        fit: BoxFit.cover,
                       ),
                     ),
                   );
                 },
               ),
 
-              // gradient overlay (single copy inside carousel)
+              /// 🔥 GRADIENT OVERLAY
               Positioned.fill(
                 child: IgnorePointer(
                   ignoring: true,
-                  child: Container(
+                  child: Align(
                     alignment: Alignment.bottomCenter,
                     child: Container(
-                      width: Get.width,
-                      height: Get.height * 0.25, // same overlay as original
+                      width: double.infinity,
+                      height: Get.height * 0.25,
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.bottomCenter,
@@ -242,21 +404,21 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                   ),
                 ),
               ),
-              // dots indicator
+
+              /// 🔥 DOT INDICATOR
               if (images.length > 1)
                 Positioned(
                   bottom: 8,
-                  left: 0,
-                  right: 0,
+                  right: 8,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(images.length, (i) {
                       final isActive = i == _currentPage;
+
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 250),
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: isActive ? 10 : 7,
-                        height: isActive ? 10 : 7,
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        width: isActive ? 8 : 6,
+                        height: isActive ? 8 : 6,
                         decoration: BoxDecoration(
                           color: isActive
                               ? ColorConstant.whiteColor
@@ -382,17 +544,24 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
         child: GestureDetector(
           onTap: widget.onPress,
           child: Container(
-            width: 368, //Get.width,
-            height: 265,
+            width: Get.width,
+            //height: 235,
             decoration: BoxDecoration(
-              color: ColorConstant.crossMarkColor,
+              color: ColorConstant.whiteColor,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender),
-                )!,
-                width: 1.5,
-              ),
+              // border: Border.all(
+              //   color: changeTheme(
+              //     SharedPrefs.readStringValue(PrefConstants.gender),
+              //   )!,
+              //   width: 1.5,
+              // ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.06),
+                    blurRadius: 6,
+                    offset: Offset(0, 3),
+                  ),
+                ]
             ),
             child: Column(
               children: [
@@ -439,58 +608,135 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         ),
                       ),
                     ),
-                    Positioned(
-                      top: 17,
-                      left: 1,
-                      child: Container(
-                        //height: 18,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 15, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7), // ✅ Figma color
-                          borderRadius:
-                              BorderRadius.circular(4), // ✅ pill shape
-                        ),
-                        child: Row(
-                          mainAxisSize:
-                              MainAxisSize.min, // ✅ important (no full width)
-                          children: [
-                            Image.asset(
-                              AssetsConstant.newOfferIcon,
-                              width: 18, // 🔥 slightly smaller (Figma match)
-                              height: 18,
+                    // Positioned(
+                    //   top: 17,
+                    //   left: 1,
+                    //   child: Container(
+                    //     //height: 18,
+                    //     padding: const EdgeInsets.symmetric(
+                    //         horizontal: 15, vertical: 5),
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.white.withOpacity(0.7), // ✅ Figma color
+                    //       borderRadius:
+                    //           BorderRadius.circular(4), // ✅ pill shape
+                    //     ),
+                    //     child: Row(
+                    //       mainAxisSize:
+                    //           MainAxisSize.min, // ✅ important (no full width)
+                    //       children: [
+                    //         Image.asset(
+                    //           AssetsConstant.newOfferIcon,
+                    //           width: 18, // 🔥 slightly smaller (Figma match)
+                    //           height: 18,
+                    //         ),
+                    //         const SizedBox(width: 4),
+                    //         Builder(
+                    //           builder: (_) {
+                    //             final discountText =
+                    //                 _getHighestDiscountForSalon();
+                    //
+                    //             if (discountText.isEmpty)
+                    //               return const SizedBox();
+                    //
+                    //             return Text(
+                    //               "${discountText} Off",
+                    //               style: AppTextTheme.bold.copyWith(
+                    //                 fontFamily: "Inter", // ✅ Figma font
+                    //                 fontWeight:
+                    //                     FontWeight.w900, // ✅ Black weight
+                    //                 fontSize: 12, // ✅ exact size
+                    //                 color: const Color(
+                    //                     0xFFE800E4), // ✅ exact color
+                    //               ),
+                    //             );
+                    //           },
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ),
+                    Builder(
+                      builder: (_) {
+                        final discountText = _getHighestDiscountForSalon();
+
+                        /// ❌ No offer → hide completely
+                        if (discountText.isEmpty) {
+                          return const SizedBox();
+                        }
+
+                        /// ✅ Show only when offer exists
+                        return Positioned(
+                          top: 15,
+                          left: 1,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(4),
                             ),
-                            const SizedBox(width: 4),
-                            Builder(
-                              builder: (_) {
-                                final discountText =
-                                    _getHighestDiscountForSalon();
-
-                                if (discountText.isEmpty)
-                                  return const SizedBox();
-
-                                return Text(
-                                  discountText,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Image.asset(
+                                  AssetsConstant.newOfferIcon,
+                                  width: 18,
+                                  height: 18,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  "$discountText Off",
                                   style: AppTextTheme.bold.copyWith(
-                                    fontFamily: "Inter", // ✅ Figma font
-                                    fontWeight:
-                                        FontWeight.w900, // ✅ Black weight
-                                    fontSize: 12, // ✅ exact size
-                                    color: const Color(
-                                        0xFFE800E4), // ✅ exact color
+                                    fontFamily: "Inter",
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 12,
+                                    color: const Color(0xFFE800E4),
                                   ),
-                                );
-                              },
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        );
+                      },
+                    ),
+                    Positioned(
+                      left: 12,
+                      bottom: 12,
+                      right: 12,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            widget.homeSalonModel.displayName ?? "",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w600,
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            widget.homeSalonModel.address ?? "",
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style:  TextStyle(
+                              fontFamily: "Outfit",
+                              fontWeight: FontWeight.w400,
+                              fontSize: 9,
+                              color: Colors.white.withOpacity(0.7),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
                 //const SizedBox(height: 3),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 7),
+                  padding: const EdgeInsets.symmetric(horizontal: 7,vertical: 2.5),
+                  //padding: const EdgeInsets.only(left: 7,right: 14,top: 2.5, bottom: 2.5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -498,39 +744,39 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           /// TOP CONTENT
-                          SizedBox(
-                            width: Get.width * 0.65,
-                            child: Text(
-                              //'${widget.homeSalonModel.name}',
-                              '${widget.homeSalonModel.displayName}',
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextTheme.bold.copyWith(
-                                fontFamily: "Outfit",
-                                fontWeight: FontWeight.w600,
-                                fontSize: 18,
-                                color: ColorConstant.blackColor,
-                              ),
-                            ),
-                          ),
-
-                          SizedBox(
-                            width: Get.width * 0.6,
-                            child: Text(
-                              '${widget.homeSalonModel.address}',
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppTextTheme.bold.copyWith(
-                                fontFamily: "Outfit",
-                                fontWeight: FontWeight.w600,
-                                fontSize: 10.5,
-                                color: Colors.black45,
-                                height: 1,
-                              ),
-                            ),
-                          ),
-
-                          const SizedBox(height: 1),
+                          // SizedBox(
+                          //   width: Get.width * 0.65,
+                          //   child: Text(
+                          //     //'${widget.homeSalonModel.name}',
+                          //     '${widget.homeSalonModel.displayName}',
+                          //     maxLines: 1,
+                          //     overflow: TextOverflow.ellipsis,
+                          //     style: AppTextTheme.bold.copyWith(
+                          //       fontFamily: "Outfit",
+                          //       fontWeight: FontWeight.w600,
+                          //       fontSize: 18,
+                          //       color: ColorConstant.blackColor,
+                          //     ),
+                          //   ),
+                          // ),
+                          //
+                          // SizedBox(
+                          //   width: Get.width * 0.6,
+                          //   child: Text(
+                          //     '${widget.homeSalonModel.address}',
+                          //     maxLines: 2,
+                          //     overflow: TextOverflow.ellipsis,
+                          //     style: AppTextTheme.bold.copyWith(
+                          //       fontFamily: "Outfit",
+                          //       fontWeight: FontWeight.w600,
+                          //       fontSize: 10.5,
+                          //       color: Colors.black45,
+                          //       height: 1,
+                          //     ),
+                          //   ),
+                          // ),
+                          //
+                          // const SizedBox(height: 1),
 
                           Row(
                             children: [
@@ -547,6 +793,42 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                                   fontWeight: FontWeight.w700,
                                   fontSize: 12.5,
                                   color: const Color(0xFF057336),
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              const SizedBox(width: 4),
+
+                              Text(
+                                "|",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: changeTheme(
+                                    SharedPrefs.readStringValue(PrefConstants.gender),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 4),
+                              Icon(
+                                Icons.lightbulb_outline, // 👈 common amenities icon
+                                size: 16,
+                                color: changeTheme(
+                                  SharedPrefs.readStringValue(PrefConstants.gender),
+                                ),
+                              ),
+
+                              Text(
+                                widget.homeSalonModel.amenities ??
+                                    "",
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                                style: AppTextTheme.medium.copyWith(
+                                  color: changeTheme(
+                                      SharedPrefs.readStringValue(PrefConstants.gender)),
+                                  fontSize: 12,
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ],
@@ -589,7 +871,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                         children: [
                           Container(
                             height: 26,
-                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 7),
                             decoration: BoxDecoration(
                               color: ColorConstant.greenColor,
                               borderRadius:
@@ -600,7 +882,6 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 const Icon(
-                                  //Icons.star,
                                   Icons.star_rounded,
                                   color: ColorConstant.whiteColor,
                                   size: 20,
@@ -622,7 +903,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                             ),
                           ),
 
-                          const SizedBox(height: 4),
+                          const SizedBox(height: 2),
 
                           Center(
                             child: Text(
@@ -726,7 +1007,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
 
     if (maxPercent == 0) return "";
 
-    return "${_formatPercent(maxPercent)} Off";
+    return _formatPercent(maxPercent);
   }
 
   String _formatPercent(double value) {

@@ -13,6 +13,7 @@ import '../../constant/variable_constant.dart';
 import '../../util/NoItemsWidget.dart';
 import '../../util/SharedPrefs.dart';
 import '../../util/call_wrapper.dart';
+import '../../util/snackbar_util.dart';
 import '../appointment/widget/pending_payment_bar.dart';
 
 class BookingHomePage extends StatefulWidget {
@@ -179,36 +180,36 @@ class _BookingHomePageState extends State<BookingHomePage>
             ),
 
             /// FLOATING PAY BAR ABOVE CALL BUTTON
-            Obx(() {
-
-              if (bookingOverView != "0") {
-                return const SizedBox();
-              }
-
-              final bookings =
-                  _homeController.getCurrentBookingListModel.data ?? [];
-
-              final pending = bookings.firstWhereOrNull(
-                    (b) =>
-                b.paymentStatus == "pending" &&
-                    b.orderStatus == "pending",
-              );
-
-              if (pending == null) {
-                return const SizedBox();
-              }
-
-              return Positioned(
-                bottom: 20,
-                left: 20,
-                right: 20,
-                child: PendingPaymentBar(
-                  bookingId: pending.appointmentId ?? "",
-                  salonName: pending.salon?.name ?? "",
-                  startsAt: pending.startsAt ?? "",
-                ),
-              );
-            }),
+            // Obx(() {
+            //
+            //   if (bookingOverView != "0") {
+            //     return const SizedBox();
+            //   }
+            //
+            //   final bookings =
+            //       _homeController.getCurrentBookingListModel.data ?? [];
+            //
+            //   final pending = bookings.firstWhereOrNull(
+            //         (b) =>
+            //     b.paymentStatus == "pending" &&
+            //         b.orderStatus == "pending",
+            //   );
+            //
+            //   if (pending == null) {
+            //     return const SizedBox();
+            //   }
+            //
+            //   return Positioned(
+            //     bottom: 70,
+            //     left: 20,
+            //     right: 20,
+            //     child: PendingPaymentBar(
+            //       bookingId: pending.appointmentId ?? "",
+            //       salonName: pending.salon?.displayName ?? "",
+            //       startsAt: pending.startsAt ?? "",
+            //     ),
+            //   );
+            // }),
 
           ],
         ),
@@ -322,7 +323,7 @@ class _BookingHomePageState extends State<BookingHomePage>
 
             Get.back(result: true);
 
-            Get.snackbar(
+            SnackbarUtil.show(
               "Re scheduled",
               "Your booking was re scheduled successfully.",
               snackPosition: SnackPosition.BOTTOM,

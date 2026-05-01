@@ -15,10 +15,11 @@ import 'package:salon_customer/page/splash_page.dart';
 import 'package:salon_customer/util/NotificationUtils.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/notification_service.dart';
-
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:facebook_app_events/facebook_app_events.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final facebookAppEvents = FacebookAppEvents();
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
     FlutterLocalNotificationsPlugin();
@@ -128,6 +129,8 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+  await facebookAppEvents.setAutoLogAppEventsEnabled(true);
+  await facebookAppEvents.setAdvertiserTracking(enabled: true);
   runApp(const MyApp());
 }
 

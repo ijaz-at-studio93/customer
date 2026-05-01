@@ -370,16 +370,20 @@ class _LoginPageState extends State<LoginPage> {
     } else if (!iAgree) {
       showMessage("Please accept Terms and Conditions");
     } else {
-      _authController.doCheckMobileNumberRegistration(
+      _authController.sendOtpAndGoToOtp(
         mobileNo: _mobileTextEditingController.text,
         countryCode: "91",
-        callback: () {
-          Get.to(() => OtpScreenPage(
-            mobileNumber: _mobileTextEditingController.text,
-            isLogin: false,
-          ));
-        },
       );
+      // _authController.doCheckMobileNumberRegistration(
+      //   mobileNo: _mobileTextEditingController.text,
+      //   countryCode: "91",
+      //   callback: () {
+      //     Get.to(() => OtpScreenPage(
+      //       mobileNumber: _mobileTextEditingController.text,
+      //       isLogin: false,
+      //     ));
+      //   },
+      // );
     }
   }
 }

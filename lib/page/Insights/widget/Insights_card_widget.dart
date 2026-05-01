@@ -8,7 +8,10 @@ import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/model/blog_data_model.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
+import '../../../project_specific/network_video_view_widget.dart';
 import '../../../util/SharedPrefs.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
+import 'dart:typed_data';
 
 class InsightsCardWidget extends StatefulWidget {
   final VoidCallback onPress;
@@ -42,46 +45,48 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
             children: [
               Stack(
                 children: [
-                  widget.blogData.image?.isEmpty ?? false
-                      ? Container(
-                          width: Get.width,
-                          height: Get.height * 0.22,
-                          decoration: BoxDecoration(
-                          color: ColorConstant.primaryColor.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Center(
-                            child: Image.asset(
-                              AssetsConstant.playIcon,
-                              width: 50,
-                              height: 50,
-                            ),
-                          ),
-                        )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: CachedNetworkImage(
-                            width: Get.width,
-                            height: Get.height * 0.22,
-                            fit: BoxFit.cover,
-                            imageUrl:
-                                "${APIConstants.image}${widget.blogData.image}",
-                            placeholder: (context, url) => Image(
-                              image:
-                                  const AssetImage(AssetsConstant.placeHolder),
-                              width: Get.width,
-                              height: Get.height * 0.22,
-                              fit: BoxFit.cover,
-                            ),
-                            errorWidget: (context, url, error) => Image(
-                              image:
-                                  const AssetImage(AssetsConstant.placeHolder),
-                              width: Get.width,
-                              height: Get.height * 0.22,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+                  _buildMedia(),
+
+                  // widget.blogData.image?.isEmpty ?? false
+                  //     ? Container(
+                  //         width: Get.width,
+                  //         height: Get.height * 0.22,
+                  //         decoration: BoxDecoration(
+                  //         color: ColorConstant.primaryColor.withOpacity(0.3),
+                  //           borderRadius: BorderRadius.circular(4),
+                  //         ),
+                  //         child: Center(
+                  //           child: Image.asset(
+                  //             AssetsConstant.playIcon,
+                  //             width: 50,
+                  //             height: 50,
+                  //           ),
+                  //         ),
+                  //       )
+                  //     : ClipRRect(
+                  //         borderRadius: BorderRadius.circular(4),
+                  //         child: CachedNetworkImage(
+                  //           width: Get.width,
+                  //           height: Get.height * 0.22,
+                  //           fit: BoxFit.cover,
+                  //           imageUrl:
+                  //               "${APIConstants.image}${widget.blogData.image}",
+                  //           placeholder: (context, url) => Image(
+                  //             image:
+                  //                 const AssetImage(AssetsConstant.placeHolder),
+                  //             width: Get.width,
+                  //             height: Get.height * 0.22,
+                  //             fit: BoxFit.cover,
+                  //           ),
+                  //           errorWidget: (context, url, error) => Image(
+                  //             image:
+                  //                 const AssetImage(AssetsConstant.placeHolder),
+                  //             width: Get.width,
+                  //             height: Get.height * 0.22,
+                  //             fit: BoxFit.cover,
+                  //           ),
+                  //         ),
+                  //       ),
                   Positioned(
                     top: 15,
                     right: 10,
@@ -96,7 +101,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                               borderRadius: BorderRadius.circular(6)),
                           child: Center(
                             child: Text(
-                              "By ${widget.blogData.artist?.salon?.name ?? ""}",
+                              "By ${widget.blogData.artist?.salon?.displayName ?? ""}",
                               style: AppTextTheme.medium.copyWith(
                                   color: ColorConstant.whiteColor,
                                   fontSize: 11),
@@ -253,6 +258,79 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
               const SizedBox(height: 5),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMedia() {
+    final image = widget.blogData.image;
+    final video = widget.blogData.video;
+
+    /// 🎥 CASE 1 → VIDEO exists
+    if (video != null && video.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: NetworkVideoViewWidget(
+          videoString: "${APIConstants.image}$video",
+        ),
+      );
+    }
+
+    /// 🖼 CASE 2 → IMAGE exists
+    if (image != null && image.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(4),
+        child: CachedNetworkImage(
+          width: Get.width,
+          height: Get.height * 0.22,
+          fit: BoxFit.cover,
+          imageUrl: "${APIConstants.image}$image",
+          placeholder: (context, url) => Image.asset(
+            AssetsConstant.placeHolder,
+            fit: BoxFit.cover,
+          ),
+          errorWidget: (context, url, error) => Image.asset(
+            AssetsConstant.placeHolder,
+            fit: BoxFit.cover,
+          ),
+        ),
+      );
+    }
+
+    /// ❌ CASE 3 → NONE
+    return Container(
+      width: Get.width,
+      height: Get.height * 0.22,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(4),
+      ),
+    );
+  }
+
+  Future<Uint8List?> _generateThumbnail(String videoUrl) async {
+    return await VideoThumbnail.thumbnailData(
+      video: "${APIConstants.image}$videoUrl",
+      imageFormat: ImageFormat.JPEG,
+      maxWidth: 400,
+      quality: 75,
+    );
+  }
+
+  Widget _videoFallback() {
+    return Container(
+      width: Get.width,
+      height: Get.height * 0.22,
+      decoration: BoxDecoration(
+        color: ColorConstant.primaryColor.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Center(
+        child: Image.asset(
+          AssetsConstant.playIcon,
+          width: 50,
+          height: 50,
         ),
       ),
     );

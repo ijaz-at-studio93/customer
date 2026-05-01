@@ -37,6 +37,7 @@ class _FavSalonCardWidgetState extends State<FavSalonCardWidget> {
           await _markSalonVisited();
           
           Get.to(() => SaloonAfterSelectingServicesPage(
+                isPayNowMode:true,
                 id: widget.favSalon.id ?? "",
                 callback: () {},
               ));

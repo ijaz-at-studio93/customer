@@ -34,6 +34,7 @@ class SharedPrefs {
 class PrefConstants {
   static const String token = "token";
   // static const String accessToken = "accessToken";
+  static const String refreshToken = 'refreshToken'; // ADD THIS
   static const String fcmToken = 'FCMToken';
   static const String deviceId = 'DeviceId';
   static const String isUserLogin = "isLogin";

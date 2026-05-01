@@ -4,6 +4,8 @@ import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/Insights/insights_detail_page.dart';
 import 'package:salon_customer/page/Insights/widget/Insights_card_widget.dart';
+import 'package:salon_customer/page/Insights/widget/full_screen_reel_view.dart';
+import 'package:salon_customer/page/Insights/widget/insights_grid_item.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
@@ -58,57 +60,99 @@ class _InsightsHomePageState extends State<InsightsHomePage>
             : _homeController.getBlogDataModel.data?.isEmpty ??
                     false || _homeController.getBlogDataModel.data == null
                 ? const NoItemsWidget(text: "Content is not available")
-                : ListView.separated(
-                    key: _InsightsHomePageState.insightsListKey,
-                    separatorBuilder: (context, i) {
-                      return const Divider(
-                        thickness: 1,
-                        color: ColorConstant.divider2Color,
-                        indent: 20,
-                        endIndent: 20,
+            : GridView.builder(
+                key: _InsightsHomePageState.insightsListKey,
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                itemCount: _homeController.getBlogDataModel.data?.length ?? 0,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 👈 2 columns
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 0.75, // 👈 adjust based on design
+                ),
+                itemBuilder: (context, i) {
+                  final item = _homeController.getBlogDataModel.data![i];
+
+                  return InsightsGridItem(
+                    blogData: item,
+                    onTap: () {
+                      _homeController.doAddViewForBlogSection(
+                          blogID: item.id ?? "");
+
+                      // Get.to(() => InsightsDetailPage(
+                      //   externalLink: item.externalLink ?? "",
+                      //   video: item.video?.isEmpty ?? false
+                      //       ? ""
+                      //       : "${APIConstants.image}${item.video}",
+                      //   body: item.description ?? "",
+                      //   title: item.title ?? "",
+                      //   subTitle: item.body ?? "",
+                      //   image: item.image?.isEmpty ?? false
+                      //       ? ""
+                      //       : "${APIConstants.image}${item.image}",
+                      // ));
+                      Get.dialog(
+                        FullScreenReelView(
+                          data: item,
+                        ),
+                        // barrierColor: Colors.black, // dark background
+                        // barrierDismissible: true,   // 👈 tap outside closes
                       );
                     },
-                    shrinkWrap: true,
-                    itemCount:
-                        _homeController.getBlogDataModel.data?.length ?? 0,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                    itemBuilder: (context, i) {
-                      return InsightsCardWidget(
-                        isFav: false,
-                        blogData: _homeController.getBlogDataModel.data![i],
-                        onPress: () {
-                          _homeController.doAddViewForBlogSection(
-                              blogID: _homeController
-                                      .getBlogDataModel.data?[i].id ??
-                                  "");
-                          Get.to(() => InsightsDetailPage(
-                                externalLink: _homeController.getBlogDataModel
-                                        .data?[i].externalLink ??
-                                    "",
-                                video: _homeController.getBlogDataModel.data?[i]
-                                            .video?.isEmpty ??
-                                        false
-                                    ? ""
-                                    : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].video ?? ""}",
-                                body: _homeController.getBlogDataModel.data?[i]
-                                        .description ??
-                                    "",
-                                title: _homeController
-                                        .getBlogDataModel.data?[i].title ??
-                                    "",
-                                subTitle: _homeController
-                                        .getBlogDataModel.data?[i].body ??
-                                    "",
-                                image: _homeController.getBlogDataModel.data?[i]
-                                            .image?.isEmpty ??
-                                        false
-                                    ? ""
-                                    : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].image ?? ""}",
-                              ));
-                        },
-                      );
-                    }),
+                  );
+                },
+              )
+                // : ListView.separated(
+                //     key: _InsightsHomePageState.insightsListKey,
+                //     separatorBuilder: (context, i) {
+                //       return const Divider(
+                //         thickness: 1,
+                //         color: ColorConstant.divider2Color,
+                //         indent: 20,
+                //         endIndent: 20,
+                //       );
+                //     },
+                //     shrinkWrap: true,
+                //     itemCount:
+                //         _homeController.getBlogDataModel.data?.length ?? 0,
+                //     padding:
+                //         const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                //     itemBuilder: (context, i) {
+                //       return InsightsCardWidget(
+                //         isFav: false,
+                //         blogData: _homeController.getBlogDataModel.data![i],
+                //         onPress: () {
+                //           _homeController.doAddViewForBlogSection(
+                //               blogID: _homeController
+                //                       .getBlogDataModel.data?[i].id ??
+                //                   "");
+                //           Get.to(() => InsightsDetailPage(
+                //                 externalLink: _homeController.getBlogDataModel
+                //                         .data?[i].externalLink ??
+                //                     "",
+                //                 video: _homeController.getBlogDataModel.data?[i]
+                //                             .video?.isEmpty ??
+                //                         false
+                //                     ? ""
+                //                     : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].video ?? ""}",
+                //                 body: _homeController.getBlogDataModel.data?[i]
+                //                         .description ??
+                //                     "",
+                //                 title: _homeController
+                //                         .getBlogDataModel.data?[i].title ??
+                //                     "",
+                //                 subTitle: _homeController
+                //                         .getBlogDataModel.data?[i].body ??
+                //                     "",
+                //                 image: _homeController.getBlogDataModel.data?[i]
+                //                             .image?.isEmpty ??
+                //                         false
+                //                     ? ""
+                //                     : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].image ?? ""}",
+                //               ));
+                //         },
+                //       );
+                //     }),
       ),
     ));
   }

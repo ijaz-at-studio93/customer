@@ -2,6 +2,13 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+        <key>NSAllowsArbitraryLoadsInMedia</key>
+        <true/>
+    </dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -76,6 +83,14 @@
 		<string>fbauth2</string>
 		<string>fb-messenger-share-api</string>
 		<string>fbshareextension</string>
+		<!-- ADD THESE ↓ for UPI apps -->
+       <string>phonepe</string>
+       <string>gpay</string>
+       <string>tez</string>
+       <string>paytm</string>
+       <string>bhim</string>
+       <string>credpay</string>
+       <string>upi</string>
 	</array>
 </dict>
 </plist>

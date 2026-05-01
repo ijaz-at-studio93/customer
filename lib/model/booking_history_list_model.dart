@@ -146,26 +146,50 @@ class Salon {
 
 class Appointment {
   String? id;
-  List<String>? stylistIds;
+  List<Stylist>? selectedStylists;
 
-  Appointment({this.id, this.stylistIds});
+  Appointment({this.id, this.selectedStylists});
 
   Appointment.fromJson(Map<String, dynamic> json) {
     id = json['id'];
 
-    /// ✅ SAFE PARSING
-    if (json['stylistIds'] != null) {
-      stylistIds = List<String>.from(json['stylistIds']);
+    if (json['selectedStylists'] != null) {
+      selectedStylists = (json['selectedStylists'] as List)
+          .map((v) => Stylist.fromJson(v))
+          .toList();
     } else {
-      stylistIds = [];
+      selectedStylists = [];
     }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['id'] = id;
-    data['stylistIds'] = stylistIds;
-    return data;
+    return {
+      'id': id,
+      'selectedStylists':
+      selectedStylists?.map((v) => v.toJson()).toList(),
+    };
+  }
+}
+
+class Stylist {
+  String? id;
+  String? name;
+  String? profileImage;
+
+  Stylist({this.id, this.name, this.profileImage});
+
+  Stylist.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+    profileImage = json['profileImage'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'profileImage': profileImage,
+    };
   }
 }
 

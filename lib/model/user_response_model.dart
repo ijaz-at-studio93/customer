@@ -32,6 +32,7 @@ class Data {
   String? refreshToken;
   String? refreshTokenValidTill;
   UserData? userData;
+  bool? isNewUser;
 
   Data(
       {this.id,
@@ -39,7 +40,8 @@ class Data {
       this.accessTokenValidTill,
       this.refreshToken,
       this.refreshTokenValidTill,
-      this.userData});
+      this.userData,
+      this.isNewUser});
 
   Data.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -49,6 +51,7 @@ class Data {
     refreshTokenValidTill = json['refreshTokenValidTill'];
     userData =
         json['userData'] != null ? UserData.fromJson(json['userData']) : null;
+    isNewUser = json['isNewUser'];
   }
 
   Map<String, dynamic> toJson() {
@@ -61,6 +64,7 @@ class Data {
     if (userData != null) {
       data['userData'] = userData!.toJson();
     }
+    data['isNewUser'] = isNewUser;
     return data;
   }
 }

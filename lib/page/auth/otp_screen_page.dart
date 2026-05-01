@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -13,6 +14,12 @@ import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/button_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+
+import '../../main.dart';
+import 'create_profile_page.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'dart:io';
 
 class OtpScreenPage extends StatefulWidget {
   final bool isLogin;
@@ -248,6 +255,10 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
     );
   }
 
+  String hashPhone(String phone) {
+    return sha256.convert(utf8.encode(phone)).toString();
+  }
+
   /*---------- header widget ---------*/
   Container _headerWidget() {
     return Container(
@@ -426,9 +437,54 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
           mobile: widget.mobileNumber,
           cc: "91",
           verificationCode: _otpTextEditingController.text,
-          callback: () {
-            Get.to(() => const BottomNavBarPage());
-          });
+          callback: () async {
+
+            // READ DATA HERE ↓ after login completes
+            final data = _authController.userResponseModel.data;
+
+            print("🔥 LOGIN EVENT TRIGGERED");
+            try {
+              await facebookAppEvents.logEvent(
+                name: 'fb_mobile_login',
+                parameters: {
+                  'ph': hashPhone("91${widget.mobileNumber}"),
+                  'method': 'phone_otp',
+                  //'is_new_user': data?.isNewUser == true ? 1 : 0,
+                  'login_source': 'app_open',
+                  'platform': Platform.isIOS ? 'ios' : 'android',
+                },
+              );
+              await facebookAppEvents.flush();
+              print("✅ FB Login Event Sent");
+            } catch (e) {
+              print("❌ FB Error: $e");
+            }
+
+            // CompleteRegistration for new users
+            if (data?.isNewUser == true) {
+              try {
+                await facebookAppEvents.logEvent(
+                  name: 'fb_mobile_complete_registration',
+                  parameters: {
+                    'ph': hashPhone("91${widget.mobileNumber}"),
+                    'registration_method': 'phone_otp',
+                    'platform': Platform.isIOS ? 'ios' : 'android',
+                  },
+                );
+                await facebookAppEvents.flush();
+                print("✅ FB CompleteRegistration Event Sent");
+              } catch (e) {
+                print("❌ FB CompleteRegistration Error: $e");
+              }
+
+              Get.to(() => CreateProfilePage(
+                mobileNo: widget.mobileNumber,
+              ));
+            } else {
+              Get.to(() => const BottomNavBarPage());
+            }
+          }
+      );
     }
   }
 }

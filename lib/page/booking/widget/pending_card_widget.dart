@@ -126,7 +126,8 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                widget.bookingData.appointment?.artist?.name ?? "",
+                //widget.bookingData.appointment?.artist?.name ?? "",
+                  getStylistNames(),
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
@@ -328,7 +329,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
 
           const SizedBox(height: 15),
           if (!(widget.bookingData.orderStatus == "user_cancelled" ||
-              widget.bookingData.orderStatus == "salon_rejected" ||
+              //widget.bookingData.orderStatus == "salon_rejected" ||
               widget.bookingData.orderStatus == "salon_artist_rejected")) ...[
             GestureDetector(
               onTap: widget.onPress,
@@ -372,6 +373,19 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
         ],
       ),
     );
+  }
+  String getStylistNames() {
+    final stylists =
+        widget.bookingData.appointment?.selectedStylists ?? [];
+
+    if (stylists.isEmpty) {
+      return "Any Stylist";
+    }
+
+    return stylists
+        .map((s) => s.name ?? "")
+        .where((name) => name.isNotEmpty)
+        .join(", ");
   }
   Future<void> launchWhatsApp(String phone) async {
     final whatsappUrl = Uri.parse("https://wa.me/$phone");

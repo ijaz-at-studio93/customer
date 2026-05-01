@@ -47,7 +47,7 @@ class AuthAPI {
   }
 
 /*--------------------- signup --------------------- */
-  static Future<String> signUp(
+  static Future<UserResponseModel> signUp(
       {required String mobileNO,
       required String name,
       required String cc,
@@ -69,10 +69,15 @@ class AuthAPI {
 
     final response =
         await DioClient.client.post('auth/user/signup', data: mapData);
+    // if (response.statusCode == 200) {
+    //   return response.data['message'];
+    // } else if (response.statusCode == 409 || !response.data['success']) {
+    //   return response.data['message'];
+    // } else {
+    //   throw response.data;
+    // }
     if (response.statusCode == 200) {
-      return response.data['message'];
-    } else if (response.statusCode == 409 || !response.data['success']) {
-      return response.data['message'];
+      return UserResponseModel.fromJson(response.data);
     } else {
       throw response.data;
     }

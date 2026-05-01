@@ -11,11 +11,14 @@ import '../../constant/variable_constant.dart';
 import '../../controller/home_controller.dart';
 import '../../model/salon_details_artiest.dart';
 import '../../util/SharedPrefs.dart';
+import '../../util/NoItemsWidget.dart';
+import '../../util/snackbar_util.dart';
 
 class ReviewItem {
   String id;
   String type;
   String name;
+  String? profileImage;
   int rating;
   String review;
   List<String> images;
@@ -24,6 +27,7 @@ class ReviewItem {
     required this.id,
     required this.type,
     required this.name,
+    this.profileImage,
     this.rating = 0,
     this.review = "",
     this.images = const [],
@@ -68,22 +72,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
     });
   }
 
-  // Future<void> _initData() async {
-  //   while (_homeController.getBookingHistoryListModel.data == null ||
-  //       _homeController.getBookingHistoryListModel.data!.isEmpty) {
-  //     await Future.delayed(const Duration(milliseconds: 100));
-  //   }
-  //   final bookings = _homeController.getBookingHistoryListModel;
-  //
-  //   final bookingList = bookings.data!;
-  //   final booking = bookingList.firstWhere(
-  //         (b) => b.appointmentId == widget.appointmentId,
-  //     orElse: () => bookingList.first,
-  //   );
-  //
-  //   /// 🔥 DIRECTLY LOAD (data will be ready after await)
-  //   loadReviewItems(booking);
-  // }
 
   Future<void> _initData() async {
     final bookings = _homeController.getBookingHistoryListModel;
@@ -94,14 +82,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
           (b) => b.appointmentId == widget.appointmentId,
       orElse: () => bookings.data!.first,
     );
-    print("STYLIST IDS FROM BOOKING: ${booking.appointment?.stylistIds}");
+    //print("STYLIST IDS FROM BOOKING: ${booking.appointment?.stylistIds}");
 
     salonName = booking.salon?.displayName ?? "";
 
     /// 🔥 CALL API SAFELY (NO LOOP, NO BLOCK)
-    await _homeController.doGetSalonArtiestListData(
-      salonId: widget.salonId,
-    );
+    // await _homeController.doGetSalonArtiestListData(
+    //   salonId: widget.salonId,
+    // );
 
     loadReviewItems(booking);
   }
@@ -119,32 +107,16 @@ class _ReviewScreenState extends State<ReviewScreen> {
 
     serviceId = serviceItem?.service?.id ?? "";
 
-    // if (booking?.appointment?.artist != null) {
-    //   temp.add(
-    //     ReviewItem(
-    //       id: booking?.appointment!.artist!.id ?? "",
-    //       type: "artist",
-    //       name: booking?.appointment!.artist!.name ?? "",
-    //     ),
-    //   );
-    // }
-    final stylistIds = booking?.appointment?.stylistIds ?? [];
-    print("STYLIST IDS USED: $stylistIds");
+    /// ✅ USE selectedStylists directly
+    final stylists = booking?.appointment?.selectedStylists ?? [];
 
-    final artists = _homeController.getSalonDetailsArtiestData.data ?? [];
-
-    for (final id in stylistIds) {
-      final artist = artists.firstWhere(
-            (e) => e.id == id,
-        orElse: () => SalonArtiestListModel(),
-      );
-
-      if (artist.id != null) {
+    for (final stylist in stylists) {
+      if (stylist.id != null) {
         temp.add(
           ReviewItem(
-            id: artist.id ?? "",
+            id: stylist.id ?? "",
             type: "artist",
-            name: artist.name ?? "",
+            name: stylist.name ?? "",
           ),
         );
       }
@@ -154,7 +126,6 @@ class _ReviewScreenState extends State<ReviewScreen> {
       reviewItems = temp;
     });
   }
-
 
   Future<bool> submitAllReviews() async {
     try {
@@ -186,7 +157,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
       return true;
 
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      SnackbarUtil.show("Error", e.toString());
       return false;
     } finally {
       _homeController.isSubmittingReview.value = false;
@@ -505,16 +476,16 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 
   Widget buildStylistImage(ReviewItem item) {
-    final artists = _homeController.getSalonDetailsArtiestData.data ?? [];
-    print(artists[0].profileImage);
-    print('helllooooooooo');
+    // final artists = _homeController.getSalonDetailsArtiestData.data ?? [];
+    // print(artists[0].profileImage);
+    // print('helllooooooooo');
+    //
+    // final artist = artists.firstWhere(
+    //       (e) => e.name == item.name,
+    //   orElse: () => SalonArtiestListModel(),
+    // );
 
-    final artist = artists.firstWhere(
-          (e) => e.name == item.name,
-      orElse: () => SalonArtiestListModel(),
-    );
-
-    final imageUrl = artist.profileImage;
+    final imageUrl = item.profileImage;
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(6),
@@ -968,12 +939,12 @@ class _ReviewScreenState extends State<ReviewScreen> {
               //       onTap: () async {
               //
               //         if (salonRating == 0) {
-              //           Get.snackbar("Error", "Please rate the salon");
+              //           SnackbarUtil.show("Error", "Please rate the salon");
               //           return;
               //         }
               //
               //         if (reviewItems.any((item) => item.rating == 0)) {
-              //           Get.snackbar("Error", "Please rate all stylists");
+              //           SnackbarUtil.show("Error", "Please rate all stylists");
               //           return;
               //         }
               //
@@ -1003,7 +974,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
               //         }
               //
               //         if (!uploadSuccess) {
-              //           Get.snackbar("Error", "Image upload failed");
+              //           SnackbarUtil.show("Error", "Image upload failed");
               //           return;
               //         }
               //
@@ -1136,7 +1107,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           }
 
                           if (!uploadSuccess) {
-                            Get.snackbar("Error", "Image upload failed");
+                            SnackbarUtil.show("Error", "Image upload failed");
                             return;
                           }
 
@@ -1202,7 +1173,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
     // Add haptic feedback for a physical cue
     HapticFeedback.vibrate();
 
-    Get.snackbar(
+    SnackbarUtil.show(
       "Attention",
       "",
       messageText: Text(

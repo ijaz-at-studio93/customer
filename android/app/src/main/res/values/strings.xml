@@ -1,5 +1,6 @@
 <resources>
     <!-- Meta / Facebook SDK — replace with values from Meta Business Manager -->
-    <string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
-    <string name="facebook_client_token">YOUR_CLIENT_TOKEN</string>
+    <string name="facebook_app_id">3358483834301971</string>
+    <string name="facebook_client_token">a4bf030156e2fb5a32a8dc32514c430c</string>
+    <string name="fb_login_protocol_scheme">fb3358483834301971</string>
 </resources>

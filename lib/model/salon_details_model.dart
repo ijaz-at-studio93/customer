@@ -49,6 +49,7 @@ class Data {
   String? homeService;
   List<ServiceCategories>? serviceCategories;
   bool? isFavourite;
+  bool? isNonMandatory;
   String? startTiming;
   String? endTiming;
   double? distance;
@@ -78,6 +79,7 @@ class Data {
         this.homeService,
         this.serviceCategories,
         this.isFavourite,
+        this.isNonMandatory,
         this.startTiming,
         this.endTiming,
         this.distance,
@@ -119,6 +121,7 @@ class Data {
       });
     }
     isFavourite = json['isFavourite'];
+    isNonMandatory = json['isNonMandatory'];
     startTiming = json['startTiming'];
     endTiming = json['endTiming'];
     distance = double.parse(json['distance'].toString());
@@ -152,6 +155,7 @@ class Data {
           serviceCategories!.map((v) => v.toJson()).toList();
     }
     data['isFavourite'] = isFavourite;
+    data['isNonMandatory'] = isNonMandatory;
     data['startTiming'] = startTiming;
     data['endTiming'] = endTiming;
     data['distance'] = distance;

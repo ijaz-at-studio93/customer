@@ -24,6 +24,7 @@ import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:share_plus/share_plus.dart';
 import '../../constant/color_constant.dart';
+import '../../main.dart';
 import '../../project_specific/text_theme.dart';
 import '../appointment/appointment_booking_page.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -32,13 +33,17 @@ import 'dart:convert';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:salon_customer/service/analytics_service.dart';
 
+import '../appointment/qr_page.dart';
+
 class SaloonAfterSelectingServicesPage extends StatefulWidget {
+  late bool isPayNowMode;
   final String id;
   final VoidCallback callback;
 
-  const SaloonAfterSelectingServicesPage({
+  SaloonAfterSelectingServicesPage({
     super.key,
     required this.id,
+    required this.isPayNowMode,
     required this.callback,
   });
 
@@ -70,7 +75,6 @@ class _SaloonAfterSelectingServicesPageState
   bool loading = false;
   final box = GetStorage();
 
-  @override
   @override
   void initState() {
     super.initState();
@@ -143,6 +147,7 @@ class _SaloonAfterSelectingServicesPageState
       try {
         await _homeController.doGetCart();
         await _homeController.doGetSalonCart(salonId: widget.id);
+        await _homeController.doGetSalonProducts(salonId: widget.id);
       } catch (_) {}
 
       // Now that the main fetch has finished (or at least attempted), load images
@@ -367,6 +372,9 @@ class _SaloonAfterSelectingServicesPageState
 
   @override
   Widget build(BuildContext context) {
+    final isNonMandatory =
+        _homeController.homeSalonDetailsData.data?.isNonMandatory ?? false;
+
     final noServices = (_homeController
                 .salonDetailsListData.data?.selectedCategories?.isEmpty ??
             true) &&
@@ -391,26 +399,55 @@ class _SaloonAfterSelectingServicesPageState
               body: Obx(
                 () => ProgressContainerView(
                   isProgressRunning: _homeController.showProgress,
-                  child: ListView(
-                    controller: _scrollController,
-                    physics: noServices
-                        ? const NeverScrollableScrollPhysics()
-                        : const BouncingScrollPhysics(),
+                  // child: ListView(
+                  //   controller: _scrollController,
+                  //   physics: noServices
+                  //       ? const NeverScrollableScrollPhysics()
+                  //       : const BouncingScrollPhysics(),
+                  //   children: [
+                  //     _imageHeaderWidget(),
+                  //     _headerWidget(),
+                  //     const SizedBox(height: 15),
+                  //     _offerWidget(),
+                  //     const SizedBox(height: 10),
+                  //     _tabBarView(),
+                  //     const SizedBox(height: 110)
+                  //   ],
+                  // ),
+                  child: Stack(
                     children: [
-                      _imageHeaderWidget(),
-                      _headerWidget(),
-                      const SizedBox(height: 15),
-                      _offerWidget(),
-                      const SizedBox(height: 10),
-                      _tabBarView(),
-                      const SizedBox(height: 110)
+                      /// 🔥 MAIN CONTENT
+                      Opacity(
+                        //opacity: isPayNowMode ? 0.4 : 1,
+                        opacity: (isNonMandatory && widget.isPayNowMode) ? 0.4 : 1,
+                        child: IgnorePointer(
+                          ignoring: (isNonMandatory && widget.isPayNowMode),
+                          child: ListView(
+                            controller: _scrollController,
+                            physics: noServices
+                                ? const NeverScrollableScrollPhysics()
+                                : const BouncingScrollPhysics(),
+                            children: [
+                              _imageHeaderWidget(),
+                              _headerWidget(),
+                              const SizedBox(height: 15),
+                              _offerWidget(),
+                              const SizedBox(height: 10),
+                              _tabBarView(),
+                              const SizedBox(height: 110),
+                            ],
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ),
               floatingActionButtonLocation:
                   FloatingActionButtonLocation.centerDocked,
-              floatingActionButton: Obx(
+              floatingActionButton: (isNonMandatory && widget.isPayNowMode)
+                ? const SizedBox()
+                : Obx(
                 () =>
                     _homeController.getSalonServiceAddCartModel.data
                                 ?.salonServicesWithProduct?.isEmpty ??
@@ -749,35 +786,97 @@ class _SaloonAfterSelectingServicesPageState
                                       ],
                                     ),
                                     GestureDetector(
-                                      onTap: () {
-                                        if (selectedArtistIdsGlobal
-                                            .value.isNotEmpty) {
-                                          Get.to(() => AppointmentBookingPage(
-                                                artistIds:
-                                                    selectedArtistIdsGlobal
-                                                        .value,
-                                              ));
-                                        } else {
-                                          // showModalBottomSheet(
-                                          //     isScrollControlled: true,
-                                          //     isDismissible: false,
-                                          //     enableDrag: false,
-                                          //     shape: const RoundedRectangleBorder(
-                                          //         borderRadius: BorderRadius.only(
-                                          //           topLeft: Radius.circular(32),
-                                          //           topRight: Radius.circular(32),
-                                          //         )),
-                                          //     context: context,
-                                          //     builder: (context) {
-                                          //       return SelectingArtistBottomSheetWidget(
-                                          //         salonId: widget.id,
-                                          //         serviceId: serviceId,
-                                          //         callback: () {
-                                          //           setState(() {});
-                                          //         },
-                                          //       );
-                                          //     });
+                                      // onTap: () {
+                                      //   if (selectedArtistIdsGlobal
+                                      //       .value.isNotEmpty) {
+                                      //     Get.to(() => AppointmentBookingPage(
+                                      //           artistIds:
+                                      //               selectedArtistIdsGlobal
+                                      //                   .value,
+                                      //         ));
+                                      //   } else {
+                                      //     // showModalBottomSheet(
+                                      //     //     isScrollControlled: true,
+                                      //     //     isDismissible: false,
+                                      //     //     enableDrag: false,
+                                      //     //     shape: const RoundedRectangleBorder(
+                                      //     //         borderRadius: BorderRadius.only(
+                                      //     //           topLeft: Radius.circular(32),
+                                      //     //           topRight: Radius.circular(32),
+                                      //     //         )),
+                                      //     //     context: context,
+                                      //     //     builder: (context) {
+                                      //     //       return SelectingArtistBottomSheetWidget(
+                                      //     //         salonId: widget.id,
+                                      //     //         serviceId: serviceId,
+                                      //     //         callback: () {
+                                      //     //           setState(() {});
+                                      //     //         },
+                                      //     //       );
+                                      //     //     });
+                                      //
+                                      //     Get.bottomSheet(
+                                      //       SelectingArtistBottomSheetWidget(
+                                      //         salonId: widget.id,
+                                      //         serviceId: serviceId,
+                                      //         callback: () {
+                                      //           setState(() {});
+                                      //         },
+                                      //       ),
+                                      //       isScrollControlled: true,
+                                      //       isDismissible: false,
+                                      //       enableDrag: false,
+                                      //       shape: const RoundedRectangleBorder(
+                                      //         borderRadius: BorderRadius.only(
+                                      //           topLeft: Radius.circular(32),
+                                      //           topRight: Radius.circular(32),
+                                      //         ),
+                                      //       ),
+                                      //     );
+                                      //   }
+                                      // },
+                                      onTap: () async {
+                                        try {
+                                          await facebookAppEvents.logAddToCart(
+                                            id: widget.id,
+                                            type: 'salon_services',
+                                            currency: 'INR',
+                                            price: _homeController.getTotalPrice(),
+                                          );
+                                          print("✅ FB AddToCart Event Sent");
+                                        } catch (e) {
+                                          print("❌ FB AddToCart Error: $e");
+                                        }
+                                        await facebookAppEvents.flush();
+                                        selectedArtistIdsGlobal.value = [];
+                                        print("CLICK");
+                                        print("selected: ${selectedArtistIdsGlobal.value}");
+                                        print("data: ${_homeController.getSalonDetailsArtiestData.data}");
+                                        final selected = selectedArtistIdsGlobal.value;
 
+                                        final data = _homeController.getSalonDetailsArtiestData.data;
+
+                                        final hasNoArtist = data == null || data.isEmpty;
+
+                                        /// ✅ CASE 1: stylist selected
+                                        if (selected.isNotEmpty) {
+                                          print('1111111111111 is causing issue');
+                                          Get.to(() => AppointmentBookingPage(
+                                            artistIds: selected,
+                                          ));
+                                        }
+
+                                        /// ✅ CASE 2: no artist available → auto assign
+                                        else if (hasNoArtist) {
+                                          print('222222222 is causing issue');
+                                          Get.to(() => AppointmentBookingPage(
+                                            artistIds: const [],
+                                          ));
+                                        }
+
+                                        /// ❌ CASE 3: artists exist but not selected → open bottom sheet
+                                        else {
+                                          print('333333333333');
                                           Get.bottomSheet(
                                             SelectingArtistBottomSheetWidget(
                                               salonId: widget.id,
@@ -816,9 +915,10 @@ class _SaloonAfterSelectingServicesPageState
                                                 valueListenable:
                                                     selectedArtistIdsGlobal,
                                                 builder: (context, v, c) {
+                                                  final hasSelectedStylist = selectedArtistIdsGlobal.value.isNotEmpty;
+                                                  final hasNoArtist = (_homeController.getSalonDetailsArtiestData.data ?? []).isEmpty;
                                                   return Text(
-                                                    selectedArtistIdsGlobal
-                                                            .value.isNotEmpty
+                                                    (hasSelectedStylist || hasNoArtist)
                                                         ? "Book Slot"
                                                         : "Select Stylist",
                                                     style: const TextStyle(
@@ -846,10 +946,167 @@ class _SaloonAfterSelectingServicesPageState
                             ],
                           ),
               ),
+              bottomNavigationBar: (isNonMandatory && widget.isPayNowMode)
+                  ? Stack(
+                clipBehavior: Clip.none,
+                children: [
+
+                  /// 🔥 CURVED BOX (BUTTON CONTAINER)
+                  Container(
+                    margin: const EdgeInsets.only(top: 20), // space for banner overlap
+                    padding: const EdgeInsets.fromLTRB(12, 20, 12, 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: const [
+                        BoxShadow(color: Colors.black12, blurRadius: 10)
+                      ],
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
+                      ),
+                      border: Border.all(
+                        color: ColorConstant.primaryColor, // ✅ BORDER COLOR
+                        width: 1.5,
+                      ),
+                    ),
+                    child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+
+                            /// BOOK NOW
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.4,
+                              height: 40,
+                              child: OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                  side: BorderSide(
+                                    color: ColorConstant.primaryColor,
+                                    width: 1.5,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    widget.isPayNowMode = false;
+                                  });
+                                },
+                                child: Text(
+                                  "Book Now",
+                                  style: TextStyle(
+                                    color: ColorConstant.primaryColor,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 16,
+                                    fontFamily: 'Outfit'
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(width: 25),
+
+                            /// PAY BILL
+                            SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.4,
+                              height: 40,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: ColorConstant.primaryColor,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                                onPressed: () async {
+
+                                  /// STEP 1: Refresh current bookings
+                                  await _homeController.doGetCurrentBookingListData();
+
+                                  /// STEP 2: Find existing pay-now booking
+                                  await _homeController.findPayNowBooking(widget.id);
+
+                                  final existing = _homeController.payNowBooking.value;
+
+                                  /// ✅ STEP 3: If exists → reuse
+                                  if (existing != null) {
+                                    Get.to(() => QRCodePage(
+                                      appointmentId: existing.appointmentId ?? '',
+                                      isBooking: false,
+                                    ));
+                                    return;
+                                  }
+
+                                  /// ❌ STEP 4: Else create new
+                                  final res = await _homeController.createNonMandatoryBooking(
+                                    salonId: widget.id,
+                                  );
+
+                                  Get.to(() => QRCodePage(
+                                    appointmentId: res?.data?.salonAppointmentId ?? '',
+                                    isBooking: false,
+                                  ));
+                                },
+                                child: const Text("Pay Bill",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 16,
+                                      fontFamily: 'Outfit'
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                  ),
+
+                  /// 🔥 FLOATING BANNER (OVERLAP EFFECT)
+                  Positioned(
+                    top: -15,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Container(
+                        width: 250,
+                        height: 35,
+                        alignment: Alignment.center,
+                        padding: const EdgeInsets.symmetric(vertical: 5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          color: ColorConstant.primaryColor,
+                        ),
+                        child: const Text(
+                          "Booking Not Mandatory",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontFamily: 'Outfit',
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+                  : null,
             ),
 
+            Positioned(
+              top: 50,
+              left: 10,
+              child: buttonWidget(
+                imageUrl: AssetsConstant.backArrow,
+                onPress: () {
+                  Navigator.of(context).maybePop();
+                  widget.callback.call();
+                },
+                h: 15,
+                w: 15,
+              ),
+            ),
             /// ✅ ADD THIS NEW MENU BOOK BUTTON HERE
-            if (!noRecommendedCategories)
+            if (!noRecommendedCategories && !(isNonMandatory && widget.isPayNowMode))
               Positioned(
                   right: 6,
                   // bottom: (_homeController.getServiceAddCartModel.data
@@ -1227,104 +1484,91 @@ class _SaloonAfterSelectingServicesPageState
                   left: 5,
                   right: 16,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      // buttonWidget(
+                      //   imageUrl: AssetsConstant.iconSearch,
+                      //   onPress: () {
+                      //     Get.to(() => StylistSearchPage(
+                      //       salonName: _homeController
+                      //           .homeSalonDetailsData.data?.name ??
+                      //           "",
+                      //       salonId: widget.id,
+                      //     ));
+                      //   },
+                      //   h: 24,
+                      //   w: 24,
+                      // ),
+                      // const SizedBox(width: 15),
                       buttonWidget(
-                        imageUrl: AssetsConstant.backArrow,
+                        imageUrl: AssetsConstant.shareIcon,
                         onPress: () {
-                          Navigator.of(context).maybePop();
-                          widget.callback.call();
-                        },
-                        h: 15,
-                        w: 15,
-                      ),
-                      Row(
-                        children: [
-                          // buttonWidget(
-                          //   imageUrl: AssetsConstant.iconSearch,
-                          //   onPress: () {
-                          //     Get.to(() => StylistSearchPage(
-                          //       salonName: _homeController
-                          //           .homeSalonDetailsData.data?.name ??
-                          //           "",
-                          //       salonId: widget.id,
-                          //     ));
-                          //   },
-                          //   h: 24,
-                          //   w: 24,
-                          // ),
-                          // const SizedBox(width: 15),
-                          buttonWidget(
-                            imageUrl: AssetsConstant.shareIcon,
-                            onPress: () {
-                              // Get the link safely
-                              final String? mapUrl = _homeController
-                                  .homeSalonDetailsData.data?.googleplaceid
-                                  ?.toString();
-                              final String? name = _homeController
-                                  .homeSalonDetailsData.data?.name
-                                  ?.toString();
+                          // Get the link safely
+                          final String? mapUrl = _homeController
+                              .homeSalonDetailsData.data?.googleplaceid
+                              ?.toString();
+                          final String? name = _homeController
+                              .homeSalonDetailsData.data?.name
+                              ?.toString();
 
-                              // Check if it exists and isn't empty
-                              if (mapUrl != null && mapUrl.isNotEmpty) {
-                                // Share the link with a clear message
-                                Share.share(
-                                    "Visit $name on Google Maps: $mapUrl");
-                              } else {
-                                // Optional: Let the user know if the link is missing
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content:
-                                          Text("Location link not available.")),
-                                );
-                              }
-                            },
-                            h: 18,
-                            w: 18,
-                          ),
-                          const SizedBox(width: 15),
-                          GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _homeController.homeSalonDetailsData.data
-                                    ?.isFavourite = !(_homeController
-                                        .homeSalonDetailsData
-                                        .data
-                                        ?.isFavourite ??
-                                    false);
-                                if (_homeController.homeSalonDetailsData.data
-                                        ?.isFavourite ??
-                                    false) {
-                                  _homeController.doAddFavouriteSalon(
-                                      salonId: widget.id);
-                                } else {
-                                  _homeController.doRemoveFavouriteSalon(
-                                      callback: () {}, salonId: widget.id);
-                                }
-                              });
-                            },
-                            child: Container(
-                              width: 34,
-                              height: 34,
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: ColorConstant.blackColor
-                                      .withOpacity(0.25)),
-                              child: Center(
-                                  child: _homeController.homeSalonDetailsData
-                                              .data?.isFavourite ??
-                                          false
-                                      ? const Icon(
-                                          CupertinoIcons.heart_fill,
-                                          color: Colors.red,
-                                        )
-                                      : const Icon(
-                                          CupertinoIcons.heart,
-                                          color: ColorConstant.whiteColor,
-                                        )),
-                            ),
-                          )
-                        ],
+                          // Check if it exists and isn't empty
+                          if (mapUrl != null && mapUrl.isNotEmpty) {
+                            // Share the link with a clear message
+                            Share.share(
+                                "Visit $name on Google Maps: $mapUrl");
+                          } else {
+                            // Optional: Let the user know if the link is missing
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text("Location link not available.")),
+                            );
+                          }
+                        },
+                        h: 18,
+                        w: 18,
+                      ),
+                      const SizedBox(width: 15),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _homeController.homeSalonDetailsData.data
+                                ?.isFavourite = !(_homeController
+                                    .homeSalonDetailsData
+                                    .data
+                                    ?.isFavourite ??
+                                false);
+                            if (_homeController.homeSalonDetailsData.data
+                                    ?.isFavourite ??
+                                false) {
+                              _homeController.doAddFavouriteSalon(
+                                  salonId: widget.id);
+                            } else {
+                              _homeController.doRemoveFavouriteSalon(
+                                  callback: () {}, salonId: widget.id);
+                            }
+                          });
+                        },
+                        child: Container(
+                          width: 34,
+                          height: 34,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: ColorConstant.blackColor
+                                  .withOpacity(0.25)),
+                          child: Center(
+                              child: _homeController.homeSalonDetailsData
+                                          .data?.isFavourite ??
+                                      false
+                                  ? const Icon(
+                                      CupertinoIcons.heart_fill,
+                                      color: Colors.red,
+                                    )
+                                  : const Icon(
+                                      CupertinoIcons.heart,
+                                      color: ColorConstant.whiteColor,
+                                    )),
+                        ),
                       )
                     ],
                   ),
@@ -1619,113 +1863,200 @@ class _SaloonAfterSelectingServicesPageState
             ],
           ),
           const SizedBox(height: 5),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   padding: const EdgeInsets.symmetric(horizontal: 7),
+          //   children: [
+          //     // Row(
+          //     //   children: [
+          //     //     Image.asset(
+          //     //       AssetsConstant.locationNewIcon,
+          //     //       height: 16,
+          //     //       width: 16,
+          //     //       color: changeTheme(
+          //     //           SharedPrefs.readStringValue(PrefConstants.gender)),
+          //     //     ),
+          //     //     const SizedBox(width: 5),
+          //     //     SizedBox(
+          //     //       width: Get.width * 0.5,
+          //     //       child: Text(
+          //     //         _homeController.homeSalonDetailsData.data?.address ?? "",
+          //     //         overflow: TextOverflow.ellipsis,
+          //     //         maxLines: 1,
+          //     //         style: AppTextTheme.medium.copyWith(
+          //     //             color: ColorConstant.blackColor, fontSize: 12,
+          //     //           fontFamily: "Outfit",
+          //     //           fontWeight: FontWeight.w600,
+          //     //       ),
+          //     //     )
+          //     //     ),
+          //     //   ],
+          //     // ),
+          //     Row(
+          //       children: [
+          //         Icon(
+          //           Icons.lightbulb_outline, // 👈 common amenities icon
+          //           size: 16,
+          //           color: changeTheme(
+          //             SharedPrefs.readStringValue(PrefConstants.gender),
+          //           ),
+          //         ),
+          //         const SizedBox(width: 3),
+          //         Text(
+          //           "Amenities : ",
+          //           overflow: TextOverflow.ellipsis,
+          //           maxLines: 1,
+          //           style: AppTextTheme.medium.copyWith(
+          //             color: Colors.black,
+          //             fontSize: 12,
+          //             fontFamily: "Outfit",
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //         ),
+          //         SizedBox(
+          //           width: Get.width * 0.5,
+          //           child: Text(
+          //             _homeController.homeSalonDetailsData.data?.amenities ??
+          //                 "",
+          //             overflow: TextOverflow.ellipsis,
+          //             maxLines: 1,
+          //             style: AppTextTheme.medium.copyWith(
+          //               color: changeTheme(
+          //                   SharedPrefs.readStringValue(PrefConstants.gender)),
+          //               fontSize: 12,
+          //               fontFamily: "Outfit",
+          //               fontWeight: FontWeight.w600,
+          //             ),
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //     GestureDetector(
+          //       onTap: () {
+          //         _openGoogleMapsForSalon();
+          //       },
+          //       child: Container(
+          //         height: 25, // ✅ Figma-like compact height (22–28 works best)
+          //         padding: const EdgeInsets.symmetric(
+          //             horizontal: 10.5), // ❌ remove vertical padding
+          //         decoration: BoxDecoration(
+          //           borderRadius: BorderRadius.circular(6),
+          //           //color: ColorConstant.pinkBgColor,
+          //           color: changeTheme(
+          //               SharedPrefs.readStringValue(PrefConstants.gender)),
+          //           //border: Border.all(color: ColorConstant.pinkStrokeColor),
+          //         ),
+          //         child: Row(
+          //           mainAxisAlignment: MainAxisAlignment.center,
+          //           crossAxisAlignment: CrossAxisAlignment.center,
+          //           children: [
+          //             Image.asset(
+          //               AssetsConstant.locationShare,
+          //               width: 15,
+          //               height: 15,
+          //               color: Colors.white,
+          //               // color: changeTheme(
+          //               //     SharedPrefs.readStringValue(PrefConstants.gender)),
+          //             ),
+          //             const SizedBox(width: 3),
+          //             Text("Get Direction",
+          //                 textScaler: const TextScaler.linear(0.85),
+          //                 style: AppTextTheme.medium.copyWith(
+          //                   fontSize: 12,
+          //                   color: Colors.white,
+          //                   // color: changeTheme(SharedPrefs.readStringValue(
+          //                   //     PrefConstants.gender))),
+          //                 ))
+          //           ],
+          //         ),
+          //       ),
+          //     )
+          //   ],
+          // ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Row(
-              //   children: [
-              //     Image.asset(
-              //       AssetsConstant.locationNewIcon,
-              //       height: 16,
-              //       width: 16,
-              //       color: changeTheme(
-              //           SharedPrefs.readStringValue(PrefConstants.gender)),
-              //     ),
-              //     const SizedBox(width: 5),
-              //     SizedBox(
-              //       width: Get.width * 0.5,
-              //       child: Text(
-              //         _homeController.homeSalonDetailsData.data?.address ?? "",
-              //         overflow: TextOverflow.ellipsis,
-              //         maxLines: 1,
-              //         style: AppTextTheme.medium.copyWith(
-              //             color: ColorConstant.blackColor, fontSize: 12,
-              //           fontFamily: "Outfit",
-              //           fontWeight: FontWeight.w600,
-              //       ),
-              //     )
-              //     ),
-              //   ],
-              // ),
-              Row(
-                children: [
-                  Icon(
-                    Icons.lightbulb_outline, // 👈 common amenities icon
-                    size: 16,
-                    color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender),
+              /// LEFT SIDE (flexible)
+              Expanded(
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.lightbulb_outline,
+                      size: 16,
+                      color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender),
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 3),
-                  Text(
-                    "Amenities : ",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                    style: AppTextTheme.medium.copyWith(
-                      color: Colors.black,
-                      fontSize: 12,
-                      fontFamily: "Outfit",
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  SizedBox(
-                    width: Get.width * 0.5,
-                    child: Text(
-                      _homeController.homeSalonDetailsData.data?.amenities ??
-                          "",
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
+                    const SizedBox(width: 3),
+                    Text(
+                      "Amenities : ",
                       style: AppTextTheme.medium.copyWith(
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)),
+                        color: Colors.black,
                         fontSize: 12,
                         fontFamily: "Outfit",
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                  ),
-                ],
+
+                    /// 🔥 IMPORTANT FIX HERE
+                    Expanded(
+                      child: Text(
+                        _homeController.homeSalonDetailsData.data?.amenities ?? "",
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                        style: AppTextTheme.medium.copyWith(
+                          color: changeTheme(
+                            SharedPrefs.readStringValue(PrefConstants.gender),
+                          ),
+                          fontSize: 12,
+                          fontFamily: "Outfit",
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
+
+              //const SizedBox(width: 8),
+
+              /// RIGHT SIDE (fixed button)
               GestureDetector(
                 onTap: () {
                   _openGoogleMapsForSalon();
                 },
                 child: Container(
-                  height: 22, // ✅ Figma-like compact height (22–28 works best)
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10), // ❌ remove vertical padding
+                  height: 30,
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
-                    //color: ColorConstant.pinkBgColor,
                     color: changeTheme(
-                        SharedPrefs.readStringValue(PrefConstants.gender)),
-                    //border: Border.all(color: ColorConstant.pinkStrokeColor),
+                      SharedPrefs.readStringValue(PrefConstants.gender),
+                    ),
                   ),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Image.asset(
                         AssetsConstant.locationShare,
-                        width: 12,
-                        height: 12,
+                        width: 13,
+                        height: 13,
                         color: Colors.white,
-                        // color: changeTheme(
-                        //     SharedPrefs.readStringValue(PrefConstants.gender)),
                       ),
-                      const SizedBox(width: 5),
-                      Text("Get Direction",
-                          textScaler: const TextScaler.linear(0.85),
-                          style: AppTextTheme.medium.copyWith(
-                            fontSize: 9,
-                            color: Colors.white,
-                            // color: changeTheme(SharedPrefs.readStringValue(
-                            //     PrefConstants.gender))),
-                          ))
+                      const SizedBox(width: 3),
+                      Text(
+                        "Get Directions",
+                        textScaler: const TextScaler.linear(0.85),
+                        style: AppTextTheme.semibold.copyWith(
+                          fontSize: 13,
+                          color: Colors.white,
+                          fontFamily: 'Outfit',
+                          fontWeight: FontWeight.w600
+                        ),
+                      )
                     ],
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ],
@@ -1888,6 +2219,9 @@ class _SaloonAfterSelectingServicesPageState
   bool serviceOffered = false;
 
   Container _tabBarView() {
+    final hasArtists =
+        (_homeController.getSalonDetailsArtiestData.data ?? []).isNotEmpty;
+    final hasProducts = _homeController.salonProducts.isNotEmpty;
     final noRecommendedCategories = _homeController
             .salonDetailsListData.data?.recommendedCategories?.isEmpty ??
         true;
@@ -1953,45 +2287,94 @@ class _SaloonAfterSelectingServicesPageState
                   ),
                 ),
                 const SizedBox(width: 20),
-                InkWell(
-                  onTap: () {
-                    setState(() {
-                      isSelectedTab = 2;
-                    });
-                  },
-                  child: Column(
-                    children: [
-                      Text(
-                        "Stylist List",
-                        style: isSelectedTab == 2
-                            ? AppTextTheme.bold.copyWith(
-                                fontFamily: 'Outfit',
-                                fontWeight: FontWeight.w700,
-                                fontSize: 16,
-                                color: changeTheme(SharedPrefs.readStringValue(
-                                    PrefConstants.gender)))
-                            : AppTextTheme.medium.copyWith(
-                                fontFamily: 'Outfit',
-                                fontWeight: FontWeight.w500,
-                                fontSize: 16,
-                                color: ColorConstant.grayTextColor),
-                      ),
-                      const SizedBox(height: 0),
-                      Container(
-                        height: 4,
-                        width: Get.width * 0.2,
-                        decoration: BoxDecoration(
-                            color: isSelectedTab == 2
-                                ? changeTheme(SharedPrefs.readStringValue(
-                                    PrefConstants.gender))
+                if (hasArtists)
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        isSelectedTab = 2;
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Text(
+                          "Stylist List",
+                          style: isSelectedTab == 2
+                              ? AppTextTheme.bold.copyWith(
+                                  fontFamily: 'Outfit',
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 16,
+                                  color: changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender)))
+                              : AppTextTheme.medium.copyWith(
+                                  fontFamily: 'Outfit',
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 16,
+                                  color: ColorConstant.grayTextColor),
+                        ),
+                        const SizedBox(height: 0),
+                        Container(
+                          height: 4,
+                          width: Get.width * 0.2,
+                          decoration: BoxDecoration(
+                              color: isSelectedTab == 2
+                                  ? changeTheme(SharedPrefs.readStringValue(
+                                      PrefConstants.gender))
+                                  : Colors.transparent,
+                              borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(12),
+                                  topRight: Radius.circular(12))),
+                        )
+                      ],
+                    ),
+                  ),
+
+                const SizedBox(width: 20),
+                if (hasProducts)
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        isSelectedTab = 3; // 👈 new tab
+                      });
+                    },
+                    child: Column(
+                      children: [
+                        Text(
+                          "Products",
+                          style: isSelectedTab == 3
+                              ? AppTextTheme.bold.copyWith(
+                            fontFamily: 'Outfit',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender),
+                            ),
+                          )
+                              : AppTextTheme.medium.copyWith(
+                            fontFamily: 'Outfit',
+                            fontWeight: FontWeight.w500,
+                            fontSize: 16,
+                            color: ColorConstant.grayTextColor,
+                          ),
+                        ),
+                        const SizedBox(height: 0),
+                        Container(
+                          height: 4,
+                          width: Get.width * 0.2,
+                          decoration: BoxDecoration(
+                            color: isSelectedTab == 3
+                                ? changeTheme(
+                              SharedPrefs.readStringValue(PrefConstants.gender),
+                            )
                                 : Colors.transparent,
                             borderRadius: const BorderRadius.only(
-                                topLeft: Radius.circular(12),
-                                topRight: Radius.circular(12))),
-                      )
-                    ],
+                              topLeft: Radius.circular(12),
+                              topRight: Radius.circular(12),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
               ],
             ),
           ),
@@ -2705,7 +3088,7 @@ class _SaloonAfterSelectingServicesPageState
                 ],
               ),
             )
-          else
+          else if (isSelectedTab == 2)
             _homeController.getSalonDetailsArtiestData.data?.isEmpty ?? false
                 ? const NoItemsWidget(
                     text:
@@ -2741,7 +3124,9 @@ class _SaloonAfterSelectingServicesPageState
                         onPress: () {},
                       );
                     },
-                  ),
+                  )
+          else if (isSelectedTab == 3)
+            _buildProducts(),
           const SizedBox(height: 20)
         ],
       ),
@@ -2935,6 +3320,222 @@ class _SaloonAfterSelectingServicesPageState
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildProducts() {
+    final products = _homeController.salonProducts;
+
+    if (products.isEmpty) {
+      return const SizedBox();
+    }
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      itemCount: products.length,
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: 160,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: 0.75,
+      ),
+      itemBuilder: (context, index) {
+        final product = products[index];
+
+        return Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: Colors.grey.shade300),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // IMAGE
+              ClipRRect(
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(10),
+                ),
+                child: Image.network(
+                  "${APIConstants.image}${product['image'] ?? ""}",
+                  height: 100,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    height: 100,
+                    color: Colors.grey.shade200,
+                    child: const Icon(Icons.image, color: Colors.grey),
+                  ),
+                ),
+              ),
+
+              // VIEW BUTTON
+              Expanded(
+                child: Center(
+                  child: GestureDetector(
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) {
+                          return Dialog(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+
+                                // MAIN DIALOG
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+
+                                    // IMAGE
+                                    ClipRRect(
+                                      borderRadius: const BorderRadius.vertical(
+                                        top: Radius.circular(16),
+                                      ),
+                                      child: Image.network(
+                                        "${APIConstants.image}${product['image'] ?? ""}",
+                                        height: 250,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (_, __, ___) => Container(
+                                          height: 200,
+                                          color: Colors.grey.shade200,
+                                          child: const Icon(Icons.image, size: 50, color: Colors.grey),
+                                        ),
+                                      ),
+                                    ),
+
+                                    // CONTENT
+                                    Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          _productDialogRow("Name", product['name'] ?? "-"),
+                                          const SizedBox(height: 8),
+                                          _productDialogRow("Category", product['salonCategory'] ?? "-"),
+                                          const SizedBox(height: 8),
+                                          _productDialogRow("Description", product['description'] ?? "-"),
+                                          const SizedBox(height: 10),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                // ❌ CLOSE BUTTON — floating above center top
+                                Positioned(
+                                  top: -45,
+                                  left: 0,
+                                  right: 0,
+                                  child: Center(
+                                    child: GestureDetector(
+                                      onTap: () => Navigator.pop(context),
+                                      child: Container(
+                                        width: 36,
+                                        height: 36,
+                                        decoration: const BoxDecoration(
+                                          color: Colors.white,
+                                          shape: BoxShape.circle,
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black26,
+                                              blurRadius: 6,
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Icon(
+                                          Icons.close,
+                                          size: 20,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                              ],
+                            ),
+                          );
+                        },
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender),
+                        ) ?? ColorConstant.primaryColor,
+                      ),
+                      child: const Text(
+                        "View",
+                        style: TextStyle(
+                          fontFamily: "Outfit",
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _productDialogRow(String label, String value) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(
+            label,
+            textAlign: TextAlign.right,
+            style: const TextStyle(
+              fontFamily: "Outfit",
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 8),
+          child: Text(
+            ":",
+            style: TextStyle(
+              fontFamily: "Outfit",
+              fontWeight: FontWeight.w700,
+              fontSize: 15,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(
+              fontFamily: "Outfit",
+              fontWeight: FontWeight.w500,
+              fontSize: 15,
+              color: Colors.black87,
+            ),
+          ),
+        ),
+      ],
     );
   }
 

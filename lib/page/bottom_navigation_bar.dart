@@ -33,7 +33,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
       },
       child: Scaffold(
         appBar: statusBarTheme(context),
-        backgroundColor: ColorConstant.bgColor,
+        backgroundColor: ColorConstant.whiteColor,
         body: _selectedIndex == 0
             ? const HomePage()
             : _selectedIndex == 1

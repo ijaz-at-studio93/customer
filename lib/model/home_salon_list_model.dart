@@ -96,6 +96,7 @@ class HomeSalonDataList {
   double? serviceStartingPrice;
   double? serviceMaxPrice;
   double?  averageArtistRatings;
+  String? amenities;
 
   HomeSalonDataList(
       {this.id,
@@ -120,6 +121,7 @@ class HomeSalonDataList {
         this.serviceStartingPrice,
         this.serviceMaxPrice,
         this.averageArtistRatings,
+        this.amenities,
 
 
       });
@@ -152,6 +154,7 @@ class HomeSalonDataList {
     serviceStartingPrice = double.parse(json['serviceStartingPrice'].toString());
     serviceMaxPrice = double.parse(json['serviceMaxPrice'].toString());
     averageArtistRatings = double.parse(json['averageArtistRatings'].toString());
+    amenities = json['amenities'];
   }
 
   Map<String, dynamic> toJson() {
@@ -183,6 +186,7 @@ class HomeSalonDataList {
     data['serviceStartingPrice'] = serviceStartingPrice;
     data['serviceMaxPrice'] = serviceMaxPrice;
     data['averageArtistRatings'] = averageArtistRatings;
+    data['amenities'] = amenities;
     return data;
   }
 }

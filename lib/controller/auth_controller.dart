@@ -9,6 +9,7 @@ import 'package:salon_customer/model/user_profile.dart';
 import 'package:salon_customer/model/user_response_model.dart';
 import 'package:salon_customer/page/auth/login_page.dart';
 import '../page/auth/create_profile_page.dart';
+import '../page/auth/otp_screen_page.dart';
 import '../util/SharedPrefs.dart';
 
 class AuthController extends GetxController {
@@ -104,7 +105,8 @@ class AuthController extends GetxController {
       } else {
         Get.to(() => CreateProfilePage(
               mobileNo: mobileNo,
-            ));
+            )
+        );
       }
     } catch (e) {
       showError(e);
@@ -114,22 +116,78 @@ class AuthController extends GetxController {
   }
 
   /*------------ Do check Mobile Number registration--------*/
-  doSignUp(
-      {required String mobileNO,
-      required String name,
-      required String cc,
-      required String email,
-      required String gender,
-      required VoidCallback callback}) async {
+  // doSignUp(
+  //     {required String mobileNO,
+  //     required String name,
+  //     required String cc,
+  //     required String email,
+  //     required String gender,
+  //     required VoidCallback callback}) async {
+  //   try {
+  //     _showProgress.value = true;
+  //     _userResponseModel.value = await AuthAPI.signUp(
+  //         mobileNO: mobileNO, name: name, cc: cc, email: email, gender: gender);
+  //     if (_userMessage.value == "Verification code sent") {
+  //       callback.call();
+  //     } else {
+  //       showMessage(_userMessage.value);
+  //     }
+  //   } catch (e) {
+  //     showError(e);
+  //   } finally {
+  //     _showProgress.value = false;
+  //   }
+  // }
+
+  doSignUp({
+    required String mobileNO,
+    required String name,
+    required String cc,
+    required String email,
+    required String gender,
+    required VoidCallback callback,
+  }) async {
     try {
       _showProgress.value = true;
-      _userMessage.value = await AuthAPI.signUp(
-          mobileNO: mobileNO, name: name, cc: cc, email: email, gender: gender);
-      if (_userMessage.value == "Verification code sent") {
-        callback.call();
-      } else {
-        showMessage(_userMessage.value);
-      }
+
+      _userResponseModel.value = await AuthAPI.signUp(
+        mobileNO: mobileNO,
+        name: name,
+        cc: cc,
+        email: email,
+        gender: gender,
+      );
+
+      // ✅ STORE TOKENS
+      await userDataStoreToSharedPrefs(_userResponseModel.value);
+
+      // ✅ ALWAYS CALL CALLBACK ON SUCCESS
+      callback.call();
+
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  Future<void> sendOtpAndGoToOtp({
+    required String mobileNo,
+    required String countryCode,
+  }) async {
+    try {
+      _showProgress.value = true;
+
+      await AuthAPI.sendVerificationCode(
+        mobileNo: mobileNo,
+        cc: countryCode,
+      );
+
+      // ✅ ALWAYS go to OTP screen
+      Get.to(() => OtpScreenPage(
+        mobileNumber: mobileNo,
+        isLogin: true,
+      ));
     } catch (e) {
       showError(e);
     } finally {
@@ -163,9 +221,10 @@ class AuthController extends GetxController {
       _userResponseModel.value = await AuthAPI.login(
           mobile: mobile, cc: cc, verificationCode: verificationCode);
       await userDataStoreToSharedPrefs(_userResponseModel.value);
-      if (_userResponseModel.value.data?.id != null) {
-        callback.call();
-      }
+      // if (_userResponseModel.value.data?.id != null) {
+      //   callback.call();
+      // }
+      callback.call();
     } catch (e) {
       showError(e);
     } finally {
@@ -182,6 +241,10 @@ class AuthController extends GetxController {
       await SharedPrefs.writeValue(
           PrefConstants.token, model.data?.accessToken);
     }
+    // ADD THIS ↓
+    if (model.data?.refreshToken != null) {
+      await SharedPrefs.writeValue(PrefConstants.refreshToken, model.data?.refreshToken);
+    }
     await SharedPrefs.writeValue(PrefConstants.userModel, model.toJson());
     await SharedPrefs.writeValue(
         PrefConstants.userId, model.data?.id.toString());
@@ -195,7 +258,7 @@ class AuthController extends GetxController {
       if (SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
         _userResponseModel.value = UserResponseModel.fromJson(
             SharedPrefs.read(PrefConstants.userModel));
-        userDataStoreToSharedPrefs(_userResponseModel.value);
+        //userDataStoreToSharedPrefs(_userResponseModel.value);
       }
     } catch (e) {
       debugPrint(e.toString());

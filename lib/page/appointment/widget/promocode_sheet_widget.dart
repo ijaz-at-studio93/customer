@@ -10,6 +10,7 @@ import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 
 import '../../../util/call_wrapper.dart';
+import '../../../util/snackbar_util.dart';
 
 class PromoCodeSheetWidget extends StatefulWidget {
   const PromoCodeSheetWidget({super.key});
@@ -153,7 +154,7 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                 //           if (cartAmount < minOrder) {
                 //             final int remaining = minOrder - cartAmount;
                 //
-                //             Get.snackbar(
+                //             SnackbarUtil.show(
                 //               "Coupon Locked",
                 //               "Add ₹$remaining more to use this coupon",
                 //               backgroundColor: Colors.orange,
@@ -171,7 +172,7 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                 //         //   Get.back(result: matchingPromo.id);
                 //         // }
                 //         else {
-                //           Get.snackbar(
+                //           SnackbarUtil.show(
                 //               "Invalid Code", "No promo found with that code.");
                 //         }
                 //       },
@@ -226,7 +227,7 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                                 if (cartAmount < minOrder) {
                                   final int remaining = minOrder - cartAmount;
 
-                                  Get.snackbar(
+                                  SnackbarUtil.show(
                                     "Coupon Locked",
                                     "Add ₹$remaining more to use this coupon",
                                     backgroundColor: Colors.orange,
@@ -238,7 +239,7 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
 
                                 Get.back(result: matchingPromo.id);
                               } else {
-                                Get.snackbar(
+                                SnackbarUtil.show(
                                   "Invalid Code",
                                   "No promo found with that code.",
                                 );
@@ -351,10 +352,22 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                         final int minOrder =
                             int.tryParse(promo?.minOrder?.toString() ?? '0') ?? 0;
 
-                        final bool isDisabled = cartAmount < minOrder;
+                        //final bool isDisabled = cartAmount < minOrder;
+                        final today = DateTime.now().weekday % 7;
+
+                        final applicableDays = promo?.applicableDays;
+
+                        final bool isDayValid = applicableDays == null ||
+                            applicableDays.isEmpty ||
+                            applicableDays.contains(today);
+
+                        final bool isMinOrderFail = cartAmount < minOrder;
+
+                        final bool isDisabled = isMinOrderFail || !isDayValid;
+                        final bool isDayFail = !isDayValid;
 
                         final int remainingAmount =
-                        isDisabled ? (minOrder - cartAmount) : 0;
+                        isMinOrderFail ? (minOrder - cartAmount) : 0;
 
                         return PromoCodeListTile(
                           id: promo?.id ?? "",
@@ -371,6 +384,9 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
 
                           isDisabled: isDisabled,
                           unlockAmount: remainingAmount,
+                          isDayValid: isDayValid,
+                          isMinOrderFail: isMinOrderFail,
+                          applicableDays: applicableDays,
 
                           onTapApplyBtn: isDisabled
                               ? null

@@ -36,9 +36,9 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
 
     if (salonId == null) return;
 
-    await Get.find<HomeController>().doGetSalonArtiestListData(
-      salonId: salonId,
-    );
+    // await Get.find<HomeController>().doGetSalonArtiestListData(
+    //   salonId: salonId,
+    // );
 
     setState(() {}); // 🔥 refresh UI after loading
   }
@@ -274,22 +274,16 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
   }
 
   String getStylistNames(HistoryList historyList) {
-    final stylistIds = historyList.appointment?.stylistIds ?? [];
+    final stylists = historyList.appointment?.selectedStylists ?? [];
 
-    // 🔥 SKIP CASE
-    if (stylistIds.isEmpty) {
+    if (stylists.isEmpty) {
       return "Any Stylist";
     }
 
-    final artists =
-        Get.find<HomeController>().getSalonDetailsArtiestData.data ?? [];
-
-    final names = artists
-        .where((a) => stylistIds.contains(a.id))
-        .map((a) => a.name ?? "")
-        .toList();
-
-    return names.isEmpty ? "No Stylist Specified" : names.join(", ");
+    return stylists
+        .map((s) => s.name ?? "")
+        .where((name) => name.isNotEmpty)
+        .join(", ");
   }
 
   /*---------------- convertTime ------------*/

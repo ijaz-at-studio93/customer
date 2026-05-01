@@ -9,6 +9,7 @@ import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/color_constant.dart';
 import '../../project_specific/button_widget.dart';
 import '../../project_specific/text_theme.dart';
+import '../bottom_navigation_bar.dart';
 import 'otp_screen_page.dart';
 
 class CreateProfilePage extends StatefulWidget {
@@ -481,6 +482,9 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
       return;
     }
 
+    SharedPrefs.remove(PrefConstants.hasVisitedSalon);
+    SharedPrefs.remove(PrefConstants.hasShownSalonDialog);
+
     // ✅ ALL GOOD → API CALL
     _authController.doSignUp(
       gender: selectGender == 1 ? "MALE" : "FEMALE",
@@ -488,11 +492,14 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
       name: name,
       cc: "91",
       email: _emailTextEditingController.text.trim(),
+      // callback: () {
+      //   Get.to(() => OtpScreenPage(
+      //         mobileNumber: mobile,
+      //         isLogin: false,
+      //       ));
+      // },
       callback: () {
-        Get.to(() => OtpScreenPage(
-              mobileNumber: mobile,
-              isLogin: false,
-            ));
+        Get.offAll(() => const BottomNavBarPage());
       },
     );
   }

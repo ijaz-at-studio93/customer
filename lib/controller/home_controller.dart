@@ -37,6 +37,7 @@ class HomeController extends GetxController {
   final Rx<bool> _showProgress = false.obs;
 
   Rxn<dynamic> pendingBooking = Rxn();
+  final Rxn<BookingData> payNowBooking = Rxn<BookingData>();
 
   bool get showProgress => _showProgress.value;
 
@@ -587,6 +588,49 @@ class HomeController extends GetxController {
     }
   }
 
+  final Rxn<dynamic> _salonAvailability = Rxn();
+
+  dynamic get salonAvailability => _salonAvailability.value;
+
+  set setSalonAvailability(val) => _salonAvailability.value = val;
+
+  Future<void> doGetSalonAvailability({
+    required String salonId,
+  }) async {
+    try {
+      _showProgress.value = true;
+
+      final data = await HomeAPI.getSalonAvailability(
+        salonId: salonId,
+      );
+
+      _salonAvailability.value = data;
+    } catch (e) {
+      showError(e);
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  var salonProducts = [].obs;
+  var isProductsLoading = false.obs;
+
+  Future<void> doGetSalonProducts({required String salonId}) async {
+    try {
+      isProductsLoading.value = true;
+
+      final res = await DioClient.client.get(
+        "/user/salon/$salonId/products",
+      );
+
+      salonProducts.value = res.data['data'] ?? [];
+    } catch (e) {
+      salonProducts.value = [];
+    } finally {
+      isProductsLoading.value = false;
+    }
+  }
+
   /*----------------------- Create Booking  ForCustomer -----------------*/
   // doCreateBooking({
   //   required String salonArtistId,
@@ -647,6 +691,28 @@ class HomeController extends GetxController {
       if (kDebugMode) {
         print("Create Booking ForCustomer $e");
       }
+    } finally {
+      _showBookingProgress.value = false;
+    }
+  }
+
+  Future<CreateBookingAppointmentModel?> createNonMandatoryBooking({
+    required String salonId,
+  }) async {
+    try {
+      _showBookingProgress.value = true;
+
+      final res = await HomeAPI.userCreateNonMandatoryBooking(
+        salonId: salonId,
+      );
+
+      return res;
+    } catch (e) {
+      showError(e);
+      if (kDebugMode) {
+        print("Create Non Mandatory Booking $e");
+      }
+      return null;
     } finally {
       _showBookingProgress.value = false;
     }
@@ -735,6 +801,22 @@ class HomeController extends GetxController {
       _showProgress.value = false;
     }
   }
+
+  Future<void> findPayNowBooking(String salonId) async {
+    final bookings = _currentBookingListModel.value.data ?? [];
+
+    try {
+      payNowBooking.value = bookings.firstWhere(
+            (b) =>
+        b.salon?.id == salonId &&
+            b.paymentStatus == "pending" &&
+            (b.orderAmount ?? 0) == 0
+      );
+    } catch (e) {
+      payNowBooking.value = null;
+    }
+  }
+
   /*-----------------  Add  Favourite Salon ---------------*/
   doAddFavouriteSalon({required String salonId}) async {
     try {
@@ -841,8 +923,12 @@ class HomeController extends GetxController {
         stylistId.value = "";
       }
     } catch (e) {
+      if (e.toString().contains("Cart not found")) {
+        _serviceAddCartModel.value = ServiceAddCartModel(); // empty state
+        return;
+      }
       showError(e);
-      if (kDebugMode) print("Get Cart $e");
+      if (kDebugMode) print("Get Cart XXXXXXXXXXXXXXXXXXX $e");
     } finally {
       if (useGlobalLoader) _showProgress.value = false;         // changed
     }
@@ -859,11 +945,15 @@ class HomeController extends GetxController {
       if (_salonServiceAddCartModel.value.data?.items?.isEmpty ?? false) {
         stylistId.value = "";
       }
-      update(); // or refresh()
-      callback?.call();
+      // update(); // or refresh()
+      // callback?.call();
     } catch (e) {
+      if (e.toString().contains("Cart not found")) {
+        _serviceAddCartModel.value = ServiceAddCartModel(); // empty state
+        return;
+      }
       showError(e);
-      if (kDebugMode) print("Get Cart $e");
+      if (kDebugMode) print("Get Cart SSSSSSSSSSSSSSSS $e");
     } finally {
       if (useGlobalLoader) _showProgress.value = false;         // changed
     }
@@ -1642,6 +1732,16 @@ class HomeController extends GetxController {
 
       if (startDate != null && now.isBefore(startDate)) continue;
       if (endDate != null && now.isAfter(endDate)) continue;
+
+      final today = now.weekday % 7; // convert 1–7 → 0–6
+
+      final applicableDays = promo.applicableDays;
+
+      final bool isDayValid = applicableDays == null ||
+          applicableDays.isEmpty ||
+          applicableDays.contains(today);
+
+      if (!isDayValid) continue;
 
       int minOrder = int.tryParse(promo.minOrder?.toString() ?? '0') ?? 0;
       if (amount < minOrder) continue;

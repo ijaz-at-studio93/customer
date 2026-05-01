@@ -34,8 +34,8 @@ class PendingPaymentBar extends StatelessWidget {
           ));
         },
         child: Container(
-          width: 368,//Get.width * 0.80,
-          height: 46,
+          width: Get.width * 0.90,
+          height: 56,
           padding: const EdgeInsets.only(left: 16, right: 3),
           decoration: BoxDecoration(
             gradient: const LinearGradient( // 🔥 ADDED GRADIENT
@@ -82,8 +82,8 @@ class PendingPaymentBar extends StatelessWidget {
 
 
               Container(
-                width: 80,
-                height: 38,
+                width: 90,
+                height: 48,
 
                 padding: const EdgeInsets.symmetric(
                   horizontal: 18,
@@ -100,7 +100,7 @@ class PendingPaymentBar extends StatelessWidget {
                       style: TextStyle(
                         fontFamily: "Outfit",          // ✅ Figma font
                         fontWeight: FontWeight.w600,   // ✅ SemiBold (not bold)
-                        fontSize: 16.9,                  // ✅ balanced inside pill
+                        fontSize: 18,                  // ✅ balanced inside pill
                         letterSpacing: 0.3,            // ✅ slight polish
                         color: Colors.white,
                         height: 1,                     // ✅ vertical alignment
@@ -152,9 +152,9 @@ class _AppointmentTextState extends State<AppointmentText> {
 
     messages = [
       "Appointment Booked",
-      "By ${widget.salonName}",
+      "${widget.salonName}",
       widget.dateTime != null && widget.dateTime!.isNotEmpty
-          ? "At ${widget.dateTime}"
+          ? "${widget.dateTime}"
           : "Time to be confirmed",
     ];
 
@@ -202,7 +202,7 @@ class _AppointmentTextState extends State<AppointmentText> {
             style: AppTextTheme.bold.copyWith(
               fontFamily: "Outfit",        // ✅ Figma font
               fontWeight: FontWeight.w800, // ✅ SemiBold (not too heavy)
-              fontSize: 15,                // ✅ balanced size
+              fontSize: 17,                // ✅ balanced size
               letterSpacing: 0.3,          // ✅ slight spacing like Figma
               color: widget.themeColor,
               height: 1,                   // ✅ vertical centering
