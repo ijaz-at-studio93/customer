@@ -184,6 +184,7 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart' hide Response;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -353,15 +354,33 @@ Future<void> showError(error) async {
   }
 }
 
+void _presentSnackBar(String message, int duration) {
+  Get.showSnackbar(GetSnackBar(
+    message: message.isEmpty ? "Error" : message,
+    snackPosition: SnackPosition.BOTTOM,
+    margin: const EdgeInsets.all(12),
+    duration: Duration(seconds: duration),
+    borderRadius: 16,
+    backgroundColor: Colors.black87,
+  ));
+}
+
+bool _hasNavigatorOverlay() {
+  final ctx = Get.overlayContext;
+  return ctx != null && Overlay.maybeOf(ctx) != null;
+}
+
 Future<void> showMessage(String message, {int duration = 3}) async {
-  if (Get.context != null) {
-    Get.showSnackbar(GetSnackBar(
-      message: message.isEmpty ? "Error" : message,
-      snackPosition: SnackPosition.BOTTOM,
-      margin: const EdgeInsets.all(12),
-      duration: Duration(seconds: duration),
-      borderRadius: 16,
-      backgroundColor: Colors.black87,
-    ));
+  if (_hasNavigatorOverlay()) {
+    _presentSnackBar(message, duration);
+    return;
   }
+  // APIs can complete before the first frame (e.g. splash); Get.snackbar needs Overlay.
+  SchedulerBinding.instance.addPostFrameCallback((_) {
+    if (_hasNavigatorOverlay()) {
+      _presentSnackBar(message, duration);
+    } else {
+      debugPrint('showMessage (no overlay yet): $message');
+    }
+  });
 }

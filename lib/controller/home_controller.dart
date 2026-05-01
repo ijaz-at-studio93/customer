@@ -43,7 +43,6 @@ class HomeController extends GetxController {
 
   set setShowProgress(val) => _showProgress.value = val;
 
-
   final Rx<bool> _showAddProgress = false.obs;
 
   bool get gteShowAddProgress => _showAddProgress.value;
@@ -200,12 +199,16 @@ class HomeController extends GetxController {
 
   ServiceAddCartModel get getServiceAddCartModel => _serviceAddCartModel.value;
 
+  /// Reactive reference for listeners (e.g. redirect when cart empties).
+  Rx<ServiceAddCartModel> get serviceAddCartModelRx => _serviceAddCartModel;
+
   set setServiceAddCartModel(val) => _serviceAddCartModel.value = val;
 
   final Rx<SalonServiceAddCartModel> _salonServiceAddCartModel =
       SalonServiceAddCartModel().obs;
 
-  SalonServiceAddCartModel get getSalonServiceAddCartModel => _salonServiceAddCartModel.value;
+  SalonServiceAddCartModel get getSalonServiceAddCartModel =>
+      _salonServiceAddCartModel.value;
 
   set setSalonServiceAddCartModel(val) => _salonServiceAddCartModel.value = val;
 
@@ -311,11 +314,11 @@ class HomeController extends GetxController {
   final RxList categoryId = [].obs;
 
   /*---------------- getHomeCategory ----------*/
-  doGetHomeCategory({required String gender}) async {
+  Future<void> doGetHomeCategory({required String gender}) async {
     try {
       _showProgress.value = true;
       _homeCategoryListModel.value =
-      await HomeAPI.homeCategoryList(gender: gender);
+          await HomeAPI.homeCategoryList(gender: gender);
       //_homeCategoryListModel.refresh();
     } catch (e) {
       showError(e);
@@ -328,7 +331,7 @@ class HomeController extends GetxController {
   }
 
   /*------------------ Get Make Package Data  ------------*/
-  doGetMakePackageData() async {
+  Future<void> doGetMakePackageData() async {
     try {
       _showProgress.value = true;
       _getLastMakeYourOwnPackage.value = await HomeAPI.makePackageDataGet();
@@ -343,7 +346,7 @@ class HomeController extends GetxController {
   }
 
   /*--------------  Get Product For Service ----------------*/
-  doGetProductData({required String serviceId}) async {
+  Future<void> doGetProductData({required String serviceId}) async {
     try {
       _showProgress.value = true;
       _serviceProductModel.value = await HomeAPI.getServiceProduct(serviceId);
@@ -358,7 +361,7 @@ class HomeController extends GetxController {
   }
 
   /*----------------------  Add One Package Data  ------------*/
-  doAddPackageOneData({
+  Future<void> doAddPackageOneData({
     required List<String> serviceCategoryIds,
     required VoidCallback callback,
   }) async {
@@ -380,7 +383,7 @@ class HomeController extends GetxController {
   }
 
   /*----------------------  Remove One Category Data --------------*/
-  doRemovePackageData({
+  Future<void> doRemovePackageData({
     required List<String> serviceCategoryIds,
     required VoidCallback callback,
   }) async {
@@ -438,7 +441,7 @@ class HomeController extends GetxController {
   /* ------------------------ Pagination End ------------------------ */
 
   /*------------------ Get Salon Details ----------------*/
-  doGetHomeSalonDetails({
+  Future<void> doGetHomeSalonDetails({
     required String salonId,
     required String lat,
     required String lng,
@@ -460,7 +463,7 @@ class HomeController extends GetxController {
   }
 
   /*------------------- Get Salon Details Service ---------------- */
-  doGetSalonDetailsService({
+  Future<void> doGetSalonDetailsService({
     required String salonId,
     required String serviceGender,
     bool useGlobalLoader = true,
@@ -468,8 +471,8 @@ class HomeController extends GetxController {
     try {
       if (useGlobalLoader) _showProgress.value = true;
       _salonDetailsListData.value =
-      await HomeAPI.getSalonDetailsCategoryServiceList(
-          salonId: salonId, serviceGender: serviceGender);
+          await HomeAPI.getSalonDetailsCategoryServiceList(
+              salonId: salonId, serviceGender: serviceGender);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -481,7 +484,7 @@ class HomeController extends GetxController {
   }
 
   /*------------------------- Do Get Home Salon List -------------*/
-  doGetHomeSalonList({
+  Future<void> doGetHomeSalonList({
     required int offset,
     required int size,
     required double lat,
@@ -516,11 +519,12 @@ class HomeController extends GetxController {
   }
 
   /*--------------- Do Get Salon Artiest ---------------*/
-  doGetSalonArtiestListData({required String salonId, bool useGlobalLoader = true}) async {
+  Future<void> doGetSalonArtiestListData(
+      {required String salonId, bool useGlobalLoader = true}) async {
     try {
       if (useGlobalLoader) _showProgress.value = true;
       _salonDetailsArtiestData.value =
-      await HomeAPI.salonDetailsArtiest(salonId: salonId);
+          await HomeAPI.salonDetailsArtiest(salonId: salonId);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -532,7 +536,7 @@ class HomeController extends GetxController {
   }
 
   /*------------------------------ DO Get Artiest List Data ------------------------------*/
-  doGetArtiestListData() async {
+  Future<void> doGetArtiestListData() async {
     try {
       _showProgress.value = true;
       _artiestListData.value = await HomeAPI.getArtiest();
@@ -547,7 +551,7 @@ class HomeController extends GetxController {
   }
 
   /*------------------------ get UnAvailableDatesListData --------------------*/
-  doGetUnAvailableDatesListData({
+  Future<void> doGetUnAvailableDatesListData({
     required String artiestId,
     required String date,
     required VoidCallback callback,
@@ -555,7 +559,7 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       _unAvailableDatesListData.value =
-      await HomeAPI.getUnAvailableDates(artiestId: artiestId, date: date);
+          await HomeAPI.getUnAvailableDates(artiestId: artiestId, date: date);
 
       if (_unAvailableDatesListData.value.data?.isMonthAvailable ?? false) {
         callback.call();
@@ -571,13 +575,13 @@ class HomeController extends GetxController {
   }
 
   /*------------------------------ Get availabilities Time  Slot ------------------------------*/
-  doGetAvailabilitiesTimeSlot(
+  Future<void> doGetAvailabilitiesTimeSlot(
       {required String artiestId, required String date}) async {
     try {
       _showProgress.value = true;
       _availabilitiesTimeSlotModelData.value =
-      await HomeAPI.getAvailabilitiesTimeSlot(
-          artiestId: artiestId, date: date);
+          await HomeAPI.getAvailabilitiesTimeSlot(
+              artiestId: artiestId, date: date);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -673,8 +677,7 @@ class HomeController extends GetxController {
     try {
       _showBookingProgress.value = true;
 
-      _createBookingAppointmentModel.value =
-      await HomeAPI.userCreateBooking(
+      _createBookingAppointmentModel.value = await HomeAPI.userCreateBooking(
         stylistIds: stylistIds,
         selectedSlots: selectedSlots,
         isHomeService: isHomeService,
@@ -682,7 +685,7 @@ class HomeController extends GetxController {
       );
 
       if (_createBookingAppointmentModel
-          .value.data?.completionToken?.isNotEmpty ??
+              .value.data?.completionToken?.isNotEmpty ??
           false) {
         callback.call();
       }
@@ -718,16 +721,16 @@ class HomeController extends GetxController {
     }
   }
 
-  fetchBookingByRazorpayOrderId({
+  Future<dynamic>? fetchBookingByRazorpayOrderId({
     required String razorpayOrderId,
   }) async {
-    _createBookingAppointmentModel.value = await HomeAPI.getBookingByRazorpayOrderId(
-        razorpayOrderId:razorpayOrderId
-    );
+    _createBookingAppointmentModel.value =
+        await HomeAPI.getBookingByRazorpayOrderId(
+            razorpayOrderId: razorpayOrderId);
     return _createBookingAppointmentModel.value.data;
   }
 
-  doCreateBookingIntent({
+  Future<void> doCreateBookingIntent({
     required String salonArtistId,
     required String startAt,
     required bool isHomeService,
@@ -741,13 +744,12 @@ class HomeController extends GetxController {
         userAddressId: userAddressId);
   }
 
-
   /*---------------- QR Code Model -------------------*/
-  doCreateQrCode({required String appointmentId}) async {
+  Future<void> doCreateQrCode({required String appointmentId}) async {
     try {
       _showProgress.value = true;
       _userBookingQrCodeModel.value =
-      await HomeAPI.userBookingQrCodeDetails(appointmentId: appointmentId);
+          await HomeAPI.userBookingQrCodeDetails(appointmentId: appointmentId);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -773,25 +775,24 @@ class HomeController extends GetxController {
   //   }
   // }
 
-  doGetCurrentBookingListData() async {
+  Future<void> doGetCurrentBookingListData() async {
     try {
       _showProgress.value = true;
 
       _currentBookingListModel.value = await HomeAPI.currentBookingList();
 
-      final bookings = _currentBookingListModel.value?.data ?? [];
+      final bookings = _currentBookingListModel.value.data ?? [];
 
       /// Find booking where payment is pending
       try {
         pendingBooking.value = bookings.firstWhere(
-              (b) =>
-          b.paymentStatus == "pending" &&
+          (b) =>
+              b.paymentStatus == "pending" &&
               (b.orderStatus == "pending" || b.orderStatus == "confirmed"),
         );
       } catch (e) {
         pendingBooking.value = null;
       }
-
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -806,19 +807,17 @@ class HomeController extends GetxController {
     final bookings = _currentBookingListModel.value.data ?? [];
 
     try {
-      payNowBooking.value = bookings.firstWhere(
-            (b) =>
-        b.salon?.id == salonId &&
-            b.paymentStatus == "pending" &&
-            (b.orderAmount ?? 0) == 0
-      );
+      payNowBooking.value = bookings.firstWhere((b) =>
+          b.salon?.id == salonId &&
+          b.paymentStatus == "pending" &&
+          (b.orderAmount ?? 0) == 0);
     } catch (e) {
       payNowBooking.value = null;
     }
   }
 
   /*-----------------  Add  Favourite Salon ---------------*/
-  doAddFavouriteSalon({required String salonId}) async {
+  Future<void> doAddFavouriteSalon({required String salonId}) async {
     try {
       _showAddProgress.value = true;
       bool result = await HomeAPI.addFavouriteSalon(salonId: salonId);
@@ -833,7 +832,7 @@ class HomeController extends GetxController {
   }
 
   /*-----------------  remove  Favourite Salon ---------------*/
-  doRemoveFavouriteSalon(
+  Future<void> doRemoveFavouriteSalon(
       {required String salonId, required VoidCallback callback}) async {
     try {
       _showAddProgress.value = true;
@@ -852,7 +851,7 @@ class HomeController extends GetxController {
   }
 
   /*----------------  Fav Salon List -------------------*/
-  doGetFavouriteSalon() async {
+  Future<void> doGetFavouriteSalon() async {
     try {
       _showProgress.value = true;
       _favSalonList.value = await HomeAPI.getFavouriteSalon();
@@ -868,10 +867,10 @@ class HomeController extends GetxController {
 
   /*>>>>>>>>>>>>>>>>>>>  CART <<<<<<<<<<<<<<<<<<<<<<<*/
   /*------------------------ Add Cart ----------------*/
-  doAddCart(
+  Future<void> doAddCart(
       {required String salonServiceId,
-        required bool isHomeService,
-        required VoidCallback callback}) async {
+      required bool isHomeService,
+      required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.serviceAddCart(
@@ -890,12 +889,12 @@ class HomeController extends GetxController {
   }
 
   /*-------------------  Remove Cart ------------------*/
-  doRemoveCart(
+  Future<void> doRemoveCart(
       {required String salonServiceId, required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result =
-      await HomeAPI.serviceRemoveAddCart(salonServiceId: salonServiceId);
+          await HomeAPI.serviceRemoveAddCart(salonServiceId: salonServiceId);
       if (result) {
         callback.call();
       }
@@ -911,12 +910,15 @@ class HomeController extends GetxController {
 
   final RxBool _skipNextGetCart = false.obs;
   /*---------------- Get Cart ---------------*/
-  doGetCart({bool useGlobalLoader = true}) async {
+  Future<void> doGetCart({bool useGlobalLoader = true}) async {
     // keep your one-shot skip if you added it
-    if (_skipNextGetCart.value) { _skipNextGetCart.value = false; return; }
+    if (_skipNextGetCart.value) {
+      _skipNextGetCart.value = false;
+      return;
+    }
 
     try {
-      if (useGlobalLoader) _showProgress.value = true;          // changed
+      if (useGlobalLoader) _showProgress.value = true; // changed
       _serviceAddCartModel.value = await HomeAPI.getUserCart();
       tempQty.clear(); // 👈 ADD THIS
       if (_serviceAddCartModel.value.data?.items?.isEmpty ?? false) {
@@ -930,17 +932,25 @@ class HomeController extends GetxController {
       showError(e);
       if (kDebugMode) print("Get Cart XXXXXXXXXXXXXXXXXXX $e");
     } finally {
-      if (useGlobalLoader) _showProgress.value = false;         // changed
+      if (useGlobalLoader) _showProgress.value = false; // changed
     }
   }
 
-  doGetSalonCart({bool useGlobalLoader = true,required String salonId,VoidCallback? callback}) async {
+  Future<void> doGetSalonCart(
+      {bool useGlobalLoader = true,
+      required String salonId,
+      VoidCallback? callback}) async {
     // keep your one-shot skip if you added it
-    if (_skipNextGetCart.value) { _skipNextGetCart.value = false; callback?.call(); return; }
+    if (_skipNextGetCart.value) {
+      _skipNextGetCart.value = false;
+      callback?.call();
+      return;
+    }
 
     try {
-      if (useGlobalLoader) _showProgress.value = true;          // changed
-      _salonServiceAddCartModel.value = await HomeAPI.getUserSalonCart(salonId: salonId);
+      if (useGlobalLoader) _showProgress.value = true; // changed
+      _salonServiceAddCartModel.value =
+          await HomeAPI.getUserSalonCart(salonId: salonId);
       tempQty.clear(); // 👈 ADD THIS
       if (_salonServiceAddCartModel.value.data?.items?.isEmpty ?? false) {
         stylistId.value = "";
@@ -955,7 +965,7 @@ class HomeController extends GetxController {
       showError(e);
       if (kDebugMode) print("Get Cart SSSSSSSSSSSSSSSS $e");
     } finally {
-      if (useGlobalLoader) _showProgress.value = false;         // changed
+      if (useGlobalLoader) _showProgress.value = false; // changed
     }
   }
 
@@ -971,7 +981,7 @@ class HomeController extends GetxController {
     final services = getServiceAddCartModel.data?.servicesWithProduct ?? [];
 
     final item = services.firstWhere(
-          (e) => e.serviceId == serviceId,
+      (e) => e.serviceId == serviceId,
       orElse: () => ServicesWithProduct(quantity: 0),
     );
 
@@ -983,7 +993,6 @@ class HomeController extends GetxController {
       _showProgress.value = true;
 
       await HomeAPI.sendSalonRequest(message);
-
     } catch (e) {
       showError(e);
       if (kDebugMode) print("Salon Request Error $e");
@@ -1018,7 +1027,8 @@ class HomeController extends GetxController {
   double getTotalPrice() {
     final data = getServiceAddCartModel.data;
 
-    final double subtotal = (data?.taxAbleTotal ?? 0).toDouble(); // after discount
+    final double subtotal =
+        (data?.taxAbleTotal ?? 0).toDouble(); // after discount
     final double gst = (data?.cartTaxDetails?.totalTaxAmount ?? 0).toDouble();
     final double platformFee = (data?.platformFee ?? 0).toDouble();
 
@@ -1028,13 +1038,14 @@ class HomeController extends GetxController {
   double getPriceNoGST() {
     final data = getServiceAddCartModel.data;
 
-    final double subtotal = (data?.taxAbleTotal ?? 0).toDouble(); // after discount
+    final double subtotal =
+        (data?.taxAbleTotal ?? 0).toDouble(); // after discount
 
     return subtotal;
   }
 
   /*---------- Clear Cart --------------*/
-  doClearCart({required VoidCallback callback}) async {
+  Future<void> doClearCart({required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.removeCart();
@@ -1053,11 +1064,11 @@ class HomeController extends GetxController {
 
   /*----------------- Add Cart in  Product ------------------*/
 
-  doAddProductCart(
+  Future<void> doAddProductCart(
       {required String productId,
-        required String productSelectedServiceId,
-        required bool isHomeService,
-        required VoidCallback callback}) async {
+      required String productSelectedServiceId,
+      required bool isHomeService,
+      required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       _serviceAddCartModel.value = await HomeAPI.addProductCart(
@@ -1078,10 +1089,10 @@ class HomeController extends GetxController {
   }
 
   /*----------------- Remove Cart in  Product ------------------*/
-  doRemoveProductCart(
+  Future<void> doRemoveProductCart(
       {required String productId,
-        required String productSelectedServiceId,
-        required VoidCallback callback}) async {
+      required String productSelectedServiceId,
+      required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.removeProductCart(
@@ -1103,7 +1114,7 @@ class HomeController extends GetxController {
   /*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Cart Part End <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
 
   /*----------------------------- Do Get Booking History Data List -----------------------*/
-  doGetBookingHistory() async {
+  Future<void> doGetBookingHistory() async {
     try {
       _showProgress.value = true;
       _bookingHistoryListModel.value = await HomeAPI.bookingHistory();
@@ -1120,7 +1131,7 @@ class HomeController extends GetxController {
   /*-------------  Get Order Id Model ---------------*/
   final RxBool _skipNextGetOrderId = false.obs;
 
-  doGetOrderId({bool useGlobalLoader = true}) async {
+  Future<void> doGetOrderId({bool useGlobalLoader = true}) async {
     if (_skipNextGetOrderId.value) {
       _skipNextGetOrderId.value = false;
       return;
@@ -1136,7 +1147,7 @@ class HomeController extends GetxController {
     }
   }
 
-  createPaymentOrder({
+  Future<void> createPaymentOrder({
     required String? bookingOrderId,
     required int billAmount,
     required int payableAmount,
@@ -1150,7 +1161,6 @@ class HomeController extends GetxController {
         billAmount: billAmount,
         payableAmount: payableAmount,
       );
-
     } catch (e) {
       showError(e);
       if (kDebugMode) print("Create Payment Order $e");
@@ -1160,7 +1170,7 @@ class HomeController extends GetxController {
   }
 
   /*----------------------------  Upload PortFolio --------------------*/
-  doUploadPortFolio({
+  Future<void> doUploadPortFolio({
     required String appointmentId,
     required bool isUpload,
     String? name,
@@ -1189,11 +1199,11 @@ class HomeController extends GetxController {
     }
   }
 
-  doUploadImage(
+  Future<void> doUploadImage(
       {required String appointmentId,
-        required List<String> multiplePath,
-        required List<String> multiplePathVideo,
-        required VoidCallback callback}) async {
+      required List<String> multiplePath,
+      required List<String> multiplePathVideo,
+      required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       String result = await HomeAPI.uploadImage(
@@ -1212,11 +1222,11 @@ class HomeController extends GetxController {
   }
 
   /*---------------------  Get Review Data List Model ----------------*/
-  doGetReviewDataList({required String appointmentId}) async {
+  Future<void> doGetReviewDataList({required String appointmentId}) async {
     try {
       _showProgress.value = true;
       _reviewDataListModel.value =
-      await HomeAPI.reviewListDataGet(appointmentId: appointmentId);
+          await HomeAPI.reviewListDataGet(appointmentId: appointmentId);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -1233,7 +1243,7 @@ class HomeController extends GetxController {
   final RxString pendingReviewsalonId = "".obs;
   RxBool isSubmittingReview = false.obs;
 
-  doCheckPendingReview() async {
+  Future<void> doCheckPendingReview() async {
     try {
       _showProgress.value = true;
 
@@ -1246,7 +1256,6 @@ class HomeController extends GetxController {
       } else {
         hasPendingReview.value = false;
       }
-
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -1310,7 +1319,7 @@ class HomeController extends GetxController {
   }
 
   /*================ Product ==================*/
-  doAddProductReview({
+  Future<void> doAddProductReview({
     required String appointmentId,
     required double rate,
     required String salonProductId,
@@ -1389,11 +1398,11 @@ class HomeController extends GetxController {
   }
 
   /*--------------------------  Artiest Portfolio -----------------*/
-  doGetArtiestPortfolio({required String artistId}) async {
+  Future<void> doGetArtiestPortfolio({required String artistId}) async {
     try {
       _showProgress.value = true;
       _artiestDetailsModel.value =
-      await HomeAPI.getArtiestPortfolio(artistId: artistId);
+          await HomeAPI.getArtiestPortfolio(artistId: artistId);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -1405,7 +1414,7 @@ class HomeController extends GetxController {
   }
 
   /*---------------- Get Blog Data ----------------*/
-  doGetBlogData({required double lat, required double lng}) async {
+  Future<void> doGetBlogData({required double lat, required double lng}) async {
     try {
       _showProgress.value = true;
       _blogDataModel.value = await HomeAPI.getBlogData(lat: lat, lng: lng);
@@ -1420,7 +1429,8 @@ class HomeController extends GetxController {
   }
 
   /*------------------- Add Fav Blog -----------------*/
-  doAddFavBlog({required String blogId, required VoidCallback callback}) async {
+  Future<void> doAddFavBlog(
+      {required String blogId, required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.addFavBlog(blogId);
@@ -1438,7 +1448,8 @@ class HomeController extends GetxController {
   }
 
   /*--------------------- Remove Fav Blog --------------------*/
-  doRemoveBlog({required String blogId, required VoidCallback callback}) async {
+  Future<void> doRemoveBlog(
+      {required String blogId, required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.removeBlog(blogId);
@@ -1456,7 +1467,7 @@ class HomeController extends GetxController {
   }
 
   /*---------------------- get Fav Blog Data  ----------------*/
-  doGetFavBlogData() async {
+  Future<void> doGetFavBlogData() async {
     try {
       _showProgress.value = true;
       _favBlogDataModel.value = await HomeAPI.getFavBlogData();
@@ -1471,7 +1482,7 @@ class HomeController extends GetxController {
   }
 
   /*------------------ Get Review Rating -----------------*/
-  doReviewRating() async {
+  Future<void> doReviewRating() async {
     try {
       _showProgress.value = true;
       _reviewRatingUserModel.value = await HomeAPI.getReviewRating();
@@ -1486,12 +1497,12 @@ class HomeController extends GetxController {
   }
 
   /*-------------  Get Salon Search ---------------*/
-  doSalonSearch(
+  Future<void> doSalonSearch(
       {required String query, required String lat, required String lng}) async {
     try {
       _showProgress.value = true;
       _searchSalonModel.value =
-      await HomeAPI.searchForSalon(query: query, lat: lat, lng: lng);
+          await HomeAPI.searchForSalon(query: query, lat: lat, lng: lng);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -1503,13 +1514,13 @@ class HomeController extends GetxController {
   }
 
   /*--------------------  Save Address For User ---------------*/
-  doSaveAddress(
+  Future<void> doSaveAddress(
       {required String geolocationLat,
-        required String geolocationLng,
-        required String address,
-        required String directions,
-        required String house,
-        required VoidCallback callback}) async {
+      required String geolocationLng,
+      required String address,
+      required String directions,
+      required String house,
+      required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.saveAddressUser(
@@ -1532,14 +1543,14 @@ class HomeController extends GetxController {
   }
 
   /*----------------  Edit  Save Address For User --------------*/
-  doSaveEditAddress(
+  Future<void> doSaveEditAddress(
       {required String geolocationLat,
-        required String geolocationLng,
-        required String address,
-        required String addressID,
-        required String directions,
-        required String house,
-        required VoidCallback callback}) async {
+      required String geolocationLng,
+      required String address,
+      required String addressID,
+      required String directions,
+      required String house,
+      required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.saveEditAddressUser(
@@ -1563,7 +1574,7 @@ class HomeController extends GetxController {
   }
 
   /*--------------- Save Get Address ------------*/
-  doGetSaveAddress() async {
+  Future<void> doGetSaveAddress() async {
     try {
       _showProgress.value = true;
       _saveAddressModel.value = await HomeAPI.getSaveAddressUser();
@@ -1578,11 +1589,12 @@ class HomeController extends GetxController {
   }
 
   /*------------------ Search  Artiest ------------------*/
-  doGetSearchArtiest({required String salonId, required String q}) async {
+  Future<void> doGetSearchArtiest(
+      {required String salonId, required String q}) async {
     try {
       _showProgress.value = true;
       _artistSearchModel.value =
-      await HomeAPI.searchArtiest(salonId: salonId, q: q);
+          await HomeAPI.searchArtiest(salonId: salonId, q: q);
     } catch (e) {
       if (kDebugMode) {
         print("Get Search Artiest $e");
@@ -1594,7 +1606,7 @@ class HomeController extends GetxController {
   }
 
   /*----------  Do Delete Save Address ------------*/
-  doDeleteSaveAddress(
+  Future<void> doDeleteSaveAddress(
       {required String id, required VoidCallback callback}) async {
     try {
       _showProgress.value = true;
@@ -1613,11 +1625,12 @@ class HomeController extends GetxController {
   }
 
   /*-------------------------  Do Get PopularServiceByYourStylist ---------------*/
-  doGetPopularServiceByYourStylist({required String stylistId}) async {
+  Future<void> doGetPopularServiceByYourStylist(
+      {required String stylistId}) async {
     try {
       _showProgress.value = true;
       _artistPopularServicesModel.value =
-      await HomeAPI.getPopularServiceByYourStylist(stylistId);
+          await HomeAPI.getPopularServiceByYourStylist(stylistId);
     } catch (e) {
       if (kDebugMode) {
         print("Get Popular Service $e");
@@ -1629,7 +1642,7 @@ class HomeController extends GetxController {
   }
 
   /*----------------------- Do Add View For Blog Section ----------------*/
-  doAddViewForBlogSection({required String blogID}) async {
+  Future<void> doAddViewForBlogSection({required String blogID}) async {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.addBlogView(blogID);
@@ -1649,11 +1662,11 @@ class HomeController extends GetxController {
   }
 
   /*---------------  Salon Id to  review get ----------------*/
-  doGetSalonReview({required String salonId}) async {
+  Future<void> doGetSalonReview({required String salonId}) async {
     try {
       _showProgress.value = true;
       _salonIdReviewsModel.value =
-      await HomeAPI.salonIdToReview(salonId: salonId);
+          await HomeAPI.salonIdToReview(salonId: salonId);
     } catch (e) {
       if (kDebugMode) {
         print("Get Salon Review $e");
@@ -1665,14 +1678,14 @@ class HomeController extends GetxController {
   }
 
   /*--------------------------- Get  PromoCode -------------------------*/
-  doGetPromoCode(
+  Future<void> doGetPromoCode(
       {required double lat,
-        required double lng,
-        required String orderBy,
-        required String serviceGender,
-        required bool nearest,
-        required bool fourPlusRating,
-        required bool homeService}) async {
+      required double lng,
+      required String orderBy,
+      required String serviceGender,
+      required bool nearest,
+      required bool fourPlusRating,
+      required bool homeService}) async {
     try {
       _showProgress.value = true;
       _promoCodeModel.value = await HomeAPI.getPromoCode(
@@ -1694,7 +1707,7 @@ class HomeController extends GetxController {
   }
 
   /*-------------------  Get PromoCode List  ----------------------*/
-  doGetListPromoCode() async {
+  Future<void> doGetListPromoCode() async {
     try {
       _showProgress.value = true;
       _promoCodeModelList.value = await HomeAPI.getPromoCodeList();
@@ -1709,7 +1722,6 @@ class HomeController extends GetxController {
   }
 
   Map<String, dynamic>? getBestDiscount(int amount) {
-
     final promos = getPromoCodeModelList.data ?? [];
 
     int bestDiscount = 0;
@@ -1718,7 +1730,6 @@ class HomeController extends GetxController {
     final now = DateTime.now();
 
     for (var promo in promos) {
-
       DateTime? startDate;
       DateTime? endDate;
 
@@ -1749,21 +1760,17 @@ class HomeController extends GetxController {
       double promoAmount =
           double.tryParse(promo.amount?.toString() ?? '0') ?? 0;
 
-      int maxDiscount =
-          int.tryParse(promo.maxDiscount?.toString() ?? '0') ?? 0;
+      int maxDiscount = int.tryParse(promo.maxDiscount?.toString() ?? '0') ?? 0;
 
       int discount = 0;
 
       if (promo.type == "percentage") {
-
         discount = ((amount * promoAmount) / 100).floor();
 
         if (maxDiscount > 0 && discount > maxDiscount) {
           discount = maxDiscount;
         }
-
       } else {
-
         discount = promoAmount.toInt();
       }
 
@@ -1780,11 +1787,14 @@ class HomeController extends GetxController {
       "promo": bestPromo,
     };
   }
+
   /*-------------------  Get PromoCode List  ----------------------*/
-  doGetSalonPromoCode({required String salonId, bool useGlobalLoader = true}) async {
+  Future<void> doGetSalonPromoCode(
+      {required String salonId, bool useGlobalLoader = true}) async {
     try {
       if (useGlobalLoader) _showProgress.value = true;
-      _salonPromoCodeModel.value = await HomeAPI.getSalonPromoCodeList(salonId: salonId);
+      _salonPromoCodeModel.value =
+          await HomeAPI.getSalonPromoCodeList(salonId: salonId);
     } catch (e) {
       if (kDebugMode) {
         print("GetListPromoCode $e");
@@ -1796,7 +1806,8 @@ class HomeController extends GetxController {
   }
 
   /*-------------------- Add Apply  PromoCode -----------------*/
-  doApplyPromoCode({required Map data, required VoidCallback callback}) async {
+  Future<void> doApplyPromoCode(
+      {required Map data, required VoidCallback callback}) async {
     try {
       _showProgress.value = true; // one loader for the whole sequence
 
@@ -1810,7 +1821,7 @@ class HomeController extends GetxController {
 
       // Make the page's immediate doGetCart() a no-op if you added the guard earlier
       _skipNextGetCart.value = true;
-      _skipNextGetOrderId.value  = true;
+      _skipNextGetOrderId.value = true;
 
       callback.call();
     } catch (e) {
@@ -1822,7 +1833,7 @@ class HomeController extends GetxController {
   }
 
   /*------------------  Remove PromoCode ----------------*/
-  doRemovePromoCode({required VoidCallback callback}) async {
+  Future<void> doRemovePromoCode({required VoidCallback callback}) async {
     try {
       _showProgress.value = false;
       bool result = await HomeAPI.promoCodeRemove();
@@ -1840,7 +1851,7 @@ class HomeController extends GetxController {
   }
 
   /*------------------  Delete package ------------------------*/
-  doDeletePackage({required VoidCallback callback}) async {
+  Future<void> doDeletePackage({required VoidCallback callback}) async {
     try {
       _showProgress.value = false;
       bool result = await HomeAPI.deletePackage();
@@ -1875,7 +1886,8 @@ class HomeController extends GetxController {
           cancellationRemark: cancellationRemark);
 
       if (result) {
-        return StandardResponse(success: true, message: "Cancelled successfully");
+        return StandardResponse(
+            success: true, message: "Cancelled successfully");
       } else {
         return StandardResponse(success: false, message: "Failed to cancel");
       }
@@ -1895,14 +1907,15 @@ class HomeController extends GetxController {
     try {
       _showProgress.value = true;
       bool result = await HomeAPI.reScheduleBooking(
-          appointmentId: appointmentId,
-          newTime: newTime);
+          appointmentId: appointmentId, newTime: newTime);
 
       if (result) {
         callback.call();
-        return StandardResponse(success: true, message: "Re scheduled successfully");
+        return StandardResponse(
+            success: true, message: "Re scheduled successfully");
       } else {
-        return StandardResponse(success: false, message: "Failed to re schedule");
+        return StandardResponse(
+            success: false, message: "Failed to re schedule");
       }
     } catch (e) {
       showError(e);
@@ -1921,4 +1934,3 @@ class StandardResponse {
 
   StandardResponse({required this.success, this.message});
 }
-

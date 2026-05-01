@@ -70,23 +70,6 @@ class AnalyticsService {
         ));
   }
 
-  // ── 3. select_stylist ───────────────────────────────────────────────────────
-  /// Trigger: stylist chosen / skipped (selecting_artist_bottom_sheet.dart)
-  void logSelectStylist({
-    required List<String> stylistIds,
-    required String salonId,
-  }) {
-    _fire(() => _fa.logEvent(
-          name: 'select_stylist',
-          parameters: {
-            'stylist_ids': stylistIds.join(','),
-            'stylist_count': stylistIds.length,
-            'salon_id': salonId,
-            'user_id': _userId,
-          },
-        ));
-  }
-
   // ── 4. select_slot ──────────────────────────────────────────────────────────
   /// Trigger: time slot picked (appointment_booking_page.dart slot tap)
   void logSelectSlot({
@@ -170,6 +153,43 @@ class AnalyticsService {
             'event_id': bookingId,
             'reason': reason,
             'time_before_slot_minutes': timeBeforeSlotMinutes,
+            'user_id': _userId,
+          },
+        ));
+  }
+
+  // ── 9. book_and_pay_after_service ──────────────────────────────────────────
+  /// Trigger: payment succeeds in qr_page.dart (pay-after-service flow)
+  void logBookAndPayAfterService({
+    required String bookingId,
+    required double value,
+    required String salonId,
+  }) {
+    _fire(() => _fa.logEvent(
+          name: 'book_and_pay_after_service',
+          parameters: {
+            'event_id': bookingId,
+            'value': value,
+            'currency': 'INR',
+            'salon_id': salonId,
+            'user_id': _userId,
+            'payment_type': 'razorpay',
+          },
+        ));
+  }
+
+  // ── 10. payment_successful ──────────────────────────────────────────────────
+  /// Trigger: PaymentSuccessPage loads (shown after QR-flow payment)
+  void logPaymentSuccessful({
+    required String bookingId,
+    required double value,
+  }) {
+    _fire(() => _fa.logEvent(
+          name: 'payment_successful',
+          parameters: {
+            'event_id': bookingId,
+            'value': value,
+            'currency': 'INR',
             'user_id': _userId,
           },
         ));
