@@ -440,7 +440,7 @@
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       /// PAY NOW BAR
-                      if (booking != null && booking.paymentStatus == "pending")
+                      if (booking != null && booking.paymentStatus == "pending" && booking.orderAmount > 0)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 65),
                           child: PendingPaymentBar(

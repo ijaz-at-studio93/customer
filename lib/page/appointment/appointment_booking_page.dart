@@ -1253,7 +1253,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                               // _payAndBook();
                               //_showBookingOptionsBottomSheet(context);
                               if (selectedSlots.isEmpty) {
-                                showMessage("Please select atleast one Time slot");
+                                showMessage("Please Select Atleast One Time Slot");
                                 return;
                               }
                               _showPaymentInfoDialog(context);
@@ -2833,13 +2833,21 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               final isSelected = formatted == selectDate;
               final isDisabled = unavailableDates.contains(formatted);
 
+              // Check if this date has no slots based on workPlan
+              final workPlan = _homeController.salonAvailability?['data'];
+              final dayKey = getWeekDayKey(date);
+              final hasNoSlots = workPlan != null && workPlan[dayKey] == null;
+
+              final isFullyDisabled = isDisabled || hasNoSlots;
+
               return GestureDetector(
-                onTap: isDisabled
+                onTap: isFullyDisabled
                     ? null
                     : () {
                         setState(() {
                           selectDate = formatted;
                           currentMonth = date;
+                          selectedSlots = [];
                         });
 
                         // _homeController.doGetAvailabilitiesTimeSlot(
@@ -2856,7 +2864,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                     borderRadius: BorderRadius.circular(
                       isSelected ? 5 : 12,
                     ),
-                    color: isDisabled
+                    color: isFullyDisabled
                         ? Colors.grey.shade200
                         : isSelected
                             ? changeTheme(
@@ -2875,8 +2883,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                         style: TextStyle(
                           fontFamily: "Outfit",
                           fontWeight: FontWeight.w400,
-                          fontSize: isDisabled ? 12 : 13,
-                          color: isDisabled
+                          fontSize: isFullyDisabled ? 12 : 13,
+                          color: isFullyDisabled
                               ? Colors.grey.shade400
                               : isSelected
                                   ? Colors.white
@@ -2890,9 +2898,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                         style: TextStyle(
                           fontFamily: "Outfit",
                           fontWeight:
-                              isDisabled ? FontWeight.w600 : FontWeight.w700,
-                          fontSize: isSelected ? 22 : (isDisabled ? 18 : 20),
-                          color: isDisabled
+                          isFullyDisabled ? FontWeight.w600 : FontWeight.w700,
+                          fontSize: isSelected ? 22 : (isFullyDisabled ? 18 : 20),
+                          color: isFullyDisabled
                               ? Colors.grey.shade400
                               : isSelected
                                   ? Colors.white

@@ -6,6 +6,7 @@ import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/page/stylist/widget/network_video_view_widget.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 
+import '../../../constant/color_constant.dart';
 import '../../home/saloon_after_selecting_page.dart';
 
 class FullScreenReelView extends StatefulWidget {
@@ -45,7 +46,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
 
           /// 🔥 BACK BUTTON
           Positioned(
-            top: 50,
+            top: 40,
             left: 12,
             child: GestureDetector(
               onTap: () => Navigator.pop(context),
@@ -65,20 +66,6 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
           Positioned(
             top: 50,
             left: 60,
-            // child: Container(
-            //   padding:
-            //   const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-            //   decoration: BoxDecoration(
-            //     color: Colors.purple,
-            //     borderRadius: BorderRadius.circular(8),
-            //   ),
-            //   child: Text(
-            //     widget.data.salon?.displayName ??
-            //         //widget.data.salon?.name ??
-            //         "By Scuts",
-            //     style: const TextStyle(color: Colors.white),
-            //   ),
-            // ),
             child: GestureDetector(
               onTap: (widget.data.salon?.id == null)
                   ? null
@@ -89,19 +76,44 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                   callback: () {},
                 ));
               },
+              // child: Opacity(
+              //   opacity: (widget.data.salon?.id == null) ? 0.6 : 1,
+              //   child: Container(
+              //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              //     decoration: BoxDecoration(
+              //       color: (widget.data.salon?.id == null)
+              //           ? Colors.grey
+              //           : Colors.purple,
+              //       borderRadius: BorderRadius.circular(8),
+              //     ),
+              //     child: Text(
+              //       widget.data.salon?.displayName ?? "By Scuts",
+              //       style: const TextStyle(color: Colors.white),
+              //     ),
+              //   ),
+              // ),
               child: Opacity(
-                opacity: (widget.data.salon?.id == null) ? 0.6 : 1,
+                opacity: (widget.data.salon?.id == null) ? 0.8 : 1,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  constraints: BoxConstraints(
+                    maxWidth: Get.width * 0.4, // 👈 prevents it from growing too much
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: (widget.data.salon?.id == null)
-                        ? Colors.grey
-                        : Colors.purple,
-                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.white.withOpacity(0.7),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     widget.data.salon?.displayName ?? "By Scuts",
-                    style: const TextStyle(color: Colors.white),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: ColorConstant.primaryColor,
+                      fontSize: 10,
+                      fontFamily: 'Outfit',
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

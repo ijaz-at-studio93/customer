@@ -1722,7 +1722,7 @@ class HomeController extends GetxController {
   }
 
   Map<String, dynamic>? getBestDiscount(int amount) {
-    final promos = getPromoCodeModelList.data ?? [];
+    final promos = getSalonPromoCodeModel.data ?? [];
 
     int bestDiscount = 0;
     dynamic bestPromo;

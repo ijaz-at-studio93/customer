@@ -68,15 +68,22 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
           .getUserBookingQrCodeModel.data?.paymentStatus
           ?.toLowerCase();
 
+      _homeController.doClearCart(
+        callback: () {
+          // stylistId.value = "";
+          // stylistId.notifyListeners();
+          // _homeController.doGetCart();
+        },
+      );
       if (paymentStatus == 'paid') {
         await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
-        _homeController.doClearCart(
-          callback: () {
-            stylistId.value = "";
-            stylistId.notifyListeners();
-            _homeController.doGetCart();
-          },
-        );
+        // _homeController.doClearCart(
+        //   callback: () {
+        //     stylistId.value = "";
+        //     stylistId.notifyListeners();
+        //     _homeController.doGetCart();
+        //   },
+        // );
       }
     });
   }
@@ -419,7 +426,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                               print(data?.bookingId);
                               print('*******************');
 
-                              _showServiceConfirmation(data?.bookingId);
+                              _showServiceConfirmation(data?.bookingId, data?.salon?.id ?? "");
                             },
                             child: const Text(
                               //"Pay Now",
@@ -794,7 +801,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                 if (data?.rejectionDisplayReason != null) ...[
                   const SizedBox(height: 4),
                   Text(
-                    (data!.rejectionDisplayReason ?? "").split(":").last.trim(),
+                    "(Reason : ${(data!.rejectionDisplayReason ?? "").split(":").last.trim()})",
                     style: const TextStyle(
                       fontFamily: "Outfit",
                       fontSize: 14,
@@ -1306,7 +1313,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                                 Get.snackbar(
                                   "Success",
                                   "Booking cancelled successfully",
-                                  backgroundColor: Colors.green,
+                                  backgroundColor: Colors.red,
                                   colorText: Colors.white,
                                 );
                               } catch (_) {}
@@ -1317,7 +1324,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                               SnackbarUtil.show(
                                 "Success",
                                 "Booking cancelled successfully",
-                                backgroundColor: Colors.green,
+                                backgroundColor: Colors.red,
                                 colorText: Colors.white,
                               );
 
@@ -1372,7 +1379,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
     ).then((_) => remarkController.dispose());
   }
 
-  void _showServiceConfirmation(String? bookingId) {
+  void _showServiceConfirmation(String? bookingId, String salonId) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1454,7 +1461,10 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                         onPressed: () async {
                           Navigator.pop(context);
 
-                          await _homeController.doGetListPromoCode();
+                          await _homeController.doGetSalonPromoCode(
+                            salonId: salonId,
+                          );
+                          //await _homeController.doGetListPromoCode();
                           //await _homeController.doGetOrderId();
 
                           final enteredAmount =
