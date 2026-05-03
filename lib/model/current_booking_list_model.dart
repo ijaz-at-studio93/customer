@@ -219,21 +219,50 @@ class Service {
   int? price;
   String? id;
   String? name;
+  List<ServiceCategory>? categories; // ✅ NEW
 
-  Service({this.price, this.id, this.name});
+  Service({this.price, this.id, this.name, this.categories});
 
   Service.fromJson(Map<String, dynamic> json) {
     price = json['price'];
     id = json['id'];
     name = json['name'];
+
+    if (json['categories'] != null) {
+      categories = (json['categories'] as List)
+          .map((e) => ServiceCategory.fromJson(e))
+          .toList();
+    } else {
+      categories = [];
+    }
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = <String, dynamic>{};
-    data['price'] = price;
-    data['id'] = id;
-    data['name'] = name;
-    return data;
+    return {
+      'price': price,
+      'id': id,
+      'name': name,
+      'categories': categories?.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+class ServiceCategory {
+  String? id;
+  String? name;
+
+  ServiceCategory({this.id, this.name});
+
+  ServiceCategory.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    name = json['name'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+    };
   }
 }
 

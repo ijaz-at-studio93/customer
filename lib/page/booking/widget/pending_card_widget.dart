@@ -166,10 +166,69 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
             ],
           ),
           const SizedBox(height: 10),
-          Text(
-            "Service : ",
-            style: AppTextTheme.medium
-                .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
+          // Text(
+          //   "Service : ",
+          //   style: AppTextTheme.medium
+          //       .copyWith(fontSize: 14, color: ColorConstant.grayTextColor),
+          // ),
+          Column(
+              children:
+                  [
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("• "),
+
+                      Expanded(
+                        child: Row(
+                          children: [
+                            /// SERVICE HEADER (LEFT)
+                            Expanded(
+                              flex: 4,
+                              child: Text(
+                                "Service",
+                                style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.grayTextColor,
+                                  fontSize: 14,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+
+                            /// CATEGORY HEADER (CENTER)
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                "Category",
+                                textAlign: TextAlign.center, // 🔥 center
+                                style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.grayTextColor,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+
+                            /// PRICE HEADER (RIGHT)
+                            Expanded(
+                              flex: 2,
+                              child: Text(
+                                "Price",
+                                textAlign: TextAlign.right, // 🔥 right align
+                                style: AppTextTheme.medium.copyWith(
+                                  color: ColorConstant.grayTextColor,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+              ),
+              ]
           ),
           const SizedBox(height: 10),
           Column(
@@ -180,47 +239,65 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
                 final item = widget.bookingData.items?[index];
 
                 if (item?.isService ?? false) {
-                  // return Padding(
-                  //   padding: const EdgeInsets.only(bottom: 4),
-                  //   child: Text(
-                  //     "${item?.service?.name ?? ""}",
-                  //     style: AppTextTheme.bold.copyWith(
-                  //       color: changeTheme(
-                  //         SharedPrefs.readStringValue(PrefConstants.gender),
-                  //       ),
-                  //       fontSize: 13,
-                  //     ),
-                  //   ),
-                  // );
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 4),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const Text("• "),
 
-                        /// BULLET
-                        const Text(
-                          "• ",
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-
-                        /// TEXT (MULTILINE SAFE)
                         Expanded(
-                          child: Text(
-                            item?.service?.name ?? "",
-                            style: AppTextTheme.bold.copyWith(
-                              color: changeTheme(
-                                SharedPrefs.readStringValue(PrefConstants.gender),
+                          child: Row(
+                            children: [
+                              /// LEFT → SERVICE NAME
+                              Expanded(
+                                flex: 4,
+                                child: Text(
+                                  item?.service?.name ?? "",
+                                  style: AppTextTheme.bold.copyWith(
+                                    color: changeTheme(
+                                      SharedPrefs.readStringValue(PrefConstants.gender),
+                                    ),
+                                    fontSize: 13,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
                               ),
-                              fontSize: 13,
-                            ),
+
+                              /// CENTER → CATEGORY
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  getCategoryName(item),
+                                  textAlign: TextAlign.center, // 🔥 center align
+                                  style: AppTextTheme.medium.copyWith(
+                                    color: Colors.grey,
+                                    fontSize: 11,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+
+                              /// RIGHT → PRICE
+                              Expanded(
+                                flex: 2,
+                                child: Text(
+                                  "₹${item?.service?.price ?? 0}",
+                                  textAlign: TextAlign.right, // 🔥 push to extreme right
+                                  style: AppTextTheme.bold.copyWith(
+                                    color: changeTheme(
+                                      SharedPrefs.readStringValue(PrefConstants.gender),
+                                    ),
+                                    fontSize: 13,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
-                    ),
+                    )
                   );
 
                 }
@@ -416,6 +493,12 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
     } catch (e) {
       return "-";
     }
+  }
+
+  String getCategoryName(Items? item) {
+    return item?.service?.categories?.isNotEmpty == true
+        ? item!.service!.categories!.first.name ?? ""
+        : "";
   }
 
   /*---------------- Date Convert Fun  -------------*/

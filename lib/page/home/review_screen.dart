@@ -105,7 +105,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
         ? items.firstWhere((e) => e.service != null)
         : null;
 
-    serviceId = serviceItem?.service?.id ?? "";
+    serviceId = serviceItem?.service?.id ?? "a62d29f5-3fc1-4f20-8151-8e5af3a52765";
 
     /// ✅ USE selectedStylists directly
     final stylists = booking?.appointment?.selectedStylists ?? [];
@@ -1120,7 +1120,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                             Navigator.pop(context);
 
                             /// 🔥 GO BACK TO HOME (SAFE)
-                            Get.until((route) => route.isFirst);
+                            //Get.until((route) => route.isFirst);
 
                             /// OR (better if you have named route)
                             // Get.offAllNamed(Routes.HOME);

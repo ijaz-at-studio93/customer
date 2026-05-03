@@ -1031,7 +1031,7 @@ class _SaloonAfterSelectingServicesPageState
                                   if (existing != null) {
                                     Get.to(() => QRCodePage(
                                       appointmentId: existing.appointmentId ?? '',
-                                      isBooking: false,
+                                      isBooking: true,
                                     ));
                                     return;
                                   }
@@ -3498,6 +3498,7 @@ class _SaloonAfterSelectingServicesPageState
 
   Widget _productDialogRow(String label, String value) {
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.start, // 👈 FIX
       children: [
         SizedBox(
           width: 100,
