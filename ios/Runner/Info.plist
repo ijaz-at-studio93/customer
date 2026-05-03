@@ -123,9 +123,9 @@
 
 	<!-- Meta / Facebook SDK — replace with values from Meta Business Manager -->
 	<key>FacebookAppID</key>
-	<string>YOUR_FACEBOOK_APP_ID</string>
+	<string>3358483834301971</string>
 	<key>FacebookClientToken</key>
-	<string>YOUR_CLIENT_TOKEN</string>
+	<string>a4bf030156e2fb5a32a8dc32514c430c</string>
 	<key>FacebookDisplayName</key>
 	<string>Scuts</string>
 	<key>LSApplicationQueriesSchemes</key>
