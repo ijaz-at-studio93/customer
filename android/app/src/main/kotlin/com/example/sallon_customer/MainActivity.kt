@@ -42,9 +42,9 @@ class MainActivity : FlutterActivity() {
             PackageManager.DONT_KILL_APP
         )
 
-        // Disable all others after a short delay. Without the delay, disabling
-        // the currently-active alias (the one the app was launched from) can cause
-        // the system to kill the process even though DONT_KILL_APP is set.
+        // Disable all other aliases after a short delay. Without the delay,
+        // disabling the currently-active alias can cause the system to kill
+        // the process even with DONT_KILL_APP on some devices.
         Handler(Looper.getMainLooper()).postDelayed({
             aliases.values.filter { it != targetAlias }.forEach { alias ->
                 packageManager.setComponentEnabledSetting(

@@ -4,4 +4,19 @@
          to allow setting breakpoints, to provide hot reload, etc.
     -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Give flutter run a real class to launch via am start -n.
+         Activity aliases can't always be resolved by am start, so this
+         LAUNCHER entry only exists in debug builds. It is absent in release,
+         so only the active alias ever appears on the home screen. -->
+    <application>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
 </manifest>
