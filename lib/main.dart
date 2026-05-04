@@ -70,7 +70,7 @@ void main() async {
   // ---------------- iOS additions begin ----------------
   // init flutter_local_notifications for iOS (and Android stays as-is)
   const AndroidInitializationSettings androidInit =
-      AndroidInitializationSettings('@mipmap/ic_launcher');
+      AndroidInitializationSettings('@mipmap/ic_launcher_monochrome');
   const DarwinInitializationSettings iosInit = DarwinInitializationSettings();
   const InitializationSettings initSettings =
       InitializationSettings(android: androidInit, iOS: iosInit);

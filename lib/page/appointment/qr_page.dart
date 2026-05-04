@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -64,9 +65,16 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
         appointmentId: widget.appointmentId,
       );
 
-      final paymentStatus = _homeController
-          .getUserBookingQrCodeModel.data?.paymentStatus
-          ?.toLowerCase();
+      final data = _homeController.getUserBookingQrCodeModel.data;
+      final paymentStatus = data?.paymentStatus?.toLowerCase();
+      final orderStatus = data?.orderStatus?.toLowerCase();
+
+      // Connect socket to listen for booking_confirmed while appointment is pending.
+      if (orderStatus == 'pending') {
+        _homeController.ensureBookingConfirmedSocket(
+          appointmentId: widget.appointmentId,
+        );
+      }
 
       _homeController.doClearCart(
         callback: () {
@@ -144,6 +152,18 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                           ),
 
                           bookingStatusWidget(data?.orderStatus ?? "pending"),
+
+                          // TODO: remove after debugging
+                          if (kDebugMode)
+                            GestureDetector(
+                              onTap: () => _homeController.debugSocketState(),
+                              child: const Padding(
+                                padding: EdgeInsets.symmetric(vertical: 4),
+                                child: Text('[ tap to print socket state ]',
+                                    style: TextStyle(
+                                        fontSize: 10, color: Colors.grey)),
+                              ),
+                            ),
 
                           const SizedBox(height: 15),
 
@@ -426,7 +446,8 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                               print(data?.bookingId);
                               print('*******************');
 
-                              _showServiceConfirmation(data?.bookingId, data?.salon?.id ?? "");
+                              _showServiceConfirmation(
+                                  data?.bookingId, data?.salon?.id ?? "");
                             },
                             child: const Text(
                               //"Pay Now",
@@ -2298,6 +2319,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     razorpay.clear();
+    _homeController.unbindBookingConfirmedSocket();
     super.dispose();
   }
 }

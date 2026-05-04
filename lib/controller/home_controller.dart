@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:socket_io_client/socket_io_client.dart' as socket_io;
 import 'package:salon_customer/api/home_api.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/model/artiest_list_model.dart';
@@ -1923,6 +1928,139 @@ class HomeController extends GetxController {
     } finally {
       _showProgress.value = false;
     }
+  }
+
+  /*-------------- Customer Booking-Confirmed Socket --------------*/
+
+  socket_io.Socket? _bookingConfirmedSocket;
+  String? _bookingConfirmedSocketUserId;
+  DateTime? _lastBookingConfirmedRefresh;
+
+  void _logBookingSocket(String msg) {
+    if (kDebugMode) print('[CustomerSocket] $msg');
+  }
+
+  void debugSocketState() {
+    final s = _bookingConfirmedSocket;
+    print('========= SOCKET DEBUG =========');
+    print('instance hashCode : ${s?.hashCode}');
+    print('connected         : ${s?.connected}');
+    print('socket id         : ${s?.id}');
+    print('userId joined     : $_bookingConfirmedSocketUserId');
+    print('================================');
+  }
+
+  void ensureBookingConfirmedSocket({
+    required String appointmentId,
+  }) {
+    final userId = SharedPrefs.readStringValue(PrefConstants.userId);
+    if (userId.isEmpty || appointmentId.isEmpty) return;
+    if (_bookingConfirmedSocket != null &&
+        _bookingConfirmedSocketUserId == userId &&
+        _bookingConfirmedSocket!.connected) {
+      _logBookingSocket('already connected for userId=$userId');
+      return;
+    }
+
+    unbindBookingConfirmedSocket();
+
+    final refreshToken =
+        SharedPrefs.readStringValue(PrefConstants.refreshToken);
+    if (refreshToken.isEmpty) {
+      _logBookingSocket('no refreshToken, skipping socket');
+      return;
+    }
+
+    final socket = socket_io.io(
+      APIConstants.socketUrl,
+      socket_io.OptionBuilder()
+          .setTransports(['websocket'])
+          .setPath('/socket.io')
+          .disableAutoConnect()
+          .setTimeout(20000)
+          .setAuth({'refreshToken': refreshToken})
+          .build(),
+    );
+
+    _logBookingSocket('socket instance: ${socket.hashCode}');
+
+    socket.onConnect((_) {
+      _logBookingSocket(
+          'connected id=${socket.id} hashCode=${socket.hashCode} → emit join userId=$userId');
+      socket.emit('join', userId);
+    });
+
+    socket.onConnectError((dynamic data) {
+      _logBookingSocket('connect_error: $data');
+    });
+
+    socket.onDisconnect((dynamic reason) {
+      _logBookingSocket('disconnect: $reason');
+    });
+
+    socket.onError((dynamic data) {
+      _logBookingSocket('error: $data');
+    });
+
+    socket.onAny((event, data) {
+      _logBookingSocket('onAny → event=$event data=$data');
+    });
+
+    socket.on('booking_confirmed', (dynamic data) {
+      _logBookingSocket('booking_confirmed received: $data');
+      final incomingAppointmentId =
+          data is Map ? data['appointmentId']?.toString() : null;
+      if (incomingAppointmentId != null &&
+          incomingAppointmentId != appointmentId) {
+        _logBookingSocket(
+            'booking_confirmed ignored (different appointmentId)');
+        return;
+      }
+      final now = DateTime.now();
+      final last = _lastBookingConfirmedRefresh;
+      if (last != null && now.difference(last).inMilliseconds < 400) {
+        _logBookingSocket('booking_confirmed ignored (debounced)');
+        return;
+      }
+      _lastBookingConfirmedRefresh = now;
+      _logBookingSocket(
+          'booking_confirmed → refresh QR for appointmentId=$appointmentId');
+      _refreshQrCodeSilent(appointmentId);
+    });
+
+    socket.connect();
+    _logBookingSocket('connect() invoked...');
+
+    _bookingConfirmedSocket = socket;
+    _bookingConfirmedSocketUserId = userId;
+  }
+
+  Future<void> _refreshQrCodeSilent(String appointmentId) async {
+    try {
+      _userBookingQrCodeModel.value =
+          await HomeAPI.userBookingQrCodeDetails(appointmentId: appointmentId);
+    } catch (e) {
+      if (kDebugMode) {
+        print('[CustomerSocket] _refreshQrCodeSilent error: $e');
+      }
+    }
+  }
+
+  void unbindBookingConfirmedSocket() {
+    if (_bookingConfirmedSocket != null) {
+      _logBookingSocket(
+          'disposing socket (userId=$_bookingConfirmedSocketUserId)');
+    }
+    _bookingConfirmedSocket?.dispose();
+    _bookingConfirmedSocket = null;
+    _bookingConfirmedSocketUserId = null;
+    _lastBookingConfirmedRefresh = null;
+  }
+
+  @override
+  void onClose() {
+    unbindBookingConfirmedSocket();
+    super.onClose();
   }
 
 /*-------------------------  -------------------------*/

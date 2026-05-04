@@ -110,7 +110,7 @@ class NotificationUtils {
       final String message = remoteMessage.data['message'] ??
           (remoteMessage.notification?.body ?? "You have a new notification");
 
-      _homeController.doGetCurrentBookingListData();
+      // _homeController.doGetCurrentBookingListData();
 
       _showOverlaySnackbar(
         title: title,
