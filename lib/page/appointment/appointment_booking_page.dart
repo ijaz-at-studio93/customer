@@ -1759,7 +1759,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                       Text("• "),
                       Expanded(
                         child: Text(
-                          "You can make changes (Add / Delete) to your services at the salon",
+                          "Discounts cannot clubbed with Memberships",
                           style: TextStyle(
                             fontFamily: 'Outfit',
                             fontSize: 15,

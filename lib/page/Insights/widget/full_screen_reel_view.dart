@@ -20,6 +20,7 @@ class FullScreenReelView extends StatefulWidget {
 
 class _FullScreenReelViewState extends State<FullScreenReelView> {
   final _homeController = Get.find<HomeController>();
+  bool isExpanded = false;
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +65,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
 
           /// 🔥 SALON NAME
           Positioned(
-            top: 50,
+            top: 40,
             left: 60,
             child: GestureDetector(
               onTap: (widget.data.salon?.id == null)
@@ -76,25 +77,10 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                   callback: () {},
                 ));
               },
-              // child: Opacity(
-              //   opacity: (widget.data.salon?.id == null) ? 0.6 : 1,
-              //   child: Container(
-              //     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              //     decoration: BoxDecoration(
-              //       color: (widget.data.salon?.id == null)
-              //           ? Colors.grey
-              //           : Colors.purple,
-              //       borderRadius: BorderRadius.circular(8),
-              //     ),
-              //     child: Text(
-              //       widget.data.salon?.displayName ?? "By Scuts",
-              //       style: const TextStyle(color: Colors.white),
-              //     ),
-              //   ),
-              // ),
               child: Opacity(
-                opacity: (widget.data.salon?.id == null) ? 0.8 : 1,
+                opacity: (widget.data.salon?.id == null) ? 0.8 : 0.9,
                 child: Container(
+                  height: 44,
                   constraints: BoxConstraints(
                     maxWidth: Get.width * 0.4, // 👈 prevents it from growing too much
                   ),
@@ -103,18 +89,20 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                     color: Colors.white.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(6),
                   ),
-                  child: Text(
+                  child: Center(
+                    child: Text(
                     widget.data.salon?.displayName ?? "By Scuts",
                     textAlign: TextAlign.center,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                       color: ColorConstant.primaryColor,
-                      fontSize: 10,
+                      fontSize: 12,
                       fontFamily: 'Outfit',
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  )
                 ),
               ),
             ),
@@ -122,7 +110,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
 
           /// 🔥 LIKE BUTTON (FIXED)
           Positioned(
-            top: 50,
+            top: 40,
             right: 16,
             child: GestureDetector(
               onTap: () {
@@ -165,48 +153,113 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
             bottom: 30,
             left: 16,
             right: 16,
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween, // 👈 KEY
               children: [
+
+                /// 🔵 LEFT → DESCRIPTION
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final description = widget.data.description ?? "";
+                    final hasOverflow =
+                    isTextOverflowing(description, constraints.maxWidth);
+
+                    return GestureDetector(
+                      onTap: hasOverflow
+                          ? () {
+                        setState(() {
+                          isExpanded = !isExpanded;
+                        });
+                      }
+                          : null,
+                      child: RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                          ),
+                          children: [
+                            TextSpan(text: description),
+                            if (hasOverflow && !isExpanded)
+                              const TextSpan(
+                                text: "  Read more",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            if (hasOverflow && isExpanded)
+                              const TextSpan(
+                                text: "  Read less",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                          ],
+                        ),
+                        maxLines: isExpanded ? null : 3,
+                        overflow:
+                        isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                      ),
+                    );
+                  },
+                ),
+
+                const SizedBox(width: 10), // optional spacing
+
+                /// 🔴 RIGHT → ARTIST
                 if ((widget.data.artist?.name ?? "").isNotEmpty)
                   Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 10,
-                      backgroundColor: Colors.grey.shade300,
-                      backgroundImage: (widget.data.artist?.profileImage != null &&
-                          widget.data.artist!.profileImage!.isNotEmpty)
-                          ? NetworkImage(
-                        "${APIConstants.image}${widget.data.artist!.profileImage}",
-                      )
-                          : null,
-                      child: (widget.data.artist?.profileImage == null ||
-                          widget.data.artist!.profileImage!.isEmpty)
-                          ? const Icon(Icons.person, size: 12, color: Colors.white)
-                          : null,
-                    ),
-
-                    const SizedBox(width: 8),
-                    Text(
-                      widget.data.artist?.name ?? "",
-                      style: const TextStyle(
-                          color: Colors.white, fontSize: 14),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  widget.data.description ?? "",
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 13),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 10,
+                        backgroundColor: Colors.grey.shade300,
+                        backgroundImage: (widget.data.artist?.profileImage != null &&
+                            widget.data.artist!.profileImage!.isNotEmpty)
+                            ? NetworkImage(
+                          "${APIConstants.image}${widget.data.artist!.profileImage}",
+                        )
+                            : null,
+                        child: (widget.data.artist?.profileImage == null ||
+                            widget.data.artist!.profileImage!.isEmpty)
+                            ? const Icon(Icons.person, size: 12, color: Colors.white)
+                            : null,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        widget.data.artist?.name ?? "",
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+  bool isTextOverflowing(String text, double maxWidth) {
+    final textPainter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: const TextStyle(
+          fontSize: 13,
+          fontFamily: 'Outfit',
+        ),
+      ),
+      maxLines: 3,
+      textDirection: TextDirection.ltr,
+    );
+
+    textPainter.layout(maxWidth: maxWidth);
+
+    return textPainter.didExceedMaxLines;
   }
 }

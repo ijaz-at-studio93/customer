@@ -440,8 +440,24 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 10),
 
+                          RichText(
+                            textAlign: TextAlign.center,
+                            text: const TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: "(Enter the Actual Bill, Discount will be Auto Applied)",
+                                  style: TextStyle(
+                                    color: ColorConstant.primaryColor,
+                                    fontSize: 14,
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 5),
                           RichText(
                             text: const TextSpan(
                               children: [
@@ -465,7 +481,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 10),
 
                           /// NOTE BOX
                           Container(
@@ -481,15 +497,29 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                                 width: 1.5,
                               ),
                             ),
-                            child: const Text(
-                              "Note : You Can Make Changes To Your Services At The Salon, You Can Add More Service At The Salon And Avail Your Discount Only If You Pay In The App",
+                            child: RichText(
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: "Outfit",
-                                fontWeight: FontWeight.w600,
-                                fontSize: 15,
-                                height: 1.4,
-                                color: Colors.black,
+                              text: const TextSpan(
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 15,
+                                  height: 1.4,
+                                  color: Colors.black,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: "Note : You Can ",
+                                  ),
+                                  TextSpan(
+                                    text: "Add/ Remove",
+                                    style: TextStyle(color: Colors.red), // 🔴 highlight
+                                  ),
+                                  TextSpan(
+                                    text:
+                                    " Services At The Salon, You don't have to Book a new Appointment And Pay In The App to Avail Your Discount",
+                                  ),
+                                ],
                               ),
                             ),
                           ),
