@@ -15,6 +15,7 @@
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
         android:label="Scuts">
         <activity
             android:name=".MainActivity"
@@ -42,7 +43,8 @@
             android:name=".MainActivityCustomerOpen"
             android:enabled="true"
             android:exported="true"
-            android:icon="@mipmap/customer_open"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/customer_open"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -54,7 +56,8 @@
             android:name=".MainActivityCustomerBook"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/customer_book"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/customer_book"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -66,7 +69,8 @@
             android:name=".MainActivityCustomer3Weeks"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/customer_3weeks"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/customer_3weeks"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -78,7 +82,8 @@
             android:name=".MainActivityCustomer4Weeks"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/customer_4weeks"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/customer_4weeks"
             android:targetActivity=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

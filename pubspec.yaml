@@ -2,7 +2,7 @@ name: salon_customer
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -19,7 +19,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.18+19
 
 environment:
-  sdk: '>=3.3.3 <4.0.0'
+  sdk: ">=3.3.3 <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -30,7 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -90,13 +89,14 @@ dependencies:
   cached_video_player_plus: ^4.1.0
   socket_io_client: ^3.0.2
 
-
 flutter_launcher_icons:
   android: "ic_launcher"
   ios: true
   image_path: "assets/images/app_logo.png"
+  adaptive_icon_background: "#EDE7F6"
+  adaptive_icon_foreground: "assets/images/app_logo.png"
+  adaptive_icon_foreground_inset: 15
   min_sdk_android: 21
-
 
 dev_dependencies:
   flutter_test:
@@ -120,14 +120,12 @@ flutter:
   # the material Icons class.
   uses-material-design: true
 
-
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/font/
     - assets/icon/
     - assets/images/
     - assets/gifs/
-
 
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -167,24 +165,24 @@ flutter:
           weight: 500
     - family: Outfit
       fonts:
-          - asset: assets/font/Outfit-Thin.ttf
-            weight: 100
-          - asset: assets/font/Outfit-SemiBold.ttf
-            weight: 600
-          - asset: assets/font/Outfit-Regular.ttf
-            weight: 400
-          - asset: assets/font/Outfit-Medium.ttf
-            weight: 500
-          - asset: assets/font/Outfit-Light.ttf
-            weight: 300
-          - asset: assets/font/Outfit-ExtraLight.ttf
-            weight: 200
-          - asset: assets/font/Outfit-ExtraBold.ttf
-            weight: 800
-          - asset: assets/font/Outfit-Bold.ttf
-            weight: 700
-          - asset: assets/font/Outfit-Black.ttf
-            weight: 900
+        - asset: assets/font/Outfit-Thin.ttf
+          weight: 100
+        - asset: assets/font/Outfit-SemiBold.ttf
+          weight: 600
+        - asset: assets/font/Outfit-Regular.ttf
+          weight: 400
+        - asset: assets/font/Outfit-Medium.ttf
+          weight: 500
+        - asset: assets/font/Outfit-Light.ttf
+          weight: 300
+        - asset: assets/font/Outfit-ExtraLight.ttf
+          weight: 200
+        - asset: assets/font/Outfit-ExtraBold.ttf
+          weight: 800
+        - asset: assets/font/Outfit-Bold.ttf
+          weight: 700
+        - asset: assets/font/Outfit-Black.ttf
+          weight: 900
   # fonts:
   #   - family: Schyler
   #     fonts:
