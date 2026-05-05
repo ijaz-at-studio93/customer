@@ -29,6 +29,15 @@
             android:usesCleartextTraffic="true"
             android:windowSoftInputMode="adjustResize"
             tools:targetApi="m">
+            <!-- Flutter resolves the launch activity from the APK manifest (first enabled
+                 MAIN/LAUNCHER). Without this filter, the tool picks an activity-alias;
+                 after in-app icon switching those aliases can be disabled at runtime,
+                 so `flutter run` / adb would fail with "Activity class does not exist".
+                 Real launcher icons still come from the aliases below. -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
             <!-- Specifies an Android theme to apply to this Activity as soon as
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
@@ -39,19 +48,6 @@
         </activity>
 
         <!-- Dynamic launcher icons — only one alias is enabled at a time -->
-        <activity-alias
-            android:name=".MainActivityCustomerOpen"
-            android:enabled="true"
-            android:exported="true"
-            android:icon="@mipmap/ic_launcher"
-            android:roundIcon="@mipmap/customer_open"
-            android:targetActivity=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity-alias>
-
         <activity-alias
             android:name=".MainActivityCustomerBook"
             android:enabled="false"

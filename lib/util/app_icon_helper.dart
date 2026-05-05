@@ -15,7 +15,6 @@ class AppIconHelper {
 
   static Future<void> updateCustomerAppIcon(DateTime? bookingDate) async {
     if (bookingDate == null) {
-      await change("CustomerOpen");
       return;
     }
 

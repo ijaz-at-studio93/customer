@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
-import 'package:salon_customer/page/Insights/Insights_home_page.dart';
+import 'package:salon_customer/page/Insights/content_page.dart';
 import 'package:salon_customer/page/booking/booking_home_page.dart';
 import 'package:salon_customer/page/home/home_page.dart';
 import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
@@ -38,7 +38,7 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
             ? const HomePage()
             : _selectedIndex == 1
                 ? const BookingHomePage()
-                : const InsightsHomePage(),
+                : const ContentPage(),
         extendBody: false,
         bottomNavigationBar: ValueListenableBuilder(
             valueListenable: selectedGender,
@@ -91,9 +91,9 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                       height: 24,
                       width: 24,
                       color: _selectedIndex == 1
-                          ?selectedGender.value == 0
-                          ? ColorConstant.primaryColor
-                          : ColorConstant.primary2
+                          ? selectedGender.value == 0
+                              ? ColorConstant.primaryColor
+                              : ColorConstant.primary2
                           : ColorConstant.grayTextColor,
                     ),
                     label: 'Bookings',
@@ -104,9 +104,9 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                       height: 24,
                       width: 24,
                       color: _selectedIndex == 2
-                          ?selectedGender.value == 0
-                          ? ColorConstant.primaryColor
-                          : ColorConstant.primary2
+                          ? selectedGender.value == 0
+                              ? ColorConstant.primaryColor
+                              : ColorConstant.primary2
                           : ColorConstant.grayTextColor,
                     ),
                     label: 'Content',

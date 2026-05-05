@@ -12,7 +12,6 @@ class MainActivity : FlutterActivity() {
 
     private val pkg = "com.anantax.scuts"
     private val aliases = mapOf(
-        "CustomerOpen"   to "$pkg.MainActivityCustomerOpen",
         "CustomerBook"   to "$pkg.MainActivityCustomerBook",
         "Customer3Weeks" to "$pkg.MainActivityCustomer3Weeks",
         "Customer4Weeks" to "$pkg.MainActivityCustomer4Weeks",
@@ -23,8 +22,8 @@ class MainActivity : FlutterActivity() {
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "app_icon")
             .setMethodCallHandler { call, result ->
                 if (call.method == "changeIcon") {
-                    val name = call.argument<String>("icon") ?: "CustomerOpen"
-                    switchAlias(name)
+                    val name = call.argument<String>("icon")
+                    if (name != null) switchAlias(name)
                     result.success(null)
                 } else {
                     result.notImplemented()
@@ -33,7 +32,7 @@ class MainActivity : FlutterActivity() {
     }
 
     private fun switchAlias(target: String) {
-        val targetAlias = aliases[target] ?: aliases["CustomerOpen"]!!
+        val targetAlias = aliases[target] ?: return
 
         // Enable the new alias first so the launcher always has an active entry.
         packageManager.setComponentEnabledSetting(

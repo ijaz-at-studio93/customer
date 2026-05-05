@@ -35,14 +35,14 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
           Positioned.fill(
             child: (video != null && video.isNotEmpty)
                 ? NetworkVideoViewWidget(
-              videoString: "${APIConstants.image}$video",
-            )
+                    videoString: "${APIConstants.image}$video",
+                  )
                 : (image != null && image.isNotEmpty)
-                ? CachedNetworkImage(
-              imageUrl: "${APIConstants.image}$image",
-              fit: BoxFit.cover,
-            )
-                : Container(color: Colors.black),
+                    ? CachedNetworkImage(
+                        imageUrl: "${APIConstants.image}$image",
+                        fit: BoxFit.cover,
+                      )
+                    : Container(color: Colors.black),
           ),
 
           /// 🔥 BACK BUTTON
@@ -57,8 +57,8 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                   color: Colors.black54,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.arrow_back,
-                    color: Colors.white, size: 22),
+                child:
+                    const Icon(Icons.arrow_back, color: Colors.white, size: 22),
               ),
             ),
           ),
@@ -71,39 +71,40 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
               onTap: (widget.data.salon?.id == null)
                   ? null
                   : () {
-                Get.to(() => SaloonAfterSelectingServicesPage(
-                  isPayNowMode: true,
-                  id: widget.data.salon!.id ?? "",
-                  callback: () {},
-                ));
-              },
+                      Get.to(() => SaloonAfterSelectingServicesPage(
+                            isPayNowMode: true,
+                            id: widget.data.salon!.id ?? "",
+                            callback: () {},
+                          ));
+                    },
               child: Opacity(
                 opacity: (widget.data.salon?.id == null) ? 0.8 : 0.9,
                 child: Container(
-                  height: 44,
-                  constraints: BoxConstraints(
-                    maxWidth: Get.width * 0.4, // 👈 prevents it from growing too much
-                  ),
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.7),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Center(
-                    child: Text(
-                    widget.data.salon?.displayName ?? "By Scuts",
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: ColorConstant.primaryColor,
-                      fontSize: 12,
-                      fontFamily: 'Outfit',
-                      fontWeight: FontWeight.w600,
+                    height: 44,
+                    constraints: BoxConstraints(
+                      maxWidth: Get.width *
+                          0.4, // 👈 prevents it from growing too much
                     ),
-                  ),
-                  )
-                ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.7),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Center(
+                      child: Text(
+                        widget.data.salon?.displayName ?? "By Scuts",
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          color: ColorConstant.primaryColor,
+                          fontSize: 12,
+                          fontFamily: 'Outfit',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    )),
               ),
             ),
           ),
@@ -115,8 +116,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
             child: GestureDetector(
               onTap: () {
                 setState(() {
-                  widget.data.isFavourite =
-                  !(widget.data.isFavourite ?? false);
+                  widget.data.isFavourite = !(widget.data.isFavourite ?? false);
 
                   if (widget.data.isFavourite ?? false) {
                     _homeController.doAddFavBlog(
@@ -141,8 +141,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                 child: Center(
                   child: widget.data.isFavourite ?? false
                       ? const Icon(Icons.favorite, color: Colors.red)
-                      : const Icon(Icons.favorite_border,
-                      color: Colors.white),
+                      : const Icon(Icons.favorite_border, color: Colors.white),
                 ),
               ),
             ),
@@ -157,21 +156,20 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceBetween, // 👈 KEY
               children: [
-
                 /// 🔵 LEFT → DESCRIPTION
                 LayoutBuilder(
                   builder: (context, constraints) {
                     final description = widget.data.description ?? "";
                     final hasOverflow =
-                    isTextOverflowing(description, constraints.maxWidth);
+                        isTextOverflowing(description, constraints.maxWidth);
 
                     return GestureDetector(
                       onTap: hasOverflow
                           ? () {
-                        setState(() {
-                          isExpanded = !isExpanded;
-                        });
-                      }
+                              setState(() {
+                                isExpanded = !isExpanded;
+                              });
+                            }
                           : null,
                       child: RichText(
                         text: TextSpan(
@@ -200,8 +198,9 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                           ],
                         ),
                         maxLines: isExpanded ? null : 3,
-                        overflow:
-                        isExpanded ? TextOverflow.visible : TextOverflow.ellipsis,
+                        overflow: isExpanded
+                            ? TextOverflow.visible
+                            : TextOverflow.ellipsis,
                       ),
                     );
                   },
@@ -217,15 +216,17 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                       CircleAvatar(
                         radius: 10,
                         backgroundColor: Colors.grey.shade300,
-                        backgroundImage: (widget.data.artist?.profileImage != null &&
-                            widget.data.artist!.profileImage!.isNotEmpty)
+                        backgroundImage: (widget.data.artist?.profileImage !=
+                                    null &&
+                                widget.data.artist!.profileImage!.isNotEmpty)
                             ? NetworkImage(
-                          "${APIConstants.image}${widget.data.artist!.profileImage}",
-                        )
+                                "${APIConstants.image}${widget.data.artist!.profileImage}",
+                              )
                             : null,
                         child: (widget.data.artist?.profileImage == null ||
-                            widget.data.artist!.profileImage!.isEmpty)
-                            ? const Icon(Icons.person, size: 12, color: Colors.white)
+                                widget.data.artist!.profileImage!.isEmpty)
+                            ? const Icon(Icons.person,
+                                size: 12, color: Colors.white)
                             : null,
                       ),
                       const SizedBox(width: 8),
@@ -245,6 +246,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
       ),
     );
   }
+
   bool isTextOverflowing(String text, double maxWidth) {
     final textPainter = TextPainter(
       text: TextSpan(

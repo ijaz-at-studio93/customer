@@ -1,9 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <!-- INTERNET is already declared in src/main/AndroidManifest.xml.
-         This file intentionally does NOT add a second MAIN/LAUNCHER on
-         MainActivity — that caused two "Scuts" icons in debug (MainActivity
-         used ic_launcher while the alias used customer_*).
-         `flutter run` starts MainActivity by explicit component; launcher
-         icons come only from the enabled activity-alias. -->
+         MainActivity carries MAIN/LAUNCHER so Flutter/adb always resolve a
+         stable launch component (see comment in main manifest). Debug may
+         show an extra launcher entry alongside the enabled activity-alias. -->
     <uses-permission android:name="android.permission.INTERNET"/>
 </manifest>
