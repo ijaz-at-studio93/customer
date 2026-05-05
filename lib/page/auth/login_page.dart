@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -275,54 +277,146 @@ class _LoginPageState extends State<LoginPage> {
         const SizedBox(height: 8), // Precise control over the gap between lines
 
         // --- SECOND ROW ---
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              getWhatsappUpdate = !getWhatsappUpdate;
-            });
-          },
-          child: Row(
+        // GestureDetector(
+        //   onTap: () {
+        //     setState(() {
+        //       getWhatsappUpdate = !getWhatsappUpdate;
+        //     });
+        //   },
+        //   child: Row(
+        //     mainAxisAlignment: MainAxisAlignment.center,
+        //     children: [
+        //       Container(
+        //         height: 17,
+        //         width: 17,
+        //         decoration: BoxDecoration(
+        //           color: getWhatsappUpdate
+        //               ? changeTheme(SharedPrefs.readStringValue(
+        //               PrefConstants.gender)) ??
+        //               ColorConstant.primaryColor
+        //               : Colors.transparent,
+        //           borderRadius: BorderRadius.circular(3),
+        //           border: Border.all(
+        //             color: changeTheme(SharedPrefs.readStringValue(
+        //                 PrefConstants.gender)) ??
+        //                 ColorConstant.primaryColor,
+        //           ),
+        //         ),
+        //         child: Center(
+        //           child: Icon(
+        //             CupertinoIcons.check_mark,
+        //             size: 8,
+        //             color: getWhatsappUpdate
+        //                 ? ColorConstant.whiteColor
+        //                 : Colors.transparent,
+        //           ),
+        //         ),
+        //       ),
+        //       const SizedBox(width: 12),
+        //       Text(
+        //         "Get Update on whatsapp",
+        //         style: AppTextTheme.medium.copyWith(
+        //             color: changeTheme(SharedPrefs.readStringValue(
+        //                 PrefConstants.gender)) ??
+        //                 ColorConstant.primaryColor,
+        //             fontSize: 14),
+        //       ),
+        //     ],
+        //   ),
+        // )
+
+        const SizedBox(height: 8),
+        if(Platform.isIOS)
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                height: 17,
-                width: 17,
-                decoration: BoxDecoration(
-                  color: getWhatsappUpdate
-                      ? changeTheme(SharedPrefs.readStringValue(
-                      PrefConstants.gender)) ??
-                      ColorConstant.primaryColor
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(3),
-                  border: Border.all(
-                    color: changeTheme(SharedPrefs.readStringValue(
-                        PrefConstants.gender)) ??
-                        ColorConstant.primaryColor,
-                  ),
-                ),
-                child: Center(
-                  child: Icon(
-                    CupertinoIcons.check_mark,
-                    size: 8,
-                    color: getWhatsappUpdate
-                        ? ColorConstant.whiteColor
-                        : Colors.transparent,
-                  ),
-                ),
+              _customCheckbox(
+                readEula,
+                    () {
+                  setState(() {
+                    readEula = !readEula;
+                  });
+                },
               ),
-              const SizedBox(width: 12),
-              Text(
-                "Get Update on whatsapp",
-                style: AppTextTheme.medium.copyWith(
-                    color: changeTheme(SharedPrefs.readStringValue(
-                        PrefConstants.gender)) ??
-                        ColorConstant.primaryColor,
-                    fontSize: 14),
+              const SizedBox(width: 6),
+
+              RichText(
+                text: TextSpan(
+                  children: [
+                    const TextSpan(
+                      text: "I agree to ",
+                      style: grayStyle,
+                    ),
+                    TextSpan(
+                      text: "Privacy Policy",
+                      style: linkStyle,
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () => openUrl("https://scuts.in/privacy-policy/"),
+                    ),
+                    const TextSpan(
+                      text: " ",
+                      style: grayStyle,
+                    ),
+                    TextSpan(
+                      text: "Read EULA",
+                      style: linkStyle,
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          showDialog(
+                            context: context,
+                            builder: (_) => _buildEulaDialog(),
+                          );
+                        },
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
-        )
       ],
+    );
+  }
+
+  Widget _buildEulaDialog() {
+    return Dialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "End User License Agreement (EULA)",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              "This End User License Agreement (\"Agreement\") is a legal agreement between you and Scuts Technologies Pvt. Ltd.\n\n"
+                  "1. You will not upload, share, or publish abusive content.\n"
+                  "2. Zero tolerance for objectionable behavior.\n"
+                  "3. We may terminate access if policies are violated.\n"
+                  "4. You are responsible for your content.\n"
+                  "5. Content is protected under copyright laws.\n\n"
+                  "If you do not agree, do not use the app.",
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 15),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text("Close"),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -368,8 +462,10 @@ class _LoginPageState extends State<LoginPage> {
     } else if (_mobileTextEditingController.text.length != 10) {
       showMessage("Please enter 10 digit mobile Number");
     } else if (!iAgree) {
-      showMessage("Please accept Terms and Conditions");
-    } else {
+      showMessage("Please accept Terms & Conditions");
+    } else if (Platform.isIOS && !readEula) {
+      showMessage("Please accept EULA");
+    }else {
       _authController.sendOtpAndGoToOtp(
         mobileNo: _mobileTextEditingController.text,
         countryCode: "91",
