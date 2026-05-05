@@ -28,6 +28,7 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   final _authController = Get.find<AuthController>();
+  final _homeController = Get.find<HomeController>();
   @override
   void initState() {
     super.initState();
@@ -190,8 +191,7 @@ class _SplashPageState extends State<SplashPage> {
           _normalUpdateDialog();
         }
       } else {
-        final raw = SharedPrefs.readStringValue(PrefConstants.bookingDate);
-        final bookingDate = raw.isNotEmpty ? DateTime.tryParse(raw) : null;
+        final bookingDate = await _homeController.fetchLatestCompletedBookingDate();
         await AppIconHelper.updateCustomerAppIcon(bookingDate);
         route();
       }

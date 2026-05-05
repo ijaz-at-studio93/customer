@@ -25,18 +25,17 @@ class BookingHomePage extends StatefulWidget {
 
 class _BookingHomePageState extends State<BookingHomePage>
     with AutomaticKeepAliveClientMixin<BookingHomePage> {
-
   final _homeController = Get.find<HomeController>();
 
-  static const pendingListKey =
-  PageStorageKey<String>('booking_pending_list');
+  static const pendingListKey = PageStorageKey<String>('booking_pending_list');
 
   static const completedListKey =
-  PageStorageKey<String>('booking_completed_list');
+      PageStorageKey<String>('booking_completed_list');
 
   @override
   bool get wantKeepAlive => true;
 
+  @override
   void initState() {
     super.initState();
 
@@ -54,7 +53,6 @@ class _BookingHomePageState extends State<BookingHomePage>
     return CallWrapper(
       child: Scaffold(
         backgroundColor: ColorConstant.whiteColor,
-
         appBar: AppBar(
           elevation: 0,
           backgroundColor: ColorConstant.whiteColor,
@@ -67,115 +65,117 @@ class _BookingHomePageState extends State<BookingHomePage>
             ),
           ),
         ),
-
         body: Stack(
           children: [
-
             /// MAIN PAGE CONTENT
             Column(
               children: [
-
                 _bookingOverView(),
 
                 /// BOOKING LIST
                 Obx(() => Expanded(
-                  child: _homeController.showProgress
-                      ? const ProgressBarView()
+                      child: _homeController.showProgress
+                          ? const ProgressBarView()
 
-                  /// UPCOMING BOOKINGS
-                      : bookingOverView == "0"
-                      ? _homeController
-                      .getCurrentBookingListModel.data?.isEmpty ?? false
-                      ? const NoItemsWidget(
-                    text: "There are no current bookings on record",
-                  )
-                      : ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 150),
-                    key: pendingListKey,
-                    itemCount: _homeController
-                        .getCurrentBookingListModel.data?.length ?? 0,
+                          /// UPCOMING BOOKINGS
+                          : bookingOverView == "0"
+                              ? _homeController.getCurrentBookingListModel.data
+                                          ?.isEmpty ??
+                                      false
+                                  ? const NoItemsWidget(
+                                      text:
+                                          "There are no current bookings on record",
+                                    )
+                                  : ListView.builder(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 150),
+                                      key: pendingListKey,
+                                      itemCount: _homeController
+                                              .getCurrentBookingListModel
+                                              .data
+                                              ?.length ??
+                                          0,
+                                      itemBuilder: (context, index) {
+                                        final booking = _homeController
+                                            .getCurrentBookingListModel
+                                            .data![index];
 
-                    itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 5),
+                                          child: PendingCardWidget(
+                                            bookingData: booking,
+                                            onPress: () async {
+                                              final result =
+                                                  await Get.to(() => QRCodePage(
+                                                        isBooking: false,
+                                                        appointmentId: booking
+                                                                .appointmentId ??
+                                                            "",
+                                                      ));
 
-                      final booking = _homeController
-                          .getCurrentBookingListModel.data![index];
+                                              if (result == true) {
+                                                _homeController
+                                                    .doGetCurrentBookingListData();
+                                              }
+                                            },
+                                            onReSchedule: () async {
+                                              final result =
+                                                  await _showRescheduleDialog(
+                                                context,
+                                                booking.appointmentId ?? "",
+                                              );
 
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 5
-                        ),
-                        child: PendingCardWidget(
+                                              if (result == true) {
+                                                _homeController
+                                                    .doGetCurrentBookingListData();
+                                              }
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    )
 
-                          bookingData: booking,
+                              /// COMPLETED BOOKINGS
+                              : _homeController.getBookingHistoryListModel.data
+                                          ?.isEmpty ??
+                                      false
+                                  ? const NoItemsWidget(
+                                      text:
+                                          "There are no completed bookings available.",
+                                    )
+                                  : ListView.builder(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 150),
+                                      key: completedListKey,
+                                      itemCount: _homeController
+                                              .getBookingHistoryListModel
+                                              .data
+                                              ?.length ??
+                                          0,
+                                      itemBuilder: (context, index) {
+                                        final history = _homeController
+                                            .getBookingHistoryListModel
+                                            .data![index];
 
-                          onPress: () async {
-
-                            final result = await Get.to(() => QRCodePage(
-                              isBooking: false,
-                              appointmentId: booking.appointmentId ?? "",
-                            ));
-
-                            if (result == true) {
-                              _homeController
-                                  .doGetCurrentBookingListData();
-                            }
-                          },
-
-                          onReSchedule: () async {
-
-                            final result = await _showRescheduleDialog(
-                              context,
-                              booking.appointmentId ?? "",
-                            );
-
-                            if (result == true) {
-                              _homeController
-                                  .doGetCurrentBookingListData();
-                            }
-                          },
-                        ),
-                      );
-                    },
-                  )
-
-                  /// COMPLETED BOOKINGS
-                      : _homeController
-                      .getBookingHistoryListModel.data?.isEmpty ?? false
-                      ? const NoItemsWidget(
-                    text:
-                    "There are no completed bookings available.",
-                  )
-                      : ListView.builder(
-                    padding: const EdgeInsets.only(bottom: 150),
-                    key: completedListKey,
-
-                    itemCount: _homeController
-                        .getBookingHistoryListModel.data?.length ?? 0,
-
-                    itemBuilder: (context, index) {
-
-                      final history = _homeController
-                          .getBookingHistoryListModel.data![index];
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 5
-                        ),
-                        child: CompleteAndRejectWidget(
-                          historyList: history,
-                          onPress: () {
-                            Get.to(() => CompleteBookingDetailsView(
-                              appointmentId:
-                              history.appointmentId ?? "",
-                            ));
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ))
+                                        return Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 5),
+                                          child: CompleteAndRejectWidget(
+                                            historyList: history,
+                                            onPress: () {
+                                              Get.to(() =>
+                                                  CompleteBookingDetailsView(
+                                                    appointmentId:
+                                                        history.appointmentId ??
+                                                            "",
+                                                  ));
+                                            },
+                                          ),
+                                        );
+                                      },
+                                    ),
+                    ))
               ],
             ),
 
@@ -210,7 +210,6 @@ class _BookingHomePageState extends State<BookingHomePage>
             //     ),
             //   );
             // }),
-
           ],
         ),
       ),
@@ -218,7 +217,7 @@ class _BookingHomePageState extends State<BookingHomePage>
   }
 
   /// TAB SWITCH
-  _bookingOverView() {
+  Container _bookingOverView() {
     return Container(
       height: 81,
       color: ColorConstant.whiteColor,
@@ -226,14 +225,12 @@ class _BookingHomePageState extends State<BookingHomePage>
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: CupertinoSlidingSegmentedControl(
         backgroundColor:
-        changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))
-            ?? Colors.transparent,
+            changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                Colors.transparent,
         padding: const EdgeInsets.all(6),
         groupValue: bookingOverView,
         thumbColor: ColorConstant.whiteColor,
-
         children: {
-
           "0": SizedBox(
             width: Get.width,
             height: Get.height * 0.05,
@@ -242,33 +239,30 @@ class _BookingHomePageState extends State<BookingHomePage>
                 "Upcoming",
                 style: bookingOverView == "0"
                     ? AppTextTheme.bold.copyWith(
-                  fontSize: 14,
-                  color: ColorConstant.blackColor,
-                )
+                        fontSize: 14,
+                        color: ColorConstant.blackColor,
+                      )
                     : AppTextTheme.medium.copyWith(
-                  fontSize: 13,
-                  color: ColorConstant.whiteColor,
-                ),
+                        fontSize: 13,
+                        color: ColorConstant.whiteColor,
+                      ),
               ),
             ),
           ),
-
           "1": Text(
             "Completed",
             style: bookingOverView == "1"
                 ? AppTextTheme.bold.copyWith(
-              fontSize: 14,
-              color: ColorConstant.blackColor,
-            )
+                    fontSize: 14,
+                    color: ColorConstant.blackColor,
+                  )
                 : AppTextTheme.medium.copyWith(
-              fontSize: 13,
-              color: ColorConstant.whiteColor,
-            ),
+                    fontSize: 13,
+                    color: ColorConstant.whiteColor,
+                  ),
           ),
         },
-
         onValueChanged: (dynamic value) {
-
           bookingOverView = value;
 
           if (bookingOverView == "0") {
@@ -287,10 +281,9 @@ class _BookingHomePageState extends State<BookingHomePage>
 
   /// RESCHEDULE
   Future<bool?> _showRescheduleDialog(
-      BuildContext context,
-      String appointmentId,
-      ) async {
-
+    BuildContext context,
+    String appointmentId,
+  ) async {
     DateTime? newDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now().add(const Duration(days: 1)),
@@ -299,14 +292,12 @@ class _BookingHomePageState extends State<BookingHomePage>
     );
 
     if (newDate != null) {
-
       TimeOfDay? newTime = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
       );
 
       if (newTime != null) {
-
         DateTime finalDateTime = DateTime(
           newDate.year,
           newDate.month,
@@ -318,9 +309,7 @@ class _BookingHomePageState extends State<BookingHomePage>
         await _homeController.reScheduledBooking(
           appointmentId: appointmentId,
           newTime: finalDateTime.toIso8601String(),
-
           callback: () {
-
             Get.back(result: true);
 
             SnackbarUtil.show(
@@ -332,5 +321,6 @@ class _BookingHomePageState extends State<BookingHomePage>
         );
       }
     }
+    return null;
   }
 }

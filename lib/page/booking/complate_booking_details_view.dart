@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
-import 'package:salon_customer/page/booking/widget/product_rating_list_tile.dart';
 import 'package:salon_customer/page/booking/widget/service_rating_list_tile.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
@@ -11,8 +10,6 @@ import 'package:salon_customer/util/NoItemsWidget.dart';
 import '../../project_specific/progressbar_view.dart';
 import 'widget/artist_rating_list_tile.dart';
 import 'package:salon_customer/service/analytics_service.dart';
-import 'package:salon_customer/util/SharedPrefs.dart';
-import 'package:salon_customer/util/app_icon_helper.dart';
 
 class CompleteBookingDetailsView extends StatefulWidget {
   final String appointmentId;
@@ -46,10 +43,6 @@ class _CompleteBookingDetailsViewState
         );
       } catch (_) {}
 
-      final now = DateTime.now();
-      await SharedPrefs.writeValue(
-          PrefConstants.bookingDate, now.toIso8601String());
-      await AppIconHelper.updateCustomerAppIcon(now);
     });
   }
 

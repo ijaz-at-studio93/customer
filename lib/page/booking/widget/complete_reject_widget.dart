@@ -9,7 +9,6 @@ import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 
-import '../../../controller/home_controller.dart';
 import '../../../model/booking_history_list_model.dart';
 
 class CompleteAndRejectWidget extends StatefulWidget {

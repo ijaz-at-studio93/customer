@@ -1133,6 +1133,23 @@ class HomeController extends GetxController {
     }
   }
 
+  /// Fetches booking history silently (no progress loader). Returns the most
+  /// recent completed appointment's [finalizedAt], or null if none exists.
+  Future<DateTime?> fetchLatestCompletedBookingDate() async {
+    try {
+      _bookingHistoryListModel.value = await HomeAPI.bookingHistory();
+      final completed = _bookingHistoryListModel.value.data
+          ?.where((h) => h.orderStatus == "completed")
+          .toList();
+      if (completed == null || completed.isEmpty) return null;
+      completed.sort((a, b) => (b.finalizedAt ?? "").compareTo(a.finalizedAt ?? ""));
+      return DateTime.tryParse(completed.first.finalizedAt ?? "");
+    } catch (e) {
+      if (kDebugMode) print("fetchLatestCompletedBookingDate error: $e");
+      return null;
+    }
+  }
+
   /*-------------  Get Order Id Model ---------------*/
   final RxBool _skipNextGetOrderId = false.obs;
 
