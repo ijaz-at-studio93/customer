@@ -43,6 +43,7 @@ class ArtiestData {
   Salon? salon;
   List<Services>? services;
   List<Portfolio>? portfolio;
+  List<String>? languagesKnown;
   List<CategorizedServiceList>? categorizedServiceList;
 
   ArtiestData(
@@ -63,6 +64,7 @@ class ArtiestData {
       this.salon,
       this.services,
       this.portfolio,
+        this.languagesKnown,
       this.categorizedServiceList});
 
   ArtiestData.fromJson(Map<String, dynamic> json) {
@@ -98,6 +100,9 @@ class ArtiestData {
         portfolio!.add(Portfolio.fromJson(v));
       });
     }
+    languagesKnown = json['languagesKnown'] != null
+        ? List<String>.from(json['languagesKnown'])
+        : [];
     if (json['categorizedServiceList'] != null) {
       categorizedServiceList = <CategorizedServiceList>[];
       json['categorizedServiceList'].forEach((v) {
@@ -133,6 +138,7 @@ class ArtiestData {
     if (portfolio != null) {
       data['portfolio'] = portfolio!.map((v) => v.toJson()).toList();
     }
+    data['languagesKnown'] = languagesKnown;
     if (categorizedServiceList != null) {
       data['categorizedServiceList'] =
           categorizedServiceList!.map((v) => v.toJson()).toList();

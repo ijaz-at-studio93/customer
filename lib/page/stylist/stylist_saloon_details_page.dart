@@ -1175,62 +1175,123 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
           style: AppTextTheme.bold
               .copyWith(color: ColorConstant.blackColor, fontSize: 14),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              /// 🔥 ROW → RATING + STARS
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  /// 🔥 RATING NUMBER
-                  Text(
-                    "${_homeController.getArtiestDetailsModel.data?.rating ?? 0}",
-                    style: AppTextTheme.bold.copyWith(
-                      fontFamily: 'Outfit',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w900,
-                      color: ColorConstant.blackColor,
-                    ),
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+
+            /// 🔥 LINE 1 → Rating + Stars + Reviews
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  "${_homeController.getArtiestDetailsModel.data?.rating ?? 0}",
+                  style: AppTextTheme.bold.copyWith(
+                    fontFamily: 'Outfit',
+                    fontSize: 18,
+                    fontWeight: FontWeight.w900,
+                    color: ColorConstant.blackColor,
                   ),
-
-                  const SizedBox(width: 6),
-
-                  /// 🔥 STARS
-                  RatingBar.builder(
-                    initialRating:
-                        _homeController.getArtiestDetailsModel.data?.rating ??
-                            0.0,
-                    minRating: 1,
-                    direction: Axis.horizontal,
-                    allowHalfRating: true,
-                    itemCount: 5,
-                    itemSize: 22.0,
-                    ignoreGestures: true,
-                    itemBuilder: (context, _) => Icon(
-                      Icons.star,
-                      color: changeTheme(SharedPrefs.readStringValue(
-                              PrefConstants.gender)) ??
-                          ColorConstant.primaryColor,
-                    ),
-                    onRatingUpdate: (rating) {},
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 4),
-
-              /// 🔥 REVIEWS BELOW
-              Text(
-                "(${_homeController.getArtiestDetailsModel.data?.reviewCount ?? 0} Reviews)",
-                style: AppTextTheme.medium.copyWith(
-                  fontSize: 13,
-                  color: Colors.black87,
                 ),
-              ),
-            ],
-          ),
+
+                const SizedBox(width: 6),
+
+                RatingBar.builder(
+                  initialRating:
+                  _homeController.getArtiestDetailsModel.data?.rating ?? 0.0,
+                  minRating: 1,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  itemCount: 5,
+                  itemSize: 22.0,
+                  ignoreGestures: true,
+                  itemBuilder: (context, _) => Icon(
+                    Icons.star,
+                    color: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
+                  ),
+                  onRatingUpdate: (rating) {},
+                ),
+
+                const SizedBox(width: 8),
+
+                Text(
+                  "(${_homeController.getArtiestDetailsModel.data?.reviewCount ?? 0} Reviews)",
+                  style: AppTextTheme.medium.copyWith(
+                    fontSize: 13,
+                    color: Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+
+            /// 🔥 LINE 2 → Languages (only if present)
+            Builder(
+              builder: (context) {
+                final languages =
+                    _homeController.getArtiestDetailsModel.data?.languagesKnown ?? [];
+
+                if (languages.isEmpty) return const SizedBox();
+
+                return Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Column(
+                    children: [
+
+                      /// 🔹 LABEL
+                      RichText(
+                        textAlign: TextAlign.center,
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "Can Understand : ",
+                              style: AppTextTheme.medium.copyWith(
+                                fontSize: 13,
+                                color: Colors.black54,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      /// 🔹 CHIPS (your pill UI)
+                      Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: languages.map((lang) {
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 6),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [
+                                  Color(0xFF8454E5),
+                                  Color(0xFFCD73B4),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              lang,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ],
     );
