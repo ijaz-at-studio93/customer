@@ -528,8 +528,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                               '',
                                                         );
                                                       } else {
-                                                        showMessage(
-                                                            "You can select up to 3 slots only");
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          const SnackBar(content: Text("You can select up to 3 slots only")),
+                                                        );
                                                       }
                                                     }
                                                   });
@@ -1253,7 +1254,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                               // _payAndBook();
                               //_showBookingOptionsBottomSheet(context);
                               if (selectedSlots.isEmpty) {
-                                showMessage("Please Select Atleast One Time Slot");
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Please Select Atleast One Time Slot")),
+                                );
                                 return;
                               }
                               _showPaymentInfoDialog(context);

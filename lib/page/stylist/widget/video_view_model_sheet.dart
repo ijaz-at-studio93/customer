@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/constant/color_constant.dart';
-import 'package:salon_customer/page/stylist/widget/network_video_view_widget.dart';
+import 'package:salon_customer/project_specific/network_video_view_widget.dart';
 import '../../../constant/assetsconstant.dart';
 import '../../../project_specific/text_theme.dart';
 
@@ -69,6 +69,7 @@ class _VideoViewModelSheetState extends State<VideoViewModelSheet> {
           Expanded(
               child: NetworkVideoViewWidget(
             videoString: widget.videoString,
+            thumbnail: "",
           )),
         ],
       ),

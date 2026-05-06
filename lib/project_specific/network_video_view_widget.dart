@@ -21,6 +21,7 @@ class NetworkVideoViewWidget extends StatefulWidget {
 
 class _NetworkVideoViewWidgetState extends State<NetworkVideoViewWidget> {
   CachedVideoPlayerPlus? _player;
+
   bool _isInitialized = false;
 
   @override
@@ -31,12 +32,11 @@ class _NetworkVideoViewWidgetState extends State<NetworkVideoViewWidget> {
       Uri.parse(widget.videoString),
     );
 
-    _player!.initialize().then((_) {
+    _player?.initialize().then((_) {
       if (!mounted) return;
-
-      _player!.controller.setLooping(true);
-      _player!.controller.play();
-      _player!.controller.setVolume(widget.muted ? 0.0 : 1.0); // CHANGE THIS
+      _player?.controller.setLooping(true);
+      _player?.controller.setVolume(widget.muted ? 0.0 : 1.0); // CHANGE THIS
+      _player?.controller.play();
 
       setState(() {
         _isInitialized = true; // ✅ control rendering safely
@@ -55,18 +55,22 @@ class _NetworkVideoViewWidgetState extends State<NetworkVideoViewWidget> {
   @override
   Widget build(BuildContext context) {
     /// 🔥 SAFETY CHECK (MOST IMPORTANT)
+
+    /// 🔥 LOADING STATE
     if (!_isInitialized || _player == null) {
       return Stack(
         children: [
-          CachedNetworkImage(
-            imageUrl: widget.thumbnail,
-            fit: BoxFit.cover,
+          Center(
+            child: widget.thumbnail.isEmpty
+                ? const SizedBox()
+                : CachedNetworkImage(
+                    imageUrl: widget.thumbnail,
+                    fit: BoxFit.cover,
+                  ),
           ),
-          Container(
-            color: Colors.black,
-            child: const Center(
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
+          const ColoredBox(
+            color: Colors.black45,
+            child: Center(child: CircularProgressIndicator(strokeWidth: 5)),
           ),
         ],
       );
@@ -74,13 +78,11 @@ class _NetworkVideoViewWidgetState extends State<NetworkVideoViewWidget> {
 
     final controller = _player!.controller;
 
-    return SizedBox.expand(
-      child: FittedBox(
-        fit: BoxFit.cover,
-        child: SizedBox(
-          width: controller.value.size.width,
-          height: controller.value.size.height,
-          child: VideoPlayer(controller),
+    return Center(
+      child: AspectRatio(
+        aspectRatio: controller.value.aspectRatio,
+        child: VideoPlayer(
+          controller,
         ),
       ),
     );

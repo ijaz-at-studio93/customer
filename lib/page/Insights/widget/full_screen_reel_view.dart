@@ -3,8 +3,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/model/blog_data_model.dart';
 import 'package:salon_customer/constant/api_constant.dart';
-import 'package:salon_customer/page/stylist/widget/network_video_view_widget.dart';
+// import 'package:salon_customer/page/stylist/widget/network_video_view_widget.dart';
 import 'package:salon_customer/controller/home_controller.dart';
+import 'package:salon_customer/project_specific/network_video_view_widget.dart';
 
 import '../../../constant/color_constant.dart';
 import '../../home/saloon_after_selecting_page.dart';
@@ -26,6 +27,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
   Widget build(BuildContext context) {
     final image = widget.data.image;
     final video = widget.data.video;
+    final thumbnail = widget.data.thumbnail;
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -36,6 +38,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
             child: (video != null && video.isNotEmpty)
                 ? NetworkVideoViewWidget(
                     videoString: "${APIConstants.image}$video",
+                    thumbnail: "${APIConstants.image}$thumbnail",
                   )
                 : (image != null && image.isNotEmpty)
                     ? CachedNetworkImage(

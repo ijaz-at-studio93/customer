@@ -5,7 +5,7 @@ import 'package:readmore/readmore.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
-import 'package:salon_customer/page/stylist/widget/network_video_view_widget.dart';
+import 'package:salon_customer/project_specific/network_video_view_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -58,7 +58,8 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             widget.image.isEmpty
-                ? NetworkVideoViewWidget(videoString: widget.video)
+                ? NetworkVideoViewWidget(
+                    videoString: widget.video, thumbnail: "")
                 : CachedNetworkImage(
                     width: Get.width,
                     height: Get.height * 0.3,
@@ -90,7 +91,7 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20,vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
               child: Text(
                 widget.subTitle,
                 style: AppTextTheme.medium
@@ -100,11 +101,10 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
             widget.externalLink.isEmpty
                 ? const SizedBox()
                 : Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20,vertical: 5),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                     child: GestureDetector(
-                      onTap:
-                       () {
+                      onTap: () {
                         _launchURL(widget.externalLink);
                       },
                       child: Text(
@@ -114,7 +114,9 @@ class _InsightsDetailPageState extends State<InsightsDetailPage> {
                       ),
                     )),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20,),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
               child: ReadMoreText(
                 widget.body,
                 trimMode: TrimMode.Line,
