@@ -17,7 +17,6 @@ import 'package:salon_customer/util/app_conctant.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../project_specific/button_widget.dart';
-import '../util/app_icon_helper.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -28,7 +27,6 @@ class SplashPage extends StatefulWidget {
 
 class _SplashPageState extends State<SplashPage> {
   final _authController = Get.find<AuthController>();
-  final _homeController = Get.find<HomeController>();
   @override
   void initState() {
     super.initState();
@@ -191,8 +189,6 @@ class _SplashPageState extends State<SplashPage> {
           _normalUpdateDialog();
         }
       } else {
-        final bookingDate = await _homeController.fetchLatestCompletedBookingDate();
-        await AppIconHelper.updateCustomerAppIcon(bookingDate);
         route();
       }
     });

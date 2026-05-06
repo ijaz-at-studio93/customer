@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoding/geocoding.dart';
@@ -25,6 +23,7 @@ import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/util/app_icon_helper.dart';
 import '../../constant/variable_constant.dart';
 import '../../util/call_wrapper.dart';
 import '../../util/logger.dart';
@@ -56,6 +55,14 @@ class _HomePageState extends State<HomePage>
   bool get wantKeepAlive => true;
   @override
   void initState() {
+    Future.delayed(
+      Duration.zero,
+      () async {
+        final bookingDate =
+            await _homeController.fetchLatestCompletedBookingDate();
+        await AppIconHelper.updateCustomerAppIcon(bookingDate);
+      },
+    );
     super.initState();
     print("🧠 CHECK DIALOG");
     print(
