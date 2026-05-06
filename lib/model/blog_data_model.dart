@@ -36,6 +36,7 @@ class BlogData {
   String? description;
   String? image;
   String? video;
+  String? thumbnail;
   String? createdAt;
   String? body;
   String? externalLink;
@@ -51,6 +52,7 @@ class BlogData {
     this.description,
     this.image,
     this.video,
+    this.thumbnail,
     this.createdAt,
     this.body,
     this.externalLink,
@@ -66,19 +68,16 @@ class BlogData {
     description = json['description'];
     image = json['image'];
     video = json['video'];
+    thumbnail = json['thumbnail'];
     createdAt = json['createdAt'];
     body = json['body'];
     externalLink = json['externalLink'];
     viewCount = json['viewCount'];
     isFavourite = json['isFavourite'];
 
-    artist = json['artist'] != null
-        ? Artist.fromJson(json['artist'])
-        : null;
+    artist = json['artist'] != null ? Artist.fromJson(json['artist']) : null;
 
-    salon = json['salon'] != null
-        ? Salon.fromJson(json['salon'])
-        : null;
+    salon = json['salon'] != null ? Salon.fromJson(json['salon']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -89,6 +88,7 @@ class BlogData {
     data['description'] = description;
     data['image'] = image;
     data['video'] = video;
+    data['thumbnail'] = thumbnail;
     data['createdAt'] = createdAt;
     data['body'] = body;
     data['externalLink'] = externalLink;

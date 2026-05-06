@@ -2,10 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/model/blog_data_model.dart';
 import 'package:get/get.dart';
-import '../../../project_specific/network_video_view_widget.dart';
 import '../../home/saloon_after_selecting_page.dart';
 
 class InsightsGridItem extends StatelessWidget {
@@ -22,7 +22,7 @@ class InsightsGridItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final image = blogData.image;
     final video = blogData.video;
-
+    final thumbnail = blogData.thumbnail;
     return GestureDetector(
       onTap: onTap,
       child: ClipRRect(
@@ -31,20 +31,55 @@ class InsightsGridItem extends StatelessWidget {
           children: [
             Positioned.fill(
               child: (video != null && video.isNotEmpty)
-                  ? NetworkVideoViewWidget(
-                videoString: "${APIConstants.image}$video",
-                muted: true, // ADD THIS ← no sound in grid
-              )
+                  ? Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        CachedNetworkImage(
+                          imageUrl: "${APIConstants.image}$thumbnail",
+                          cacheKey: '${APIConstants.image}$thumbnail',
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Image.asset(
+                            AssetsConstant.placeHolder,
+                            fit: BoxFit.cover,
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            AssetsConstant.placeHolder,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          color: Colors.black.withValues(alpha: 0.3),
+                        ),
+                        // Play button (visual only)
+                        const Center(
+                          child: Icon(
+                            Icons.play_circle_filled,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        ),
+                      ],
+                    )
                   : (image != null && image.isNotEmpty)
-                  ? CachedNetworkImage(
-                imageUrl: "${APIConstants.image}$image",
-                fit: BoxFit.cover,
-              )
-                  : Container(
-                color: Colors.grey.shade300,
-              ),
+                      ? CachedNetworkImage(
+                          imageUrl: "${APIConstants.image}$image",
+                          cacheKey: '${APIConstants.image}$image',
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Image.asset(
+                            AssetsConstant.placeHolder,
+                            fit: BoxFit.cover,
+                          ),
+                          errorWidget: (context, url, error) => Image.asset(
+                            AssetsConstant.placeHolder,
+                            fit: BoxFit.cover,
+                          ),
+                        )
+                      : Container(
+                          color: Colors.grey.shade300,
+                        ),
             ),
-
 
             /// TOP LEFT → SALON
             Positioned(
@@ -54,19 +89,21 @@ class InsightsGridItem extends StatelessWidget {
                 onTap: (blogData.salon?.id == null)
                     ? null
                     : () {
-                  Get.to(() => SaloonAfterSelectingServicesPage(
-                    isPayNowMode: true,
-                    id: blogData.salon!.id ?? "",
-                    callback: () {},
-                  ));
-                },
+                        Get.to(() => SaloonAfterSelectingServicesPage(
+                              isPayNowMode: true,
+                              id: blogData.salon!.id ?? "",
+                              callback: () {},
+                            ));
+                      },
                 child: Opacity(
                   opacity: (blogData.salon?.id == null) ? 0.8 : 1,
                   child: Container(
                     constraints: BoxConstraints(
-                      maxWidth: Get.width * 0.4, // 👈 prevents it from growing too much
+                      maxWidth: Get.width *
+                          0.4, // 👈 prevents it from growing too much
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(6),
@@ -93,21 +130,20 @@ class InsightsGridItem extends StatelessWidget {
               top: 8,
               right: 8,
               child: Container(
-                width: 32,
-                height: 32,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.black54,
-                ),
-                child:  Icon(
-                  blogData.isFavourite == true
-                      ? Icons.favorite
-                      : Icons.favorite_border,
-                  color: blogData.isFavourite == true
-                      ? Colors.red
-                      : Colors.white,
-                )
-              ),
+                  width: 32,
+                  height: 32,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black54,
+                  ),
+                  child: Icon(
+                    blogData.isFavourite == true
+                        ? Icons.favorite
+                        : Icons.favorite_border,
+                    color: blogData.isFavourite == true
+                        ? Colors.red
+                        : Colors.white,
+                  )),
             ),
 
             /// BOTTOM → USER
@@ -122,14 +158,15 @@ class InsightsGridItem extends StatelessWidget {
                       radius: 10,
                       backgroundColor: Colors.grey.shade300,
                       backgroundImage: (blogData.artist?.profileImage != null &&
-                          blogData.artist!.profileImage!.isNotEmpty)
+                              blogData.artist!.profileImage!.isNotEmpty)
                           ? NetworkImage(
-                        "${APIConstants.image}${blogData.artist!.profileImage}",
-                      )
+                              "${APIConstants.image}${blogData.artist!.profileImage}",
+                            )
                           : null,
                       child: (blogData.artist?.profileImage == null ||
-                          blogData.artist!.profileImage!.isEmpty)
-                          ? const Icon(Icons.person, size: 12, color: Colors.white)
+                              blogData.artist!.profileImage!.isEmpty)
+                          ? const Icon(Icons.person,
+                              size: 12, color: Colors.white)
                           : null,
                     ),
                     const SizedBox(width: 4),

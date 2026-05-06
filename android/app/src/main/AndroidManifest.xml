@@ -29,30 +29,30 @@
             android:usesCleartextTraffic="true"
             android:windowSoftInputMode="adjustResize"
             tools:targetApi="m">
-            <!-- Flutter resolves the launch activity from the APK manifest (first enabled
-                 MAIN/LAUNCHER). Without this filter, the tool picks an activity-alias;
-                 after in-app icon switching those aliases can be disabled at runtime,
-                 so `flutter run` / adb would fail with "Activity class does not exist".
-                 Real launcher icons still come from the aliases below. -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <!-- Specifies an Android theme to apply to this Activity as soon as
-                 the Android process has started. This theme is visible to the user
-                 while the Flutter UI initializes. After that, this theme continues
-                 to determine the Window background behind the Flutter UI. -->
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
         </activity>
 
-        <!-- Dynamic launcher icons — only one alias is enabled at a time -->
+        <!-- Dynamic launcher icons — only one alias enabled at a time -->
+        <activity-alias
+            android:name=".MainActivityDefault"
+            android:enabled="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_launcher"
+            android:roundIcon="@mipmap/ic_launcher"
+            android:targetActivity=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
         <activity-alias
             android:name=".MainActivityCustomerBook"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/customer_book"
             android:roundIcon="@mipmap/customer_book"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -65,7 +65,7 @@
             android:name=".MainActivityCustomer3Weeks"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/customer_3weeks"
             android:roundIcon="@mipmap/customer_3weeks"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -78,7 +78,7 @@
             android:name=".MainActivityCustomer4Weeks"
             android:enabled="false"
             android:exported="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/customer_4weeks"
             android:roundIcon="@mipmap/customer_4weeks"
             android:targetActivity=".MainActivity">
             <intent-filter>
@@ -93,7 +93,7 @@
             android:value="2" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@mipmap/ic_launcher_monochrome" />
+            android:resource="@mipmap/notification_icon" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorPrimary" />

@@ -149,7 +149,6 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
                                     widget.blogData.isFavourite =
                                         !(widget.blogData.isFavourite ?? false);
 
-
                                     if (widget.blogData.isFavourite ?? false) {
                                       _homeController.doAddFavBlog(
                                           callback: () {},
@@ -273,6 +272,7 @@ class _InsightsCardWidgetState extends State<InsightsCardWidget> {
         borderRadius: BorderRadius.circular(4),
         child: NetworkVideoViewWidget(
           videoString: "${APIConstants.image}$video",
+          thumbnail: "${APIConstants.image}${widget.blogData.thumbnail ?? ""}",
         ),
       );
     }

@@ -1,24 +1,25 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:video_player/video_player.dart';
 
 class NetworkVideoViewWidget extends StatefulWidget {
   final String videoString;
+  final String thumbnail;
   final bool muted; // ADD THIS
 
   const NetworkVideoViewWidget({
     super.key,
     required this.videoString,
+    required this.thumbnail,
     this.muted = false, // default is sound on
   });
 
   @override
-  State<NetworkVideoViewWidget> createState() =>
-      _NetworkVideoViewWidgetState();
+  State<NetworkVideoViewWidget> createState() => _NetworkVideoViewWidgetState();
 }
 
-class _NetworkVideoViewWidgetState
-    extends State<NetworkVideoViewWidget> {
+class _NetworkVideoViewWidgetState extends State<NetworkVideoViewWidget> {
   CachedVideoPlayerPlus? _player;
   bool _isInitialized = false;
 
@@ -55,11 +56,19 @@ class _NetworkVideoViewWidgetState
   Widget build(BuildContext context) {
     /// 🔥 SAFETY CHECK (MOST IMPORTANT)
     if (!_isInitialized || _player == null) {
-      return Container(
-        color: Colors.black,
-        child: const Center(
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
+      return Stack(
+        children: [
+          CachedNetworkImage(
+            imageUrl: widget.thumbnail,
+            fit: BoxFit.cover,
+          ),
+          Container(
+            color: Colors.black,
+            child: const Center(
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+        ],
       );
     }
 

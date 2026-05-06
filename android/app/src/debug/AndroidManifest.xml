@@ -1,7 +1,17 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- INTERNET is already declared in src/main/AndroidManifest.xml.
-         MainActivity carries MAIN/LAUNCHER so Flutter/adb always resolve a
-         stable launch component (see comment in main manifest). Debug may
-         show an extra launcher entry alongside the enabled activity-alias. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Gives flutter run / adb a stable launch target that is never
+         disabled by dynamic icon switching. Only present in debug builds;
+         release builds rely solely on the activity-alias entries. -->
+    <application>
+        <activity
+            android:name=".MainActivity"
+            tools:node="merge">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
 </manifest>

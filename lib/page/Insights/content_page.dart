@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
-import 'package:salon_customer/page/Insights/insights_detail_page.dart';
-import 'package:salon_customer/page/Insights/widget/Insights_card_widget.dart';
 import 'package:salon_customer/page/Insights/widget/full_screen_reel_view.dart';
 import 'package:salon_customer/page/Insights/widget/insights_grid_item.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';

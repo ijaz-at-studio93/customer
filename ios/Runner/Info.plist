@@ -73,15 +73,6 @@
 		</dict>
 		<key>CFBundleAlternateIcons</key>
 		<dict>
-			<key>CustomerOpen</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>CustomerOpen</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
 			<key>CustomerBook</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
