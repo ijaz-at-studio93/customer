@@ -7,7 +7,7 @@ class CallWrapper extends StatefulWidget {
   final Widget child;
   final Offset? initialPosition;
 
-  const CallWrapper({required this.child, this.initialPosition, Key? key}) : super(key: key);
+  const CallWrapper({required this.child, this.initialPosition, super.key});
 
   @override
   State<CallWrapper> createState() => _CallWrapperState();
@@ -69,7 +69,8 @@ class _CallWrapperState extends State<CallWrapper> {
     final maxX = size.width - fabSize - margin;
 
     final minY = safe.top + margin;
-    final maxY = size.height - fabSize - margin - kBottomNavigationBarHeight - 5;
+    final maxY =
+        size.height - fabSize - margin - kBottomNavigationBarHeight - 5;
     // 30px extra space above bottom nav so "Help 24*7" text is always visible
 
     return Offset(
@@ -95,7 +96,9 @@ class _CallWrapperState extends State<CallWrapper> {
               children: [
                 FloatingActionButton(
                   heroTag: 'global-call-fab',
-                  onPressed: () {_showCallOptions(context);},
+                  onPressed: () {
+                    _showCallOptions(context);
+                  },
                   // backgroundColor: changeTheme(
                   //   SharedPrefs.readStringValue(PrefConstants.gender),
                   // ),
@@ -103,13 +106,17 @@ class _CallWrapperState extends State<CallWrapper> {
                   child: const Icon(Icons.call, size: 28),
                 ),
                 const SizedBox(height: 6),
-                const Text(
-                  "Help 24×7",
-                  style: TextStyle(
-                    fontFamily: "Outfit",          // ✅ added
-                    fontSize: 14,
-                    fontWeight: FontWeight.w800,   // ✅ better than w900 (Figma style)
-                    color: Colors.black,
+                Material(
+                  color: Colors.transparent,
+                  child: const Text(
+                    "Help 24×7",
+                    style: TextStyle(
+                      fontFamily: "Outfit", // ✅ added
+                      fontSize: 14,
+                      fontWeight:
+                          FontWeight.w800, // ✅ better than w900 (Figma style)
+                      color: Colors.black,
+                    ),
                   ),
                 ),
               ],

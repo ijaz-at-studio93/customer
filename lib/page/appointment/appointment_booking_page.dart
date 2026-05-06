@@ -470,8 +470,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                     Builder(
                                       builder: (context) {
                                         //final slots = generateTimeSlots();
-                                        final workPlan = _homeController.salonAvailability?['data'];
-                                        final slots = generateTimeSlots(workPlan);
+                                        final workPlan = _homeController
+                                            .salonAvailability?['data'];
+                                        final slots =
+                                            generateTimeSlots(workPlan);
                                         if (slots.isEmpty) {
                                           return SizedBox(
                                             height: 90,
@@ -528,8 +530,12 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                               '',
                                                         );
                                                       } else {
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                          const SnackBar(content: Text("You can select up to 3 slots only")),
+                                                        ScaffoldMessenger.of(
+                                                                context)
+                                                            .showSnackBar(
+                                                          const SnackBar(
+                                                              content: Text(
+                                                                  "You can select up to 3 slots only")),
                                                         );
                                                       }
                                                     }
@@ -824,7 +830,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                         ),
 
                                         /// RIGHT → EDIT STYLIST BUTTON
-                                        if (selectedArtistIdsGlobal.value.isNotEmpty)
+                                        if (selectedArtistIdsGlobal
+                                            .value.isNotEmpty)
                                           GestureDetector(
                                             // onTap: () {
                                             //   selectedArtistIdsGlobal.value = []; // 🔥 reset selection
@@ -860,8 +867,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                             },
                                             child: Container(
                                               height: 30,
-                                              padding: const EdgeInsets.symmetric(
-                                                  horizontal: 12),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 12),
                                               decoration: BoxDecoration(
                                                 borderRadius:
                                                     BorderRadius.circular(8),
@@ -1255,7 +1263,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                               //_showBookingOptionsBottomSheet(context);
                               if (selectedSlots.isEmpty) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Please Select Atleast One Time Slot")),
+                                  const SnackBar(
+                                      behavior: SnackBarBehavior.floating,
+                                      content: Text(
+                                          "Please Select At least One Time Slot")),
                                 );
                                 return;
                               }
@@ -1348,14 +1359,22 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
   String getWeekDayKey(DateTime date) {
     switch (date.weekday) {
-      case 1: return "monday";
-      case 2: return "tuesday";
-      case 3: return "wednesday";
-      case 4: return "thursday";
-      case 5: return "friday";
-      case 6: return "saturday";
-      case 7: return "sunday";
-      default: return "";
+      case 1:
+        return "monday";
+      case 2:
+        return "tuesday";
+      case 3:
+        return "wednesday";
+      case 4:
+        return "thursday";
+      case 5:
+        return "friday";
+      case 6:
+        return "saturday";
+      case 7:
+        return "sunday";
+      default:
+        return "";
     }
   }
 
@@ -1381,7 +1400,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
     /// ✅ Backend start & end
     DateTime startTime = DateTime.parse("$selectDate ${dayPlan['start']}");
-    DateTime endTime   = DateTime.parse("$selectDate ${dayPlan['end']}");
+    DateTime endTime = DateTime.parse("$selectDate ${dayPlan['end']}");
 
     /// ✅ TODAY → skip past time
     if (DateFormat("yyyy-MM-dd").format(now) == selectDate) {
@@ -2900,9 +2919,11 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                         DateFormat("d").format(date),
                         style: TextStyle(
                           fontFamily: "Outfit",
-                          fontWeight:
-                          isFullyDisabled ? FontWeight.w600 : FontWeight.w700,
-                          fontSize: isSelected ? 22 : (isFullyDisabled ? 18 : 20),
+                          fontWeight: isFullyDisabled
+                              ? FontWeight.w600
+                              : FontWeight.w700,
+                          fontSize:
+                              isSelected ? 22 : (isFullyDisabled ? 18 : 20),
                           color: isFullyDisabled
                               ? Colors.grey.shade400
                               : isSelected
