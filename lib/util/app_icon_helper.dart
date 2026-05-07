@@ -61,6 +61,12 @@ class AppIconHelper {
     try {
       // On iOS, isDefaultIcon resets to the primary icon via setAlternateIconName(nil).
       final name = (icon.isDefaultIcon && Platform.isIOS) ? null : icon.currentIcon;
+      final currentIcon = await _plugin.getCurrentIcon();
+
+      // iOS default icon returns null
+      if (currentIcon == name) {
+        return; // 🚀 prevent unnecessary change → no popup
+      }
       await _plugin.changeIcon(name);
     } catch (e) {
       debugPrint('Icon change failed: $e');

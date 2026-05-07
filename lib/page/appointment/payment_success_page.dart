@@ -82,13 +82,24 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
                     children: [
 
                       /// Title
-                      const Text(
-                        "Payment Successful",
-                        style: TextStyle(
-                          fontFamily: "Outfit",
-                          fontSize: 33,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF01AB4D),
+                      // const Text(
+                      //   "Payment Successful",
+                      //   style: TextStyle(
+                      //     fontFamily: "Outfit",
+                      //     fontSize: 33,
+                      //     fontWeight: FontWeight.bold,
+                      //     color: Color(0xFF01AB4D),
+                      //   ),
+                      // ),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: const Text(
+                          "Payment Successful",
+                          style: TextStyle(
+                            fontSize: 33,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF01AB4D),
+                          ),
                         ),
                       ),
 

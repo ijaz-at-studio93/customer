@@ -99,15 +99,21 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                     label: 'Bookings',
                   ),
                   BottomNavigationBarItem(
-                    icon: Image.asset(
-                      AssetsConstant.insights,
-                      height: 24,
-                      width: 24,
-                      color: _selectedIndex == 2
-                          ? selectedGender.value == 0
-                              ? ColorConstant.primaryColor
-                              : ColorConstant.primary2
-                          : ColorConstant.grayTextColor,
+                    icon: ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        colors: [
+                          Color(0xFFFD98FB),
+                          Color(0xFFB479FF),
+                        ],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ).createShader(bounds),
+                      child: Image.asset(
+                        AssetsConstant.insights,
+                        height: 24,
+                        width: 24,
+                        color: Colors.white, // 👈 required
+                      ),
                     ),
                     label: 'Content',
                   ),

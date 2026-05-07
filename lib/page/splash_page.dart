@@ -178,8 +178,19 @@ class _SplashPageState extends State<SplashPage> {
     //   }
     // });
     _authController.doAppUpdate(callback: () async {
-      final serverVersion =
-          _authController.getAppUpdateModel.data?.userAppLatestVersion;
+
+      String? serverVersion;
+
+
+      if (Platform.isAndroid) {
+        serverVersion =
+            _authController.getAppUpdateModel.data?.userAppLatestVersion;
+      }
+      else if (Platform.isIOS) {
+        serverVersion =
+            _authController.getAppUpdateModel.data?.userAppIOSLatestVersion;
+      }
+
 
       if (serverVersion != null && isUpdateRequired(data, serverVersion)) {
         if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ??

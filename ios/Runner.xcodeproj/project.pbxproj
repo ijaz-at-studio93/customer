@@ -8,9 +8,15 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		188EEB5F7AAD5D0485C54658 /* CustomerBook@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8D81DEDE35445A8383D4A24B /* CustomerBook@2x.png */; };
+		259FDAEDD9235BD58FD5AB79 /* CustomerOpen@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02F5140C669251D485B11ABF /* CustomerOpen@3x.png */; };
+		2B650FD7795D5C71800636B4 /* Customer3Weeks@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 28689237CE7A5004A6BAA2D6 /* Customer3Weeks@3x.png */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
+		5166D9D4AC325BBA8421F3BB /* Customer4Weeks@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE8F978A219536C8608AEAE /* Customer4Weeks@2x.png */; };
+		5E490678D822510F96A7D823 /* CustomerOpen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 81C89DBB55E35E29A56CBD39 /* CustomerOpen@2x.png */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
+		81D04546AEF35305AFE34EF6 /* CustomerBook@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7123CE4F88145F229207BCC8 /* CustomerBook@3x.png */; };
 		8CD6CD1F350B2594FB0DEE4D /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 76E3592CB6A81ACB2E7BC50D /* Pods_Runner.framework */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
@@ -18,15 +24,9 @@
 		97D5B01C2C2EF5AC004B2C1F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 97D5B01B2C2EF5AC004B2C1F /* GoogleService-Info.plist */; };
 		A52C2E692F8FC2B200771B46 /* confirm.wav in Resources */ = {isa = PBXBuildFile; fileRef = A52C2E682F8FC2B200771B46 /* confirm.wav */; };
 		A52C2E6F2F8FC31900771B46 /* complete.wav in Resources */ = {isa = PBXBuildFile; fileRef = A52C2E6E2F8FC31900771B46 /* complete.wav */; };
-		FEB5F79ADEC7FE5224294934 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F49DCEFE257AD4297DF74C4C /* Pods_RunnerTests.framework */; };
-		5E490678D822510F96A7D823 /* CustomerOpen@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 81C89DBB55E35E29A56CBD39 /* CustomerOpen@2x.png */; };
-		259FDAEDD9235BD58FD5AB79 /* CustomerOpen@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 02F5140C669251D485B11ABF /* CustomerOpen@3x.png */; };
-		188EEB5F7AAD5D0485C54658 /* CustomerBook@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 8D81DEDE35445A8383D4A24B /* CustomerBook@2x.png */; };
-		81D04546AEF35305AFE34EF6 /* CustomerBook@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7123CE4F88145F229207BCC8 /* CustomerBook@3x.png */; };
 		DE29A3F52EF25EBA8AD03570 /* Customer3Weeks@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 7513EE4B0E215781A6D6A2E2 /* Customer3Weeks@2x.png */; };
-		2B650FD7795D5C71800636B4 /* Customer3Weeks@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 28689237CE7A5004A6BAA2D6 /* Customer3Weeks@3x.png */; };
-		5166D9D4AC325BBA8421F3BB /* Customer4Weeks@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = CEE8F978A219536C8608AEAE /* Customer4Weeks@2x.png */; };
 		E5B6D2CEC3F458DFB441C47A /* Customer4Weeks@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 669D9463A3D55C32908A9588 /* Customer4Weeks@3x.png */; };
+		FEB5F79ADEC7FE5224294934 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F49DCEFE257AD4297DF74C4C /* Pods_RunnerTests.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,16 +53,23 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		02F5140C669251D485B11ABF /* CustomerOpen@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CustomerOpen@3x.png"; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		28689237CE7A5004A6BAA2D6 /* Customer3Weeks@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Customer3Weeks@3x.png"; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
+		669D9463A3D55C32908A9588 /* Customer4Weeks@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Customer4Weeks@3x.png"; sourceTree = "<group>"; };
 		6CAE9B3EF7F3E28888BE3D87 /* Pods-RunnerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release.xcconfig"; sourceTree = "<group>"; };
+		7123CE4F88145F229207BCC8 /* CustomerBook@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CustomerBook@3x.png"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		7513EE4B0E215781A6D6A2E2 /* Customer3Weeks@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Customer3Weeks@2x.png"; sourceTree = "<group>"; };
 		76E3592CB6A81ACB2E7BC50D /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
+		81C89DBB55E35E29A56CBD39 /* CustomerOpen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CustomerOpen@2x.png"; sourceTree = "<group>"; };
+		8D81DEDE35445A8383D4A24B /* CustomerBook@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CustomerBook@2x.png"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -78,17 +85,10 @@
 		A52C30022F8FC40000771B48 /* RunnerRelease.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = RunnerRelease.entitlements; sourceTree = "<group>"; };
 		C8C261C6EA7C78005FA3978E /* Pods-RunnerTests.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.profile.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.profile.xcconfig"; sourceTree = "<group>"; };
 		CA2872AE1682158EBA33FF70 /* Pods-Runner.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.release.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.release.xcconfig"; sourceTree = "<group>"; };
+		CEE8F978A219536C8608AEAE /* Customer4Weeks@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Customer4Weeks@2x.png"; sourceTree = "<group>"; };
 		DBA20E6DF5E191F1083B09A7 /* Pods-RunnerTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.debug.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.debug.xcconfig"; sourceTree = "<group>"; };
 		DDEEDDDF4460DE81E956DBB2 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		F49DCEFE257AD4297DF74C4C /* Pods_RunnerTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RunnerTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		81C89DBB55E35E29A56CBD39 /* CustomerOpen@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CustomerOpen@2x.png"; sourceTree = "<group>"; };
-		02F5140C669251D485B11ABF /* CustomerOpen@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CustomerOpen@3x.png"; sourceTree = "<group>"; };
-		8D81DEDE35445A8383D4A24B /* CustomerBook@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CustomerBook@2x.png"; sourceTree = "<group>"; };
-		7123CE4F88145F229207BCC8 /* CustomerBook@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "CustomerBook@3x.png"; sourceTree = "<group>"; };
-		7513EE4B0E215781A6D6A2E2 /* Customer3Weeks@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Customer3Weeks@2x.png"; sourceTree = "<group>"; };
-		28689237CE7A5004A6BAA2D6 /* Customer3Weeks@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Customer3Weeks@3x.png"; sourceTree = "<group>"; };
-		CEE8F978A219536C8608AEAE /* Customer4Weeks@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Customer4Weeks@2x.png"; sourceTree = "<group>"; };
-		669D9463A3D55C32908A9588 /* Customer4Weeks@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Customer4Weeks@3x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -348,9 +348,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -381,9 +385,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Runner/Pods-Runner-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -539,7 +547,7 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/RunnerRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = CJ8SV692GN;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -548,6 +556,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anantax.scutscustomers;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -734,7 +743,7 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/RunnerDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = CJ8SV692GN;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -743,6 +752,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anantax.scutscustomers;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -767,7 +777,7 @@
 				CODE_SIGN_ENTITLEMENTS = Runner/RunnerRelease.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = CJ8SV692GN;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -776,6 +786,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.anantax.scutscustomers;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

@@ -836,16 +836,46 @@ class _SaloonAfterSelectingServicesPageState
                                       //   }
                                       // },
                                       onTap: () async {
+                                        // try {
+                                        //   await facebookAppEvents.logAddToCart(
+                                        //     id: widget.id,
+                                        //     type: 'salon_services',
+                                        //     currency: 'INR',
+                                        //     price: _homeController.getTotalPrice(),
+                                        //   );
+                                        //   print("✅ FB AddToCart Event Sent");
+                                        // } catch (e) {
+                                        //   print("❌ FB AddToCart Error: $e");
+                                        // }
+                                        final cartData = _homeController
+                                            .getSalonServiceAddCartModel.data?.salonServicesWithProduct ?? [];
+
+                                        if (cartData.isEmpty) return;
+
+                                        final contents = cartData.map((item) => {
+                                          'id': item.serviceId.toString(), // adjust field if needed
+                                          'quantity': 1,
+                                          'item_price': (item.price ?? 0).toDouble(),
+                                        }).toList();
+
+                                        final totalPrice = _homeController.getTotalPrice().toDouble();
+
                                         try {
                                           await facebookAppEvents.logAddToCart(
-                                            id: widget.id,
-                                            type: 'salon_services',
+                                            id: cartData.first.serviceId.toString(), // ✅ REQUIRED by SDK
+                                            type: 'product', // ✅ REQUIRED
                                             currency: 'INR',
-                                            price: _homeController.getTotalPrice(),
+                                            price: totalPrice,
+                                            parameters: {
+                                              'content_type': 'product',
+                                              'contents': contents, // ✅ THIS FIXES META WARNING
+                                              'num_items': cartData.length,
+                                            },
                                           );
-                                          print("✅ FB AddToCart Event Sent");
+
+                                          print("✅ FB AddToCart (Multi-Service) Sent");
                                         } catch (e) {
-                                          print("❌ FB AddToCart Error: $e");
+                                          print("❌ FB Error: $e");
                                         }
                                         await facebookAppEvents.flush();
                                         selectedArtistIdsGlobal.value = [];

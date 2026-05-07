@@ -12,7 +12,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>salon Customer</string>
+	<string>Scuts</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -60,6 +60,23 @@
         <string>Do you allow this app to know your current location?</string>
         <key>NSPhotoLibraryUsageDescription</key>
         <string>You need to provide photo album access to upload profile image or you can directly upload using camera.</string>
+        <key>NSContactsUsageDescription</key>
+        <string>This app does not access your contacts but permission is required by integrated services.</string>
+
+        <key>NSMotionUsageDescription</key>
+        <string>This app does not use motion data but permission is required by integrated services.</string>
+
+        <key>NSAppleMusicUsageDescription</key>
+        <string>This app does not access Apple Music but permission is required by integrated services.</string>
+
+        <key>NSCalendarsUsageDescription</key>
+        <string>This app does not access your calendar but permission is required by integrated services.</string>
+
+        <key>NSSpeechRecognitionUsageDescription</key>
+        <string>This app does not use speech recognition but permission is required by integrated services.</string>
+
+        <key>NSSiriUsageDescription</key>
+        <string>This app does not use Siri but permission is required by integrated services.</string>
 	<key>CFBundleIcons</key>
 	<dict>
 		<key>CFBundlePrimaryIcon</key>

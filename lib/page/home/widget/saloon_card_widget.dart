@@ -545,7 +545,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
           onTap: widget.onPress,
           child: Container(
             width: Get.width,
-            //height: 235,
+            //height: 255,
             decoration: BoxDecoration(
               color: ColorConstant.whiteColor,
               borderRadius: BorderRadius.circular(10),
@@ -735,7 +735,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                 ),
                 //const SizedBox(height: 3),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 7,vertical: 2.5),
+                  padding: const EdgeInsets.symmetric(horizontal: 7,vertical: 3.5),
                   //padding: const EdgeInsets.only(left: 7,right: 14,top: 2.5, bottom: 2.5),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,

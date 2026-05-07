@@ -276,56 +276,6 @@ class _LoginPageState extends State<LoginPage> {
 
         const SizedBox(height: 8), // Precise control over the gap between lines
 
-        // --- SECOND ROW ---
-        // GestureDetector(
-        //   onTap: () {
-        //     setState(() {
-        //       getWhatsappUpdate = !getWhatsappUpdate;
-        //     });
-        //   },
-        //   child: Row(
-        //     mainAxisAlignment: MainAxisAlignment.center,
-        //     children: [
-        //       Container(
-        //         height: 17,
-        //         width: 17,
-        //         decoration: BoxDecoration(
-        //           color: getWhatsappUpdate
-        //               ? changeTheme(SharedPrefs.readStringValue(
-        //               PrefConstants.gender)) ??
-        //               ColorConstant.primaryColor
-        //               : Colors.transparent,
-        //           borderRadius: BorderRadius.circular(3),
-        //           border: Border.all(
-        //             color: changeTheme(SharedPrefs.readStringValue(
-        //                 PrefConstants.gender)) ??
-        //                 ColorConstant.primaryColor,
-        //           ),
-        //         ),
-        //         child: Center(
-        //           child: Icon(
-        //             CupertinoIcons.check_mark,
-        //             size: 8,
-        //             color: getWhatsappUpdate
-        //                 ? ColorConstant.whiteColor
-        //                 : Colors.transparent,
-        //           ),
-        //         ),
-        //       ),
-        //       const SizedBox(width: 12),
-        //       Text(
-        //         "Get Update on whatsapp",
-        //         style: AppTextTheme.medium.copyWith(
-        //             color: changeTheme(SharedPrefs.readStringValue(
-        //                 PrefConstants.gender)) ??
-        //                 ColorConstant.primaryColor,
-        //             fontSize: 14),
-        //       ),
-        //     ],
-        //   ),
-        // )
-
-        const SizedBox(height: 8),
         if(Platform.isIOS)
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

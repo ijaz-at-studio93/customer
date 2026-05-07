@@ -156,59 +156,61 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
             left: 16,
             right: 16,
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceBetween, // 👈 KEY
               children: [
                 /// 🔵 LEFT → DESCRIPTION
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final description = widget.data.description ?? "";
-                    final hasOverflow =
-                        isTextOverflowing(description, constraints.maxWidth);
+                SizedBox(
+                  width: Get.width * 0.5, // 👈 only 80% width
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      final description = widget.data.description ?? "";
+                      final hasOverflow =
+                          isTextOverflowing(description, constraints.maxWidth);
 
-                    return GestureDetector(
-                      onTap: hasOverflow
-                          ? () {
-                              setState(() {
-                                isExpanded = !isExpanded;
-                              });
-                            }
-                          : null,
-                      child: RichText(
-                        text: TextSpan(
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 13,
+                      return GestureDetector(
+                        onTap: hasOverflow
+                            ? () {
+                                setState(() {
+                                  isExpanded = !isExpanded;
+                                });
+                              }
+                            : null,
+                        child: RichText(
+                          text: TextSpan(
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 13,
+                            ),
+                            children: [
+                              TextSpan(text: description),
+                              if (hasOverflow && !isExpanded)
+                                const TextSpan(
+                                  text: "  Read more",
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              if (hasOverflow && isExpanded)
+                                const TextSpan(
+                                  text: "  Read less",
+                                  style: TextStyle(
+                                    color: Colors.blue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
                           ),
-                          children: [
-                            TextSpan(text: description),
-                            if (hasOverflow && !isExpanded)
-                              const TextSpan(
-                                text: "  Read more",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            if (hasOverflow && isExpanded)
-                              const TextSpan(
-                                text: "  Read less",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                          ],
+                          maxLines: isExpanded ? null : 3,
+                          overflow: isExpanded
+                              ? TextOverflow.visible
+                              : TextOverflow.ellipsis,
                         ),
-                        maxLines: isExpanded ? null : 3,
-                        overflow: isExpanded
-                            ? TextOverflow.visible
-                            : TextOverflow.ellipsis,
-                      ),
-                    );
-                  },
+                      );
+                    },
+                  ),
                 ),
-
                 const SizedBox(width: 10), // optional spacing
 
                 /// 🔴 RIGHT → ARTIST
@@ -217,7 +219,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       CircleAvatar(
-                        radius: 10,
+                        radius: 20,
                         backgroundColor: Colors.grey.shade300,
                         backgroundImage: (widget.data.artist?.profileImage !=
                                     null &&
