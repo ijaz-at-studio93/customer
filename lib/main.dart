@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,6 +18,7 @@ import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/notification_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final facebookAppEvents = FacebookAppEvents();
@@ -65,6 +67,35 @@ Future<void> _setupAndroidChannels() async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SentryFlutter.init(
+    (options) {
+      options.dsn =
+          'https://26c4ac3e31eb89df4c1676c207817fae@o4511365659230208.ingest.de.sentry.io/4511365676335184';
+      //   // Adds request headers and IP for users, for more info visit:
+      //   // https://docs.sentry.io/platforms/dart/guides/flutter/data-management/data-collected/
+      options.sendDefaultPii = true;
+      options.tracesSampleRate = 0.1;
+      options.attachScreenshot = true;
+      options.enableAutoNativeBreadcrumbs = true;
+      options.enableAutoSessionTracking = true;
+      options.enableAutoPerformanceTracing = true;
+      options.enableWatchdogTerminationTracking = true;
+      options.attachStacktrace = true;
+      options.enablePrintBreadcrumbs = true;
+      options.debug = kDebugMode;
+      options.appHangTimeoutInterval = const Duration(seconds: 5);
+      options.beforeSend = (event, hint) {
+        final t = event.throwable;
+        if (t is SocketException ||
+            t is TimeoutException ||
+            t is HttpException) {
+          return null;
+        }
+
+        return event;
+      };
+    },
+  );
   DioClient.init();
   await Firebase.initializeApp();
   // ---------------- iOS additions begin ----------------
@@ -131,7 +162,8 @@ void main() async {
   ]);
   await facebookAppEvents.setAutoLogAppEventsEnabled(true);
   await facebookAppEvents.setAdvertiserTracking(enabled: true);
-  runApp(const MyApp());
+
+  runApp(SentryWidget(child: const MyApp()));
 }
 
 class MyApp extends StatefulWidget {
