@@ -337,15 +337,21 @@ class AuthController extends GetxController {
   }
 
   /*------------  App  Update ------------------*/
-  doAppUpdate({required VoidCallback callback}) async {
+  doAppUpdate({
+    required VoidCallback callback,
+    VoidCallback? onError,
+  }) async {
     try {
       _showProgress.value = true;
       _appUpdateModel.value = await AuthAPI.appUpdate();
       if (_appUpdateModel.value.statusCode == 200) {
         callback.call();
+      } else {
+        onError?.call();
       }
     } catch (e) {
       showError(e);
+      onError?.call();
     } finally {
       _showProgress.value = false;
     }

@@ -270,6 +270,11 @@ class DioClient {
               try {
                 final RequestOptions requestOptions = error.requestOptions;
 
+                // Refresh endpoint errors must not re-enter refresh logic (deadlock).
+                if (requestOptions.extra['isRefreshCall'] == true) {
+                  return handler.next(error);
+                }
+
                 // Prevent infinite retry loop on the same request
                 if (requestOptions.extra["retried"] == true) {
                   return handler.next(error);
@@ -295,7 +300,10 @@ class DioClient {
                   refreshSuccess = result;
                 } else {
                   // Another request is already refreshing — wait for its result
-                  refreshSuccess = await _refreshCompleter!.future;
+                  refreshSuccess = await _refreshCompleter!.future.timeout(
+                    const Duration(seconds: 10),
+                    onTimeout: () => false,
+                  );
                 }
 
                 if (!refreshSuccess) {

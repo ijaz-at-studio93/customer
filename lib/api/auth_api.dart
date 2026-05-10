@@ -167,7 +167,10 @@ class AuthAPI {
       if (storedJson == null) return false;
 
       final model = UserResponseModel.fromJson(storedJson);
-      final refreshToken = model.data?.refreshToken ?? "";
+      var refreshToken = model.data?.refreshToken ?? "";
+      if (refreshToken.isEmpty) {
+        refreshToken = SharedPrefs.readStringValue(PrefConstants.refreshToken);
+      }
       debugPrint("refreshAccessToken: $refreshToken");
       if (refreshToken.isEmpty) return false;
 
@@ -175,7 +178,7 @@ class AuthAPI {
         'auth/refresh',
         options: Options(
           headers: {'Cookie': 'refresh-token=$refreshToken'},
-          extra: {'skipAuth': true},
+          extra: {'skipAuth': true, 'isRefreshCall': true},
         ),
       );
 
@@ -193,8 +196,7 @@ class AuthAPI {
       return true;
     } on DioException catch (e) {
       if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
-        // Refresh token itself is expired — force logout
-        Get.find<AuthController>().resetApp();
+        // Refresh token rejected — return false; DioClient calls resetApp().
         return false;
       }
       // Transient network error — let the caller decide, do not logout

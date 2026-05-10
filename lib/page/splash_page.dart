@@ -61,51 +61,62 @@ class _SplashPageState extends State<SplashPage> {
 
   /*-------------- Route For Welcome Page -----------------*/
   Future<void> route() async {
-    if (!SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
-      _pushLaunchPage(
-        const LoginPage(
-          splashPage: true,
-        ),
-      );
-      return;
+    try {
+      if (!SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
+        _pushLaunchPage(
+          const LoginPage(
+            splashPage: true,
+          ),
+        );
+        return;
+      }
+
+      final homeController = Get.find<HomeController>();
+      await homeController.doGetCurrentBookingListData();
+
+      if (!mounted) return;
+
+      final saved =
+          SharedPrefs.readStringValue(PrefConstants.resumePayBillAppointmentId);
+
+      if (saved.isNotEmpty &&
+          _savedBookingStillPendingPay(homeController, saved)) {
+        _pushLaunchPage(
+          QRCodePage(
+            appointmentId: saved,
+            isBooking: false,
+          ),
+        );
+        return;
+      }
+
+      if (saved.isNotEmpty) {
+        await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
+      }
+
+      final activeAppointmentId =
+          _firstPendingOrConfirmedAppointmentId(homeController);
+      if (activeAppointmentId != null) {
+        _pushLaunchPage(
+          QRCodePage(
+            appointmentId: activeAppointmentId,
+            isBooking: false,
+          ),
+        );
+        return;
+      }
+
+      _pushLaunchPage(const BottomNavBarPage());
+    } catch (e, st) {
+      debugPrint('route() error: $e\n$st');
+      if (mounted) {
+        _pushLaunchPage(
+          const LoginPage(
+            splashPage: true,
+          ),
+        );
+      }
     }
-
-    final homeController = Get.find<HomeController>();
-    await homeController.doGetCurrentBookingListData();
-
-    if (!mounted) return;
-
-    final saved =
-        SharedPrefs.readStringValue(PrefConstants.resumePayBillAppointmentId);
-
-    if (saved.isNotEmpty &&
-        _savedBookingStillPendingPay(homeController, saved)) {
-      _pushLaunchPage(
-        QRCodePage(
-          appointmentId: saved,
-          isBooking: false,
-        ),
-      );
-      return;
-    }
-
-    if (saved.isNotEmpty) {
-      await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
-    }
-
-    final activeAppointmentId =
-        _firstPendingOrConfirmedAppointmentId(homeController);
-    if (activeAppointmentId != null) {
-      _pushLaunchPage(
-        QRCodePage(
-          appointmentId: activeAppointmentId,
-          isBooking: false,
-        ),
-      );
-      return;
-    }
-
-    _pushLaunchPage(const BottomNavBarPage());
   }
 
   bool _savedBookingStillPendingPay(HomeController c, String appointmentId) {
@@ -149,60 +160,55 @@ class _SplashPageState extends State<SplashPage> {
 
   /*-------------- GET VERSION  APP -------------------*/
   void getVersionApp() async {
-    String? deviceId;
-    var deviceInfo = DeviceInfoPlugin();
-
-    if (Platform.isAndroid) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceId = androidInfo.id;
-    } else if (Platform.isIOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceId = iosInfo.identifierForVendor;
-    }
-
-    if (deviceId != null) {
-      SharedPrefs.writeValue(PrefConstants.deviceId, deviceId);
-    }
-
-    String data = await getVersion();
-
-    // _authController.doAppUpdate(callback: () {
-    //   if (_authController.getAppUpdateModel.data?.userAppLatestVersion != data) {
-    //     if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ?? false) {
-    //       _forceUpdateDialog();
-    //     } else {
-    //       _normalUpdateDialog();
-    //     }
-    //   } else {
-    //     route();
-    //   }
-    // });
-    _authController.doAppUpdate(callback: () async {
-
-      String? serverVersion;
-
+    try {
+      String? deviceId;
+      var deviceInfo = DeviceInfoPlugin();
 
       if (Platform.isAndroid) {
-        serverVersion =
-            _authController.getAppUpdateModel.data?.userAppLatestVersion;
-      }
-      else if (Platform.isIOS) {
-        serverVersion =
-            _authController.getAppUpdateModel.data?.userAppIOSLatestVersion;
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        deviceId = androidInfo.id;
+      } else if (Platform.isIOS) {
+        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        deviceId = iosInfo.identifierForVendor;
       }
 
-
-      if (serverVersion != null && isUpdateRequired(data, serverVersion)) {
-        if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ??
-            false) {
-          _forceUpdateDialog();
-        } else {
-          _normalUpdateDialog();
-        }
-      } else {
-        route();
+      if (deviceId != null) {
+        SharedPrefs.writeValue(PrefConstants.deviceId, deviceId);
       }
-    });
+
+      String data = await getVersion();
+
+      _authController.doAppUpdate(
+        callback: () async {
+          String? serverVersion;
+
+          if (Platform.isAndroid) {
+            serverVersion =
+                _authController.getAppUpdateModel.data?.userAppLatestVersion;
+          } else if (Platform.isIOS) {
+            serverVersion =
+                _authController.getAppUpdateModel.data?.userAppIOSLatestVersion;
+          }
+
+          if (serverVersion != null && isUpdateRequired(data, serverVersion)) {
+            if (_authController.getAppUpdateModel.data?.forceUpdateUserApp ??
+                false) {
+              _forceUpdateDialog();
+            } else {
+              _normalUpdateDialog();
+            }
+          } else {
+            route();
+          }
+        },
+        onError: () {
+          if (mounted) route();
+        },
+      );
+    } catch (e, st) {
+      debugPrint('getVersionApp error: $e\n$st');
+      if (mounted) route();
+    }
   }
 
   /*---------------  Force Update Widget ---------------*/
