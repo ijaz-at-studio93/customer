@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -38,13 +39,14 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
     return GestureDetector(
       onTap: widget.onPress,
       child: Container(
+        height: 200,
         // height: 180,
         // width: 138,
         decoration: ShapeDecoration(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
             side: BorderSide(
-              color: themeColor.withOpacity(0.6),
+              color: themeColor.withValues(alpha: 0.6),
               width: 1,
             ),
           ),
@@ -240,9 +242,10 @@ class _StylistListGridWidgetState extends State<StylistListGridWidget> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Expanded(
-                    child: Text(
+                    child: AutoSizeText(
                       widget.salonArtiestListModel.name ?? "",
-                      maxLines: 2,
+                      maxLines: 1,
+                      minFontSize: 10,
                       overflow: TextOverflow.ellipsis,
                       style: AppTextTheme.bold.copyWith(
                         fontFamily: 'Outfit',
