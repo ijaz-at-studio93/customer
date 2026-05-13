@@ -111,15 +111,12 @@ class _BookingHomePageState extends State<BookingHomePage>
 
                           onPress: () async {
 
-                            final result = await Get.to(() => QRCodePage(
+                            await Get.to(() => QRCodePage(
                               isBooking: false,
                               appointmentId: booking.appointmentId ?? "",
                             ));
 
-                            if (result == true) {
-                              _homeController
-                                  .doGetCurrentBookingListData();
-                            }
+                            _homeController.doGetCurrentBookingListData();
                           },
 
                           onReSchedule: () async {

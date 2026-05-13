@@ -83,7 +83,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
               onTap: (widget.data.salon?.id == null)
                   ? null
                   : () {
-                Get.to(() => SaloonAfterSelectingServicesPage(
+                Get.off(() => SaloonAfterSelectingServicesPage(
                   isPayNowMode: true,
                   id: widget.data.salon!.id ?? "",
                   callback: () {},
@@ -175,10 +175,14 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                     ),
 
                     const SizedBox(width: 8),
-                    Text(
-                      widget.data.artist?.name ?? "",
-                      style: const TextStyle(
-                          color: Colors.white, fontSize: 14),
+                    Flexible(
+                      child: Text(
+                        widget.data.artist?.name ?? "",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            color: Colors.white, fontSize: 14),
+                      ),
                     ),
                   ],
                 ),

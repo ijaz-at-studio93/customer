@@ -65,12 +65,12 @@ class DialogMenuListWidget extends StatelessWidget {
                   textAlign: TextAlign.center,
                   textScaler: const TextScaler.linear(0.85),
                   style: AppTextTheme.medium.copyWith(
-                    fontFamily: "Outfit",           // ✅ added
-                    fontWeight: FontWeight.w500,    // ✅ Medium weight
+                    fontFamily: "Outfit",
+                    fontWeight: FontWeight.w500,
                     fontSize: 13,
                     color: ColorConstant.blackColor,
                   ),
-                  overflow: TextOverflow.visible,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],

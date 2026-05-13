@@ -172,34 +172,17 @@ class SelectedFavArtistCardWidget extends StatelessWidget {
               children: [
                 /// NAME
                 Expanded(
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final text = artiest.name ?? "";
-
-                      final textPainter = TextPainter(
-                        text: TextSpan(
-                          text: text,
-                          style: AppTextTheme.bold.copyWith(fontSize: 13),
-                        ),
-                        maxLines: 2,
-                        textDirection: TextDirection.ltr,
-                      )..layout(maxWidth: constraints.maxWidth);
-
-                      final isTwoLines =
-                          textPainter.computeLineMetrics().length > 1;
-
-                      return Text(
-                        text,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTextTheme.bold.copyWith(
-                          fontFamily: 'Outfit',
-                          fontWeight: FontWeight.w700,
-                          fontSize: isTwoLines ? 9.15 : 13, // 🔥 KEY LOGIC
-                          color: Colors.black,
-                        ),
-                      );
-                    },
+                  child: AutoSizeText(
+                    artiest.name ?? "",
+                    maxLines: 2,
+                    minFontSize: 9,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextTheme.bold.copyWith(
+                      fontFamily: 'Outfit',
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
 

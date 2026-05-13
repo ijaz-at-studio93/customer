@@ -137,12 +137,15 @@ class PromoCodeListTile extends StatelessWidget {
                   ),
                 ),
 
-                if (!isDayValid && applicableDays != null)
+                if (applicableDays != null && applicableDays!.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 6),
                     child: Text(
                       "Valid on ${_getDayNames(applicableDays!)}",
-                      style: TextStyle(color: Colors.grey, fontSize: 12),
+                      style: TextStyle(
+                        color: isDayValid ? Colors.green : Colors.grey,
+                        fontSize: 12,
+                      ),
                     ),
                   ),
 
