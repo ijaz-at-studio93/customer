@@ -862,14 +862,15 @@ class _SaloonAfterSelectingServicesPageState
 
                                         try {
                                           await facebookAppEvents.logAddToCart(
-                                            id: cartData.first.serviceId.toString(), // ✅ REQUIRED by SDK
-                                            type: 'product', // ✅ REQUIRED
+                                            id: cartData.first.serviceId.toString(),
+                                            type: 'service',
                                             currency: 'INR',
                                             price: totalPrice,
                                             parameters: {
-                                              'content_type': 'product',
-                                              'contents': contents, // ✅ THIS FIXES META WARNING
+                                              'content_type': 'service',
+                                              'contents': contents,
                                               'num_items': cartData.length,
+                                              'content_category': 'salon_booking',
                                             },
                                           );
 

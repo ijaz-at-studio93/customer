@@ -22,6 +22,7 @@ import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 
 import '../../api/dio_client.dart';
+import '../../main.dart';
 import '../../util/call_wrapper.dart';
 import '../home/home_page.dart';
 import '../home/saloon_after_selecting_page.dart';
@@ -2302,9 +2303,49 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       isHomeService:
           _homeController.getServiceAddCartModel.data?.isHomeService ?? false,
       userAddressId: "",
-      callback: () {
+      callback: () async {
+        try {
+
+          final cartItems =
+              _homeController.getServiceAddCartModel.data?.items ?? [];
+
+          final totalPrice = double.tryParse(
+            _homeController
+                .getServiceAddCartModel.data?.totalPrice
+                ?.toString() ??
+                "0",
+          ) ??
+              0;
+
+          final contents = cartItems.map((e) {
+            return {
+              'id': e.service?.id.toString(),
+              'quantity': 1,
+            };
+          }).toList();
+
+          await facebookAppEvents.logInitiatedCheckout(
+            totalPrice: totalPrice,
+            currency: 'INR',
+            contentType: 'service',
+            numItems: cartItems.length,
+            parameters: {
+              'contents': contents,
+              'content_category': 'salon_booking',
+            },
+          );
+
+          print("✅ FB InitiateCheckout Sent");
+
+          await facebookAppEvents.flush();
+
+        } catch (e) {
+          print("❌ FB InitiateCheckout Error: $e");
+        }
+
         stylistId.value = "";
         stylistId.notifyListeners();
+
         _navigateAfterBooking();
       },
     );

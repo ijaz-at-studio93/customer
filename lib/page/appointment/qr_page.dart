@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../api/home_api.dart';
 import '../../constant/variable_constant.dart';
 import '../../controller/auth_controller.dart';
+import '../../main.dart';
 import '../../util/SharedPrefs.dart';
 import '../../util/snackbar_util.dart';
 import '../booking/booking_home_page.dart';
@@ -1591,323 +1592,6 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
 
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-            // return Stack(
-            //   alignment: Alignment.topCenter,
-            //   children: [
-            //
-            //     /// MAIN DIALOG
-            //     Container(
-            //       margin: const EdgeInsets.only(top: 40),
-            //       child: Dialog(
-            //         backgroundColor: Colors.transparent,
-            //         child: Container(
-            //           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            //           decoration: BoxDecoration(
-            //             color: Colors.white,
-            //             borderRadius: BorderRadius.circular(18),
-            //             border: Border.all(
-            //               color: ColorConstant.primaryColor,
-            //               width: 2,
-            //             ),
-            //           ),
-            //           child: Column(
-            //             mainAxisSize: MainAxisSize.min,
-            //             children: [
-            //
-            //               /// ACTUAL AMOUNT
-            //               const Text(
-            //                 "Actual Amount",
-            //                 style: TextStyle(
-            //                   fontFamily: "Outfit",
-            //                   fontWeight: FontWeight.bold,
-            //                   fontSize: 20,
-            //                 ),
-            //               ),
-            //
-            //               const SizedBox(height: 8),
-            //
-            //               // Text(
-            //               //   "₹$actualAmount",
-            //               //   style: TextStyle(
-            //               //     fontSize: 44,
-            //               //     height: 1.1,
-            //               //     color: Colors.grey,
-            //               //     fontWeight: FontWeight.w900,
-            //               //     fontFamily: 'Outfit',
-            //               //     decoration: TextDecoration.lineThrough,
-            //               //     decorationColor: changeTheme(
-            //               //       SharedPrefs.readStringValue(PrefConstants.gender),
-            //               //   ),
-            //               //     decorationThickness: 2.5,
-            //               //   )
-            //               // ),
-            //
-            //               Stack(
-            //                 alignment: Alignment.center,
-            //                 children: [
-            //                   Text(
-            //                     "₹$actualAmount",
-            //                     style: const TextStyle(
-            //                       fontSize: 44,
-            //                       color: Colors.grey,
-            //                       fontWeight: FontWeight.w900,
-            //                       fontFamily: 'Outfit',
-            //                     ),
-            //                   ),
-            //
-            //                   Positioned(
-            //                     left: 0,
-            //                     right: 0,
-            //                     child: Container(
-            //                       height: 2.5,
-            //                       color: changeTheme(
-            //                         SharedPrefs.readStringValue(PrefConstants.gender),
-            //                       ),
-            //                     ),
-            //                   ),
-            //                 ],
-            //               ),
-            //
-            //               const SizedBox(height: 20),
-            //
-            //               /// YOU PAY
-            //               Text(
-            //                 "You Pay",
-            //                 style: TextStyle(
-            //                   fontSize: 50,
-            //                   fontWeight: FontWeight.w900,
-            //                   fontFamily: 'Outfit',
-            //                   color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-            //                 ),
-            //               ),
-            //
-            //               const SizedBox(height: 6),
-            //
-            //               Text(
-            //                 "₹${finalAmount + 5}",
-            //                 style: const TextStyle(
-            //                   fontSize: 46,
-            //                   fontWeight: FontWeight.w900,
-            //                   fontFamily: 'Outfit',
-            //                   color: Colors.green,
-            //                 ),
-            //               ),
-            //
-            //               //const SizedBox(height: 10),
-            //
-            //               Container(
-            //                 width: 120,
-            //                 height: 1,
-            //                 color: Colors.black,
-            //               ),
-            //
-            //               const SizedBox(height: 15),
-            //
-            //               /// EDIT PRICE
-            //               SizedBox(
-            //                 width: 127,
-            //                 height: 42,
-            //                 child: ElevatedButton(
-            //                   style: ElevatedButton.styleFrom(
-            //                     backgroundColor:  changeTheme(SharedPrefs.readStringValue(PrefConstants.gender))?.withOpacity(0.7),
-            //                     shape: RoundedRectangleBorder(
-            //                       borderRadius: BorderRadius.circular(10), // updated
-            //                     ),
-            //                   ),
-            //                   onPressed: () {
-            //                     Navigator.pop(context);
-            //                   },
-            //                   child: const Text(
-            //                     "Edit Price",
-            //                     style: TextStyle(
-            //                       fontFamily: "Outfit",
-            //                       fontWeight: FontWeight.w600, // semi-bold
-            //                       fontSize: 20,
-            //                     ),
-            //                   ),
-            //                 ),
-            //               ),
-            //               const SizedBox(height: 18),
-            //
-            //               /// VIEW BREAKDOWN
-            //               Container(
-            //                 padding: const EdgeInsets.symmetric(
-            //                   horizontal: 15,
-            //                   vertical: 12,
-            //                 ),
-            //                 decoration: BoxDecoration(
-            //                   color: Colors.white,
-            //                   boxShadow: const [
-            //                     BoxShadow(
-            //                       color: Colors.black12,
-            //                       blurRadius: 6,
-            //                     )
-            //                   ],
-            //                   borderRadius: BorderRadius.circular(10),
-            //                 ),
-            //                 child: Column(
-            //                   children: [
-            //
-            //                     /// HEADER
-            //                     InkWell(
-            //                       onTap: () {
-            //                         setStateDialog(() {
-            //                           showBreakdown = !showBreakdown;
-            //                         });
-            //                       },
-            //                       child: Container(
-            //                         width: double.infinity,
-            //                         padding: const EdgeInsets.symmetric(vertical: 4),
-            //                         child: Row(
-            //                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //                           children: [
-            //
-            //                             const Text(
-            //                               "View Breakdown",
-            //                               style: TextStyle(fontFamily: "Outfit",
-            //                                 fontWeight: FontWeight.bold,
-            //                               fontSize: 14),
-            //                             ),
-            //
-            //                             AnimatedRotation(
-            //                               turns: showBreakdown ? 0.5 : 0,
-            //                               duration: const Duration(milliseconds: 250),
-            //                               child: Icon(
-            //                                 Icons.keyboard_arrow_down,
-            //                                 color: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-            //                               ),
-            //                             ),
-            //                           ],
-            //                         ),
-            //                       ),
-            //                     ),
-            //
-            //                     /// BREAKDOWN CONTENT
-            //                     AnimatedSize(
-            //                       duration: const Duration(milliseconds: 300),
-            //                       curve: Curves.easeInOut,
-            //                       child: showBreakdown
-            //                           ? Padding(
-            //                         padding: const EdgeInsets.only(top: 12),
-            //                         child: Column(
-            //                           children: [
-            //
-            //                             _row("Actual Amount", "₹$actualAmount"),
-            //
-            //                             _row(
-            //                               "Discount",
-            //                               "-₹$discount",
-            //                               color: Colors.green,
-            //                             ),
-            //
-            //                             //_row("($promoName Applied)", ""),
-            //                             Padding(
-            //                               padding: const EdgeInsets.symmetric(vertical: 4),
-            //                               child: Row(
-            //                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //                                 children: [
-            //                                   Text(
-            //                                     "($promoName Applied)",
-            //                                     style: TextStyle(
-            //                                       fontSize: 14,
-            //                                       fontWeight:  FontWeight.bold,
-            //                                       color: Colors.green,
-            //                                     ),
-            //                                   ),
-            //                                 ],
-            //                               ),
-            //                             ),
-            //
-            //
-            //                             _row("Platform Fee", "+₹5"),
-            //
-            //                             const Divider(),
-            //
-            //                             _row(
-            //                               "You Pay",
-            //                               "₹${actualAmount - discount + 5}",
-            //                               isBold: true,
-            //                             ),
-            //                           ],
-            //                         ),
-            //                       )
-            //                           : const SizedBox(),
-            //                     ),
-            //                   ],
-            //                 ),
-            //               ),
-            //
-            //               const SizedBox(height: 20),
-            //
-            //               /// PROCEED TO PAY
-            //               SizedBox(
-            //                 width: 289,
-            //                 height: 43,
-            //                 child: ElevatedButton(
-            //                   style: ElevatedButton.styleFrom(
-            //                     padding: EdgeInsets.zero,
-            //                     minimumSize: Size.zero, // overrides the previous infinity size
-            //                     backgroundColor: changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)),
-            //                     shape: RoundedRectangleBorder(
-            //                       borderRadius: BorderRadius.circular(10), // updated
-            //                     ),
-            //                   ),
-            //                   onPressed: () async {
-            //                     Navigator.pop(context);
-            //
-            //                     final payable = finalAmount + 5;
-            //
-            //                     print(bookingId);
-            //                     print('_____________________');
-            //
-            //                     await _homeController.createPaymentOrder(
-            //                       bookingOrderId: bookingId,
-            //                       billAmount: actualAmount,
-            //                       payableAmount: payable,
-            //                     );
-            //
-            //                     openRazorpay(payable);
-            //                   },
-            //                   child: const Text(
-            //                     "Proceed To Pay",
-            //                     style: TextStyle(
-            //                       fontFamily: "Outfit",
-            //                       fontWeight: FontWeight.bold,
-            //                       fontSize: 20,
-            //                     ),
-            //                   ),
-            //                 ),
-            //               )
-            //             ],
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //
-            //     /// ❌ CLOSE BUTTON
-            //     Positioned(
-            //       top: 50,
-            //       child: GestureDetector(
-            //         onTap: () {
-            //           Navigator.pop(context);
-            //         },
-            //         child: Container(
-            //           height: 42,
-            //           width: 42,
-            //           decoration: const BoxDecoration(
-            //             color: Colors.white,
-            //             shape: BoxShape.circle,
-            //           ),
-            //           child: const Icon(
-            //             Icons.close,
-            //             color: Colors.black,
-            //             size: 22,
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ],
-            // );
 
             return Center(
                 child: Stack(alignment: Alignment.center, children: [
@@ -2241,6 +1925,27 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
       value: paidAmount,
       salonId: salonId,
     );
+
+    try {
+
+      await facebookAppEvents.logPurchase(
+        amount: paidAmount,
+        currency: "INR",
+        parameters: {
+          'content_type': 'service',
+          'content_category': 'salon_booking',
+          'booking_id': bookingId,
+          'salon_id': salonId,
+        },
+      );
+
+      print("✅ FB Purchase Event Sent");
+
+      await facebookAppEvents.flush();
+
+    } catch (e) {
+      print("❌ FB Purchase Error: $e");
+    }
 
     await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
     Get.offAll(

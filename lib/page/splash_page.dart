@@ -124,7 +124,9 @@ class _SplashPageState extends State<SplashPage> {
     for (final b in bookings) {
       if (b.appointmentId == appointmentId &&
           b.paymentStatus == "pending" &&
-          (b.orderStatus == "pending" || b.orderStatus == "confirmed")) {
+          (b.orderStatus == "pending" || b.orderStatus == "confirmed") &&
+          b.orderAmount! > 0
+      ) {
         return true;
       }
     }
@@ -137,7 +139,9 @@ class _SplashPageState extends State<SplashPage> {
     final bookings = c.getCurrentBookingListModel.data ?? [];
     for (final b in bookings) {
       final status = b.orderStatus;
-      if (status == "pending" || status == "confirmed") {
+      if ((status == "pending" || status == "confirmed") &&
+        b.orderAmount! > 0
+      ) {
         final id = b.appointmentId;
         if (id != null && id.isNotEmpty) return id;
       }
