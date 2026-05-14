@@ -467,89 +467,77 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                     //   },
                                     // ),
 
-                                    Builder(
-                                      builder: (context) {
-                                        //final slots = generateTimeSlots();
-                                        final workPlan = _homeController
-                                            .salonAvailability?['data'];
-                                        final slots =
-                                            generateTimeSlots(workPlan);
-                                        if (slots.isEmpty) {
-                                          return SizedBox(
-                                            height: 90,
-                                            child: Center(
-                                              child: Text(
-                                                "No Slots available for today\nPlease choose another date",
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.w600,
-                                                  fontFamily: 'Outfit',
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        }
-
+                                    Obx(() {
+                                      final workPlan = _homeController
+                                          .salonAvailability?['data'];
+                                      final slots = generateTimeSlots(workPlan);
+                                      if (slots.isEmpty) {
                                         return SizedBox(
                                           height: 90,
-                                          child: GridView.builder(
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: slots.length,
-                                            gridDelegate:
-                                                const SliverGridDelegateWithFixedCrossAxisCount(
-                                              crossAxisCount: 2,
-                                              mainAxisSpacing: 0,
-                                              crossAxisSpacing: 6,
-                                              mainAxisExtent: 100,
+                                          child: Center(
+                                            child: Text(
+                                              "No Slots available for today\nPlease choose another date",
+                                              style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w600,
+                                                fontFamily: 'Outfit',
+                                              ),
                                             ),
-                                            itemBuilder: (context, i) {
-                                              final slot = slots[i];
-
-                                              return _timeSlotContainerWidget(
-                                                isSelected: selectedSlots
-                                                    .contains(slot),
-                                                onPress: () {
-                                                  setState(() {
-                                                    if (selectedSlots
-                                                        .contains(slot)) {
-                                                      selectedSlots
-                                                          .remove(slot);
-                                                    } else {
-                                                      if (selectedSlots.length <
-                                                          3) {
-                                                        selectedSlots.add(slot);
-                                                        // 📊 select_slot
-                                                        AnalyticsService
-                                                            .instance
-                                                            .logSelectSlot(
-                                                          slotTime: slot,
-                                                          salonId: _homeController
-                                                                  .getServiceAddCartModel
-                                                                  .data
-                                                                  ?.salonId ??
-                                                              '',
-                                                        );
-                                                      } else {
-                                                        ScaffoldMessenger.of(
-                                                                context)
-                                                            .showSnackBar(
-                                                          const SnackBar(
-                                                              content: Text(
-                                                                  "You can select up to 3 slots only")),
-                                                        );
-                                                      }
-                                                    }
-                                                  });
-                                                },
-                                                timeSlot:
-                                                    convertTimesToAmPmString(
-                                                        slot),
-                                              );
-                                            },
                                           ),
                                         );
-                                      },
-                                    )
+                                      }
+
+                                      return SizedBox(
+                                        height: 90,
+                                        child: GridView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: slots.length,
+                                          gridDelegate:
+                                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 2,
+                                            mainAxisSpacing: 0,
+                                            crossAxisSpacing: 6,
+                                            mainAxisExtent: 100,
+                                          ),
+                                          itemBuilder: (context, i) {
+                                            final slot = slots[i];
+
+                                            return _timeSlotContainerWidget(
+                                              isSelected:
+                                                  selectedSlots.contains(slot),
+                                              onPress: () {
+                                                setState(() {
+                                                  if (selectedSlots
+                                                      .contains(slot)) {
+                                                    selectedSlots.remove(slot);
+                                                  } else {
+                                                    if (selectedSlots.length <
+                                                        3) {
+                                                      selectedSlots.add(slot);
+                                                      AnalyticsService.instance
+                                                          .logSelectSlot(
+                                                        slotTime: slot,
+                                                        salonId: _homeController
+                                                                .getServiceAddCartModel
+                                                                .data
+                                                                ?.salonId ??
+                                                            '',
+                                                      );
+                                                    } else {
+                                                      showMessage(
+                                                          "You can select up to 3 slots only");
+                                                    }
+                                                  }
+                                                });
+                                              },
+                                              timeSlot:
+                                                  convertTimesToAmPmString(
+                                                      slot),
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    })
                                   ],
                                 ),
                               ),
@@ -710,7 +698,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                   else
                                     GestureDetector(
                                       onTap: () async {
-                                        String id = await showModalBottomSheet(
+                                        String? id = await showModalBottomSheet(
                                             isScrollControlled: true,
                                             shape: const RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.only(
@@ -719,8 +707,15 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                             )),
                                             context: context,
                                             builder: (context) {
-                                              return const PromoCodeSheetWidget();
+                                              return PromoCodeSheetWidget(
+                                                selectedDate: selectDate
+                                                        .isNotEmpty
+                                                    ? DateTime.parse(selectDate)
+                                                    : DateTime.now(),
+                                              );
                                             });
+
+                                        if (id == null) return;
 
                                         _homeController.doApplyPromoCode(
                                             data: {
@@ -2657,22 +2652,13 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       //     ? DateTime.now()
       //     : DateTime.parse(selectDate).subtract(const Duration(days: 3)),
       onDateChange: (selectedDate) {
-        //`selectedDate` the new date selected.
-        selectDate = "";
-        String formatDate = DateFormat("yyyy-MM-dd").format(selectedDate);
-        selectDate = formatDate;
-        // final formatDate = DateFormat("yyyy-MM-dd").format(selectedDate);
-        //
-        // setState(() {
-        //   selectDate = formatDate;
-        // });
-        // _homeController.doGetAvailabilitiesTimeSlot(
-        //   artiestId: widget.artistIds.first,
-        //   date: formatDate,
-        // );
-        /// 🔥 ADD THIS (CENTER FIX)
+        final formatDate = DateFormat("yyyy-MM-dd").format(selectedDate);
+        setState(() {
+          selectDate = formatDate;
+          selectedSlots.clear();
+        });
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          final index = selectedDate.day - 1; // 🔥 key logic
+          final index = selectedDate.day - 1;
           _scrollToCenter(index);
         });
       },

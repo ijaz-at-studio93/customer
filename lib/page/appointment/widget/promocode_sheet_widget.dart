@@ -13,7 +13,9 @@ import '../../../util/call_wrapper.dart';
 import '../../../util/snackbar_util.dart';
 
 class PromoCodeSheetWidget extends StatefulWidget {
-  const PromoCodeSheetWidget({super.key});
+  final DateTime selectedDate;
+
+  const PromoCodeSheetWidget({super.key, required this.selectedDate});
 
   @override
   State<PromoCodeSheetWidget> createState() => _PromoCodeSheetWidgetState();
@@ -353,7 +355,7 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                             int.tryParse(promo?.minOrder?.toString() ?? '0') ?? 0;
 
                         //final bool isDisabled = cartAmount < minOrder;
-                        final today = DateTime.now().weekday % 7;
+                        final today = widget.selectedDate.weekday % 7;
 
                         final applicableDays = promo?.applicableDays;
 

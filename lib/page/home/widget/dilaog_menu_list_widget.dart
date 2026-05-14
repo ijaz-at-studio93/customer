@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -58,19 +59,18 @@ class DialogMenuListWidget extends StatelessWidget {
               // Space between image and text
               SizedBox(
                 width: Get.width * 0.2,
-                child: Text(
+                child: AutoSizeText(
                   categoryListData.name ?? "",
                   maxLines: 2,
-                  softWrap: true,
+                  minFontSize: 8,
                   textAlign: TextAlign.center,
-                  textScaler: const TextScaler.linear(0.85),
+                  overflow: TextOverflow.ellipsis,
                   style: AppTextTheme.medium.copyWith(
-                    fontFamily: "Outfit",           // ✅ added
-                    fontWeight: FontWeight.w500,    // ✅ Medium weight
+                    fontFamily: "Outfit",
+                    fontWeight: FontWeight.w500,
                     fontSize: 13,
                     color: ColorConstant.blackColor,
                   ),
-                  overflow: TextOverflow.visible,
                 ),
               ),
             ],

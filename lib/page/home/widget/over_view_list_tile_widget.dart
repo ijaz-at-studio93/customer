@@ -19,8 +19,6 @@ import '../../../project_specific/action_button.dart';
 class OverviewListTileWidget extends StatefulWidget {
   final Services servicesList;
   final VoidCallback onTap;
-  // final VoidCallback addButtonTap;
-  // final bool isSelect;
   final int quantity;
   final VoidCallback onAdd;
   final VoidCallback onRemove;
@@ -28,8 +26,6 @@ class OverviewListTileWidget extends StatefulWidget {
   const OverviewListTileWidget(
       {super.key,
       required this.onTap,
-      // required this.addButtonTap,
-      // required this.isSelect,
       required this.quantity,
       required this.onAdd,
       required this.onRemove,
@@ -50,12 +46,11 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  width: Get.width * 0.5,
-                  child: Text(
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
                     widget.servicesList.name ?? "",
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
@@ -67,21 +62,20 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                       fontWeight: FontWeight.w700,
                     ),
                   ),
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  children: [
-                    Text(
-                      "₹${widget.servicesList.price}  ",
-                      textScaler: const TextScaler.linear(0.85),
-                      style: AppTextTheme.bold.copyWith(
-                        color: ColorConstant.blackColor,
-                        fontSize: 17,
-                        fontFamily: 'Inter',
-                        fontWeight: FontWeight.w800,
+                  const SizedBox(height: 5),
+                  Row(
+                    children: [
+                      Text(
+                        "₹${widget.servicesList.price}  ",
+                        textScaler: const TextScaler.linear(0.85),
+                        style: AppTextTheme.bold.copyWith(
+                          color: ColorConstant.blackColor,
+                          fontSize: 17,
+                          fontFamily: 'Inter',
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                    Transform.translate(
+                      Transform.translate(
                         offset: const Offset(0, 1),
                         child: Text(
                           "(${widget.servicesList.duration} min)",
@@ -91,40 +85,37 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                             fontSize: 13,
                             fontFamily: 'Inter',
                           ),
-                        )),
-                  ],
-                ),
-                const SizedBox(height: 5),
-                SizedBox(
-                  //height: 75,
-                  width: Get.width * 0.56,
-                  child: ReadMoreText(widget.servicesList.description ?? "",
-                      trimMode: TrimMode.Line,
-                      style: AppTextTheme.medium.copyWith(
-                        color: changeTheme(
-                            SharedPrefs.readStringValue(PrefConstants.gender)),
-                        fontSize: 12,
-                        fontFamily: 'Outfit',
-                        fontWeight: FontWeight.w600,
+                        ),
                       ),
-                      trimLines: 4,
-                      // colorClickableText: changeTheme(
-                      //     SharedPrefs.readStringValue(PrefConstants.gender)),
-                      colorClickableText: ColorConstant.blackColor,
-                      trimCollapsedText: 'more',
-                      trimExpandedText: 'Show less',
-                      moreStyle: AppTextTheme.medium.copyWith(
-                        fontSize: 12,
-                        color: ColorConstant.blackColor,
-                      )),
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 5),
+                  ReadMoreText(
+                    widget.servicesList.description ?? "",
+                    trimMode: TrimMode.Line,
+                    style: AppTextTheme.medium.copyWith(
+                      color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)),
+                      fontSize: 12,
+                      fontFamily: 'Outfit',
+                      fontWeight: FontWeight.w600,
+                    ),
+                    trimLines: 4,
+                    colorClickableText: ColorConstant.blackColor,
+                    trimCollapsedText: 'more',
+                    trimExpandedText: 'Show less',
+                    moreStyle: AppTextTheme.medium.copyWith(
+                      fontSize: 12,
+                      color: ColorConstant.blackColor,
+                    ),
+                  ),
+                ],
+              ),
             ),
             Stack(
               clipBehavior: Clip.none,
               children: [
                 GestureDetector(
-                  //onTap: widget.addButtonTap,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: CachedNetworkImage(
@@ -159,57 +150,6 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                       final serviceId = widget.servicesList.id ?? "";
                       final qty = controller.getQuantity(serviceId);
 
-                      // return qty > 0
-                      //     ? Container(
-                      //   height: 40,
-                      //   width: 115,
-                      //   //padding: const EdgeInsets.symmetric(horizontal: 0),
-                      //   decoration: BoxDecoration(
-                      //     color: Colors.white,
-                      //     borderRadius: BorderRadius.circular(10),
-                      //     border: Border.all(color: changeTheme(
-                      //       SharedPrefs.readStringValue(PrefConstants.gender),
-                      //     ) ?? ColorConstant.primaryColor),
-                      //   ),
-                      //     child: Center(
-                      //       child: Row(
-                      //         mainAxisSize: MainAxisSize.min,
-                      //         mainAxisAlignment: MainAxisAlignment.center,
-                      //         children: [
-                      //
-                      //           /// 🔥 MINUS
-                      //           ActionIconButton(
-                      //             icon: Icons.remove,
-                      //             onTap: widget.onRemove,
-                      //           ),
-                      //
-                      //           const SizedBox(width: 15),
-                      //
-                      //           Text(
-                      //             qty.toString(),
-                      //             style: AppTextTheme.bold.copyWith(
-                      //               color: ColorConstant.blackColor,
-                      //             ),
-                      //           ),
-                      //
-                      //           const SizedBox(width: 15),
-                      //
-                      //           /// 🔥 PLUS
-                      //           ActionIconButton(
-                      //             icon: Icons.add,
-                      //             onTap: widget.onAdd,
-                      //           ),
-                      //         ],
-                      //       )
-                      //     )
-                      //   )
-                      //     : AddButtonWidget(
-                      //   onPress: widget.onAdd,
-                      //   color: changeTheme(
-                      //     SharedPrefs.readStringValue(PrefConstants.gender),
-                      //   ) ??
-                      //       ColorConstant.primaryColor,
-                      // );
                       return AnimatedSwitcher(
                         duration: const Duration(milliseconds: 250),
                         transitionBuilder: (child, animation) {
@@ -245,14 +185,9 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                                         icon: Icons.remove,
                                         onTap: widget.onRemove,
                                       ),
-
                                       const SizedBox(width: 15),
-
-                                      /// 👇 NEXT STEP (qty animation)
                                       _buildQtyText(qty),
-
                                       const SizedBox(width: 15),
-
                                       ActionIconButton(
                                         icon: Icons.add,
                                         onTap: widget.onAdd,
@@ -273,9 +208,9 @@ class _OverviewListTileWidgetState extends State<OverviewListTileWidget> {
                       );
                     }),
                   ),
-                )
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),
