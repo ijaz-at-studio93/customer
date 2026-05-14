@@ -5,8 +5,13 @@ import '../../../../project_specific/progressbar_view.dart';
 
 class NetworkVideoViewWidget extends StatefulWidget {
   final String videoString;
+  final ValueNotifier<bool>? pauseNotifier;
 
-  const NetworkVideoViewWidget({super.key, required this.videoString, t});
+  const NetworkVideoViewWidget({
+    super.key,
+    required this.videoString,
+    this.pauseNotifier,
+  });
 
   @override
   State<NetworkVideoViewWidget> createState() => _NetworkVideoViewWidgetState();
@@ -14,23 +19,35 @@ class NetworkVideoViewWidget extends StatefulWidget {
 
 class _NetworkVideoViewWidgetState extends State<NetworkVideoViewWidget> {
   late VideoPlayerController _controller;
-  bool isPlay = false;
+
   @override
   void initState() {
-    _controller = VideoPlayerController.networkUrl(Uri.parse(
-      widget.videoString,
-    ));
-    _controller.setLooping(true);
-    _controller.initialize().then((value) {
-      setState(() {
-        _controller.play();
-      });
-    });
     super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoString));
+    _controller.setLooping(true);
+    _controller.initialize().then((_) {
+      if (mounted) {
+        setState(() {
+          if (widget.pauseNotifier?.value != true) {
+            _controller.play();
+          }
+        });
+      }
+    });
+    widget.pauseNotifier?.addListener(_onPauseChanged);
+  }
+
+  void _onPauseChanged() {
+    if (widget.pauseNotifier?.value == true) {
+      _controller.pause();
+    } else {
+      if (_controller.value.isInitialized) _controller.play();
+    }
   }
 
   @override
   void dispose() {
+    widget.pauseNotifier?.removeListener(_onPauseChanged);
     _controller.dispose();
     super.dispose();
   }

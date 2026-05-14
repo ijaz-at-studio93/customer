@@ -19,6 +19,13 @@ class FullScreenReelView extends StatefulWidget {
 
 class _FullScreenReelViewState extends State<FullScreenReelView> {
   final _homeController = Get.find<HomeController>();
+  final _pauseNotifier = ValueNotifier<bool>(false);
+
+  @override
+  void dispose() {
+    _pauseNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,8 +40,9 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
           Positioned.fill(
             child: (video != null && video.isNotEmpty)
                 ? NetworkVideoViewWidget(
-              videoString: "${APIConstants.image}$video",
-            )
+                    videoString: "${APIConstants.image}$video",
+                    pauseNotifier: _pauseNotifier,
+                  )
                 : (image != null && image.isNotEmpty)
                 ? CachedNetworkImage(
               imageUrl: "${APIConstants.image}$image",
@@ -82,13 +90,15 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
             child: GestureDetector(
               onTap: (widget.data.salon?.id == null)
                   ? null
-                  : () {
-                Get.off(() => SaloonAfterSelectingServicesPage(
-                  isPayNowMode: true,
-                  id: widget.data.salon!.id ?? "",
-                  callback: () {},
-                ));
-              },
+                  : () async {
+                      _pauseNotifier.value = true;
+                      await Get.to(() => SaloonAfterSelectingServicesPage(
+                            isPayNowMode: true,
+                            id: widget.data.salon!.id ?? "",
+                            callback: () {},
+                          ));
+                      _pauseNotifier.value = false;
+                    },
               child: Opacity(
                 opacity: (widget.data.salon?.id == null) ? 0.6 : 1,
                 child: Container(

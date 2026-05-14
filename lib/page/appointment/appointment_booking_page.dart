@@ -698,7 +698,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                   else
                                     GestureDetector(
                                       onTap: () async {
-                                        String id = await showModalBottomSheet(
+                                        String? id = await showModalBottomSheet(
                                             isScrollControlled: true,
                                             shape: const RoundedRectangleBorder(
                                                 borderRadius: BorderRadius.only(
@@ -713,6 +713,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                                     : DateTime.now(),
                                               );
                                             });
+
+                                            if(id == null) return;
 
                                         _homeController.doApplyPromoCode(
                                             data: {
