@@ -97,22 +97,12 @@ class _HomePageState extends State<HomePage>
           },
         );
       }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final genderPref = SharedPrefs.readStringValue(PrefConstants.gender);
+        selectedGender.value = (genderPref == "1") ? 1 : 0;
+      });
+      //_homeController.getLastMakeYourOwnPackageModel.data = [];
     });
-
-    if (SharedPrefs.readBoolValue(PrefConstants.isHomeService)) {
-      atHome = true;
-    } else {
-      atHome = false;
-    }
-    if (SharedPrefs.readStringValue(PrefConstants.gender).isEmpty) {
-      selectedGender.value = 0;
-    } else {
-      if (SharedPrefs.readStringValue(PrefConstants.gender) == "0") {
-        selectedGender.value = 0;
-      } else {
-        selectedGender.value = 1;
-      }
-    }
     //_homeController.getLastMakeYourOwnPackageModel.data = [];
   }
 

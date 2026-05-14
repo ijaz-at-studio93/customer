@@ -21,7 +21,14 @@ class FullScreenReelView extends StatefulWidget {
 
 class _FullScreenReelViewState extends State<FullScreenReelView> {
   final _homeController = Get.find<HomeController>();
+  final _pauseNotifier = ValueNotifier<bool>(false);
   bool isExpanded = false;
+
+  @override
+  void dispose() {
+    _pauseNotifier.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +46,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                 ? NetworkVideoViewWidget(
                     videoString: "${APIConstants.image}$video",
                     thumbnail: "${APIConstants.image}$thumbnail",
+                    pauseNotifier: _pauseNotifier,
                   )
                 : (image != null && image.isNotEmpty)
                     ? CachedNetworkImage(
@@ -73,12 +81,14 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
             child: GestureDetector(
               onTap: (widget.data.salon?.id == null)
                   ? null
-                  : () {
-                      Get.to(() => SaloonAfterSelectingServicesPage(
+                  : () async {
+                      _pauseNotifier.value = true;
+                      await Get.to(() => SaloonAfterSelectingServicesPage(
                             isPayNowMode: true,
                             id: widget.data.salon!.id ?? "",
                             callback: () {},
                           ));
+                      _pauseNotifier.value = false;
                     },
               child: Opacity(
                 opacity: (widget.data.salon?.id == null) ? 0.8 : 0.9,
@@ -216,10 +226,9 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                 /// 🔴 RIGHT → ARTIST
                 if ((widget.data.artist?.name ?? "").isNotEmpty)
                   Row(
-                    mainAxisSize: MainAxisSize.min,
                     children: [
                       CircleAvatar(
-                        radius: 20,
+                        radius: 10,
                         backgroundColor: Colors.grey.shade300,
                         backgroundImage: (widget.data.artist?.profileImage !=
                                     null &&
@@ -235,15 +244,24 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                             : null,
                       ),
                       const SizedBox(width: 8),
-                      Text(
-                        widget.data.artist?.name ?? "",
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
+                      Flexible(
+                        child: Text(
+                          widget.data.artist?.name ?? "",
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 14),
                         ),
                       ),
                     ],
                   ),
+                const SizedBox(height: 8),
+                Text(
+                  widget.data.description ?? "",
+                  style: const TextStyle(color: Colors.white, fontSize: 13),
+                  maxLines: 3,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),

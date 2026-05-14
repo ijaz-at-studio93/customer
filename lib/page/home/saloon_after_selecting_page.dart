@@ -177,6 +177,7 @@ class _SaloonAfterSelectingServicesPageState
                 : "0";
 
         SharedPrefs.writeValue(PrefConstants.gender, newGender);
+        selectedGender.value = newGender == "0" ? 0 : 1;
 
         await _homeController.doGetSalonDetailsService(
           salonId: widget.id,
@@ -3109,6 +3110,7 @@ class _SaloonAfterSelectingServicesPageState
                                                     },
                                                     onTap: () {},
                                                   );
+                                                
                                                 }),
                                             const SizedBox(height: 30),
                                           ],
