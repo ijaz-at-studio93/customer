@@ -7,12 +7,14 @@ class NetworkVideoViewWidget extends StatefulWidget {
   final String videoString;
   final String thumbnail;
   final bool muted; // ADD THIS
+  final ValueNotifier<bool>? pauseNotifier;
 
   const NetworkVideoViewWidget({
     super.key,
     required this.videoString,
     required this.thumbnail,
     this.muted = false, // default is sound on
+    this.pauseNotifier,
   });
 
   @override
@@ -44,10 +46,21 @@ class _NetworkVideoViewWidgetState extends State<NetworkVideoViewWidget> {
     }).catchError((e) {
       debugPrint("Video init error: $e");
     });
+    widget.pauseNotifier?.addListener(_onPauseChanged);
+  }
+
+  void _onPauseChanged() {
+    if (widget.pauseNotifier?.value == true) {
+      _player?.controller.pause();
+    } else {
+      if (_player?.controller.value.isInitialized ?? false)
+        _player?.controller.play();
+    }
   }
 
   @override
   void dispose() {
+    widget.pauseNotifier?.removeListener(_onPauseChanged);
     _player?.dispose();
     super.dispose();
   }
