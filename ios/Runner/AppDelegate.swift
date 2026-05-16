@@ -52,4 +52,29 @@ import flutter_local_notifications
 
     return launched
   }
+
+  override func application(
+    _ app: UIApplication,
+    open url: URL,
+    options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+  ) -> Bool {
+    AppsFlyerAttribution.shared()?.handleOpenUrl(url, options: options)
+    return super.application(app, open: url, options: options)
+  }
+
+  override func application(
+    _ application: UIApplication,
+    continue userActivity: NSUserActivity,
+    restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void
+  ) -> Bool {
+    AppsFlyerAttribution.shared()?.continueUserActivity(
+      userActivity,
+      restorationHandler: nil
+    )
+    return super.application(
+      application,
+      continue: userActivity,
+      restorationHandler: restorationHandler
+    )
+  }
 }

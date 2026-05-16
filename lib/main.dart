@@ -19,6 +19,7 @@ import 'package:salon_customer/util/notification_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:salon_customer/service/appsflyer_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 final facebookAppEvents = FacebookAppEvents();
@@ -98,6 +99,7 @@ void main() async {
   );
   DioClient.init();
   await Firebase.initializeApp();
+  await AppsFlyerService.instance.init();
   // ---------------- iOS additions begin ----------------
   // init flutter_local_notifications for iOS (and Android stays as-is)
   const AndroidInitializationSettings androidInit =
@@ -144,6 +146,7 @@ void main() async {
         Get.find<AuthController>().userResponseModel.data?.userData?.userId;
     if (userId != null && userId.isNotEmpty) {
       await FirebaseAnalytics.instance.setUserId(id: userId);
+      AppsFlyerService.instance.setCustomerUserId(userId);
     }
   } catch (_) {}
 

@@ -119,6 +119,8 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>FlutterDeepLinkingEnabled</key>
+	<false/>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
