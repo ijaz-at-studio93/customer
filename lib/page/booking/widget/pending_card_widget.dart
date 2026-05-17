@@ -75,7 +75,7 @@ class _PendingCardWidgetState extends State<PendingCardWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                convertFinalDate(date: widget.bookingData.finalizedAt ?? ""),
+                convertFinalDate(date: widget.bookingData.startsAt ?? ""),
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),
