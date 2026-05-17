@@ -30,6 +30,7 @@ import '../home/widget/add_product_sheet_widget.dart';
 import '../profile/add_address_page.dart';
 import '../stylist/selecting_artist_bottom_sheet.dart';
 import 'package:salon_customer/model/cart/service_add_cart_model.dart';
+import 'package:salon_customer/model/promo_code/promocode_model.dart';
 import 'package:salon_customer/service/analytics_service.dart';
 
 class AppointmentBookingPage extends StatefulWidget {
@@ -104,9 +105,18 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       //     artiestId: widget.artistIds.first, date: formatDate, callback: () {});
 
       _homeController.doGetCart();
+      final cartSalonId =
+          _homeController.getServiceAddCartModel.data?.salonId ?? "";
       _homeController.doGetSalonAvailability(
-        salonId: _homeController.getServiceAddCartModel.data?.salonId ?? "",
+        salonId: cartSalonId,
       );
+      if (cartSalonId.isNotEmpty &&
+          (_homeController.getSalonPromoCodeModel.data?.isEmpty ?? true)) {
+        _homeController.doGetSalonPromoCode(
+          salonId: cartSalonId,
+          useGlobalLoader: false,
+        );
+      }
       //Commenting because of Pay after service
       // No need to creating razorpay order
       //     .whenComplete(() {
@@ -2300,16 +2310,14 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
       userAddressId: "",
       callback: () async {
         try {
-
           final cartItems =
               _homeController.getServiceAddCartModel.data?.items ?? [];
 
           final totalPrice = double.tryParse(
-            _homeController
-                .getServiceAddCartModel.data?.totalPrice
-                ?.toString() ??
-                "0",
-          ) ??
+                _homeController.getServiceAddCartModel.data?.totalPrice
+                        ?.toString() ??
+                    "0",
+              ) ??
               0;
 
           final contents = cartItems.map((e) {
@@ -2333,7 +2341,6 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
           print("✅ FB InitiateCheckout Sent");
 
           await facebookAppEvents.flush();
-
         } catch (e) {
           print("❌ FB InitiateCheckout Error: $e");
         }
@@ -2809,6 +2816,52 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   }
 
   DateTime currentMonth = DateTime.now();
+
+  String _getDiscountForDate(DateTime date) {
+    final salonPromos = _homeController.getSalonPromoCodeModel.data ?? [];
+    final globalPromos = _homeController.getPromoCodeModel.data ?? [];
+    final salonId = _homeController.getServiceAddCartModel.data?.salonId ?? "";
+
+    final List<PromoCode> promos = [
+      ...salonPromos,
+      ...globalPromos.where((p) {
+        final pid = p.salon?.id ?? "";
+        return salonId.isEmpty || pid.isEmpty || pid == salonId;
+      }),
+    ];
+    if (promos.isEmpty) return "";
+
+    final dayKey = date.weekday % 7; // Sun=0..Sat=6, matches backend convention
+    final dayStart = DateTime(date.year, date.month, date.day);
+
+    double best = 0;
+    for (final promo in promos) {
+      final applicable = promo.applicableDays;
+      final isDayValid = applicable == null ||
+          applicable.isEmpty ||
+          applicable.contains(dayKey);
+      if (!isDayValid) continue;
+
+      final startsAt =
+          DateTime.tryParse((promo.startsAt ?? "").replaceAll(" ", "T"));
+      final endsAt =
+          DateTime.tryParse((promo.endsAt ?? "").replaceAll(" ", "T"));
+      if (startsAt != null && dayStart.isBefore(startsAt)) continue;
+      if (endsAt != null && dayStart.isAfter(endsAt)) continue;
+
+      if (promo.type == "percentage") {
+        final v = (promo.amount ?? 0).toDouble();
+        if (v > best) best = v;
+      }
+    }
+
+    if (best <= 0) return "";
+    final formatted = best == best.roundToDouble()
+        ? best.toInt().toString()
+        : best.toString();
+    return "$formatted% Off";
+  }
+
   Widget _customDateTimeline() {
     final today = DateTime.now();
     // final today = DateTime(
@@ -2870,7 +2923,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
         /// 🔥 TIMELINE (EXACT UI)
         SizedBox(
-          height: 58,
+          height: 75,
           child: ListView.builder(
             controller: _scrollController,
             scrollDirection: Axis.horizontal,
@@ -2888,6 +2941,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               final hasNoSlots = workPlan != null && workPlan[dayKey] == null;
 
               final isFullyDisabled = isDisabled || hasNoSlots;
+              final discountText = _getDiscountForDate(date);
 
               return GestureDetector(
                 onTap: isFullyDisabled
@@ -2907,12 +2961,10 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                         _scrollToCenter(index);
                       },
                 child: Container(
-                  width: 56,
+                  width: 64,
                   margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(
-                      isSelected ? 5 : 12,
-                    ),
+                    borderRadius: BorderRadius.circular(5),
                     color: isFullyDisabled
                         ? Colors.grey.shade200
                         : isSelected
@@ -2958,6 +3010,54 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
                                   : Colors.black,
                         ),
                       ),
+
+                      /// 🔥 DISCOUNT BADGE
+                      if (discountText.isNotEmpty) ...[
+                        const SizedBox(height: 2),
+                        Builder(builder: (_) {
+                          final gender =
+                              SharedPrefs.readStringValue(PrefConstants.gender);
+                          final isMale = gender.isEmpty || gender == "0";
+                          final strokeColor = isMale
+                              ? ColorConstant.primary2
+                              : ColorConstant.primaryColor2;
+                          const baseStyle = TextStyle(
+                            fontFamily: "Outfit",
+                            fontWeight: FontWeight.w800,
+                            fontSize: 11,
+                          );
+                          if (!isSelected || isFullyDisabled) {
+                            return Text(
+                              discountText,
+                              style: baseStyle.copyWith(
+                                color: isFullyDisabled
+                                    ? Colors.grey.shade400
+                                    : Colors.black.withOpacity(0.35),
+                              ),
+                            );
+                          }
+                          return Stack(
+                            children: [
+                              Text(
+                                discountText,
+                                style: baseStyle.copyWith(
+                                  foreground: Paint()
+                                    ..style = PaintingStyle.stroke
+                                    ..strokeWidth = 2.5
+                                    ..strokeJoin = StrokeJoin.round
+                                    ..color = strokeColor,
+                                ),
+                              ),
+                              Text(
+                                discountText,
+                                style: baseStyle.copyWith(
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          );
+                        }),
+                      ],
                     ],
                   ),
                 ),
