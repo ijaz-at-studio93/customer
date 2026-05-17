@@ -98,7 +98,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                convertFinalDate(date: widget.historyList.finalizedAt ?? ""),
+                convertFinalDate(date: widget.historyList.startsAt ?? ""),
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),

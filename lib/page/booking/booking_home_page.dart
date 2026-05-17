@@ -38,7 +38,6 @@ class _BookingHomePageState extends State<BookingHomePage>
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _homeController.doGetCurrentBookingListData();
     });

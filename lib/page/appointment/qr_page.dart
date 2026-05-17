@@ -138,13 +138,14 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                               icon: const Icon(Icons.arrow_back,
                                   color: Colors.black),
                               onPressed: () async {
+                                final navigator = Navigator.of(context);
                                 await SharedPrefs.remove(
                                     PrefConstants.resumePayBillAppointmentId);
                                 if (!mounted) return;
                                 if (widget.isBooking) {
                                   Get.offAll(() => const BottomNavBarPage());
-                                } else if (Navigator.of(context).canPop()) {
-                                  Navigator.of(context).maybePop();
+                                } else if (navigator.canPop()) {
+                                  navigator.pop(true);
                                 } else {
                                   Get.offAll(() => const BottomNavBarPage());
                                 }
