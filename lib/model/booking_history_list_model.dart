@@ -146,12 +146,19 @@ class Salon {
 
 class Appointment {
   String? id;
+  List<String>? selectedSlots;
   List<Stylist>? selectedStylists;
 
-  Appointment({this.id, this.selectedStylists});
+  Appointment({this.id, this.selectedSlots, this.selectedStylists});
 
   Appointment.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+
+    if (json['selectedSlots'] != null) {
+      selectedSlots = List<String>.from(json['selectedSlots']);
+    } else {
+      selectedSlots = [];
+    }
 
     if (json['selectedStylists'] != null) {
       selectedStylists = (json['selectedStylists'] as List)
@@ -165,8 +172,8 @@ class Appointment {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'selectedStylists':
-      selectedStylists?.map((v) => v.toJson()).toList(),
+      'selectedSlots': selectedSlots,
+      'selectedStylists': selectedStylists?.map((v) => v.toJson()).toList(),
     };
   }
 }

@@ -75,7 +75,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
                 ],
               ),
               Text(
-                convertDate(date: widget.historyList.startsAt ?? ""),
+                convertDate(date: widget.historyList.appointment?.selectedSlots?.firstOrNull ?? widget.historyList.startsAt ?? ""),
                 style: AppTextTheme.regular
                     .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
               )
@@ -98,7 +98,7 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                convertFinalDate(date: widget.historyList.startsAt ?? ""),
+                convertFinalDate(date: widget.historyList.appointment?.selectedSlots?.firstOrNull ?? widget.historyList.startsAt ?? ""),
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold
                     .copyWith(fontSize: 16, color: ColorConstant.blackColor),

@@ -46,7 +46,7 @@ class HomeAPI {
   /*--------------- Make Package Data Get ---------------------- */
   static Future<HomeCategoryListModel> makePackageDataGet() async {
     final response =
-    await DioClient.client.get("user/home/get-last-make-your-own-package");
+        await DioClient.client.get("user/home/get-last-make-your-own-package");
     if (response.isSuccess) {
       return HomeCategoryListModel.fromJson(response.data);
     } else {
@@ -98,14 +98,14 @@ class HomeAPI {
   /*-------------------  get Salon  Salon -----------------*/
   static Future<HomeSalonModel> getSalonHome(
       {required int offset,
-        required int size,
-        required double lat,
-        required double lng,
-        required String orderBy,
-        required String serviceGender,
-        required bool nearest,
-        required bool fourPlusRating,
-        required bool homeService}) async {
+      required int size,
+      required double lat,
+      required double lng,
+      required String orderBy,
+      required String serviceGender,
+      required bool nearest,
+      required bool fourPlusRating,
+      required bool homeService}) async {
     final formData = FormData.fromMap({
       'page': offset,
       'limit': size,
@@ -154,13 +154,10 @@ class HomeAPI {
 
   /*---------------- Salon  Details Category service  List ----------------*/
   static Future<CategoryServicesListModel> getSalonDetailsCategoryServiceList(
-      {required String salonId,required String serviceGender}) async {
-    final response = await DioClient.client
-        .get("user/salon/$salonId/category/services-with-selected-categories",
-        queryParameters: {
-          "serviceGender": serviceGender
-        }
-    );
+      {required String salonId, required String serviceGender}) async {
+    final response = await DioClient.client.get(
+        "user/salon/$salonId/category/services-with-selected-categories",
+        queryParameters: {"serviceGender": serviceGender});
     if (response.isSuccess) {
       return CategoryServicesListModel.fromJson(response.data);
     } else {
@@ -182,7 +179,7 @@ class HomeAPI {
   /*----------------- Get Artiest ------------*/
   static Future<ArtistListModel> getArtiest() async {
     final response =
-    await DioClient.client.get("user/cart/artists-by-cart-services");
+        await DioClient.client.get("user/cart/artists-by-cart-services");
     if (response.isSuccess) {
       return ArtistListModel.fromJson(response.data);
     } else {
@@ -261,14 +258,13 @@ class HomeAPI {
     required bool isHomeService,
     required String userAddressId,
   }) async {
-
     print("STYLIST IDS: $stylistIds");
     print("SELECTED SLOTS: $selectedSlots");
 
     final response = await DioClient.client.post(
       "user/booking/create",
       data: {
-        "stylistIds": stylistIds,       // 👈 NEW
+        "stylistIds": stylistIds, // 👈 NEW
         "selectedSlots": selectedSlots, // 👈 NEW
         "isHomeService": isHomeService,
         "userAddressId": userAddressId,
@@ -285,7 +281,6 @@ class HomeAPI {
   static Future<CreateBookingAppointmentModel> userCreateNonMandatoryBooking({
     required String salonId,
   }) async {
-
     final response = await DioClient.client.post(
       "user/booking/non-mandatory",
       data: {
@@ -300,14 +295,12 @@ class HomeAPI {
     }
   }
 
-  static Future<CreateBookingAppointmentModel> getBookingByRazorpayOrderId(
-      {
-        required String razorpayOrderId,
-      }
-      ) async {
-    final response = await DioClient.client.post("user/booking/by-razorpay-order", data: {
-      "razorpayOrderId": razorpayOrderId
-    });
+  static Future<CreateBookingAppointmentModel> getBookingByRazorpayOrderId({
+    required String razorpayOrderId,
+  }) async {
+    final response = await DioClient.client.post(
+        "user/booking/by-razorpay-order",
+        data: {"razorpayOrderId": razorpayOrderId});
     if (response.isSuccess) {
       return CreateBookingAppointmentModel.fromJson(response.data);
     } else {
@@ -332,13 +325,12 @@ class HomeAPI {
     );
   }
 
-
   /*---------------------Get Booking Qr Code Details ------------------*/
   static Future<UserBookingQrCodeModel> userBookingQrCodeDetails({
     required String appointmentId,
   }) async {
     final response =
-    await DioClient.client.get("user/booking/appointments/$appointmentId");
+        await DioClient.client.get("user/booking/appointments/$appointmentId");
     if (response.statusCode == 200) {
       return UserBookingQrCodeModel.fromJson(response.data);
     } else {
@@ -349,7 +341,7 @@ class HomeAPI {
   /*------------------------------------ Current Booking List Model -----------------------*/
   static Future<CurrentBookingListModel> currentBookingList() async {
     final response =
-    await DioClient.client.get("user/booking/current-booking/list");
+        await DioClient.client.get("user/booking/current-booking/list");
     if (response.isSuccess) {
       return CurrentBookingListModel.fromJson(response.data);
     } else {
@@ -360,7 +352,7 @@ class HomeAPI {
   /*--------------------- Add Favourite Salon ------------------ */
   static Future<bool> addFavouriteSalon({required String salonId}) async {
     final response =
-    await DioClient.client.put("user/salon/favourite/add", data: {
+        await DioClient.client.put("user/salon/favourite/add", data: {
       "salonId": salonId,
     });
     if (response.isSuccess) {
@@ -373,7 +365,7 @@ class HomeAPI {
   /*--------------------- Remove Favourite Salon ------------------ */
   static Future<bool> removeFavouriteSalon({required String salonId}) async {
     final response =
-    await DioClient.client.delete("user/salon/favourite/remove", data: {
+        await DioClient.client.delete("user/salon/favourite/remove", data: {
       "salonId": salonId,
     });
     if (response.isSuccess) {
@@ -412,7 +404,7 @@ class HomeAPI {
   /*------------ get Service Product -----------------*/
   static Future<ServiceProductModel> getServiceProduct(String serviceId) async {
     final response =
-    await DioClient.client.get("user/salon/service/$serviceId/products");
+        await DioClient.client.get("user/salon/service/$serviceId/products");
     if (response.isSuccess) {
       return ServiceProductModel.fromJson(response.data);
     } else {
@@ -443,10 +435,14 @@ class HomeAPI {
   }
 
   /*------------- Get User Cart  Data -------------*/
-  static Future<SalonServiceAddCartModel> getUserSalonCart({required String salonId}) async {
-    final response = await DioClient.client.post("user/cart/salon",data: {
-      "salonId": salonId,
-    },);
+  static Future<SalonServiceAddCartModel> getUserSalonCart(
+      {required String salonId}) async {
+    final response = await DioClient.client.post(
+      "user/cart/salon",
+      data: {
+        "salonId": salonId,
+      },
+    );
     if (response.isSuccess) {
       return SalonServiceAddCartModel.fromJson(response.data);
     } else {
@@ -480,8 +476,8 @@ class HomeAPI {
   /*------------------ Add cart Product ---------------------*/
   static Future<ServiceAddCartModel> addProductCart(
       {required String productId,
-        required String productSelectedServiceId,
-        required bool isHomeService}) async {
+      required String productSelectedServiceId,
+      required bool isHomeService}) async {
     final response = await DioClient.client.put("user/cart/add", data: {
       "productId": productId,
       "productSelectedServiceId": productSelectedServiceId,
@@ -497,7 +493,7 @@ class HomeAPI {
   /*------------------  Remove Cart Product ---------------------*/
   static Future<bool> removeProductCart(
       {required String productId,
-        required String productSelectedServiceId}) async {
+      required String productSelectedServiceId}) async {
     final response = await DioClient.client.put("user/cart/remove", data: {
       "productId": productId,
       "productSelectedServiceId": productSelectedServiceId
@@ -512,7 +508,7 @@ class HomeAPI {
   /*-------------------  Booking History List Data Get ------------------- */
   static Future<BookingHistoryListModel> bookingHistory() async {
     final response =
-    await DioClient.client.get("user/booking/history-booking/list");
+        await DioClient.client.get("user/booking/history-booking/list");
     if (response.isSuccess) {
       return BookingHistoryListModel.fromJson(response.data);
     } else {
@@ -522,7 +518,10 @@ class HomeAPI {
 
   /*---------------------- Allow PortFolio Upload ------------------------*/
   static Future<bool> portFolioUpload(
-      {required String appointmentId, required bool isUpload, String? name, String? phone}) async {
+      {required String appointmentId,
+      required bool isUpload,
+      String? name,
+      String? phone}) async {
     final response = await DioClient.client.put(
         "user/booking/appointments/$appointmentId/allow-portfolio-upload",
         data: {"allowPortfolioUpload": isUpload, "name": name, "phone": phone});
@@ -543,8 +542,7 @@ class HomeAPI {
     /// 🔥 IMAGES
     if (multiplePath.isNotEmpty) {
       for (int i = 0; i < multiplePath.length; i++) {
-        final mimeType =
-            mime.lookupMimeType(multiplePath[i]) ?? 'image/jpeg';
+        final mimeType = mime.lookupMimeType(multiplePath[i]) ?? 'image/jpeg';
 
         final mimeTypeData = mimeType.split('/');
 
@@ -564,8 +562,7 @@ class HomeAPI {
     /// 🔥 VIDEOS
     if (multipleVideo.isNotEmpty) {
       for (int i = 0; i < multipleVideo.length; i++) {
-        final mimeType =
-            mime.lookupMimeType(multipleVideo[i]) ?? 'video/mp4';
+        final mimeType = mime.lookupMimeType(multipleVideo[i]) ?? 'video/mp4';
 
         final mimeTypeData = mimeType.split('/');
 
@@ -598,7 +595,7 @@ class HomeAPI {
   static Future<ReviewListModel> reviewListDataGet(
       {required String appointmentId}) async {
     final response =
-    await DioClient.client.get("user/booking/$appointmentId/review");
+        await DioClient.client.get("user/booking/$appointmentId/review");
     if (response.isSuccess) {
       return ReviewListModel.fromJson(response.data);
     } else {
@@ -619,9 +616,9 @@ class HomeAPI {
   /*----------------- Appointment Service Review ------------------ */
   static Future<bool> addAppointmentServiceReview(
       {required String appointmentId,
-        required double rate,
-        required String salonServiceId,
-        required String review}) async {
+      required double rate,
+      required String salonServiceId,
+      required String review}) async {
     final response = await DioClient.client
         .put("user/booking/$appointmentId/review", data: {
       "rating": rate,
@@ -638,9 +635,9 @@ class HomeAPI {
 /*----------------- Appointment product Review ------------------ */
   static Future<bool> addAppointmentProductReview(
       {required String appointmentId,
-        required double rate,
-        required String salonProductId,
-        required String review}) async {
+      required double rate,
+      required String salonProductId,
+      required String review}) async {
     final response = await DioClient.client
         .put("user/booking/$appointmentId/review", data: {
       "rating": rate,
@@ -657,9 +654,9 @@ class HomeAPI {
 /*----------------- Appointment Artiest Review ------------------ */
   static Future<bool> addAppointmentArtiestReview(
       {required String appointmentId,
-        required double rate,
-        required String salonArtistId,
-        required String review}) async {
+      required double rate,
+      required String salonArtistId,
+      required String review}) async {
     final response = await DioClient.client
         .put("user/booking/$appointmentId/review", data: {
       "rating": rate,
@@ -677,7 +674,7 @@ class HomeAPI {
   static Future<ArtiestPortfolio> getArtiestPortfolio(
       {required String artistId}) async {
     final response =
-    await DioClient.client.get("user/salon/artist/$artistId/portfolio");
+        await DioClient.client.get("user/salon/artist/$artistId/portfolio");
 
     if (response.isSuccess) {
       return ArtiestPortfolio.fromJson(response.data);
@@ -743,8 +740,9 @@ class HomeAPI {
   /*--------------------- Search -------------------------- */
   static Future<SearchSalonModel> searchForSalon(
       {required String query, required String lat, required String lng}) async {
-    if(query.isEmpty){
-      return SearchSalonModel();}
+    if (query.isEmpty) {
+      return SearchSalonModel();
+    }
     final response = await DioClient.client.get("user/home/search",
         queryParameters: {
           "q": query,
@@ -793,7 +791,7 @@ class HomeAPI {
     required String house,
   }) async {
     final response =
-    await DioClient.client.patch("user/address/$addressID/update", data: {
+        await DioClient.client.patch("user/address/$addressID/update", data: {
       "geolocationLat": geolocationLat,
       "geolocationLng": geolocationLng,
       "address": address,
@@ -847,7 +845,6 @@ class HomeAPI {
     required int billAmount,
     required int payableAmount,
   }) async {
-
     final response = await DioClient.client.post(
       "/user/booking/create-payment-order",
       data: {
@@ -886,7 +883,7 @@ class HomeAPI {
   /*------------------  Blog View Count ----------------------*/
   static Future<bool> addBlogView(String blogId) async {
     final response =
-    await DioClient.client.get("user/blog/$blogId/increase-view");
+        await DioClient.client.get("user/blog/$blogId/increase-view");
     if (response.isSuccess) {
       return true;
     } else {
@@ -908,14 +905,14 @@ class HomeAPI {
   /*--------------------------  Get PromoCode ----------------------------*/
   static Future<PromoCodeModel> getPromoCode(
       {required double lat,
-        required double lng,
-        required String orderBy,
-        required String serviceGender,
-        required bool nearest,
-        required bool fourPlusRating,
-        required bool homeService}) async {
+      required double lng,
+      required String orderBy,
+      required String serviceGender,
+      required bool nearest,
+      required bool fourPlusRating,
+      required bool homeService}) async {
     final response =
-    await DioClient.client.get("user/home/discount-list", queryParameters: {
+        await DioClient.client.get("user/home/discount-list", queryParameters: {
       'lat': lat,
       'lng': lng,
       "distanceRadius": 50000,
@@ -935,7 +932,7 @@ class HomeAPI {
   /*----------------------- Get PromoCode  For ------------------------ */
   static Future<PromoCodeModel> getPromoCodeList() async {
     final response =
-    await DioClient.client.get("user/cart/discounts-by-user-cart");
+        await DioClient.client.get("user/cart/discounts-by-user-cart");
     if (response.isSuccess) {
       return PromoCodeModel.fromJson(response.data);
     } else {
@@ -943,9 +940,10 @@ class HomeAPI {
     }
   }
 
-  static Future<PromoCodeModel> getSalonPromoCodeList({required String salonId}) async {
+  static Future<PromoCodeModel> getSalonPromoCodeList(
+      {required String salonId}) async {
     final response =
-    await DioClient.client.get("user/salon/$salonId/discounts");
+        await DioClient.client.get("user/salon/$salonId/discounts");
     if (response.isSuccess) {
       return PromoCodeModel.fromJson(response.data);
     } else {
@@ -956,7 +954,7 @@ class HomeAPI {
   /*----------------------- Apply  PromoCode --------------------*/
   static Future<bool> applyPromoCode({required Map data}) async {
     final response =
-    await DioClient.client.put("user/cart/apply-discount", data: data);
+        await DioClient.client.put("user/cart/apply-discount", data: data);
     if (response.isSuccess) {
       return true;
     } else {
@@ -977,7 +975,7 @@ class HomeAPI {
   /*----------------------  Delete Package ---------------------*/
   static Future<bool> deletePackage() async {
     final response =
-    await DioClient.client.delete("user/home/make-your-own-package");
+        await DioClient.client.delete("user/home/make-your-own-package");
     if (response.isSuccess) {
       return true;
     } else {
@@ -1021,21 +1019,18 @@ class HomeAPI {
     }
   }
 
-  static Future<bool> reScheduleBooking({
-    required String appointmentId,
-    required String newTime
-  }) async {
+  static Future<bool> reScheduleBooking(
+      {required String appointmentId, required String newTime}) async {
     final response = await DioClient.client.put(
       "user/booking/$appointmentId/reSchedule",
-      data: {
-        "newDateTime": newTime
-      },
+      data: {"newDateTime": newTime},
     );
 
     if (response.statusCode == 200 && response.data['success'] == true) {
       return true;
     } else {
-      throw Exception(response.data['message'] ?? 'Failed to re schedule booking');
+      throw Exception(
+          response.data['message'] ?? 'Failed to re schedule booking');
     }
   }
 }

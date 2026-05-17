@@ -29,8 +29,12 @@ class _ContentPageState extends State<ContentPage>
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       _homeController.doGetBlogData(
-        lat: double.parse(SharedPrefs.readStringValue(PrefConstants.latitude)),
-        lng: double.parse(SharedPrefs.readStringValue(PrefConstants.longitude)),
+        lat: double.tryParse(
+                SharedPrefs.readStringValue(PrefConstants.latitude)) ??
+            0.0,
+        lng: double.tryParse(
+                SharedPrefs.readStringValue(PrefConstants.longitude)) ??
+            0.0,
       );
     });
   }
