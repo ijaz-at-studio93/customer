@@ -117,6 +117,9 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
           useGlobalLoader: false,
         );
       }
+      _homeController.doGetListPromoCode().then((_) {
+        if (mounted) setState(() {});
+      });
       //Commenting because of Pay after service
       // No need to creating razorpay order
       //     .whenComplete(() {
@@ -2817,18 +2820,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
   DateTime currentMonth = DateTime.now();
 
-  String _getDiscountForDate(DateTime date) {
-    final salonPromos = _homeController.getSalonPromoCodeModel.data ?? [];
-    final globalPromos = _homeController.getPromoCodeModel.data ?? [];
-    final salonId = _homeController.getServiceAddCartModel.data?.salonId ?? "";
-
-    final List<PromoCode> promos = [
-      ...salonPromos,
-      ...globalPromos.where((p) {
-        final pid = p.salon?.id ?? "";
-        return salonId.isEmpty || pid.isEmpty || pid == salonId;
-      }),
-    ];
+  String _getDiscountForDate(DateTime date, List<PromoCode> promos) {
     if (promos.isEmpty) return "";
 
     final dayKey = date.weekday % 7; // Sun=0..Sat=6, matches backend convention
@@ -2863,6 +2855,8 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
   }
 
   Widget _customDateTimeline() {
+    // Read reactively here so Obx tracks this and rebuilds when promos load
+    final promoList = _homeController.getPromoCodeModelList.data ?? [];
     final today = DateTime.now();
     // final today = DateTime(
     //   currentMonth.year,
@@ -2941,7 +2935,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
               final hasNoSlots = workPlan != null && workPlan[dayKey] == null;
 
               final isFullyDisabled = isDisabled || hasNoSlots;
-              final discountText = _getDiscountForDate(date);
+              final discountText = _getDiscountForDate(date, promoList);
 
               return GestureDetector(
                 onTap: isFullyDisabled
