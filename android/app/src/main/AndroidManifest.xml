@@ -36,6 +36,9 @@
             <meta-data
                 android:name="flutter_deeplinking_enabled"
                 android:value="false" />
+            <!-- LAUNCHER kept here solely for Flutter build-tool compatibility.
+                 At runtime the plugin disables this activity's launcher slot
+                 and promotes one of the activity-alias entries instead. -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -51,10 +54,15 @@
             </intent-filter>
         </activity>
 
-        <!-- Dynamic launcher icons — only one alias enabled at a time -->
+        <!-- Dynamic launcher icons — only one alias enabled at a time.
+             All aliases start disabled; the app_icon_helper enables the correct
+             one on first launch and also disables MainActivity's launcher slot,
+             so the home screen always shows exactly one icon.
+             Each alias carries the deep-link filter so incoming links are
+             handled regardless of which alias is currently active. -->
         <activity-alias
             android:name=".MainActivityDefault"
-            android:enabled="true"
+            android:enabled="false"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
             android:roundIcon="@mipmap/ic_launcher"
@@ -62,6 +70,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="scuts.onelink.me"
+                    android:pathPrefix="/prSS" />
             </intent-filter>
         </activity-alias>
 
@@ -76,6 +93,15 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="scuts.onelink.me"
+                    android:pathPrefix="/prSS" />
+            </intent-filter>
         </activity-alias>
 
         <activity-alias
@@ -89,6 +115,15 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="scuts.onelink.me"
+                    android:pathPrefix="/prSS" />
+            </intent-filter>
         </activity-alias>
 
         <activity-alias
@@ -101,6 +136,15 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="scuts.onelink.me"
+                    android:pathPrefix="/prSS" />
             </intent-filter>
         </activity-alias>
         <!-- Don't delete the meta-data below.

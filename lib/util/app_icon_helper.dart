@@ -5,6 +5,23 @@ import 'package:flutter_app_icon_changer/flutter_app_icon_changer.dart';
 
 // CustomerOpen = primary/default icon (AppIcon on iOS, MainActivityDefault alias on Android).
 // CustomerBook / Customer3Weeks / Customer4Weeks = alternates selected by booking recency.
+//
+// Android note: MainActivity is included in iconsSet so the plugin disables its
+// LAUNCHER slot when promoting an alias.  On a fresh install MainActivity is the
+// only enabled launcher entry; the first call to updateCustomerAppIcon switches to
+// the correct alias and disables MainActivity, giving exactly one home-screen icon.
+
+class _MainActivitySelf extends AppIcon {
+  // Android-only sentinel — never selected as a target icon, only present so
+  // the plugin can disable MainActivity's launcher slot when switching aliases.
+  // The iOSIcon value is intentionally unused (iOS uses a separate code path).
+  _MainActivitySelf()
+      : super(
+          iOSIcon: 'AppIcon',
+          androidIcon: 'MainActivity',
+          isDefaultIcon: false,
+        );
+}
 
 class _DefaultIcon extends AppIcon {
   _DefaultIcon()
@@ -43,12 +60,14 @@ class _Customer4WeeksIcon extends AppIcon {
 }
 
 class AppIconHelper {
+  static final _mainActivitySelf = _MainActivitySelf();
   static final _defaultIcon = _DefaultIcon();
   static final _customerBookIcon = _CustomerBookIcon();
   static final _customer3WeeksIcon = _Customer3WeeksIcon();
   static final _customer4WeeksIcon = _Customer4WeeksIcon();
 
   static final _plugin = FlutterAppIconChangerPlugin(iconsSet: [
+    _mainActivitySelf, // keeps MainActivity's launcher slot in sync
     _defaultIcon,
     _customerBookIcon,
     _customer3WeeksIcon,
