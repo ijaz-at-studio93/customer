@@ -94,7 +94,8 @@ class AppIconHelper {
 
   static Future<void> updateCustomerAppIcon(DateTime? bookingDate) async {
     if (bookingDate == null) {
-      await _change(_defaultIcon);
+      // New user with no bookings — leave MainActivity as the launcher.
+      // Switching aliases here restarts the Android process for no visual change.
       return;
     }
     final weeks = DateTime.now().difference(bookingDate).inDays ~/ 7;
