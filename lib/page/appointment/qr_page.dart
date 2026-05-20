@@ -1933,6 +1933,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
         amount: paidAmount,
         currency: "INR",
         parameters: {
+          'event_id': bookingId,
           'content_type': 'service',
           'content_category': 'salon_booking',
           'booking_id': bookingId,

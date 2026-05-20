@@ -1414,6 +1414,7 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
     /// ✅ TODAY → skip past time
     if (DateFormat("yyyy-MM-dd").format(now) == selectDate) {
       if (startTime.isBefore(now)) {
+        now = now.add(const Duration(minutes: 15));
         int remainder = now.minute % 15;
 
         if (remainder != 0) {
@@ -2312,41 +2313,6 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
           _homeController.getServiceAddCartModel.data?.isHomeService ?? false,
       userAddressId: "",
       callback: () async {
-        try {
-          final cartItems =
-              _homeController.getServiceAddCartModel.data?.items ?? [];
-
-          final totalPrice = double.tryParse(
-                _homeController.getServiceAddCartModel.data?.totalPrice
-                        ?.toString() ??
-                    "0",
-              ) ??
-              0;
-
-          final contents = cartItems.map((e) {
-            return {
-              'id': e.service?.id.toString(),
-              'quantity': 1,
-            };
-          }).toList();
-
-          await facebookAppEvents.logInitiatedCheckout(
-            totalPrice: totalPrice,
-            currency: 'INR',
-            contentType: 'service',
-            numItems: cartItems.length,
-            parameters: {
-              'contents': contents,
-              'content_category': 'salon_booking',
-            },
-          );
-
-          print("✅ FB InitiateCheckout Sent");
-
-          await facebookAppEvents.flush();
-        } catch (e) {
-          print("❌ FB InitiateCheckout Error: $e");
-        }
 
         stylistId.value = "";
         stylistId.notifyListeners();
@@ -3125,6 +3091,43 @@ class _AppointmentBookingPageState extends State<AppointmentBookingPage> {
 
     String? name;
     String? phone;
+
+    try {
+      final cartItems =
+          _homeController.getServiceAddCartModel.data?.items ?? [];
+
+      final totalPrice = double.tryParse(
+        _homeController.getServiceAddCartModel.data?.totalPrice
+            ?.toString() ??
+            "0",
+      ) ??
+          0;
+
+      final contents = cartItems.map((e) {
+        return {
+          'id': e.service?.id.toString(),
+          'quantity': 1,
+        };
+      }).toList();
+
+      await facebookAppEvents.logInitiatedCheckout(
+        totalPrice: totalPrice,
+        currency: 'INR',
+        contentType: 'service',
+        numItems: cartItems.length,
+        parameters: {
+          'event_id': booking?.id,
+          'contents': contents,
+          'content_category': 'salon_booking',
+        },
+      );
+
+      print("✅ FB InitiateCheckout Sent");
+
+      await facebookAppEvents.flush();
+    } catch (e) {
+      print("❌ FB InitiateCheckout Error: $e");
+    }
 
     // 👉 Person of the Year (INTERMEDIATE STEP)
     if (isPersonOfTheYearEnabled) {

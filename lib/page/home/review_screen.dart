@@ -87,9 +87,9 @@ class _ReviewScreenState extends State<ReviewScreen> {
     salonName = booking.salon?.displayName ?? "";
 
     /// 🔥 CALL API SAFELY (NO LOOP, NO BLOCK)
-    // await _homeController.doGetSalonArtiestListData(
-    //   salonId: widget.salonId,
-    // );
+    await _homeController.doGetSalonArtiestListData(
+      salonId: widget.salonId,
+    );
 
     loadReviewItems(booking);
   }

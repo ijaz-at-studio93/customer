@@ -51,13 +51,13 @@
     <key>NSCameraUsageDescription</key>
         <string>You need to provide camera access to upload profile image using phone camera or you can directly upload from gallery.</string>
         <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-        <string>Application requires user’s location information while the app is running in the foreground.</string>
+        <string>Scuts uses your location to show nearby salons, estimate distance, and improve salon discovery based on your area.</string>
         <key>NSLocationAlwaysUsageDescription</key>
-        <string>Will you allow this app to always know your location?</string>
+        <string>Scuts uses your location to help you discover salons and beauty services available near your area.</string>
         <key>NSLocationUsageDescription</key>
-        <string>We need location permission to get your current location using which we display list of nearby store , without that we can't fetch list of store</string>
+        <string>Scuts uses your location to display nearby salons, home services, and beauty professionals available around your current location.</string>
         <key>NSLocationWhenInUseUsageDescription</key>
-        <string>Do you allow this app to know your current location?</string>
+        <string>Scuts uses your location to show nearby salons, calculate distance, and help you discover salon services available in your area.</string>
         <key>NSPhotoLibraryUsageDescription</key>
         <string>You need to provide photo album access to upload profile image or you can directly upload using camera.</string>
         <key>NSContactsUsageDescription</key>

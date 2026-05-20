@@ -2647,7 +2647,7 @@ class _HomePageState extends State<HomePage>
     }
     await Permission.location.onDeniedCallback(() async {
       await Permission.location.request();
-      showMessage("Location services are disabled.");
+      showMessage("Location permission is needed to show nearby salons.");
     }).onGrantedCallback(() async {
       Position position = await Geolocator.getCurrentPosition();
       List<Placemark> placeMarks =
@@ -2697,10 +2697,12 @@ class _HomePageState extends State<HomePage>
       });
       SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
     }).onPermanentlyDeniedCallback(() async {
-      openAppSettings();
-      Geolocator.openLocationSettings();
-      showMessage(
-          "Location permissions are permanently denied, we cannot request permissions.");
+      // IOS will reject, if we directly open settings
+      // openAppSettings();
+      // Geolocator.openLocationSettings();
+      // showMessage(
+      //     "Location permissions are permanently denied, we cannot request permissions.");
+      showLocationPermissionDialog(context);
     }).onRestrictedCallback(() async {
       logger.e("Setting call Back");
     }).onLimitedCallback(() {
@@ -2760,6 +2762,33 @@ class _HomePageState extends State<HomePage>
     //   SharedPrefs.writeValue(PrefConstants.isFirstTime, true);
     // }
     loadHomeData();
+  }
+
+  void showLocationPermissionDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Location Required"),
+        content: const Text(
+          "Scuts needs your location to show nearby salons and available services in your area.",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await openAppSettings();
+            },
+            child: const Text("Open Settings"),
+          ),
+        ],
+      ),
+    );
   }
 
   void loadHomeData() {
