@@ -38,7 +38,6 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   Timer? _autoPlayTimer;
   int _currentPage = 0;
   late List<String> _images;
-  static const Duration _autoPlayInterval = Duration(seconds: 4);
   static const Duration _autoPlayResumeDelay = Duration(seconds: 2);
   bool _isUserInteracting = false;
   //static const String kLongPressHintShown = "long_press_image_hint_shown";
@@ -123,19 +122,9 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   }
 
   void _startAutoPlay() {
+    // Row 18: auto-scroll of the salon image carousel is disabled.
+    // Images now advance only when the user swipes manually.
     _autoPlayTimer?.cancel();
-    _autoPlayTimer = Timer.periodic(_autoPlayInterval, (_) {
-      if (_isUserInteracting) return;
-      //final images = _getImageList(widget.homeSalonModel);
-      if (_images.length <= 1) return;
-      final nextPage = (_currentPage + 1) % _images.length;
-      if (!_pageController.hasClients) return;
-      _pageController.animateToPage(
-        nextPage,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      );
-    });
   }
 
   void _stopAutoPlay() {
@@ -866,7 +855,29 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                           ),
                         ],
                       ),
-                      Column(
+                      (widget.homeSalonModel.reviewCount ?? 0) == 0
+                          // No reviews yet → show a "New" tag instead of a 0 rating.
+                          ? Container(
+                              height: 26,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: ColorConstant.greenColor,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                "New",
+                                style: AppTextTheme.medium.copyWith(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 14,
+                                  color: ColorConstant.whiteColor,
+                                  height: 1.2,
+                                ),
+                              ),
+                            )
+                          : Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(

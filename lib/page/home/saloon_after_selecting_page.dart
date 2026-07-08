@@ -1495,16 +1495,19 @@ class _SaloonAfterSelectingServicesPageState
                   ),
                 ),
 
-                // --- ORIGINAL GRADIENT (unchanged) ---
+                // --- LIGHT BOTTOM SCRIM (softened so salon photos stay visible) ---
                 Positioned(
                   child: Container(
                     width: 391, //Get.width,
                     height: 210, //Get.height * 0.30,
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
-                        begin: Alignment(0.02, 1.00),
-                        end: Alignment(-0.02, -1),
-                        colors: [Colors.black, Color(0x003D3636)],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        // Light scrim only along the bottom strip for text/dot
+                        // legibility; the rest of the photo is left untouched.
+                        colors: [Color(0x73000000), Color(0x00000000)],
+                        stops: [0.0, 0.35],
                       ),
                     ),
                   ),
@@ -1614,7 +1617,30 @@ class _SaloonAfterSelectingServicesPageState
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Row(
+                      (_homeController.homeSalonDetailsData.data?.reviewCount ??
+                                  0) ==
+                              0
+                          // No reviews yet → "New" tag instead of a 0 rating.
+                          ? Container(
+                              height: 26,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF16A34A),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: const Text(
+                                "New",
+                                style: TextStyle(
+                                  fontFamily: "Outfit",
+                                  fontWeight: FontWeight.w700,
+                                  fontSize: 15,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            )
+                          : Row(
                         children: [
                           Container(
                             height: 26,

@@ -14,6 +14,7 @@ import '../../../project_specific/action_button.dart';
 
 class SelectedServiceListTileWidget extends StatelessWidget {
   final String serviceName;
+  final String serviceCategory;
   final String servicePrice;
   final String serviceRating;
   final String serviceReview;
@@ -33,6 +34,7 @@ class SelectedServiceListTileWidget extends StatelessWidget {
     required this.onAdd,
     required this.editProduct,
     required this.serviceName,
+    required this.serviceCategory,
     required this.gender,
     required this.servicePrice,
     required this.serviceTime,
@@ -45,6 +47,12 @@ class SelectedServiceListTileWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
+
+    // Prefer the category from the cart response; otherwise resolve it from
+    // the loaded salon categories using the service id.
+    final String categoryLabel = serviceCategory.trim().isNotEmpty
+        ? serviceCategory.trim()
+        : controller.categoryNameForService(serviceId);
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -71,6 +79,25 @@ class SelectedServiceListTileWidget extends StatelessWidget {
                 ),
               ),
             ),
+
+            /// CATEGORY (shown under the service name)
+            if (categoryLabel.trim().isNotEmpty) ...[
+              const SizedBox(height: 4),
+              SizedBox(
+                width: Get.width * 0.6,
+                child: Text(
+                  categoryLabel,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textScaler: const TextScaler.linear(0.85),
+                  style: AppTextTheme.medium.copyWith(
+                    fontSize: 13,
+                    fontFamily: 'Outfit',
+                    color: ColorConstant.grayTextColor,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 10),
 
             const SizedBox(height: 10),

@@ -97,6 +97,27 @@ class HomeController extends GetxController {
 
   set setSalonDetailsListData(val) => _salonDetailsListData.value = val;
 
+  /// Resolves a service's category name from the loaded salon service list
+  /// (services grouped under selected/recommended categories). Used as a
+  /// fallback when the cart response doesn't include serviceCategoryName.
+  String categoryNameForService(String? serviceId) {
+    if (serviceId == null || serviceId.isEmpty) return "";
+    final data = _salonDetailsListData.value.data;
+    if (data == null) return "";
+
+    for (final cat in data.selectedCategories ?? const []) {
+      for (final s in cat.services ?? const []) {
+        if (s.id == serviceId) return cat.name ?? "";
+      }
+    }
+    for (final cat in data.recommendedCategories ?? const []) {
+      for (final s in cat.services ?? const []) {
+        if (s.id == serviceId) return cat.name ?? "";
+      }
+    }
+    return "";
+  }
+
   /*-----------------  Home Salon List Widget Get -------------------*/
   final Rx<HomeSalonModel> _homeSalonList = HomeSalonModel().obs;
 
