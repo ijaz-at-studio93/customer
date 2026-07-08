@@ -61,8 +61,10 @@ class DialogMenuListWidget extends StatelessWidget {
                 width: Get.width * 0.2,
                 child: AutoSizeText(
                   categoryListData.name ?? "",
-                  maxLines: 2,
-                  minFontSize: 8,
+                  // Row 31: keep long names readable — wrap over more lines
+                  // instead of shrinking the font to a tiny size.
+                  maxLines: 3,
+                  minFontSize: 11,
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                   style: AppTextTheme.medium.copyWith(

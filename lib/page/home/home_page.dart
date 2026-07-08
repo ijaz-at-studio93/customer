@@ -462,7 +462,8 @@ class _HomePageState extends State<HomePage>
                         child: PendingPaymentBar(
                             bookingId: booking.appointmentId,
                             salonName: booking.salon.displayName,
-                            startsAt: booking.startsAt),
+                            startsAt: booking.startsAt,
+                            orderStatus: booking.orderStatus),
                       ),
 
                     /// YOUR EXISTING MEN / WOMEN SWITCH

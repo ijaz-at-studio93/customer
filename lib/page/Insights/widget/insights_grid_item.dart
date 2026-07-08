@@ -154,21 +154,7 @@ class InsightsGridItem extends StatelessWidget {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircleAvatar(
-                      radius: 10,
-                      backgroundColor: Colors.grey.shade300,
-                      backgroundImage: (blogData.artist?.profileImage != null &&
-                              blogData.artist!.profileImage!.isNotEmpty)
-                          ? NetworkImage(
-                              "${APIConstants.image}${blogData.artist!.profileImage}",
-                            )
-                          : null,
-                      child: (blogData.artist?.profileImage == null ||
-                              blogData.artist!.profileImage!.isEmpty)
-                          ? const Icon(Icons.person,
-                              size: 12, color: Colors.white)
-                          : null,
-                    ),
+                    _artistAvatar(blogData.artist?.profileImage),
                     const SizedBox(width: 4),
                     Text(
                       blogData.artist!.name!,
@@ -187,6 +173,31 @@ class InsightsGridItem extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  /// 404-safe circular artist avatar: falls back to a person icon instead of
+  /// throwing when the profile image is missing or fails to load (Row 9).
+  Widget _artistAvatar(String? profileImage) {
+    const double size = 20;
+    final fallback = Container(
+      width: size,
+      height: size,
+      color: Colors.grey.shade300,
+      alignment: Alignment.center,
+      child: const Icon(Icons.person, size: 12, color: Colors.white),
+    );
+    return ClipOval(
+      child: (profileImage != null && profileImage.isNotEmpty)
+          ? CachedNetworkImage(
+              imageUrl: "${APIConstants.image}$profileImage",
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => fallback,
+              errorWidget: (context, url, error) => fallback,
+            )
+          : fallback,
     );
   }
 }
