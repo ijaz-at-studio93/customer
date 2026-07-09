@@ -133,16 +133,21 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
               ),
               const SizedBox(height: 5),
               Text(
-                widget.historyList.orderStatus == "salon_artist_rejected"
+                widget.historyList.orderStatus == "salon_artist_rejected" ||
+                        widget.historyList.orderStatus == "salon_rejected"
                     ? "Rejected"
-                    : widget.historyList.orderStatus == "completed"
-                        ? "Completed"
-                        : widget.historyList.orderStatus ?? "",
+                    : widget.historyList.orderStatus == "user_cancelled"
+                        ? "Cancelled"
+                        : widget.historyList.orderStatus == "completed"
+                            ? "Completed"
+                            : widget.historyList.orderStatus ?? "",
                 textScaler: const TextScaler.linear(0.85),
                 style: AppTextTheme.bold.copyWith(
                     fontSize: 16,
-                    color: widget.historyList.orderStatus ==
-                            "salon_artist_rejected"
+                    color: (widget.historyList.orderStatus ==
+                                "salon_artist_rejected" ||
+                            widget.historyList.orderStatus == "salon_rejected" ||
+                            widget.historyList.orderStatus == "user_cancelled")
                         ? ColorConstant.redBgColor
                         : changeTheme(
                             SharedPrefs.readStringValue(PrefConstants.gender))),

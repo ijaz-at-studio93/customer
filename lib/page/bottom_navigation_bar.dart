@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/page/Insights/content_page.dart';
@@ -123,6 +125,12 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                   setState(() {
                     _selectedIndex = val;
                   });
+                  // Row 36: refresh bookings when the Bookings tab is opened so
+                  // an accepted/cancelled appointment is reflected right away
+                  // (the page is kept-alive and won't otherwise re-fetch).
+                  if (val == 1) {
+                    Get.find<HomeController>().refreshBookingListsSilent();
+                  }
                 },
               );
             }),

@@ -49,6 +49,16 @@ class _NetworkVideoViewWidgetState extends State<NetworkVideoViewWidget> {
     widget.pauseNotifier?.addListener(_onPauseChanged);
   }
 
+  @override
+  void didUpdateWidget(covariant NetworkVideoViewWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Apply a live mute/unmute toggle without recreating the player.
+    if (oldWidget.muted != widget.muted &&
+        (_player?.controller.value.isInitialized ?? false)) {
+      _player?.controller.setVolume(widget.muted ? 0.0 : 1.0);
+    }
+  }
+
   void _onPauseChanged() {
     if (widget.pauseNotifier?.value == true) {
       _player?.controller.pause();

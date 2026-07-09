@@ -739,18 +739,24 @@ class HomeAPI {
 
   /*--------------------- Search -------------------------- */
   static Future<SearchSalonModel> searchForSalon(
-      {required String query, required String lat, required String lng}) async {
+      {required String query,
+      required String lat,
+      required String lng,
+      String type = "name"}) async {
     if (query.isEmpty) {
       return SearchSalonModel();
     }
-    final response = await DioClient.client.get("user/home/search",
-        queryParameters: {
-          "q": query,
-          "lat": lat,
-          "lng": lng,
-          "limit": 10,
-          "distanceRadius": 50000
-        });
+    final response =
+        await DioClient.client.get("user/home/search", queryParameters: {
+      "q": query,
+      "lat": lat,
+      "lng": lng,
+      "limit": 10,
+      "distanceRadius": 50000,
+      // Row 24: "name" or "area" — backend matches q against the salon
+      // name or its area/address accordingly.
+      "type": type,
+    });
     if (response.isSuccess) {
       return SearchSalonModel.fromJson(response.data);
     } else {
