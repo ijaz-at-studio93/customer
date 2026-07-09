@@ -43,7 +43,6 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
 
   // Row 3: dismissible payment demo video.
   bool _showDemoVideo = true;
-  bool _demoMuted = true; // mini player starts muted (like the reference).
 
   final _homeController = Get.find<HomeController>();
   final TextEditingController _amountController = TextEditingController();
@@ -698,29 +697,8 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                     : NetworkVideoViewWidget(
                         videoString: _paymentDemoUrl,
                         thumbnail: "",
-                        muted: _demoMuted,
+                        muted: true, // mini preview is always muted
                       ),
-
-                /// MUTE / UNMUTE (bottom-right)
-                Positioned(
-                  bottom: 4,
-                  right: 4,
-                  child: GestureDetector(
-                    onTap: () => setState(() => _demoMuted = !_demoMuted),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Icon(
-                        _demoMuted ? Icons.volume_off : Icons.volume_up,
-                        color: Colors.white,
-                        size: 14,
-                      ),
-                    ),
-                  ),
-                ),
 
                 /// EXPAND → FULLSCREEN (bottom-left)
                 Positioned(
