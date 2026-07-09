@@ -54,4 +54,5 @@ class PrefConstants {
   static const String hasShownSalonDialog = "hasShownSalonDialog";
   /// Set while user is on pay bill (`QRCodePage`); used to resume after app kill.
   static const String resumePayBillAppointmentId = "resumePayBillAppointmentId";
+  static const String appsflyerAttributionSent = "appsflyerAttributionSent";
 }

@@ -75,6 +75,10 @@ class AppIconHelper {
   ]);
 
   static Future<void> _change(AppIcon icon) async {
+    // `flutter run` always launches .MainActivity directly; switching aliases
+    // disables that component and breaks subsequent debug launches with
+    // "Activity class does not exist". Icon switching is a release-only concern.
+    if (kDebugMode) return;
     final supported = await _plugin.isSupported();
     if (!supported) return;
     try {

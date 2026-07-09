@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:flutter/foundation.dart';
+import 'package:salon_customer/api/analytics_api.dart';
+import 'package:salon_customer/util/SharedPrefs.dart';
 
 /// AppsFlyer attribution and OneLink deep linking.
 ///
@@ -15,8 +17,22 @@ class AppsFlyerService {
   static const String oneLinkHost = 'scuts.onelink.me';
   static const String oneLinkPathPrefix = '/prSS';
 
+  static const List<String> _attributionKeys = [
+    'af_status',
+    'media_source',
+    'campaign',
+    'campaign_id',
+    'adset',
+    'adset_id',
+    'ad',
+    'ad_id',
+    'channel',
+  ];
+
   AppsflyerSdk? _sdk;
   bool _initialized = false;
+  Map<String, dynamic>? _pendingAttribution;
+  String? _pendingAppsflyerId;
 
   AppsflyerSdk get sdk {
     final s = _sdk;
@@ -39,9 +55,7 @@ class AppsFlyerService {
     _sdk = AppsflyerSdk(options);
 
     _sdk!.onInstallConversionData((dynamic res) {
-      if (kDebugMode) {
-        debugPrint('[AppsFlyer] onInstallConversionData: $res');
-      }
+      _handleInstallConversionData(res);
     });
 
     _sdk!.onDeepLinking((DeepLinkResult result) {
@@ -67,9 +81,89 @@ class AppsFlyerService {
     }
   }
 
+  /// Call after login/signup so deferred attribution can be sent.
+  Future<void> onUserAuthenticated() async {
+    await _sendAttribution(
+      appsflyerId: _pendingAppsflyerId,
+      attribution: _pendingAttribution,
+    );
+  }
+
   void logEvent(String eventName, [Map<String, dynamic>? values]) {
     if (!_initialized) return;
     _sdk?.logEvent(eventName, values ?? {});
+  }
+
+  Future<void> _handleInstallConversionData(dynamic res) async {
+    if (kDebugMode) {
+      debugPrint('[AppsFlyer] onInstallConversionData: $res');
+    }
+
+    if (SharedPrefs.readBoolValue(PrefConstants.appsflyerAttributionSent)) {
+      return;
+    }
+
+    final payload = _extractPayload(res);
+    if (payload == null) return;
+
+    final attribution = _mapAttribution(payload);
+    final appsflyerId = await _sdk?.getAppsFlyerUID();
+
+    await _sendAttribution(
+      appsflyerId: appsflyerId,
+      attribution: attribution,
+    );
+  }
+
+  Map<String, dynamic>? _extractPayload(dynamic res) {
+    if (res is! Map) return null;
+
+    final payload = res['payload'];
+    if (payload is Map) {
+      return Map<String, dynamic>.from(payload);
+    }
+    return Map<String, dynamic>.from(res);
+  }
+
+  Map<String, dynamic> _mapAttribution(Map<String, dynamic> payload) {
+    final attribution = <String, dynamic>{};
+    for (final key in _attributionKeys) {
+      final value = payload[key];
+      if (value != null && value.toString().isNotEmpty) {
+        attribution[key] = value.toString();
+      }
+    }
+    return attribution;
+  }
+
+  Future<void> _sendAttribution({
+    String? appsflyerId,
+    Map<String, dynamic>? attribution,
+  }) async {
+    if (attribution == null || attribution.isEmpty) return;
+    if (SharedPrefs.readBoolValue(PrefConstants.appsflyerAttributionSent)) {
+      return;
+    }
+
+    if (!SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
+      _pendingAppsflyerId = appsflyerId;
+      _pendingAttribution = attribution;
+      return;
+    }
+
+    final sent = await AnalyticsAPI.saveAppsFlyerAttribution(
+      appsflyerId: appsflyerId,
+      attribution: attribution,
+    );
+    if (sent) {
+      await SharedPrefs.writeValue(
+          PrefConstants.appsflyerAttributionSent, true);
+      _pendingAppsflyerId = null;
+      _pendingAttribution = null;
+      if (kDebugMode) {
+        debugPrint('[AppsFlyer] attribution saved to backend');
+      }
+    }
   }
 
   void _handleDeepLink(DeepLinkResult result) {

@@ -147,6 +147,7 @@ void main() async {
     if (userId != null && userId.isNotEmpty) {
       await FirebaseAnalytics.instance.setUserId(id: userId);
       AppsFlyerService.instance.setCustomerUserId(userId);
+      await AppsFlyerService.instance.onUserAuthenticated();
     }
   } catch (_) {}
 

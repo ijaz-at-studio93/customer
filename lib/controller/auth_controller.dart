@@ -8,6 +8,7 @@ import 'package:salon_customer/model/otp_verify_model.dart';
 import 'package:salon_customer/model/user_profile.dart';
 import 'package:salon_customer/model/user_response_model.dart';
 import 'package:salon_customer/page/auth/login_page.dart';
+import 'package:salon_customer/service/appsflyer_service.dart';
 import '../page/auth/create_profile_page.dart';
 import '../page/auth/otp_screen_page.dart';
 import '../util/SharedPrefs.dart';
@@ -249,6 +250,12 @@ class AuthController extends GetxController {
     await SharedPrefs.writeValue(
         PrefConstants.userId, model.data?.id.toString());
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, true);
+
+    final userId = model.data?.userData?.userId;
+    if (userId != null && userId.isNotEmpty) {
+      AppsFlyerService.instance.setCustomerUserId(userId);
+    }
+    await AppsFlyerService.instance.onUserAuthenticated();
   }
 
   /*---------------  init User Data -----------*/
