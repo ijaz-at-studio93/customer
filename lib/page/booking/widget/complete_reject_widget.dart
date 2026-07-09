@@ -10,6 +10,7 @@ import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 
 import '../../../model/booking_history_list_model.dart';
+import '../../appointment/payment_success_page.dart';
 
 class CompleteAndRejectWidget extends StatefulWidget {
   final HistoryList historyList;
@@ -238,6 +239,35 @@ class _CompleteAndRejectWidgetState extends State<CompleteAndRejectWidget> {
             ),
           ),
           const SizedBox(height: 10),
+
+          /// Row 34: view the payment-successful screen — only for completed.
+          if (widget.historyList.orderStatus == "completed")
+            GestureDetector(
+              onTap: () {
+                Get.to(() => PaymentSuccessPage(
+                      amount: (widget.historyList.orderAmount ?? 0).toInt(),
+                      bookingId: widget.historyList.appointmentId ?? "",
+                      isViewOnly: true,
+                    ));
+              },
+              child: Container(
+                height: 48,
+                width: Get.width,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: changeTheme(
+                          SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                      ColorConstant.primaryColor,
+                ),
+                child: Center(
+                  child: Text(
+                    "View Payment Receipt",
+                    style: AppTextTheme.bold
+                        .copyWith(color: ColorConstant.whiteColor, fontSize: 16),
+                  ),
+                ),
+              ),
+            ),
           // Text(
           //   'Hope you liked the service! Tap the VIEW button below to leave your valuable feedback.',
           //   style: AppTextTheme.medium.copyWith(

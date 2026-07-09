@@ -441,6 +441,7 @@ class ServicesWithProduct {
   int? totalProductCost;
   int? totalProductCount;
   String? productsName;
+  String? serviceCategoryName;
 
   ServicesWithProduct(
       {this.price,
@@ -464,7 +465,8 @@ class ServicesWithProduct {
       this.totalServiceCost,
       this.totalProductCost,
       this.totalProductCount,
-      this.productsName});
+      this.productsName,
+      this.serviceCategoryName});
 
   ServicesWithProduct.fromJson(Map<String, dynamic> json) {
     price = json['price'];
@@ -494,6 +496,7 @@ class ServicesWithProduct {
     totalProductCost = json['totalProductCost'];
     totalProductCount = json['totalProductCount'];
     productsName = json['productsName'];
+    serviceCategoryName = json['serviceCategoryName'];
   }
 
   Map<String, dynamic> toJson() {
@@ -522,6 +525,7 @@ class ServicesWithProduct {
     data['totalProductCost'] = totalProductCost;
     data['totalProductCount'] = totalProductCount;
     data['productsName'] = productsName;
+    data['serviceCategoryName'] = serviceCategoryName;
     return data;
   }
 }

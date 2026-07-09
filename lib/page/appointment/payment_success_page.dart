@@ -9,10 +9,15 @@ class PaymentSuccessPage extends StatefulWidget {
   final int amount;
   final String bookingId;
 
+  /// When true (e.g. opened from Completed Appointments to review a receipt),
+  /// back returns to the previous screen instead of resetting to the home tab.
+  final bool isViewOnly;
+
   const PaymentSuccessPage({
     super.key,
     required this.amount,
     required this.bookingId,
+    this.isViewOnly = false,
   });
 
   @override
@@ -45,7 +50,11 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Get.offAll(() => const BottomNavBarPage());
+        if (widget.isViewOnly) {
+          Get.back();
+        } else {
+          Get.offAll(() => const BottomNavBarPage());
+        }
         return false;
       },
       child: Scaffold(
@@ -57,7 +66,11 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Get.offAll(() => const BottomNavBarPage());
+              if (widget.isViewOnly) {
+                Get.back();
+              } else {
+                Get.offAll(() => const BottomNavBarPage());
+              }
             },
           ),
         ),
@@ -115,15 +128,19 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
 
                       //const SizedBox(height: 20),
 
-                      /// Amount
-                      Text(
-                        //"₹${widget.amount}/-",
-                        "₹${widget.amount}",
-                        style: const TextStyle(
-                          fontFamily: "Outfit",
-                          fontSize: 90,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
+                      /// Amount (auto-scales down so large values don't overflow)
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Text(
+                          //"₹${widget.amount}/-",
+                          "₹${widget.amount}",
+                          maxLines: 1,
+                          style: const TextStyle(
+                            fontFamily: "Outfit",
+                            fontSize: 90,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
 

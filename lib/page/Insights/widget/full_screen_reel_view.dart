@@ -227,22 +227,7 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                 if ((widget.data.artist?.name ?? "").isNotEmpty)
                   Row(
                     children: [
-                      CircleAvatar(
-                        radius: 10,
-                        backgroundColor: Colors.grey.shade300,
-                        backgroundImage: (widget.data.artist?.profileImage !=
-                                    null &&
-                                widget.data.artist!.profileImage!.isNotEmpty)
-                            ? NetworkImage(
-                                "${APIConstants.image}${widget.data.artist!.profileImage}",
-                              )
-                            : null,
-                        child: (widget.data.artist?.profileImage == null ||
-                                widget.data.artist!.profileImage!.isEmpty)
-                            ? const Icon(Icons.person,
-                                size: 12, color: Colors.white)
-                            : null,
-                      ),
+                      _artistAvatar(widget.data.artist?.profileImage),
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(
@@ -255,18 +240,39 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                       ),
                     ],
                   ),
-                const SizedBox(height: 8),
-                Text(
-                  widget.data.description ?? "",
-                  style: const TextStyle(color: Colors.white, fontSize: 13),
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
-                ),
+                // Row 9: right-bottom shows the stylist name if present, else
+                // nothing — the description lives on the left only (the stray
+                // duplicate Text(description) that used to render here is gone).
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  /// 404-safe circular artist avatar: falls back to a person icon instead of
+  /// throwing when the profile image is missing or fails to load (Row 9).
+  Widget _artistAvatar(String? profileImage) {
+    const double size = 20;
+    final fallback = Container(
+      width: size,
+      height: size,
+      color: Colors.grey.shade300,
+      alignment: Alignment.center,
+      child: const Icon(Icons.person, size: 12, color: Colors.white),
+    );
+    return ClipOval(
+      child: (profileImage != null && profileImage.isNotEmpty)
+          ? CachedNetworkImage(
+              imageUrl: "${APIConstants.image}$profileImage",
+              width: size,
+              height: size,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => fallback,
+              errorWidget: (context, url, error) => fallback,
+            )
+          : fallback,
     );
   }
 

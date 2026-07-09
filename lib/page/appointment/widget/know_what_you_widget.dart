@@ -90,6 +90,32 @@ class KnowWhatYouWidget extends StatelessWidget {
                         ],
                       ),
 
+                      /// Category under the service name (backend field first,
+                      /// otherwise resolved from the loaded salon categories).
+                      Builder(builder: (_) {
+                        final category =
+                            (items.serviceCategoryName ?? "").trim().isNotEmpty
+                                ? items.serviceCategoryName!.trim()
+                                : controller.categoryNameForService(
+                                    items.serviceId ?? serviceId);
+                        if (category.trim().isEmpty) {
+                          return const SizedBox.shrink();
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 4),
+                          child: Text(
+                            category,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTextTheme.medium.copyWith(
+                              fontFamily: "Outfit",
+                              fontSize: 13,
+                              color: ColorConstant.grayTextColor,
+                            ),
+                          ),
+                        );
+                      }),
+
                       const SizedBox(height: 4), // 🔥 reduced gap
 
                       /// ROW 2: Price + Remove

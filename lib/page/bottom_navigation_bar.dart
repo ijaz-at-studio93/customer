@@ -99,20 +99,21 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                     label: 'Bookings',
                   ),
                   BottomNavigationBarItem(
-                    icon: ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        colors: [
-                          Color(0xFFFD98FB),
-                          Color(0xFFB479FF),
-                        ],
-                        begin: Alignment.centerLeft,
-                        end: Alignment.centerRight,
-                      ).createShader(bounds),
+                    // Row 32: normalized colour (gray → theme like the other
+                    // tabs) with a scale-pop animation when selected.
+                    icon: AnimatedScale(
+                      scale: _selectedIndex == 2 ? 1.25 : 1.0,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOutBack,
                       child: Image.asset(
                         AssetsConstant.insights,
                         height: 24,
                         width: 24,
-                        color: Colors.white, // 👈 required
+                        color: _selectedIndex == 2
+                            ? selectedGender.value == 0
+                                ? ColorConstant.primaryColor
+                                : ColorConstant.primary2
+                            : ColorConstant.grayTextColor,
                       ),
                     ),
                     label: 'Content',

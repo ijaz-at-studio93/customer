@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../../../constant/color_constant.dart';
 import '../../../project_specific/text_theme.dart';
 import '../../../util/SharedPrefs.dart';
@@ -10,13 +11,24 @@ class PendingPaymentBar extends StatelessWidget {
   final String bookingId;
   final String salonName;
   final String? startsAt;
+  final String? orderStatus;
 
   const PendingPaymentBar({
     super.key,
     required this.bookingId,
     required this.salonName,
-    this.startsAt
+    this.startsAt,
+    this.orderStatus,
   });
+
+  /// Formats the raw ISO startsAt into a friendly "dd MMM, h:mm a" string
+  /// (e.g. "08 Jul, 2:30 PM"). Returns "" when it can't be parsed.
+  String _formatDateTime(String? raw) {
+    if (raw == null || raw.isEmpty) return "";
+    final parsed = DateTime.tryParse(raw);
+    if (parsed == null) return "";
+    return DateFormat('dd MMM, h:mm a').format(parsed.toLocal());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +82,8 @@ class PendingPaymentBar extends StatelessWidget {
                   Flexible(
                     child: AppointmentText(
                       salonName: salonName,
-                      dateTime: startsAt,
+                      dateTime: _formatDateTime(startsAt),
+                      isConfirmed: orderStatus == "confirmed",
                       themeColor: Colors.white,
                     )
                   ),
@@ -120,12 +133,14 @@ class PendingPaymentBar extends StatelessWidget {
 class AppointmentText extends StatefulWidget {
   final String salonName;
   final String? dateTime;
+  final bool isConfirmed;
   final Color themeColor;
 
   const AppointmentText({
     super.key,
     required this.salonName,
     this.dateTime,
+    this.isConfirmed = false,
     required this.themeColor,
   });
 
@@ -154,7 +169,9 @@ class _AppointmentTextState extends State<AppointmentText> {
       "Appointment Booked",
       "${widget.salonName}",
       widget.dateTime != null && widget.dateTime!.isNotEmpty
-          ? "${widget.dateTime}"
+          ? (widget.isConfirmed
+              ? "Confirmed: ${widget.dateTime}"
+              : "Scheduled: ${widget.dateTime}")
           : "Time to be confirmed",
     ];
 

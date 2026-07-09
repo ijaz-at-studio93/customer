@@ -97,6 +97,40 @@ class HomeController extends GetxController {
 
   set setSalonDetailsListData(val) => _salonDetailsListData.value = val;
 
+  /// Persistent serviceId -> categoryName cache. Populated every time a salon's
+  /// service list loads (for ANY gender), so category names survive a gender
+  /// switch even though salonDetailsListData is replaced with the new gender.
+  final Map<String, String> _serviceCategoryCache = {};
+
+  /// Folds the currently-loaded salon service list into the persistent cache.
+  void cacheServiceCategories() {
+    final data = _salonDetailsListData.value.data;
+    if (data == null) return;
+    void addAll(List cats) {
+      for (final cat in cats) {
+        final name = cat.name ?? "";
+        if (name.isEmpty) continue;
+        for (final s in cat.services ?? const []) {
+          final id = s.id ?? "";
+          if (id.isNotEmpty) _serviceCategoryCache[id] = name;
+        }
+      }
+    }
+
+    addAll(data.selectedCategories ?? const []);
+    addAll(data.recommendedCategories ?? const []);
+  }
+
+  /// Resolves a service's category name. Used as a fallback when the cart
+  /// response doesn't include serviceCategoryName. Reads from the persistent
+  /// cache (which accumulates across gender loads).
+  String categoryNameForService(String? serviceId) {
+    if (serviceId == null || serviceId.isEmpty) return "";
+    // Fold in whatever is currently loaded, then look up.
+    cacheServiceCategories();
+    return _serviceCategoryCache[serviceId] ?? "";
+  }
+
   /*-----------------  Home Salon List Widget Get -------------------*/
   final Rx<HomeSalonModel> _homeSalonList = HomeSalonModel().obs;
 
@@ -478,6 +512,9 @@ class HomeController extends GetxController {
       _salonDetailsListData.value =
           await HomeAPI.getSalonDetailsCategoryServiceList(
               salonId: salonId, serviceGender: serviceGender);
+      // Remember this gender's service→category mapping so it survives a
+      // later gender switch (Row 38).
+      cacheServiceCategories();
     } catch (e) {
       showError(e);
       if (kDebugMode) {

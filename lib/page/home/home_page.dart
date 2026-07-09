@@ -100,6 +100,20 @@ class _HomePageState extends State<HomePage>
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final genderPref = SharedPrefs.readStringValue(PrefConstants.gender);
         selectedGender.value = (genderPref == "1") ? 1 : 0;
+
+        // Row 23: default the home gender to the customer's own gender,
+        // unless they've already picked a gender manually.
+        if (!SharedPrefs.readBoolValue(PrefConstants.isSelectedGender)) {
+          final loaded = _authController.getUserProfile.data?.gender;
+          if (loaded != null && loaded.isNotEmpty) {
+            _applyProfileGenderDefault(loaded);
+          } else {
+            _authController.doGetProfile(callback: () {
+              _applyProfileGenderDefault(
+                  _authController.getUserProfile.data?.gender);
+            });
+          }
+        }
       });
       //_homeController.getLastMakeYourOwnPackageModel.data = [];
     });
@@ -448,16 +462,25 @@ class _HomePageState extends State<HomePage>
                         child: PendingPaymentBar(
                             bookingId: booking.appointmentId,
                             salonName: booking.salon.displayName,
-                            startsAt: booking.startsAt),
+                            startsAt: booking.startsAt,
+                            orderStatus: booking.orderStatus),
                       ),
 
                     /// YOUR EXISTING MEN / WOMEN SWITCH
                     Container(
                       width: Get.width * 0.58,
                       height: 50,
+                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                         color: ColorConstant.whiteColor,
                         borderRadius: BorderRadius.circular(12),
+                        // Highlight border reflecting the active gender.
+                        border: Border.all(
+                          color: selectedGender.value == 0
+                              ? ColorConstant.primaryColor
+                              : ColorConstant.primary2,
+                          width: 1.5,
+                        ),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -622,6 +645,63 @@ class _HomePageState extends State<HomePage>
                 );
               }),
             )));
+  }
+
+  /// Row 23: applies the customer's profile gender ("MALE"/"FEMALE") as the
+  /// default home selection. Persists it for next launch and refreshes the
+  /// gender-dependent content only when the selection actually changes.
+  void _applyProfileGenderDefault(String? rawGender) {
+    if (!mounted) return;
+
+    final g = (rawGender ?? "").toUpperCase();
+    final int target;
+    if (g == "FEMALE") {
+      target = 1;
+    } else if (g == "MALE") {
+      target = 0;
+    } else {
+      return; // Unknown gender → keep the existing default.
+    }
+
+    // Persist so subsequent launches start on the correct gender.
+    SharedPrefs.writeValue(PrefConstants.gender, target == 1 ? "1" : "0");
+
+    // Already showing the right gender → nothing else to do.
+    if (selectedGender.value == target) return;
+
+    setState(() {
+      selectedGender.value = target;
+    });
+    final serviceGender = target == 0 ? "male" : "female";
+
+    _homeController.doGetHomeCategory(gender: serviceGender);
+
+    final lat =
+        double.tryParse(SharedPrefs.readStringValue(PrefConstants.latitude));
+    final lng =
+        double.tryParse(SharedPrefs.readStringValue(PrefConstants.longitude));
+    if (lat != null && lng != null) {
+      _homeController.doGetPromoCode(
+        fourPlusRating: false,
+        homeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
+        nearest: false,
+        orderBy: "",
+        serviceGender: serviceGender,
+        lat: lat,
+        lng: lng,
+      );
+      _homeController.doGetHomeSalonList(
+        serviceGender: serviceGender,
+        homeService: atHome,
+        offset: 1,
+        size: 500,
+        lat: lat,
+        lng: lng,
+        orderBy: "",
+        nearest: false,
+        fourPlusRating: false,
+      );
+    }
   }
 
   void sortSalonsByDiscount() {

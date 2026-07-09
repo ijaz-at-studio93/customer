@@ -310,6 +310,13 @@ class _SelectedServiceSheetPageState extends State<SelectedServiceSheetPage> {
                                               .name ??
                                           "",
 
+                                      serviceCategory: _homeController
+                                              .getServiceAddCartModel
+                                              .data
+                                              ?.servicesWithProduct?[index]
+                                              .serviceCategoryName ??
+                                          "",
+
                                       servicePrice: _homeController
                                               .getServiceAddCartModel
                                               .data

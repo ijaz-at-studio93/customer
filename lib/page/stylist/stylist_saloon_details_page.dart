@@ -1034,10 +1034,12 @@ class _StylistSaloonDetailsPageState extends State<StylistSaloonDetailsPage>
           width: Get.width,
           height: Get.height * 0.28,
           decoration: const BoxDecoration(
+            // Light bottom scrim (softened so the salon photo stays visible).
             gradient: LinearGradient(
-              begin: Alignment(0.02, 1.00),
-              end: Alignment(-0.02, -1),
-              colors: [Colors.black, Color(0x003D3636)],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
+              colors: [Color(0x73000000), Color(0x00000000)],
+              stops: [0.0, 0.35],
             ),
           ),
         )),
