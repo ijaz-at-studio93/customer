@@ -93,6 +93,12 @@ class AppIconHelper {
   }
 
   static Future<void> updateCustomerAppIcon(DateTime? bookingDate) async {
+    // In debug builds, skip dynamic launcher-icon switching. The plugin
+    // disables the running MainActivity component when promoting an alias,
+    // which finishes the foreground activity → the app exits ~2s after launch
+    // (and also breaks `flutter run`). Icons still switch in release builds.
+    if (kDebugMode) return;
+
     if (bookingDate == null) {
       await _change(_defaultIcon);
       return;

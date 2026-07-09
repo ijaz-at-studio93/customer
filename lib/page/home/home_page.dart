@@ -21,7 +21,6 @@ import 'package:salon_customer/page/location/google_map.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/project_specific/status_bar_color_appbar.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
-import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'package:salon_customer/util/app_icon_helper.dart';
 import '../../constant/variable_constant.dart';
@@ -375,18 +374,43 @@ class _HomePageState extends State<HomePage>
                         final salons =
                             _homeController.getHomeSalonList.data?.rows ?? [];
 
-                        /// Empty state
-                        if (salons.isEmpty) {
+                        /// Row 25 fix: while loading (or before the salon list
+                        /// has loaded at all), don't show the "not here yet"
+                        /// card — the loading indicator is on screen and we
+                        /// don't yet know whether the area is operational.
+                        final bool salonsLoaded =
+                            _homeController.getHomeSalonList.data != null;
+                        if (_homeController.showProgress || !salonsLoaded) {
                           return const SliverToBoxAdapter(
-                            child: NoItemsWidget(text: "No salons were found."),
+                            child: SizedBox.shrink(),
                           );
+                        }
+
+                        /// Row 25: non-operational area — no salon within 12 km.
+                        if (!_hasSalonWithin12km()) {
+                          return SliverToBoxAdapter(
+                            child: _notHereYetWidget(),
+                          );
+                        }
+
+                        /// Row 26 (updated) + Row 27: client-side ordering.
+                        /// Nearest → by distance; Budget → starting price
+                        /// low-to-high. Nearest takes precedence if both are on.
+                        final orderedSalons = List.of(salons);
+                        if (isNearestSelected) {
+                          orderedSalons.sort((a, b) => (a.distance ?? (1 << 30))
+                              .compareTo(b.distance ?? (1 << 30)));
+                        } else if (_budgetLowToHigh) {
+                          orderedSalons.sort((a, b) =>
+                              (a.serviceStartingPrice ?? 0)
+                                  .compareTo(b.serviceStartingPrice ?? 0));
                         }
 
                         /// Salon list
                         return SliverList(
                           delegate: SliverChildBuilderDelegate(
                             (context, index) {
-                              final salon = salons[index];
+                              final salon = orderedSalons[index];
 
                               return SaloonCardWidget(
                                 homeSalonModel: salon,
@@ -435,7 +459,7 @@ class _HomePageState extends State<HomePage>
                                 isFav: false,
                               );
                             },
-                            childCount: salons.length,
+                            childCount: orderedSalons.length,
                           ),
                         );
                       }),
@@ -470,7 +494,6 @@ class _HomePageState extends State<HomePage>
                     Container(
                       width: Get.width * 0.58,
                       height: 50,
-                      clipBehavior: Clip.antiAlias,
                       decoration: BoxDecoration(
                         color: ColorConstant.whiteColor,
                         borderRadius: BorderRadius.circular(12),
@@ -482,56 +505,27 @@ class _HomePageState extends State<HomePage>
                           width: 1.5,
                         ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          /// MEN BUTTON
+                      child: ClipRRect(
+                        // Inner radius = outer 12 − 1.5px border, so the filled
+                        // halves round to match the border's inner edge with no
+                        // corner clipping or gaps.
+                        borderRadius: BorderRadius.circular(10.5),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            /// MEN BUTTON
                           Expanded(
                             child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  selectedGender.value = 0;
-
-                                  SharedPrefs.writeValue(
-                                      PrefConstants.isSelectedGender, true);
-
-                                  SharedPrefs.writeValue(
-                                      PrefConstants.gender, "0");
-                                  // _homeController
-                                  //     .getLastMakeYourOwnPackageModel.data = [];
-
-                                  _homeController.doGetHomeCategory(
-                                    gender: "male",
-                                  );
-
-                                  _homeController.doGetHomeSalonList(
-                                      serviceGender: "male",
-                                      homeService: atHome,
-                                      offset: 1,
-                                      size: 500,
-                                      lat: double.parse(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.latitude)),
-                                      lng: double.parse(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.longitude)),
-                                      orderBy: "",
-                                      nearest: false,
-                                      fourPlusRating: false);
-                                });
-                              },
+                              onTap: () => _selectGender(0),
                               child: Container(
                                 height: 50,
-                                decoration: BoxDecoration(
-                                  color: selectedGender.value == 0
-                                      ? ColorConstant.primaryColor
-                                      : ColorConstant.whiteColor,
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(12),
-                                    bottomLeft: Radius.circular(12),
-                                  ),
-                                ),
+                                // No corner radius here — the outer container's
+                                // clipBehavior rounds the corners, so the fill
+                                // reaches the border cleanly (no unfilled notch).
+                                color: selectedGender.value == 0
+                                    ? ColorConstant.primaryColor
+                                    : ColorConstant.whiteColor,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -565,49 +559,15 @@ class _HomePageState extends State<HomePage>
                           /// WOMEN BUTTON
                           Expanded(
                             child: InkWell(
-                              onTap: () {
-                                setState(() {
-                                  selectedGender.value = 1;
-                                  SharedPrefs.writeValue(
-                                      PrefConstants.isSelectedGender, true);
-
-                                  SharedPrefs.writeValue(
-                                      PrefConstants.gender, "1");
-
-                                  // _homeController
-                                  //     .getLastMakeYourOwnPackageModel.data = [];
-                                  // List<String> storeServiceId = [];
-
-                                  _homeController.doGetHomeCategory(
-                                    gender: "female",
-                                  );
-                                  _homeController.doGetHomeSalonList(
-                                      serviceGender: "female",
-                                      homeService: atHome,
-                                      offset: 1,
-                                      size: 500,
-                                      lat: double.parse(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.latitude)),
-                                      lng: double.parse(
-                                          SharedPrefs.readStringValue(
-                                              PrefConstants.longitude)),
-                                      orderBy: "",
-                                      nearest: false,
-                                      fourPlusRating: false);
-                                });
-                              },
+                              onTap: () => _selectGender(1),
                               child: Container(
                                 height: 50,
-                                decoration: BoxDecoration(
-                                  color: selectedGender.value == 1
-                                      ? ColorConstant.primary2
-                                      : ColorConstant.whiteColor,
-                                  borderRadius: const BorderRadius.only(
-                                    topRight: Radius.circular(12),
-                                    bottomRight: Radius.circular(12),
-                                  ),
-                                ),
+                                // No corner radius here — outer clipBehavior
+                                // handles rounding so the fill reaches the
+                                // border cleanly.
+                                color: selectedGender.value == 1
+                                    ? ColorConstant.primary2
+                                    : ColorConstant.whiteColor,
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
@@ -641,10 +601,55 @@ class _HomePageState extends State<HomePage>
                         ],
                       ),
                     ),
+                    ),
                   ],
                 );
               }),
             )));
+  }
+
+  /// Row 22: single, robust handler for the Home gender switch. Updates the
+  /// selection, persists it, and refreshes ALL gender-dependent content
+  /// (categories, packages, promos, salons). Lat/lng are parsed safely so a
+  /// switch before location is ready can't crash the handler.
+  void _selectGender(int gender) {
+    setState(() {
+      selectedGender.value = gender;
+    });
+
+    SharedPrefs.writeValue(PrefConstants.isSelectedGender, true);
+    SharedPrefs.writeValue(PrefConstants.gender, gender == 0 ? "0" : "1");
+
+    final serviceGender = gender == 0 ? "male" : "female";
+    _homeController.doGetHomeCategory(gender: serviceGender);
+    _homeController.doGetMakePackageData();
+
+    final lat =
+        double.tryParse(SharedPrefs.readStringValue(PrefConstants.latitude));
+    final lng =
+        double.tryParse(SharedPrefs.readStringValue(PrefConstants.longitude));
+    if (lat != null && lng != null) {
+      _homeController.doGetPromoCode(
+        fourPlusRating: false,
+        homeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
+        nearest: false,
+        orderBy: "",
+        serviceGender: serviceGender,
+        lat: lat,
+        lng: lng,
+      );
+      _homeController.doGetHomeSalonList(
+        serviceGender: serviceGender,
+        homeService: atHome,
+        offset: 1,
+        size: 500,
+        lat: lat,
+        lng: lng,
+        orderBy: "",
+        nearest: false,
+        fourPlusRating: false,
+      );
+    }
   }
 
   /// Row 23: applies the customer's profile gender ("MALE"/"FEMALE") as the
@@ -1377,11 +1382,6 @@ class _HomePageState extends State<HomePage>
                                 itemCount: current.length,
                                 itemBuilder: (context, index) {
                                   var item = current[index];
-                                  print('************************ in current');
-                                  print(item.imageMale);
-                                  print(item.name);
-                                  print(
-                                      "${APIConstants.image}${item.imageMale}");
                                   return GestureDetector(
                                     onTap: () {
                                       List<String> storeServiceId = [];
@@ -1437,44 +1437,46 @@ class _HomePageState extends State<HomePage>
                                             // fadeInDuration: index < 4
                                             //     ? Duration.zero
                                             //     : const Duration(milliseconds: 300),
-                                            placeholder: (context, url) {
-                                              print("⏳ LOADING: $url");
-                                              return Container(
-                                                height: 60,
-                                                width: 60,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey.shade200,
-                                                  shape: BoxShape.circle,
-                                                ),
-                                              );
-                                            },
-                                            errorWidget: (context, url, error) {
-                                              print(
-                                                  "🔍 FULL ITEM: ${item.toJson()}");
-                                              print("name is: ${item.name}");
-                                              print(
-                                                  "👉 FINAL URL USED: ${selectedGender.value == 0 ? item.imageMale : item.imageFemale}");
-                                              print("❌ ERROR: $url");
-                                              print("❌ ERROR DETAILS: $error");
-
-                                              return Icon(Icons.error);
-                                            },
+                                            placeholder: (context, url) =>
+                                                Container(
+                                              height: 60,
+                                              width: 60,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade200,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                            // Row 21: neutral placeholder instead
+                                            // of a red exclamation when an image
+                                            // fails to load.
+                                            errorWidget: (context, url, error) =>
+                                                Container(
+                                              height: 60,
+                                              width: 60,
+                                              alignment: Alignment.center,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade200,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.image_not_supported_outlined,
+                                                size: 22,
+                                                color: Colors.grey.shade400,
+                                              ),
+                                            ),
                                             imageBuilder:
-                                                (context, imageProvider) {
-                                              print(
-                                                  "✅ SUCCESS: ${selectedGender.value == 0 ? item.imageMale : item.imageFemale}");
-                                              return Container(
-                                                height: 60,
-                                                width: 60,
-                                                decoration: BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  image: DecorationImage(
-                                                    image: imageProvider,
-                                                    fit: BoxFit.cover,
-                                                  ),
+                                                (context, imageProvider) =>
+                                                    Container(
+                                              height: 60,
+                                              width: 60,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                  image: imageProvider,
+                                                  fit: BoxFit.cover,
                                                 ),
-                                              );
-                                            },
+                                              ),
+                                            ),
                                           ),
                                         ),
                                         const SizedBox(height: 12),
@@ -2116,11 +2118,75 @@ class _HomePageState extends State<HomePage>
   bool atHome = false;
   int select = 0;
   bool isNearestSelected = false;
-  bool isHighDiscountSelected = false;
+
+  // Row 26 (updated): budget = sort salons by starting price low→high.
+  bool _budgetLowToHigh = false;
+
+  // Row 25: operational-area check — is any salon within 12 km (12000 m)?
+  bool _hasSalonWithin12km() {
+    final salons = _homeController.getHomeSalonList.data?.rows ?? [];
+    return salons.any((s) => (s.distance ?? (1 << 30)) <= 12000);
+  }
+
+  // Row 25: "We're not here yet" message + Request button (frontend snackbar).
+  Widget _notHereYetWidget() {
+    final Color themeColor =
+        changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
+            ColorConstant.primaryColor;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+      child: Column(
+        children: [
+          Icon(Icons.location_off_outlined, size: 60, color: themeColor),
+          const SizedBox(height: 16),
+          Text(
+            "We are not Here Yet,\nWe'll be Here Soon",
+            textAlign: TextAlign.center,
+            style: AppTextTheme.bold
+                .copyWith(fontSize: 18, color: ColorConstant.blackColor),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "We don't have any salons within 12 km of your location yet.",
+            textAlign: TextAlign.center,
+            style: AppTextTheme.medium
+                .copyWith(fontSize: 13, color: ColorConstant.grayTextColor),
+          ),
+          const SizedBox(height: 22),
+          GestureDetector(
+            onTap: () {
+              Get.snackbar(
+                "Request received",
+                "Thanks! We've noted your request — we'll try to reach your area soon.",
+                snackPosition: SnackPosition.BOTTOM,
+                backgroundColor: themeColor,
+                colorText: ColorConstant.whiteColor,
+                margin: const EdgeInsets.all(12),
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 12),
+              decoration: BoxDecoration(
+                color: themeColor,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text(
+                "Request",
+                style: AppTextTheme.bold
+                    .copyWith(fontSize: 15, color: ColorConstant.whiteColor),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Obx _saloonsFoundNear() {
     return Obx(
-      () => Container(
+      () => !_hasSalonWithin12km()
+          ? const SizedBox.shrink()
+          : Container(
         color: ColorConstant.whiteColor,
         child: Column(
           children: [
@@ -2570,17 +2636,16 @@ class _HomePageState extends State<HomePage>
                                 //           SharedPrefs.readStringValue(
                                 //               PrefConstants.longitude)));
                                 // }
-                                isHighDiscountSelected =
-                                    !isHighDiscountSelected;
+                                // Row 26 (updated): Budget = price low-to-high.
+                                _budgetLowToHigh = !_budgetLowToHigh;
                               });
-                              applyFilters();
                             },
                             child: Container(
-                              width: Get.width * 0.25,
+                              width: Get.width * 0.28,
                               height: 30,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(12),
-                                color: isHighDiscountSelected //select == 2
+                                color: _budgetLowToHigh //budget selected
                                     ? changeTheme(SharedPrefs.readStringValue(
                                         PrefConstants.gender))
                                     : ColorConstant.whiteColor,
@@ -2590,12 +2655,12 @@ class _HomePageState extends State<HomePage>
                               ),
                               child: Center(
                                 child: Text(
-                                  "High Discount",
+                                  "Budget",
                                   style: AppTextTheme.medium.copyWith(
                                     fontFamily: "Outfit", // ✅ added
                                     fontWeight: FontWeight.w400, // ✅ Regular
                                     fontSize: 14, // ✅ Figma size
-                                    color: isHighDiscountSelected //select == 2
+                                    color: _budgetLowToHigh //budget selected
                                         ? ColorConstant.whiteColor
                                         : ColorConstant.blackColor,
                                   ),
@@ -2678,25 +2743,21 @@ class _HomePageState extends State<HomePage>
         fourPlusRating: false,
       );
 
-      // /// 🔥 IF ALSO DISCOUNT → apply after fetch
-      // if (isHighDiscountSelected) {
-      //   //sortSalonsByDiscount();
-      //   Future.delayed(const Duration(milliseconds: 5300), () {
-      //     sortSalonsByDiscount();
-      //   });
-      //   return;
-      // }
+      // Row 27: keep the offers strip in sync when toggling Nearest on.
+      _homeController.doGetPromoCode(
+        fourPlusRating: false,
+        homeService: SharedPrefs.readBoolValue(PrefConstants.isHomeService),
+        nearest: true,
+        orderBy: orderBy,
+        serviceGender: selectedGender.value == 0 ? "male" : "female",
+        lat: lat,
+        lng: lng,
+      );
 
       return;
     }
 
-    /// 🔥 CASE 2: ONLY HIGH DISCOUNT
-    if (isHighDiscountSelected) {
-      sortSalonsByDiscount();
-      return;
-    }
-
-    /// 🔥 CASE 3: NONE (default)
+    /// 🔥 CASE 2: NONE (default)
     _homeController.doGetHomeSalonList(
       serviceGender: selectedGender.value == 0 ? "male" : "female",
       homeService: atHome,

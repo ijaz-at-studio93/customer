@@ -78,102 +78,188 @@ class _BookingHomePageState extends State<BookingHomePage>
 
                           /// UPCOMING BOOKINGS
                           : bookingOverView == "0"
-                              ? _homeController.getCurrentBookingListModel.data
-                                          ?.isEmpty ??
-                                      false
-                                  ? const NoItemsWidget(
+                              ? Builder(builder: (context) {
+                                  final all = _homeController
+                                          .getCurrentBookingListModel.data ??
+                                      [];
+                                  // Upcoming = active bookings only. Cancelled
+                                  // (user_cancelled), rejected and completed
+                                  // belong to the other tabs.
+                                  final items = all
+                                      .where((b) =>
+                                          b.orderStatus == "pending" ||
+                                          b.orderStatus == "confirmed")
+                                      .toList();
+
+                                  if (items.isEmpty) {
+                                    return const NoItemsWidget(
                                       text:
                                           "There are no current bookings on record",
-                                    )
-                                  : ListView.builder(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 150),
-                                      key: pendingListKey,
-                                      itemCount: _homeController
-                                              .getCurrentBookingListModel
-                                              .data
-                                              ?.length ??
-                                          0,
-                                      itemBuilder: (context, index) {
-                                        final booking = _homeController
-                                            .getCurrentBookingListModel
-                                            .data![index];
+                                    );
+                                  }
 
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 5),
-                                          child: PendingCardWidget(
-                                            bookingData: booking,
-                                            onPress: () async {
-                                              final result =
-                                                  await Get.to(() => QRCodePage(
-                                                        isBooking: false,
-                                                        appointmentId: booking
-                                                                .appointmentId ??
-                                                            "",
-                                                      ));
+                                  return ListView.builder(
+                                    padding:
+                                        const EdgeInsets.only(bottom: 150),
+                                    key: pendingListKey,
+                                    itemCount: items.length,
+                                    itemBuilder: (context, index) {
+                                      final booking = items[index];
 
-                                              if (result == true) {
-                                                _homeController
-                                                    .doGetCurrentBookingListData();
-                                              }
-                                            },
-                                            onReSchedule: () async {
-                                              final result =
-                                                  await _showRescheduleDialog(
-                                                context,
-                                                booking.appointmentId ?? "",
-                                              );
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 5),
+                                        child: PendingCardWidget(
+                                          bookingData: booking,
+                                          onPress: () async {
+                                            final result =
+                                                await Get.to(() => QRCodePage(
+                                                      isBooking: false,
+                                                      appointmentId: booking
+                                                              .appointmentId ??
+                                                          "",
+                                                    ));
 
-                                              if (result == true) {
-                                                _homeController
-                                                    .doGetCurrentBookingListData();
-                                              }
-                                            },
-                                          ),
+                                            if (result == true) {
+                                              _homeController
+                                                  .doGetCurrentBookingListData();
+                                            }
+                                          },
+                                          onReSchedule: () async {
+                                            final result =
+                                                await _showRescheduleDialog(
+                                              context,
+                                              booking.appointmentId ?? "",
+                                            );
+
+                                            if (result == true) {
+                                              _homeController
+                                                  .doGetCurrentBookingListData();
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  );
+                                })
+
+                              /// CANCELLED BOOKINGS (from current list + history)
+                              : bookingOverView == "2"
+                                  ? Builder(builder: (context) {
+                                      final currentCancelled =
+                                          (_homeController
+                                                      .getCurrentBookingListModel
+                                                      .data ??
+                                                  [])
+                                              .where((b) =>
+                                                  b.orderStatus ==
+                                                  "user_cancelled")
+                                              .toList();
+                                      final currentIds = currentCancelled
+                                          .map((b) => b.appointmentId)
+                                          .toSet();
+                                      final historyCancelled = (_homeController
+                                                  .getBookingHistoryListModel
+                                                  .data ??
+                                              [])
+                                          .where((h) =>
+                                              h.orderStatus == "user_cancelled" &&
+                                              !currentIds
+                                                  .contains(h.appointmentId))
+                                          .toList();
+
+                                      final total = currentCancelled.length +
+                                          historyCancelled.length;
+                                      if (total == 0) {
+                                        return const NoItemsWidget(
+                                          text:
+                                              "There are no cancelled bookings.",
                                         );
-                                      },
-                                    )
+                                      }
 
-                              /// COMPLETED BOOKINGS
-                              : _homeController.getBookingHistoryListModel.data
-                                          ?.isEmpty ??
-                                      false
-                                  ? const NoItemsWidget(
-                                      text:
-                                          "There are no completed bookings available.",
-                                    )
-                                  : ListView.builder(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 150),
-                                      key: completedListKey,
-                                      itemCount: _homeController
-                                              .getBookingHistoryListModel
-                                              .data
-                                              ?.length ??
-                                          0,
-                                      itemBuilder: (context, index) {
-                                        final history = _homeController
-                                            .getBookingHistoryListModel
-                                            .data![index];
+                                      return ListView.builder(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 150),
+                                        itemCount: total,
+                                        itemBuilder: (context, index) {
+                                          if (index < currentCancelled.length) {
+                                            final booking =
+                                                currentCancelled[index];
+                                            return Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 20,
+                                                      vertical: 5),
+                                              child: PendingCardWidget(
+                                                bookingData: booking,
+                                                onPress: () {},
+                                                onReSchedule: () {},
+                                              ),
+                                            );
+                                          }
+                                          final history = historyCancelled[
+                                              index - currentCancelled.length];
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20, vertical: 5),
+                                            child: CompleteAndRejectWidget(
+                                              historyList: history,
+                                              onPress: () {
+                                                Get.to(() =>
+                                                    CompleteBookingDetailsView(
+                                                      appointmentId: history
+                                                              .appointmentId ??
+                                                          "",
+                                                    ));
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    })
 
-                                        return Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 5),
-                                          child: CompleteAndRejectWidget(
-                                            historyList: history,
-                                            onPress: () {
-                                              Get.to(() =>
-                                                  CompleteBookingDetailsView(
-                                                    appointmentId:
-                                                        history.appointmentId ??
-                                                            "",
-                                                  ));
-                                            },
-                                          ),
+                                  /// COMPLETED BOOKINGS (completed + rejected)
+                                  : Builder(builder: (context) {
+                                      final items = (_homeController
+                                                  .getBookingHistoryListModel
+                                                  .data ??
+                                              [])
+                                          .where((h) =>
+                                              h.orderStatus != "user_cancelled")
+                                          .toList();
+
+                                      if (items.isEmpty) {
+                                        return const NoItemsWidget(
+                                          text:
+                                              "There are no completed bookings available.",
                                         );
-                                      },
-                                    ),
+                                      }
+
+                                      return ListView.builder(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 150),
+                                        key: completedListKey,
+                                        itemCount: items.length,
+                                        itemBuilder: (context, index) {
+                                          final history = items[index];
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 20, vertical: 5),
+                                            child: CompleteAndRejectWidget(
+                                              historyList: history,
+                                              onPress: () {
+                                                Get.to(() =>
+                                                    CompleteBookingDetailsView(
+                                                      appointmentId: history
+                                                              .appointmentId ??
+                                                          "",
+                                                    ));
+                                              },
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }),
                     ))
               ],
             ),
@@ -250,13 +336,27 @@ class _BookingHomePageState extends State<BookingHomePage>
           ),
           "1": Text(
             "Completed",
+            textAlign: TextAlign.center,
             style: bookingOverView == "1"
                 ? AppTextTheme.bold.copyWith(
-                    fontSize: 14,
+                    fontSize: 13,
                     color: ColorConstant.blackColor,
                   )
                 : AppTextTheme.medium.copyWith(
+                    fontSize: 12,
+                    color: ColorConstant.whiteColor,
+                  ),
+          ),
+          "2": Text(
+            "Cancelled",
+            textAlign: TextAlign.center,
+            style: bookingOverView == "2"
+                ? AppTextTheme.bold.copyWith(
                     fontSize: 13,
+                    color: ColorConstant.blackColor,
+                  )
+                : AppTextTheme.medium.copyWith(
+                    fontSize: 12,
                     color: ColorConstant.whiteColor,
                   ),
           ),
@@ -267,6 +367,12 @@ class _BookingHomePageState extends State<BookingHomePage>
           if (bookingOverView == "0") {
             setState(() {
               _homeController.doGetCurrentBookingListData();
+            });
+          } else if (bookingOverView == "2") {
+            // Cancelled draws from BOTH the current list and history.
+            setState(() {
+              _homeController.doGetCurrentBookingListData();
+              _homeController.doGetBookingHistory();
             });
           } else {
             setState(() {

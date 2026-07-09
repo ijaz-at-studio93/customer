@@ -19,6 +19,8 @@ import '../../util/snackbar_util.dart';
 import '../booking/booking_home_page.dart';
 import '../bottom_navigation_bar.dart';
 import 'package:salon_customer/service/analytics_service.dart';
+import 'package:salon_customer/constant/api_constant.dart';
+import 'package:salon_customer/project_specific/network_video_view_widget.dart';
 
 class QRCodePage extends StatefulWidget {
   final String appointmentId;
@@ -38,6 +40,10 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
   late Razorpay razorpay;
   bool showBreakdown = false;
   final FocusNode _amountFocus = FocusNode();
+
+  // Row 3: dismissible payment demo video.
+  bool _showDemoVideo = true;
+  bool _demoMuted = true; // mini player starts muted (like the reference).
 
   final _homeController = Get.find<HomeController>();
   final TextEditingController _amountController = TextEditingController();
@@ -116,7 +122,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
         final canCancel = paymentStatus == "pending" &&
             (orderStatus == "pending" || orderStatus == "confirmed");
 
-        return Stack(children: [
+        return Stack(fit: StackFit.expand, children: [
           GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: () {
@@ -429,7 +435,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                             ),
-                            onPressed: () {
+                            onPressed: () async {
                               final enteredAmount = double.tryParse(
                                       _amountController.text.trim()) ??
                                   0;
@@ -445,11 +451,37 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                                 return;
                               }
 
-                              print(data?.bookingId);
-                              print('*******************');
+                              // Row 4: Apply Discount goes straight to the
+                              // payment summary now; the "completed service?"
+                              // prompt moved to Proceed To Pay.
+                              await _homeController.doGetSalonPromoCode(
+                                salonId: data?.salon?.id ?? "",
+                              );
 
-                              _showServiceConfirmation(
-                                  data?.bookingId, data?.salon?.id ?? "");
+                              final result = _homeController
+                                  .getBestDiscount(enteredAmount.toInt());
+                              if (result != null) {
+                                final int discount = result["discount"];
+                                final int finalAmount =
+                                    enteredAmount.toInt() - discount;
+                                final String promoName =
+                                    result["promo"].title ?? "";
+                                _showPaymentSummaryDialog(
+                                  bookingId: data?.bookingId,
+                                  actualAmount: enteredAmount.toInt(),
+                                  discount: discount,
+                                  finalAmount: finalAmount,
+                                  promoName: promoName,
+                                );
+                              } else {
+                                _showPaymentSummaryDialog(
+                                  bookingId: data?.bookingId,
+                                  actualAmount: enteredAmount.toInt(),
+                                  discount: 0,
+                                  finalAmount: enteredAmount.toInt(),
+                                  promoName: "NA",
+                                );
+                              }
                             },
                             child: const Text(
                               //"Pay Now",
@@ -609,8 +641,194 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                       ),
                     ),
                   ))),
+
+          /// Row 3: dismissible payment demo video (bottom-left, tap = fullscreen)
+          if (_showDemoVideo && paymentStatus == "pending")
+            Positioned(
+              left: 12,
+              bottom: 24,
+              child: _paymentDemoVideo(),
+            ),
         ]);
       })),
+    );
+  }
+
+  /// Full demo video URL from [APIConstants.paymentDemoVideoUrl] (the backend
+  /// swap-in point). Empty until a real URL is set — the mini player then shows
+  /// a loading indicator. Absolute URLs are used as-is; relative paths are
+  /// prefixed with the media base (same as Content).
+  String get _paymentDemoUrl {
+    final u = APIConstants.paymentDemoVideoUrl;
+    if (u.isEmpty) return "";
+    return u.startsWith("http") ? u : "${APIConstants.image}$u";
+  }
+
+  Widget _paymentDemoVideo() {
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        /// MINI PREVIEW
+        Container(
+          width: 110,
+          height: 150,
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.white, width: 1.5),
+            boxShadow: const [
+              BoxShadow(color: Colors.black26, blurRadius: 8),
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(12),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                // Loading indicator until a real video URL is available.
+                _paymentDemoUrl.isEmpty
+                    ? const Center(
+                        child: SizedBox(
+                          width: 26,
+                          height: 26,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2.5, color: Colors.white),
+                        ),
+                      )
+                    : NetworkVideoViewWidget(
+                        videoString: _paymentDemoUrl,
+                        thumbnail: "",
+                        muted: _demoMuted,
+                      ),
+
+                /// MUTE / UNMUTE (bottom-right)
+                Positioned(
+                  bottom: 4,
+                  right: 4,
+                  child: GestureDetector(
+                    onTap: () => setState(() => _demoMuted = !_demoMuted),
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Icon(
+                        _demoMuted ? Icons.volume_off : Icons.volume_up,
+                        color: Colors.white,
+                        size: 14,
+                      ),
+                    ),
+                  ),
+                ),
+
+                /// EXPAND → FULLSCREEN (bottom-left)
+                Positioned(
+                  bottom: 4,
+                  left: 4,
+                  child: GestureDetector(
+                    onTap: _openDemoFullscreen,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: Colors.black54,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: const Icon(Icons.fullscreen,
+                          color: Colors.white, size: 16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        /// ✕ REMOVE
+        Positioned(
+          top: -8,
+          right: -8,
+          child: GestureDetector(
+            onTap: () => setState(() => _showDemoVideo = false),
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: const BoxDecoration(
+                color: Colors.black87,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.close, color: Colors.white, size: 16),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// Fullscreen demo player — sound on by default, with mute + ✕ overlays.
+  void _openDemoFullscreen() {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black,
+      builder: (_) {
+        bool fsMuted = false; // fullscreen starts with sound.
+        return StatefulBuilder(
+          builder: (context, setSheet) {
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                _paymentDemoUrl.isEmpty
+                    ? const Center(
+                        child: CircularProgressIndicator(color: Colors.white),
+                      )
+                    : NetworkVideoViewWidget(
+                        videoString: _paymentDemoUrl,
+                        thumbnail: "",
+                        muted: fsMuted,
+                      ),
+
+                /// MUTE (top-left)
+                Positioned(
+                  top: 40,
+                  left: 16,
+                  child: GestureDetector(
+                    onTap: () => setSheet(() => fsMuted = !fsMuted),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        fsMuted ? Icons.volume_off : Icons.volume_up,
+                        color: Colors.white,
+                        size: 22,
+                      ),
+                    ),
+                  ),
+                ),
+
+                /// ✕ CLOSE (top-right)
+                Positioned(
+                  top: 40,
+                  right: 16,
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: const BoxDecoration(
+                        color: Colors.black54,
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.close,
+                          color: Colors.white, size: 22),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 
@@ -1432,7 +1650,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
     ).then((_) => remarkController.dispose());
   }
 
-  void _showServiceConfirmation(String? bookingId, String salonId) {
+  void _showServiceConfirmation({required Future<void> Function() onYes}) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1513,45 +1731,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                         ),
                         onPressed: () async {
                           Navigator.pop(context);
-
-                          await _homeController.doGetSalonPromoCode(
-                            salonId: salonId,
-                          );
-                          //await _homeController.doGetListPromoCode();
-                          //await _homeController.doGetOrderId();
-
-                          final enteredAmount =
-                              double.tryParse(_amountController.text.trim()) ??
-                                  0;
-
-                          if (enteredAmount <= 0) {
-                            SnackbarUtil.show(
-                                "Invalid Amount", "Please enter amount");
-                            return;
-                          }
-                          final result = _homeController
-                              .getBestDiscount(enteredAmount.toInt());
-
-                          if (result != null) {
-                            int discount = result["discount"];
-
-                            int finalAmount = enteredAmount.toInt() - discount;
-                            String promoName = result["promo"].title ?? "";
-
-                            _showPaymentSummaryDialog(
-                                bookingId: bookingId,
-                                actualAmount: enteredAmount.toInt(),
-                                discount: discount,
-                                finalAmount: finalAmount,
-                                promoName: promoName);
-                          } else {
-                            _showPaymentSummaryDialog(
-                                bookingId: bookingId,
-                                actualAmount: enteredAmount.toInt(),
-                                discount: 0,
-                                finalAmount: enteredAmount.toInt(),
-                                promoName: "NA");
-                          }
+                          await onYes();
                         },
                         child: const Padding(
                           padding: EdgeInsets.symmetric(
@@ -1876,20 +2056,20 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                                 ),
                               ),
                               onPressed: () async {
-                                Navigator.pop(context);
+                                Navigator.pop(context); // close the summary
 
                                 final payable = finalAmount + 5;
 
-                                print(bookingId);
-                                print('_____________________');
-
-                                await _homeController.createPaymentOrder(
-                                  bookingOrderId: bookingId,
-                                  billAmount: actualAmount,
-                                  payableAmount: payable,
-                                );
-
-                                openRazorpay(payable);
+                                // Row 4: ask "Have You Completed Your Service?"
+                                // AFTER Proceed To Pay — pay only on Yes.
+                                _showServiceConfirmation(onYes: () async {
+                                  await _homeController.createPaymentOrder(
+                                    bookingOrderId: bookingId,
+                                    billAmount: actualAmount,
+                                    payableAmount: payable,
+                                  );
+                                  openRazorpay(payable);
+                                });
                               },
                               child: const Text(
                                 "Proceed To Pay",

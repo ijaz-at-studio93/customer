@@ -1557,11 +1557,14 @@ class HomeController extends GetxController {
 
   /*-------------  Get Salon Search ---------------*/
   Future<void> doSalonSearch(
-      {required String query, required String lat, required String lng}) async {
+      {required String query,
+      required String lat,
+      required String lng,
+      String type = "name"}) async {
     try {
       _showProgress.value = true;
-      _searchSalonModel.value =
-          await HomeAPI.searchForSalon(query: query, lat: lat, lng: lng);
+      _searchSalonModel.value = await HomeAPI.searchForSalon(
+          query: query, lat: lat, lng: lng, type: type);
     } catch (e) {
       showError(e);
       if (kDebugMode) {
@@ -2058,6 +2061,18 @@ class HomeController extends GetxController {
 
     socket.onAny((event, data) {
       _logBookingSocket('onAny → event=$event data=$data');
+      // Row 36: any booking-status change (accept/cancel/reject/reschedule)
+      // silently refreshes the lists so Bookings/Home reflect it instantly,
+      // regardless of the exact event name the backend uses.
+      final e = event.toString().toLowerCase();
+      if (e.contains('booking') ||
+          e.contains('appointment') ||
+          e.contains('order') ||
+          e.contains('cancel') ||
+          e.contains('reject') ||
+          e.contains('confirm')) {
+        refreshBookingListsSilent();
+      }
     });
 
     socket.on('booking_confirmed', (dynamic data) {
@@ -2097,6 +2112,40 @@ class HomeController extends GetxController {
       if (kDebugMode) {
         print('[CustomerSocket] _refreshQrCodeSilent error: $e');
       }
+    }
+  }
+
+  DateTime? _lastBookingListRefresh;
+
+  /// Row 36: silently refresh the booking lists (current + history) and the
+  /// pending-booking pointer so Bookings/Home reflect an accept/cancel without
+  /// a manual refresh. Debounced and does NOT toggle the global loader.
+  Future<void> refreshBookingListsSilent() async {
+    final now = DateTime.now();
+    final last = _lastBookingListRefresh;
+    if (last != null && now.difference(last).inMilliseconds < 500) return;
+    _lastBookingListRefresh = now;
+
+    try {
+      _currentBookingListModel.value = await HomeAPI.currentBookingList();
+      final bookings = _currentBookingListModel.value.data ?? [];
+      try {
+        pendingBooking.value = bookings.firstWhere(
+          (b) =>
+              b.paymentStatus == "pending" &&
+              (b.orderStatus == "pending" || b.orderStatus == "confirmed"),
+        );
+      } catch (_) {
+        pendingBooking.value = null;
+      }
+    } catch (e) {
+      if (kDebugMode) print('[CustomerSocket] refresh current error: $e');
+    }
+
+    try {
+      _bookingHistoryListModel.value = await HomeAPI.bookingHistory();
+    } catch (e) {
+      if (kDebugMode) print('[CustomerSocket] refresh history error: $e');
     }
   }
 

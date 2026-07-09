@@ -7,6 +7,7 @@ import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/color_constant.dart';
+import '../../constant/variable_constant.dart';
 import '../../project_specific/text_theme.dart';
 import '../../util/call_wrapper.dart';
 
@@ -22,6 +23,11 @@ class _ContentPageState extends State<ContentPage>
   final _homeController = Get.find<HomeController>();
   static const insightsListKey = PageStorageKey<String>('insights_main_list');
 
+  // Row 10: live search matched against the salon name shown on each
+  // content tile's top-left chip.
+  final TextEditingController _searchController = TextEditingController();
+  String _query = "";
+
   @override
   bool get wantKeepAlive => true;
   @override
@@ -33,6 +39,12 @@ class _ContentPageState extends State<ContentPage>
         lng: double.parse(SharedPrefs.readStringValue(PrefConstants.longitude)),
       );
     });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,108 +64,103 @@ class _ContentPageState extends State<ContentPage>
               .copyWith(color: ColorConstant.blackColor, fontSize: 19),
         ),
       ),
-      body: Obx(() => _homeController.showProgress
-              ? const ProgressBarView()
-              : _homeController.getBlogDataModel.data?.isEmpty ??
-                      false || _homeController.getBlogDataModel.data == null
-                  ? const NoItemsWidget(text: "Content is not available")
-                  : GridView.builder(
-                      key: _ContentPageState.insightsListKey,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 10),
-                      itemCount:
-                          _homeController.getBlogDataModel.data?.length ?? 0,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // 👈 2 columns
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.75, // 👈 adjust based on design
-                      ),
-                      itemBuilder: (context, i) {
-                        final item = _homeController.getBlogDataModel.data![i];
-
-                        return InsightsGridItem(
-                          blogData: item,
-                          onTap: () {
-                            _homeController.doAddViewForBlogSection(
-                                blogID: item.id ?? "");
-
-                            // Get.to(() => InsightsDetailPage(
-                            //   externalLink: item.externalLink ?? "",
-                            //   video: item.video?.isEmpty ?? false
-                            //       ? ""
-                            //       : "${APIConstants.image}${item.video}",
-                            //   body: item.description ?? "",
-                            //   title: item.title ?? "",
-                            //   subTitle: item.body ?? "",
-                            //   image: item.image?.isEmpty ?? false
-                            //       ? ""
-                            //       : "${APIConstants.image}${item.image}",
-                            // ));
-                            Get.dialog(
-                              FullScreenReelView(
-                                data: item,
-                              ),
-                              // barrierColor: Colors.black, // dark background
-                              // barrierDismissible: true,   // 👈 tap outside closes
-                            );
-                          },
-                        );
-                      },
-                    )
-          // : ListView.separated(
-          //     key: _InsightsHomePageState.insightsListKey,
-          //     separatorBuilder: (context, i) {
-          //       return const Divider(
-          //         thickness: 1,
-          //         color: ColorConstant.divider2Color,
-          //         indent: 20,
-          //         endIndent: 20,
-          //       );
-          //     },
-          //     shrinkWrap: true,
-          //     itemCount:
-          //         _homeController.getBlogDataModel.data?.length ?? 0,
-          //     padding:
-          //         const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-          //     itemBuilder: (context, i) {
-          //       return InsightsCardWidget(
-          //         isFav: false,
-          //         blogData: _homeController.getBlogDataModel.data![i],
-          //         onPress: () {
-          //           _homeController.doAddViewForBlogSection(
-          //               blogID: _homeController
-          //                       .getBlogDataModel.data?[i].id ??
-          //                   "");
-          //           Get.to(() => InsightsDetailPage(
-          //                 externalLink: _homeController.getBlogDataModel
-          //                         .data?[i].externalLink ??
-          //                     "",
-          //                 video: _homeController.getBlogDataModel.data?[i]
-          //                             .video?.isEmpty ??
-          //                         false
-          //                     ? ""
-          //                     : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].video ?? ""}",
-          //                 body: _homeController.getBlogDataModel.data?[i]
-          //                         .description ??
-          //                     "",
-          //                 title: _homeController
-          //                         .getBlogDataModel.data?[i].title ??
-          //                     "",
-          //                 subTitle: _homeController
-          //                         .getBlogDataModel.data?[i].body ??
-          //                     "",
-          //                 image: _homeController.getBlogDataModel.data?[i]
-          //                             .image?.isEmpty ??
-          //                         false
-          //                     ? ""
-          //                     : "${APIConstants.image}${_homeController.getBlogDataModel.data?[i].image ?? ""}",
-          //               ));
-          //         },
-          //       );
-          //     }),
+      body: Column(
+        children: [
+          /// Row 10: search matched against the salon name on each tile's chip.
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 4),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (v) => setState(() => _query = v),
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                hintText: "Search by salon name",
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: _query.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () {
+                          _searchController.clear();
+                          setState(() => _query = "");
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: ColorConstant.whiteColor,
+                isDense: true,
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                  borderSide: BorderSide(
+                    color: changeTheme(SharedPrefs.readStringValue(
+                            PrefConstants.gender)) ??
+                        ColorConstant.primaryColor,
+                  ),
+                ),
+              ),
+            ),
           ),
+          Expanded(
+            child: Obx(() {
+              if (_homeController.showProgress) {
+                return const ProgressBarView();
+              }
+              final all = _homeController.getBlogDataModel.data ?? [];
+              final q = _query.trim().toLowerCase();
+              // Match against the exact label shown on the tile's top-left
+              // chip (salon displayName, falling back to "By Scuts").
+              final items = q.isEmpty
+                  ? all
+                  : all
+                      .where((b) => (b.salon?.displayName ?? "By Scuts")
+                          .toLowerCase()
+                          .contains(q))
+                      .toList();
+
+              if (items.isEmpty) {
+                return NoItemsWidget(
+                  text: q.isEmpty
+                      ? "Content is not available"
+                      : "No content found for that salon.",
+                );
+              }
+
+              return GridView.builder(
+                key: _ContentPageState.insightsListKey,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                itemCount: items.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                  childAspectRatio: 0.75,
+                ),
+                itemBuilder: (context, i) {
+                  final item = items[i];
+                  return InsightsGridItem(
+                    blogData: item,
+                    onTap: () {
+                      _homeController.doAddViewForBlogSection(
+                          blogID: item.id ?? "");
+                      Get.dialog(FullScreenReelView(data: item));
+                    },
+                  );
+                },
+              );
+            }),
+          ),
+        ],
+      ),
     ));
   }
 }

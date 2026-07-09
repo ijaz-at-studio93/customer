@@ -41,7 +41,10 @@ class _StylistPortfolioGridviewState extends State<StylistPortfolioGridview> {
                       mainAxisSpacing: 12,
                       crossAxisSpacing: 12,
                       childAspectRatio: 1.0),
-                  itemBuilder: (context, index) => GestureDetector(
+                  itemBuilder: (context, index) {
+                    final item =
+                        widget.artiestPortfolio.data?.portfolio?[index];
+                    return GestureDetector(
                     // onTap: () {
                     //   if (widget.artiestPortfolio.data?.portfolio?[index]
                     //           .isVideo ??
@@ -92,41 +95,53 @@ class _StylistPortfolioGridviewState extends State<StylistPortfolioGridview> {
                     },
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(10),
-                      child: widget.artiestPortfolio.data?.portfolio?[index]
-                                  .isVideo ??
-                              false
-                          ? Container(
-                              height: 200,
-                              width: 120,
-                              color:
-                                  ColorConstant.primaryColor.withOpacity(0.3),
-                              child: Center(
-                                child: Image.asset(
-                                  AssetsConstant.playIcon,
-                                  width: 45,
-                                  height: 45,
+                      child: (item?.isVideo ?? false)
+                          // Row 7: video tile styled identically to the Content
+                          // grid — thumbnail image + dark scrim + play icon.
+                          ? Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                CachedNetworkImage(
+                                  fit: BoxFit.cover,
+                                  imageUrl:
+                                      "${APIConstants.image}${item?.image}",
+                                  placeholder: (context, url) => Image.asset(
+                                    AssetsConstant.placeHolder,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  errorWidget: (context, url, error) =>
+                                      Image.asset(
+                                    AssetsConstant.placeHolder,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
-                              ),
+                                Container(
+                                  color: Colors.black.withOpacity(0.3),
+                                ),
+                                const Center(
+                                  child: Icon(
+                                    Icons.play_circle_filled,
+                                    color: Colors.white,
+                                    size: 40,
+                                  ),
+                                ),
+                              ],
                             )
                           : CachedNetworkImage(
-                              height: 200,
-                              width: 120,
                               fit: BoxFit.cover,
-                              imageUrl:
-                                  '${APIConstants.image}${widget.artiestPortfolio.data?.portfolio?[index].image}',
-                              placeholder: (context, url) => const Image(
-                                  image: AssetImage(AssetsConstant.placeHolder),
-                                  height: 200,
-                                  width: 120,
-                                  fit: BoxFit.cover),
-                              errorWidget: (context, url, error) => const Image(
-                                  image: AssetImage(AssetsConstant.placeHolder),
-                                  height: 200,
-                                  width: 120,
-                                  fit: BoxFit.cover),
+                              imageUrl: "${APIConstants.image}${item?.image}",
+                              placeholder: (context, url) => Image.asset(
+                                AssetsConstant.placeHolder,
+                                fit: BoxFit.cover,
+                              ),
+                              errorWidget: (context, url, error) => Image.asset(
+                                AssetsConstant.placeHolder,
+                                fit: BoxFit.cover,
+                              ),
                             ),
                     ),
-                  ),
+                  );
+                  },
                 ),
                 SizedBox(height: Get.height * 0.20),
               ],

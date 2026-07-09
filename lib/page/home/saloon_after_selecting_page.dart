@@ -11,6 +11,7 @@ import 'package:salon_customer/constant/assetsconstant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/home/_ImageViewerSheet.dart';
+import 'package:salon_customer/page/Insights/salon_content_page.dart';
 import 'package:salon_customer/page/home/home_page.dart';
 import 'package:salon_customer/page/home/salon_rating_page.dart';
 import 'package:salon_customer/page/home/widget/over_view_list_tile_widget.dart';
@@ -2077,6 +2078,46 @@ class _SaloonAfterSelectingServicesPageState
               ),
 
               //const SizedBox(width: 8),
+
+              /// CONTENT REDIRECT (Row 15) — opens this salon's content
+              GestureDetector(
+                onTap: () {
+                  Get.to(() => SalonContentPage(
+                        salonId: widget.id,
+                        salonName:
+                            _homeController.homeSalonDetailsData.data?.name ??
+                                "",
+                      ));
+                },
+                child: Container(
+                  height: 30,
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    color: changeTheme(
+                      SharedPrefs.readStringValue(PrefConstants.gender),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.play_circle_outline,
+                          size: 14, color: Colors.white),
+                      const SizedBox(width: 3),
+                      Text(
+                        "Content",
+                        textScaler: const TextScaler.linear(0.85),
+                        style: AppTextTheme.semibold.copyWith(
+                          fontSize: 13,
+                          color: Colors.white,
+                          fontFamily: 'Outfit',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 6),
 
               /// RIGHT SIDE (fixed button)
               GestureDetector(

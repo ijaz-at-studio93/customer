@@ -15,6 +15,7 @@ import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/splash_page.dart';
 import 'package:salon_customer/util/NotificationUtils.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/util/notification_service.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:facebook_app_events/facebook_app_events.dart';
@@ -138,6 +139,13 @@ void main() async {
   Get.put(AuthController());
   Get.put(HomeController());
   await GetStorage.init();
+
+  // Row 20: seed the gender toggle from the persisted pref before first paint,
+  // so "Men" doesn't briefly render with the female (pink) theme on launch when
+  // the last session was female.
+  selectedGender.value =
+      SharedPrefs.readStringValue(PrefConstants.gender) == "1" ? 1 : 0;
+
   await Get.find<AuthController>().initUserData();
 
   // Set Firebase Analytics user ID once auth is loaded
