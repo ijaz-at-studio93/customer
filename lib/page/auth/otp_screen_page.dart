@@ -10,6 +10,7 @@ import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
 import 'package:salon_customer/page/bottom_navigation_bar.dart';
+import 'package:salon_customer/page/onboarding/pay_after_service_onboarding_page.dart';
 import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/button_widget.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
@@ -481,7 +482,9 @@ class _OtpScreenPageState extends State<OtpScreenPage> {
                 mobileNo: widget.mobileNumber,
               ));
             } else {
-              Get.to(() => const BottomNavBarPage());
+              Get.to(() => PayAfterServiceOnboardingPage.gate(
+                    const BottomNavBarPage(),
+                  ));
             }
           }
       );

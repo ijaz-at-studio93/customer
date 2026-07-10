@@ -52,6 +52,8 @@ class PrefConstants {
   static const String longitude = "longitude";
   static const String hasVisitedSalon = "hasVisitedSalon";
   static const String hasShownSalonDialog = "hasShownSalonDialog";
+  /// Row 29: set once the first-launch onboarding carousel has been seen.
+  static const String hasSeenOnboarding = "hasSeenOnboarding";
   /// Set while user is on pay bill (`QRCodePage`); used to resume after app kill.
   static const String resumePayBillAppointmentId = "resumePayBillAppointmentId";
   static const String appsflyerAttributionSent = "appsflyerAttributionSent";
