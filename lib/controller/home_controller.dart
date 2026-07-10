@@ -34,6 +34,7 @@ import 'package:salon_customer/model/search_model/search_model.dart';
 import 'package:salon_customer/model/un_available_dates_model.dart';
 import 'package:salon_customer/model/user_booking_qr_code_model.dart';
 import 'package:salon_customer/util/logger.dart';
+import 'package:salon_customer/service/appsflyer_service.dart';
 import '../model/artiest_popular_service_model.dart';
 import '../model/cart/salon_service_add_cart_model.dart';
 
@@ -729,6 +730,14 @@ class HomeController extends GetxController {
       if (_createBookingAppointmentModel
               .value.data?.completionToken?.isNotEmpty ??
           false) {
+        // 📊 AppsFlyer: appointment booked without payment
+        final bookingData = _createBookingAppointmentModel.value.data;
+        AppsFlyerService.instance.logBookingWithoutPayment(
+          bookingId: bookingData?.idx ?? bookingData?.id ?? '',
+          salonId: bookingData?.salonId ?? '',
+          amount: bookingData?.orderAmount,
+        );
+
         callback.call();
       }
     } catch (e) {

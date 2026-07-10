@@ -92,6 +92,47 @@ class AppsFlyerService {
   void logEvent(String eventName, [Map<String, dynamic>? values]) {
     if (!_initialized) return;
     _sdk?.logEvent(eventName, values ?? {});
+    if (kDebugMode) {
+      debugPrint('[AppsFlyer] logEvent: $eventName $values');
+    }
+  }
+
+  // ── Business events ────────────────────────────────────────────────────────
+
+  /// Trigger: user completes sign-up (auth_controller.doSignUp).
+  void logRegistration({String method = 'mobile'}) {
+    logEvent('af_complete_registration', {
+      'af_registration_method': method,
+    });
+  }
+
+  /// Trigger: appointment booked before any payment (home_controller.doCreateBooking).
+  void logBookingWithoutPayment({
+    required String bookingId,
+    required String salonId,
+    double? amount,
+  }) {
+    logEvent('af_booking_created', {
+      'af_content_id': bookingId,
+      'salon_id': salonId,
+      if (amount != null) 'af_price': amount,
+      'af_currency': 'INR',
+    });
+  }
+
+  /// Trigger: user pays after the service is done (qr_page._handlePaymentSuccess).
+  void logPayAfterService({
+    required String bookingId,
+    required double amount,
+    required String salonId,
+  }) {
+    logEvent('af_purchase', {
+      'af_revenue': amount,
+      'af_currency': 'INR',
+      'af_order_id': bookingId,
+      'af_content_id': bookingId,
+      'salon_id': salonId,
+    });
   }
 
   Future<void> _handleInstallConversionData(dynamic res) async {

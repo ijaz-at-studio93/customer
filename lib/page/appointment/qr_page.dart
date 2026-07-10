@@ -19,6 +19,7 @@ import '../../util/snackbar_util.dart';
 import '../booking/booking_home_page.dart';
 import '../bottom_navigation_bar.dart';
 import 'package:salon_customer/service/analytics_service.dart';
+import 'package:salon_customer/service/appsflyer_service.dart';
 import 'package:salon_customer/constant/api_constant.dart';
 import 'package:salon_customer/project_specific/network_video_view_widget.dart';
 
@@ -2104,6 +2105,13 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
     AnalyticsService.instance.logBookAndPayAfterService(
       bookingId: bookingId,
       value: paidAmount,
+      salonId: salonId,
+    );
+
+    // 📊 AppsFlyer: pay money after service
+    AppsFlyerService.instance.logPayAfterService(
+      bookingId: bookingId,
+      amount: paidAmount,
       salonId: salonId,
     );
 

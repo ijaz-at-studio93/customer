@@ -162,6 +162,9 @@ class AuthController extends GetxController {
       // ✅ STORE TOKENS
       await userDataStoreToSharedPrefs(_userResponseModel.value);
 
+      // 📊 AppsFlyer: user registration
+      AppsFlyerService.instance.logRegistration();
+
       // ✅ ALWAYS CALL CALLBACK ON SUCCESS
       callback.call();
 
