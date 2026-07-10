@@ -10,6 +10,7 @@ import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/appointment/qr_page.dart';
 import 'package:salon_customer/page/auth/login_page.dart';
 import 'package:salon_customer/page/bottom_navigation_bar.dart';
+import 'package:salon_customer/page/onboarding/pay_after_service_onboarding_page.dart';
 import 'package:salon_customer/project_specific/ProgressContainerView.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
@@ -76,37 +77,29 @@ class _SplashPageState extends State<SplashPage> {
 
       if (!mounted) return;
 
+      /// Resolve the logged-in destination (resume pay-bill / active booking /
+      /// home) so onboarding can hand off to it.
+      Widget destination;
       final saved =
           SharedPrefs.readStringValue(PrefConstants.resumePayBillAppointmentId);
 
       if (saved.isNotEmpty &&
           _savedBookingStillPendingPay(homeController, saved)) {
-        _pushLaunchPage(
-          QRCodePage(
-            appointmentId: saved,
-            isBooking: false,
-          ),
-        );
-        return;
+        destination = QRCodePage(appointmentId: saved, isBooking: false);
+      } else {
+        if (saved.isNotEmpty) {
+          await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
+        }
+        final activeAppointmentId =
+            _firstPendingOrConfirmedAppointmentId(homeController);
+        destination = activeAppointmentId != null
+            ? QRCodePage(appointmentId: activeAppointmentId, isBooking: false)
+            : const BottomNavBarPage();
       }
 
-      if (saved.isNotEmpty) {
-        await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
-      }
-
-      final activeAppointmentId =
-          _firstPendingOrConfirmedAppointmentId(homeController);
-      if (activeAppointmentId != null) {
-        _pushLaunchPage(
-          QRCodePage(
-            appointmentId: activeAppointmentId,
-            isBooking: false,
-          ),
-        );
-        return;
-      }
-
-      _pushLaunchPage(const BottomNavBarPage());
+      /// Row 29: first-launch onboarding — only for a logged-in user seeing the
+      /// app for the first time (else passes through to [destination]).
+      _pushLaunchPage(PayAfterServiceOnboardingPage.gate(destination));
     } catch (e, st) {
       debugPrint('route() error: $e\n$st');
       if (mounted) {

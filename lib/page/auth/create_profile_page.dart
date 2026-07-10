@@ -10,6 +10,7 @@ import '../../constant/color_constant.dart';
 import '../../project_specific/button_widget.dart';
 import '../../project_specific/text_theme.dart';
 import '../bottom_navigation_bar.dart';
+import '../onboarding/pay_after_service_onboarding_page.dart';
 import 'otp_screen_page.dart';
 
 class CreateProfilePage extends StatefulWidget {
@@ -499,7 +500,9 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
       //       ));
       // },
       callback: () {
-        Get.offAll(() => const BottomNavBarPage());
+        Get.offAll(() => PayAfterServiceOnboardingPage.gate(
+              const BottomNavBarPage(),
+            ));
       },
     );
   }

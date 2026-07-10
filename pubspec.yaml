@@ -129,6 +129,7 @@ flutter:
     - assets/font/
     - assets/icon/
     - assets/images/
+    - assets/images/pay_after_service/
     - assets/gifs/
 
   # assets:
