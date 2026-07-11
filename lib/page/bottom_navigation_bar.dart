@@ -20,10 +20,34 @@ class BottomNavBarPage extends StatefulWidget {
   State<BottomNavBarPage> createState() => _BottomNavBarPageState();
 }
 
-class _BottomNavBarPageState extends State<BottomNavBarPage> {
+class _BottomNavBarPageState extends State<BottomNavBarPage>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   bool _canPopNow = false;
   DateTime? _currentBackPressTime;
+
+  /// Bouncy attention animation for the Content tab — plays only while Content
+  /// (index 2) is NOT the selected tab.
+  late final AnimationController _contentBounceController;
+
+  @override
+  void initState() {
+    super.initState();
+    // Loops continuously; the icon only *shows* the bounce while Content is
+    // unselected (the AnimatedBuilder zeroes the offset when selected), so it
+    // keeps playing reliably whenever Content isn't the active tab.
+    _contentBounceController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _contentBounceController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -101,12 +125,26 @@ class _BottomNavBarPageState extends State<BottomNavBarPage> {
                     label: 'Bookings',
                   ),
                   BottomNavigationBarItem(
-                    // Row 32: normalized colour (gray → theme like the other
-                    // tabs) with a scale-pop animation when selected.
-                    icon: AnimatedScale(
-                      scale: _selectedIndex == 2 ? 1.25 : 1.0,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeOutBack,
+                    // Row 32 + bounce: normalized colour; a scale-pop when
+                    // selected, and a bouncy bob while unselected to draw
+                    // attention to the Content tab.
+                    icon: AnimatedBuilder(
+                      animation: _contentBounceController,
+                      builder: (context, child) {
+                        final selected = _selectedIndex == 2;
+                        final dy = selected
+                            ? 0.0
+                            : -6.0 *
+                                Curves.easeInOut
+                                    .transform(_contentBounceController.value);
+                        return Transform.translate(
+                          offset: Offset(0, dy),
+                          child: Transform.scale(
+                            scale: selected ? 1.25 : 1.0,
+                            child: child,
+                          ),
+                        );
+                      },
                       child: Image.asset(
                         AssetsConstant.insights,
                         height: 24,
