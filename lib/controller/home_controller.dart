@@ -103,6 +103,15 @@ class HomeController extends GetxController {
   /// switch even though salonDetailsListData is replaced with the new gender.
   final Map<String, String> _serviceCategoryCache = {};
 
+  /// Persistent serviceId -> categoryId cache (Row 39). Lets us resolve the
+  /// category of a booked cart service without the cart payload carrying the
+  /// id, so category-scoped coupons can gate against the current cart.
+  final Map<String, String> _serviceCategoryIdCache = {};
+
+  /// Persistent categoryId -> categoryName cache (Row 39), for showing the
+  /// human-readable category names on a coupon tile.
+  final Map<String, String> _categoryNameById = {};
+
   /// Folds the currently-loaded salon service list into the persistent cache.
   void cacheServiceCategories() {
     final data = _salonDetailsListData.value.data;
@@ -111,9 +120,13 @@ class HomeController extends GetxController {
       for (final cat in cats) {
         final name = cat.name ?? "";
         if (name.isEmpty) continue;
+        final catId = cat.id ?? "";
+        if (catId.isNotEmpty) _categoryNameById[catId] = name;
         for (final s in cat.services ?? const []) {
           final id = s.id ?? "";
-          if (id.isNotEmpty) _serviceCategoryCache[id] = name;
+          if (id.isEmpty) continue;
+          _serviceCategoryCache[id] = name;
+          if (catId.isNotEmpty) _serviceCategoryIdCache[id] = catId;
         }
       }
     }
@@ -130,6 +143,39 @@ class HomeController extends GetxController {
     // Fold in whatever is currently loaded, then look up.
     cacheServiceCategories();
     return _serviceCategoryCache[serviceId] ?? "";
+  }
+
+  /// Resolves a service's category id (Row 39). Same accumulate-then-lookup
+  /// pattern as [categoryNameForService].
+  String categoryIdForService(String? serviceId) {
+    if (serviceId == null || serviceId.isEmpty) return "";
+    cacheServiceCategories();
+    return _serviceCategoryIdCache[serviceId] ?? "";
+  }
+
+  /// Resolves a category name from its id (Row 39) for coupon-tile display.
+  String categoryNameById(String? categoryId) {
+    if (categoryId == null || categoryId.isEmpty) return "";
+    return _categoryNameById[categoryId] ?? "";
+  }
+
+  /// Category ids present in the current cart (Row 39). Derived from the booked
+  /// services so a category-scoped coupon can be gated against the cart.
+  Set<String> cartCategoryIds() {
+    final data = getServiceAddCartModel.data;
+    final ids = <String>{};
+    if (data == null) return ids;
+    for (final s in data.servicesWithProduct ?? const []) {
+      final cid = categoryIdForService(s.serviceId);
+      if (cid.isNotEmpty) ids.add(cid);
+    }
+    for (final it in data.items ?? const []) {
+      if (it.isService == true) {
+        final cid = categoryIdForService(it.service?.id);
+        if (cid.isNotEmpty) ids.add(cid);
+      }
+    }
+    return ids;
   }
 
   /*-----------------  Home Salon List Widget Get -------------------*/
@@ -1569,11 +1615,11 @@ class HomeController extends GetxController {
       {required String query,
       required String lat,
       required String lng,
-      String type = "name"}) async {
+      String searchBy = "salon"}) async {
     try {
       _showProgress.value = true;
       _searchSalonModel.value = await HomeAPI.searchForSalon(
-          query: query, lat: lat, lng: lng, type: type);
+          query: query, lat: lat, lng: lng, searchBy: searchBy);
     } catch (e) {
       showError(e);
       if (kDebugMode) {

@@ -742,7 +742,7 @@ class HomeAPI {
       {required String query,
       required String lat,
       required String lng,
-      String type = "name"}) async {
+      String searchBy = "salon"}) async {
     if (query.isEmpty) {
       return SearchSalonModel();
     }
@@ -753,9 +753,9 @@ class HomeAPI {
       "lng": lng,
       "limit": 10,
       "distanceRadius": 50000,
-      // Row 24: "name" or "area" — backend matches q against the salon
-      // name or its area/address accordingly.
-      "type": type,
+      // Row 24: backend requires searchBy — "salon" (match by name) or
+      // "area" (match by area/address).
+      "searchBy": searchBy,
     });
     if (response.isSuccess) {
       return SearchSalonModel.fromJson(response.data);

@@ -30,8 +30,8 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
   final _homeController = Get.find<HomeController>();
   Timer? _debounce;
 
-  // Row 24: search mode chosen from the dropdown — "name" or "area".
-  String _searchMode = "name";
+  // Row 24: search mode from the dropdown — backend values "salon" or "area".
+  String _searchMode = "salon";
 
   @override
   void initState() {
@@ -58,8 +58,52 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
           query: _searchTextEditingController.text,
           lat: SharedPrefs.readStringValue(PrefConstants.latitude),
           lng: SharedPrefs.readStringValue(PrefConstants.longitude),
-          type: _searchMode);
+          searchBy: _searchMode);
     });
+  }
+
+  /// Row 24: one segment of the Salon/Area mode toggle. Switching modes
+  /// re-runs the current query in the new mode.
+  Widget _searchModeTab({required String label, required String value}) {
+    final bool selected = _searchMode == value;
+    final Color activeColor =
+        changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
+            ColorConstant.primaryColor;
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () {
+          if (_searchMode == value) return;
+          setState(() => _searchMode = value);
+          // Re-run the search in the new mode if there's a query.
+          if (_searchTextEditingController.text.trim().isNotEmpty) {
+            _homeController.doSalonSearch(
+              query: _searchTextEditingController.text,
+              lat: SharedPrefs.readStringValue(PrefConstants.latitude),
+              lng: SharedPrefs.readStringValue(PrefConstants.longitude),
+              searchBy: _searchMode,
+            );
+          }
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: selected ? activeColor : Colors.transparent,
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: Text(
+            label,
+            style: AppTextTheme.medium.copyWith(
+              color: selected
+                  ? ColorConstant.whiteColor
+                  : ColorConstant.grayTextColor,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -272,51 +316,23 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
       color: ColorConstant.whiteColor,
       child: Column(
         children: [
-          /// Row 24: choose search mode — by Name or by Area.
+          /// Row 24: choose search mode — by Salon (name) or by Area, shown as
+          /// a segmented tab toggle.
           Padding(
-            padding: const EdgeInsets.fromLTRB(15, 10, 15, 0),
-            child: Row(
-              children: [
-                Text(
-                  "Search by:",
-                  style: AppTextTheme.medium.copyWith(
-                      color: ColorConstant.blackColor, fontSize: 14),
-                ),
-                const SizedBox(width: 10),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: const Color(0xFFE4E4E4)),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: DropdownButton<String>(
-                    value: _searchMode,
-                    underline: const SizedBox(),
-                    borderRadius: BorderRadius.circular(10),
-                    style: AppTextTheme.medium.copyWith(
-                        color: ColorConstant.blackColor, fontSize: 14),
-                    items: const [
-                      DropdownMenuItem(value: "name", child: Text("Name")),
-                      DropdownMenuItem(value: "area", child: Text("Area")),
-                    ],
-                    onChanged: (v) {
-                      if (v == null) return;
-                      setState(() => _searchMode = v);
-                      // Re-run the search in the new mode if there's a query.
-                      if (_searchTextEditingController.text.trim().isNotEmpty) {
-                        _homeController.doSalonSearch(
-                          query: _searchTextEditingController.text,
-                          lat: SharedPrefs.readStringValue(
-                              PrefConstants.latitude),
-                          lng: SharedPrefs.readStringValue(
-                              PrefConstants.longitude),
-                          type: _searchMode,
-                        );
-                      }
-                    },
-                  ),
-                ),
-              ],
+            padding: const EdgeInsets.fromLTRB(15, 12, 15, 0),
+            child: Container(
+              height: 44,
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF2F2F2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  _searchModeTab(label: "Salon", value: "salon"),
+                  _searchModeTab(label: "Area", value: "area"),
+                ],
+              ),
             ),
           ),
           Container(
