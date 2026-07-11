@@ -515,92 +515,92 @@ class _HomePageState extends State<HomePage>
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             /// MEN BUTTON
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => _selectGender(0),
-                              child: Container(
-                                height: 50,
-                                // No corner radius here — the outer container's
-                                // clipBehavior rounds the corners, so the fill
-                                // reaches the border cleanly (no unfilled notch).
-                                color: selectedGender.value == 0
-                                    ? ColorConstant.primaryColor
-                                    : ColorConstant.whiteColor,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      AssetsConstant.man,
-                                      height: 24,
-                                      width: 24,
-                                      color: selectedGender.value == 0
-                                          ? ColorConstant.whiteColor
-                                          : ColorConstant.grayTextColor,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      "Men",
-                                      style: AppTextTheme.medium.copyWith(
-                                        fontFamily: "Outfit", // ✅ added
-                                        fontWeight: FontWeight
-                                            .w500, // ✅ Medium (best for tabs/buttons)
-                                        fontSize: 16, // ✅ consistent sizing
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => _selectGender(0),
+                                child: Container(
+                                  height: 50,
+                                  // No corner radius here — the outer container's
+                                  // clipBehavior rounds the corners, so the fill
+                                  // reaches the border cleanly (no unfilled notch).
+                                  color: selectedGender.value == 0
+                                      ? ColorConstant.primaryColor
+                                      : ColorConstant.whiteColor,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        AssetsConstant.man,
+                                        height: 24,
+                                        width: 24,
                                         color: selectedGender.value == 0
                                             ? ColorConstant.whiteColor
                                             : ColorConstant.grayTextColor,
                                       ),
-                                    )
-                                  ],
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        "Men",
+                                        style: AppTextTheme.medium.copyWith(
+                                          fontFamily: "Outfit", // ✅ added
+                                          fontWeight: FontWeight
+                                              .w500, // ✅ Medium (best for tabs/buttons)
+                                          fontSize: 16, // ✅ consistent sizing
+                                          color: selectedGender.value == 0
+                                              ? ColorConstant.whiteColor
+                                              : ColorConstant.grayTextColor,
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
 
-                          /// WOMEN BUTTON
-                          Expanded(
-                            child: InkWell(
-                              onTap: () => _selectGender(1),
-                              child: Container(
-                                height: 50,
-                                // No corner radius here — outer clipBehavior
-                                // handles rounding so the fill reaches the
-                                // border cleanly.
-                                color: selectedGender.value == 1
-                                    ? ColorConstant.primary2
-                                    : ColorConstant.whiteColor,
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      AssetsConstant.woman,
-                                      height: 24,
-                                      width: 24,
-                                      color: selectedGender.value == 1
-                                          ? ColorConstant.whiteColor
-                                          : ColorConstant.grayTextColor,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      "Women",
-                                      style: AppTextTheme.medium.copyWith(
-                                        fontFamily: "Outfit", // ✅ added
-                                        fontWeight: selectedGender.value == 1
-                                            ? FontWeight.w600 // 🔥 active
-                                            : FontWeight.w500, // inactive
-                                        fontSize: 16, // ✅ consistent
+                            /// WOMEN BUTTON
+                            Expanded(
+                              child: InkWell(
+                                onTap: () => _selectGender(1),
+                                child: Container(
+                                  height: 50,
+                                  // No corner radius here — outer clipBehavior
+                                  // handles rounding so the fill reaches the
+                                  // border cleanly.
+                                  color: selectedGender.value == 1
+                                      ? ColorConstant.primary2
+                                      : ColorConstant.whiteColor,
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Image.asset(
+                                        AssetsConstant.woman,
+                                        height: 24,
+                                        width: 24,
                                         color: selectedGender.value == 1
                                             ? ColorConstant.whiteColor
                                             : ColorConstant.grayTextColor,
                                       ),
-                                    )
-                                  ],
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        "Women",
+                                        style: AppTextTheme.medium.copyWith(
+                                          fontFamily: "Outfit", // ✅ added
+                                          fontWeight: selectedGender.value == 1
+                                              ? FontWeight.w600 // 🔥 active
+                                              : FontWeight.w500, // inactive
+                                          fontSize: 16, // ✅ consistent
+                                          color: selectedGender.value == 1
+                                              ? ColorConstant.whiteColor
+                                              : ColorConstant.grayTextColor,
+                                        ),
+                                      )
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
                     ),
                   ],
                 );
@@ -892,6 +892,162 @@ class _HomePageState extends State<HomePage>
 
                             Navigator.pop(context);
                             SystemNavigator.pop();
+                          },
+                          child: Container(
+                            height: 40,
+                            width: 100,
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [Color(0xFF6A5AE0), Color(0xFFE85AA8)],
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Container(
+                              margin: const EdgeInsets.all(
+                                  1.5), // 👈 border thickness
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFE5E5E5), // inner color
+                                borderRadius: BorderRadius.circular(10.5),
+                              ),
+                              child: const Center(
+                                child: Text(
+                                  "Submit",
+                                  style: TextStyle(
+                                    fontFamily: 'Outfit',
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ))
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showRequestSalonDialog(BuildContext context) {
+    final controller = TextEditingController();
+    final homeController = Get.find<HomeController>();
+
+    // Mark that we've shown the dialog
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          child: Container(
+            width: 300,
+            height: 320,
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              gradient: const LinearGradient(
+                colors: [Color(0xFF6A5AE0), Color(0xFFE85AA8)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 281,
+                  height: 18,
+                  child: const FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      "Help Us!",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontFamily: 'Outfit',
+                        color: Colors.white,
+                        fontSize: 25,
+                        fontWeight: FontWeight.w800,
+                        height: 1, // 🔥 important (removes extra spacing)
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: 281,
+                  height: 43,
+                  child: const Text(
+                    "Didn’t find the salon you’re \nlooking for?",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Outfit',
+                      color: Colors.white70,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      height: 1, // 🔥 controls line spacing
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: 281,
+                  child: const Text(
+                    "Drop the Name, Location of the Salon below",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Outfit',
+                      color: Colors.white70,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      //height: 1.3,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 9),
+                Container(
+                  width: 261,
+                  height: 132,
+                  padding: const EdgeInsets.only(
+                      left: 16, right: 16, bottom: 5, top: 30),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    //border: Border.all(color: Color(0xFF3B82F6), width: 1.5),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextField(
+                        controller: controller,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          fontFamily: 'Outfit',
+                          color: Colors.black, // ❌ not exact 20%
+                        ),
+                        decoration: InputDecoration(
+                          hintText: "ENTER HERE",
+                          hintStyle: TextStyle(
+                            color: Colors.black.withOpacity(0.2),
+                          ),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                      InkWell(
+                          onTap: () async {
+                            final text = controller.text.trim();
+
+                            if (text.isEmpty) return;
+
+                            await homeController.doSendSalonRequest(text);
+
+                            if (!context.mounted) return;
+                            Navigator.pop(context);
                           },
                           child: Container(
                             height: 40,
@@ -1449,8 +1605,9 @@ class _HomePageState extends State<HomePage>
                                             // Row 21: neutral placeholder instead
                                             // of a red exclamation when an image
                                             // fails to load.
-                                            errorWidget: (context, url, error) =>
-                                                Container(
+                                            errorWidget:
+                                                (context, url, error) =>
+                                                    Container(
                                               height: 60,
                                               width: 60,
                                               alignment: Alignment.center,
@@ -1459,7 +1616,8 @@ class _HomePageState extends State<HomePage>
                                                 shape: BoxShape.circle,
                                               ),
                                               child: Icon(
-                                                Icons.image_not_supported_outlined,
+                                                Icons
+                                                    .image_not_supported_outlined,
                                                 size: 22,
                                                 color: Colors.grey.shade400,
                                               ),
@@ -2155,14 +2313,7 @@ class _HomePageState extends State<HomePage>
           const SizedBox(height: 22),
           GestureDetector(
             onTap: () {
-              Get.snackbar(
-                "Request received",
-                "Thanks! We've noted your request — we'll try to reach your area soon.",
-                snackPosition: SnackPosition.BOTTOM,
-                backgroundColor: themeColor,
-                colorText: ColorConstant.whiteColor,
-                margin: const EdgeInsets.all(12),
-              );
+              _showRequestSalonDialog(context);
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 34, vertical: 12),
@@ -2187,487 +2338,504 @@ class _HomePageState extends State<HomePage>
       () => !_hasSalonWithin12km()
           ? const SizedBox.shrink()
           : Container(
-        color: ColorConstant.whiteColor,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 18),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              color: ColorConstant.whiteColor,
+              child: Column(
                 children: [
-                  Text(
-                    "${_homeController.getHomeSalonList.data?.rows?.length ?? 0} Salons Found Near You",
-                    textScaler: const TextScaler.linear(0.90), // ✅ untouched
-                    style: AppTextTheme.bold.copyWith(
-                      fontFamily: "Outfit", // ✅ added
-                      fontWeight: FontWeight.w600, // ✅ SemiBold (matches Figma)
-                      fontSize: 18,
-                      color: ColorConstant.blackColor,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 18),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          "${_homeController.getHomeSalonList.data?.rows?.length ?? 0} Salons Found Near You",
+                          textScaler:
+                              const TextScaler.linear(0.90), // ✅ untouched
+                          style: AppTextTheme.bold.copyWith(
+                            fontFamily: "Outfit", // ✅ added
+                            fontWeight:
+                                FontWeight.w600, // ✅ SemiBold (matches Figma)
+                            fontSize: 18,
+                            color: ColorConstant.blackColor,
+                          ),
+                        ),
+                        // const SizedBox(width: 5),
+                        // Disabled home service temporarily
+                        // Container(
+                        //   height: 50,
+                        //   color: ColorConstant.whiteColor,
+                        //   child: Row(
+                        //     children: [
+                        //       // Text(
+                        //       //   "Home Service",
+                        //       //   style: AppTextTheme.bold.copyWith(
+                        //       //       color: changeTheme(SharedPrefs.readStringValue(
+                        //       //           PrefConstants.gender)),
+                        //       //       fontSize: 13),
+                        //       // ),
+                        //       // SizedBox(
+                        //       //   height: 30,
+                        //       //   child: CupertinoSwitch(
+                        //       //     value: atHome,
+                        //       //     activeColor: changeTheme(
+                        //       //         SharedPrefs.readStringValue(
+                        //       //             PrefConstants.gender)),
+                        //       //     onChanged: (bool value) {
+                        //       //       setState(() {
+                        //       //         atHome = value;
+                        //       //         if (atHome) {
+                        //       //           SharedPrefs.writeValue(
+                        //       //               PrefConstants.isHomeService, true);
+                        //       //         } else {
+                        //       //           SharedPrefs.writeValue(
+                        //       //               PrefConstants.isHomeService, false);
+                        //       //         }
+                        //       //         _homeController.doGetHomeSalonList(
+                        //       //             serviceGender: selectedGender.value == 0
+                        //       //                 ? "male"
+                        //       //                 : "female",
+                        //       //             homeService: atHome,
+                        //       //             offset: 1,
+                        //       //             size: 500,
+                        //       //             lat: double.parse(
+                        //       //                 SharedPrefs.readStringValue(
+                        //       //                     PrefConstants.latitude)),
+                        //       //             lng: double.parse(
+                        //       //                 SharedPrefs.readStringValue(
+                        //       //                     PrefConstants.longitude)),
+                        //       //             orderBy: "",
+                        //       //             nearest: false,
+                        //       //             fourPlusRating: false);
+                        //       //
+                        //       //         _homeController.doGetPromoCode(
+                        //       //             fourPlusRating: false,
+                        //       //             homeService: SharedPrefs.readBoolValue(
+                        //       //                 PrefConstants.isHomeService),
+                        //       //             nearest: false,
+                        //       //             orderBy: dropdownvalue == "Sort By"
+                        //       //                 ? ""
+                        //       //                 : dropdownvalue == "Newest"
+                        //       //                     ? "createdAt"
+                        //       //                     : dropdownvalue == "Price"
+                        //       //                         ? "serviceStartingPrice"
+                        //       //                         : "name",
+                        //       //             serviceGender: selectedGender.value == 0
+                        //       //                 ? "male"
+                        //       //                 : "female",
+                        //       //             lat: double.parse(
+                        //       //                 SharedPrefs.readStringValue(
+                        //       //                     PrefConstants.latitude)),
+                        //       //             lng: double.parse(
+                        //       //                 SharedPrefs.readStringValue(
+                        //       //                     PrefConstants.longitude)));
+                        //       //       });
+                        //       //     },
+                        //       //   ),
+                        //       // ),
+                        //     ],
+                        //   ),
+                        // )
+                      ],
                     ),
                   ),
-                  // const SizedBox(width: 5),
-                  // Disabled home service temporarily
-                  // Container(
-                  //   height: 50,
-                  //   color: ColorConstant.whiteColor,
-                  //   child: Row(
-                  //     children: [
-                  //       // Text(
-                  //       //   "Home Service",
-                  //       //   style: AppTextTheme.bold.copyWith(
-                  //       //       color: changeTheme(SharedPrefs.readStringValue(
-                  //       //           PrefConstants.gender)),
-                  //       //       fontSize: 13),
-                  //       // ),
-                  //       // SizedBox(
-                  //       //   height: 30,
-                  //       //   child: CupertinoSwitch(
-                  //       //     value: atHome,
-                  //       //     activeColor: changeTheme(
-                  //       //         SharedPrefs.readStringValue(
-                  //       //             PrefConstants.gender)),
-                  //       //     onChanged: (bool value) {
-                  //       //       setState(() {
-                  //       //         atHome = value;
-                  //       //         if (atHome) {
-                  //       //           SharedPrefs.writeValue(
-                  //       //               PrefConstants.isHomeService, true);
-                  //       //         } else {
-                  //       //           SharedPrefs.writeValue(
-                  //       //               PrefConstants.isHomeService, false);
-                  //       //         }
-                  //       //         _homeController.doGetHomeSalonList(
-                  //       //             serviceGender: selectedGender.value == 0
-                  //       //                 ? "male"
-                  //       //                 : "female",
-                  //       //             homeService: atHome,
-                  //       //             offset: 1,
-                  //       //             size: 500,
-                  //       //             lat: double.parse(
-                  //       //                 SharedPrefs.readStringValue(
-                  //       //                     PrefConstants.latitude)),
-                  //       //             lng: double.parse(
-                  //       //                 SharedPrefs.readStringValue(
-                  //       //                     PrefConstants.longitude)),
-                  //       //             orderBy: "",
-                  //       //             nearest: false,
-                  //       //             fourPlusRating: false);
-                  //       //
-                  //       //         _homeController.doGetPromoCode(
-                  //       //             fourPlusRating: false,
-                  //       //             homeService: SharedPrefs.readBoolValue(
-                  //       //                 PrefConstants.isHomeService),
-                  //       //             nearest: false,
-                  //       //             orderBy: dropdownvalue == "Sort By"
-                  //       //                 ? ""
-                  //       //                 : dropdownvalue == "Newest"
-                  //       //                     ? "createdAt"
-                  //       //                     : dropdownvalue == "Price"
-                  //       //                         ? "serviceStartingPrice"
-                  //       //                         : "name",
-                  //       //             serviceGender: selectedGender.value == 0
-                  //       //                 ? "male"
-                  //       //                 : "female",
-                  //       //             lat: double.parse(
-                  //       //                 SharedPrefs.readStringValue(
-                  //       //                     PrefConstants.latitude)),
-                  //       //             lng: double.parse(
-                  //       //                 SharedPrefs.readStringValue(
-                  //       //                     PrefConstants.longitude)));
-                  //       //       });
-                  //       //     },
-                  //       //   ),
-                  //       // ),
-                  //     ],
-                  //   ),
-                  // )
-                ],
-              ),
-            ),
-            const SizedBox(height: 10),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Stack(
-                        children: [
-                          DropdownButtonHideUnderline(
-                            child: DropdownButton2<String>(
-                              isExpanded: true,
+                  const SizedBox(height: 10),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Stack(
+                              children: [
+                                DropdownButtonHideUnderline(
+                                  child: DropdownButton2<String>(
+                                    isExpanded: true,
 
-                              /// 🔥 SHOW DEFAULT TEXT HERE
-                              hint: Center(
-                                  child: Text(
-                                "Sort By",
-                                textAlign: TextAlign.center,
-                                style: AppTextTheme.medium.copyWith(
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 14,
-                                  color: ColorConstant.blackColor,
-                                ),
-                              )),
-
-                              items: items
-                                  .map((String item) =>
-                                      DropdownMenuItem<String>(
-                                        value: item,
-                                        alignment: Alignment.center,
+                                    /// 🔥 SHOW DEFAULT TEXT HERE
+                                    hint: Center(
                                         child: Text(
-                                          item,
-                                          style: AppTextTheme.medium.copyWith(
-                                            fontFamily: "Outfit",
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 14,
-                                            color: ColorConstant.blackColor,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
+                                      "Sort By",
+                                      textAlign: TextAlign.center,
+                                      style: AppTextTheme.medium.copyWith(
+                                        fontFamily: "Outfit",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 14,
+                                        color: ColorConstant.blackColor,
+                                      ),
+                                    )),
+
+                                    items: items
+                                        .map((String item) =>
+                                            DropdownMenuItem<String>(
+                                              value: item,
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                item,
+                                                style: AppTextTheme.medium
+                                                    .copyWith(
+                                                  fontFamily: "Outfit",
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 14,
+                                                  color:
+                                                      ColorConstant.blackColor,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ))
+                                        .toList(),
+
+                                    value: dropdownvalue, // 🔥 can be null
+
+                                    onChanged: (value) {
+                                      setState(() {
+                                        dropdownvalue = value;
+
+                                        String orderBy =
+                                            value == "Price: Low - High"
+                                                ? "serviceStartingPrice"
+                                                : "serviceMaxPrice";
+
+                                        _homeController.doGetPromoCode(
+                                          fourPlusRating: false,
+                                          homeService:
+                                              SharedPrefs.readBoolValue(
+                                                  PrefConstants.isHomeService),
+                                          nearest: false,
+                                          orderBy: orderBy,
+                                          serviceGender:
+                                              selectedGender.value == 0
+                                                  ? "male"
+                                                  : "female",
+                                          lat: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.latitude)),
+                                          lng: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.longitude)),
+                                        );
+
+                                        _homeController.doGetHomeSalonList(
+                                          serviceGender:
+                                              selectedGender.value == 0
+                                                  ? "male"
+                                                  : "female",
+                                          homeService: atHome,
+                                          offset: 1,
+                                          size: 500,
+                                          lat: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.latitude)),
+                                          lng: double.parse(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.longitude)),
+                                          orderBy: orderBy,
+                                          nearest: false,
+                                          fourPlusRating: false,
+                                        );
+                                      });
+                                    },
+
+                                    buttonStyleData: ButtonStyleData(
+                                      height: 30,
+                                      width: 150,
+                                      padding: const EdgeInsets.only(
+                                          left: 8, right: 8),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(12),
+                                        border:
+                                            Border.all(color: Colors.black26),
+                                        color: Colors.white,
+                                      ),
+                                    ),
+
+                                    iconStyleData: const IconStyleData(
+                                      icon: Icon(
+                                          Icons.arrow_forward_ios_outlined),
+                                      iconSize: 14,
+                                      iconEnabledColor:
+                                          ColorConstant.blackColor,
+                                      iconDisabledColor:
+                                          ColorConstant.blackColor,
+                                    ),
+
+                                    dropdownStyleData: DropdownStyleData(
+                                      maxHeight: 200,
+                                      width: 200,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(14),
+                                        color: ColorConstant.whiteColor,
+                                      ),
+                                      offset: const Offset(-20, 0),
+                                    ),
+
+                                    menuItemStyleData: const MenuItemStyleData(
+                                      height: 40,
+                                    ),
+                                  ),
+                                ),
+                                // Positioned(
+                                //   left: 10,
+                                //   top: 9,
+                                //   child: Image.asset(AssetsConstant.filter,
+                                //       height: 14, width: 14),
+                                // ),
+                              ],
+                            ),
+                            const SizedBox(width: 6),
+                            Row(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      // if (select == 0 || select == 2) {
+                                      //   select = 1;
+                                      //   _homeController.doGetHomeSalonList(
+                                      //       serviceGender: selectedGender.value == 0
+                                      //           ? "male"
+                                      //           : "female",
+                                      //       homeService: atHome,
+                                      //       offset: 1,
+                                      //       size: 500,
+                                      //       lat: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.latitude)),
+                                      //       lng: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.longitude)),
+                                      //       orderBy: dropdownvalue == "Sort By"
+                                      //           ? ""
+                                      //           : dropdownvalue == "Price: Low - High"
+                                      //           ? "serviceStartingPrice"
+                                      //           : "serviceMaxPrice",
+                                      //       nearest: true,
+                                      //       fourPlusRating: false);
+                                      //
+                                      //   _homeController.doGetPromoCode(
+                                      //       fourPlusRating: false,
+                                      //       homeService: SharedPrefs.readBoolValue(
+                                      //           PrefConstants.isHomeService),
+                                      //       nearest: true,
+                                      //       orderBy: dropdownvalue == "Sort By"
+                                      //           ? ""
+                                      //           : dropdownvalue == "Price: Low - High"
+                                      //           ? "serviceStartingPrice"
+                                      //           : "serviceMaxPrice",
+                                      //       serviceGender: selectedGender.value == 0
+                                      //           ? "male"
+                                      //           : "female",
+                                      //       lat: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.latitude)),
+                                      //       lng: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.longitude)));
+                                      // } else {
+                                      //   select = 0;
+                                      //   _homeController.doGetHomeSalonList(
+                                      //       serviceGender: selectedGender.value == 0
+                                      //           ? "male"
+                                      //           : "female",
+                                      //       homeService: atHome,
+                                      //       offset: 1,
+                                      //       size: 500,
+                                      //       lat: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.latitude)),
+                                      //       lng: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.longitude)),
+                                      //       orderBy: dropdownvalue == "Sort By"
+                                      //           ? ""
+                                      //           : dropdownvalue == "Price: Low - High"
+                                      //           ? "serviceStartingPrice"
+                                      //           : "serviceMaxPrice",
+                                      //       nearest: false,
+                                      //       fourPlusRating: false);
+                                      //
+                                      //   _homeController.doGetPromoCode(
+                                      //       fourPlusRating: false,
+                                      //       homeService: SharedPrefs.readBoolValue(
+                                      //           PrefConstants.isHomeService),
+                                      //       nearest: false,
+                                      //       orderBy: dropdownvalue == "Sort By"
+                                      //           ? ""
+                                      //           : dropdownvalue == "Price: Low - High"
+                                      //           ? "serviceStartingPrice"
+                                      //           : "serviceMaxPrice",
+                                      //       serviceGender: selectedGender.value == 0
+                                      //           ? "male"
+                                      //           : "female",
+                                      //       lat: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.latitude)),
+                                      //       lng: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.longitude)));
+                                      // }
+                                      isNearestSelected = !isNearestSelected;
+                                    });
+                                    applyFilters();
+                                  },
+                                  child: Container(
+                                    width: Get.width * 0.25,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      color: isNearestSelected //select == 1
+                                          ? changeTheme(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.gender))
+                                          : ColorConstant.whiteColor,
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                          color: ColorConstant.grayBorderColor,
+                                          width: 1),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Nearest",
+                                        style: AppTextTheme.medium.copyWith(
+                                          fontFamily: "Outfit", // ✅ added
+                                          fontWeight:
+                                              FontWeight.w400, // ✅ Regular
+                                          fontSize: 14, // ✅ Figma size
+                                          color: isNearestSelected //select == 1
+                                              ? ColorConstant.whiteColor
+                                              : ColorConstant.blackColor,
                                         ),
-                                      ))
-                                  .toList(),
-
-                              value: dropdownvalue, // 🔥 can be null
-
-                              onChanged: (value) {
-                                setState(() {
-                                  dropdownvalue = value;
-
-                                  String orderBy = value == "Price: Low - High"
-                                      ? "serviceStartingPrice"
-                                      : "serviceMaxPrice";
-
-                                  _homeController.doGetPromoCode(
-                                    fourPlusRating: false,
-                                    homeService: SharedPrefs.readBoolValue(
-                                        PrefConstants.isHomeService),
-                                    nearest: false,
-                                    orderBy: orderBy,
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                  );
-
-                                  _homeController.doGetHomeSalonList(
-                                    serviceGender: selectedGender.value == 0
-                                        ? "male"
-                                        : "female",
-                                    homeService: atHome,
-                                    offset: 1,
-                                    size: 500,
-                                    lat: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.latitude)),
-                                    lng: double.parse(
-                                        SharedPrefs.readStringValue(
-                                            PrefConstants.longitude)),
-                                    orderBy: orderBy,
-                                    nearest: false,
-                                    fourPlusRating: false,
-                                  );
-                                });
-                              },
-
-                              buttonStyleData: ButtonStyleData(
-                                height: 30,
-                                width: 150,
-                                padding:
-                                    const EdgeInsets.only(left: 8, right: 8),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  border: Border.all(color: Colors.black26),
-                                  color: Colors.white,
-                                ),
-                              ),
-
-                              iconStyleData: const IconStyleData(
-                                icon: Icon(Icons.arrow_forward_ios_outlined),
-                                iconSize: 14,
-                                iconEnabledColor: ColorConstant.blackColor,
-                                iconDisabledColor: ColorConstant.blackColor,
-                              ),
-
-                              dropdownStyleData: DropdownStyleData(
-                                maxHeight: 200,
-                                width: 200,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  color: ColorConstant.whiteColor,
-                                ),
-                                offset: const Offset(-20, 0),
-                              ),
-
-                              menuItemStyleData: const MenuItemStyleData(
-                                height: 40,
-                              ),
-                            ),
-                          ),
-                          // Positioned(
-                          //   left: 10,
-                          //   top: 9,
-                          //   child: Image.asset(AssetsConstant.filter,
-                          //       height: 14, width: 14),
-                          // ),
-                        ],
-                      ),
-                      const SizedBox(width: 6),
-                      Row(
-                        children: [
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                // if (select == 0 || select == 2) {
-                                //   select = 1;
-                                //   _homeController.doGetHomeSalonList(
-                                //       serviceGender: selectedGender.value == 0
-                                //           ? "male"
-                                //           : "female",
-                                //       homeService: atHome,
-                                //       offset: 1,
-                                //       size: 500,
-                                //       lat: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.latitude)),
-                                //       lng: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.longitude)),
-                                //       orderBy: dropdownvalue == "Sort By"
-                                //           ? ""
-                                //           : dropdownvalue == "Price: Low - High"
-                                //           ? "serviceStartingPrice"
-                                //           : "serviceMaxPrice",
-                                //       nearest: true,
-                                //       fourPlusRating: false);
-                                //
-                                //   _homeController.doGetPromoCode(
-                                //       fourPlusRating: false,
-                                //       homeService: SharedPrefs.readBoolValue(
-                                //           PrefConstants.isHomeService),
-                                //       nearest: true,
-                                //       orderBy: dropdownvalue == "Sort By"
-                                //           ? ""
-                                //           : dropdownvalue == "Price: Low - High"
-                                //           ? "serviceStartingPrice"
-                                //           : "serviceMaxPrice",
-                                //       serviceGender: selectedGender.value == 0
-                                //           ? "male"
-                                //           : "female",
-                                //       lat: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.latitude)),
-                                //       lng: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.longitude)));
-                                // } else {
-                                //   select = 0;
-                                //   _homeController.doGetHomeSalonList(
-                                //       serviceGender: selectedGender.value == 0
-                                //           ? "male"
-                                //           : "female",
-                                //       homeService: atHome,
-                                //       offset: 1,
-                                //       size: 500,
-                                //       lat: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.latitude)),
-                                //       lng: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.longitude)),
-                                //       orderBy: dropdownvalue == "Sort By"
-                                //           ? ""
-                                //           : dropdownvalue == "Price: Low - High"
-                                //           ? "serviceStartingPrice"
-                                //           : "serviceMaxPrice",
-                                //       nearest: false,
-                                //       fourPlusRating: false);
-                                //
-                                //   _homeController.doGetPromoCode(
-                                //       fourPlusRating: false,
-                                //       homeService: SharedPrefs.readBoolValue(
-                                //           PrefConstants.isHomeService),
-                                //       nearest: false,
-                                //       orderBy: dropdownvalue == "Sort By"
-                                //           ? ""
-                                //           : dropdownvalue == "Price: Low - High"
-                                //           ? "serviceStartingPrice"
-                                //           : "serviceMaxPrice",
-                                //       serviceGender: selectedGender.value == 0
-                                //           ? "male"
-                                //           : "female",
-                                //       lat: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.latitude)),
-                                //       lng: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.longitude)));
-                                // }
-                                isNearestSelected = !isNearestSelected;
-                              });
-                              applyFilters();
-                            },
-                            child: Container(
-                              width: Get.width * 0.25,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                color: isNearestSelected //select == 1
-                                    ? changeTheme(SharedPrefs.readStringValue(
-                                        PrefConstants.gender))
-                                    : ColorConstant.whiteColor,
-                                borderRadius: BorderRadius.circular(12),
-                                border: Border.all(
-                                    color: ColorConstant.grayBorderColor,
-                                    width: 1),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Nearest",
-                                  style: AppTextTheme.medium.copyWith(
-                                    fontFamily: "Outfit", // ✅ added
-                                    fontWeight: FontWeight.w400, // ✅ Regular
-                                    fontSize: 14, // ✅ Figma size
-                                    color: isNearestSelected //select == 1
-                                        ? ColorConstant.whiteColor
-                                        : ColorConstant.blackColor,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-                          InkWell(
-                            onTap: () {
-                              setState(() {
-                                // if (select == 0 || select == 1) {
-                                //   select = 2;
-                                //   // _homeController.doGetHomeSalonList(
-                                //   //     serviceGender: selectedGender.value == 0
-                                //   //         ? "male"
-                                //   //         : "female",
-                                //   //     homeService: atHome,
-                                //   //     offset: 1,
-                                //   //     size: 500,
-                                //   //     lat: double.parse(
-                                //   //         SharedPrefs.readStringValue(
-                                //   //             PrefConstants.latitude)),
-                                //   //     lng: double.parse(
-                                //   //         SharedPrefs.readStringValue(
-                                //   //             PrefConstants.longitude)),
-                                //   //     orderBy: dropdownvalue == "Sort By"
-                                //   //         ? ""
-                                //   //         : dropdownvalue == "Newest"
-                                //   //         ? "createdAt"
-                                //   //         : dropdownvalue == "Price"
-                                //   //         ? "serviceStartingPrice"
-                                //   //         : "name",
-                                //   //     nearest: false,
-                                //   //     fourPlusRating: true);
-                                //   //
-                                //   // _homeController.doGetPromoCode(
-                                //   //     fourPlusRating: true,
-                                //   //     homeService: SharedPrefs.readBoolValue(
-                                //   //         PrefConstants.isHomeService),
-                                //   //     nearest: false,
-                                //   //     orderBy: dropdownvalue == "Sort By"
-                                //   //         ? ""
-                                //   //         : dropdownvalue == "Newest"
-                                //   //         ? "createdAt"
-                                //   //         : dropdownvalue == "Price"
-                                //   //         ? "serviceStartingPrice"
-                                //   //         : "name",
-                                //   //     serviceGender: selectedGender.value == 0
-                                //   //         ? "male"
-                                //   //         : "female",
-                                //   //     lat: double.parse(
-                                //   //         SharedPrefs.readStringValue(
-                                //   //             PrefConstants.latitude)),
-                                //   //     lng: double.parse(
-                                //   //         SharedPrefs.readStringValue(
-                                //   //             PrefConstants.longitude)));
-                                //   sortSalonsByDiscount();
-                                // } else {
-                                //   select = 0;
-                                //   _homeController.doGetHomeSalonList(
-                                //       serviceGender: selectedGender.value == 0
-                                //           ? "male"
-                                //           : "female",
-                                //       homeService: atHome,
-                                //       offset: 1,
-                                //       size: 500,
-                                //       lat: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.latitude)),
-                                //       lng: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.longitude)),
-                                //       orderBy: dropdownvalue == "Sort By"
-                                //           ? ""
-                                //           : dropdownvalue == "Price: Low - High"
-                                //           ? "serviceStartingPrice"
-                                //           : "serviceMaxPrice",
-                                //       nearest: false,
-                                //       fourPlusRating: false);
-                                //
-                                //   _homeController.doGetPromoCode(
-                                //       fourPlusRating: false,
-                                //       homeService: SharedPrefs.readBoolValue(
-                                //           PrefConstants.isHomeService),
-                                //       nearest: false,
-                                //       orderBy: dropdownvalue == "Sort By"
-                                //           ? ""
-                                //           : dropdownvalue == "Price: Low - High"
-                                //           ? "serviceStartingPrice"
-                                //           : "serviceMaxPrice",
-                                //       serviceGender: selectedGender.value == 0
-                                //           ? "male"
-                                //           : "female",
-                                //       lat: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.latitude)),
-                                //       lng: double.parse(
-                                //           SharedPrefs.readStringValue(
-                                //               PrefConstants.longitude)));
-                                // }
-                                // Row 26 (updated): Budget = price low-to-high.
-                                _budgetLowToHigh = !_budgetLowToHigh;
-                              });
-                            },
-                            child: Container(
-                              width: Get.width * 0.28,
-                              height: 30,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: _budgetLowToHigh //budget selected
-                                    ? changeTheme(SharedPrefs.readStringValue(
-                                        PrefConstants.gender))
-                                    : ColorConstant.whiteColor,
-                                border: Border.all(
-                                    color: ColorConstant.grayBorderColor,
-                                    width: 1),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  "Budget",
-                                  style: AppTextTheme.medium.copyWith(
-                                    fontFamily: "Outfit", // ✅ added
-                                    fontWeight: FontWeight.w400, // ✅ Regular
-                                    fontSize: 14, // ✅ Figma size
-                                    color: _budgetLowToHigh //budget selected
-                                        ? ColorConstant.whiteColor
-                                        : ColorConstant.blackColor,
+                                const SizedBox(width: 4),
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      // if (select == 0 || select == 1) {
+                                      //   select = 2;
+                                      //   // _homeController.doGetHomeSalonList(
+                                      //   //     serviceGender: selectedGender.value == 0
+                                      //   //         ? "male"
+                                      //   //         : "female",
+                                      //   //     homeService: atHome,
+                                      //   //     offset: 1,
+                                      //   //     size: 500,
+                                      //   //     lat: double.parse(
+                                      //   //         SharedPrefs.readStringValue(
+                                      //   //             PrefConstants.latitude)),
+                                      //   //     lng: double.parse(
+                                      //   //         SharedPrefs.readStringValue(
+                                      //   //             PrefConstants.longitude)),
+                                      //   //     orderBy: dropdownvalue == "Sort By"
+                                      //   //         ? ""
+                                      //   //         : dropdownvalue == "Newest"
+                                      //   //         ? "createdAt"
+                                      //   //         : dropdownvalue == "Price"
+                                      //   //         ? "serviceStartingPrice"
+                                      //   //         : "name",
+                                      //   //     nearest: false,
+                                      //   //     fourPlusRating: true);
+                                      //   //
+                                      //   // _homeController.doGetPromoCode(
+                                      //   //     fourPlusRating: true,
+                                      //   //     homeService: SharedPrefs.readBoolValue(
+                                      //   //         PrefConstants.isHomeService),
+                                      //   //     nearest: false,
+                                      //   //     orderBy: dropdownvalue == "Sort By"
+                                      //   //         ? ""
+                                      //   //         : dropdownvalue == "Newest"
+                                      //   //         ? "createdAt"
+                                      //   //         : dropdownvalue == "Price"
+                                      //   //         ? "serviceStartingPrice"
+                                      //   //         : "name",
+                                      //   //     serviceGender: selectedGender.value == 0
+                                      //   //         ? "male"
+                                      //   //         : "female",
+                                      //   //     lat: double.parse(
+                                      //   //         SharedPrefs.readStringValue(
+                                      //   //             PrefConstants.latitude)),
+                                      //   //     lng: double.parse(
+                                      //   //         SharedPrefs.readStringValue(
+                                      //   //             PrefConstants.longitude)));
+                                      //   sortSalonsByDiscount();
+                                      // } else {
+                                      //   select = 0;
+                                      //   _homeController.doGetHomeSalonList(
+                                      //       serviceGender: selectedGender.value == 0
+                                      //           ? "male"
+                                      //           : "female",
+                                      //       homeService: atHome,
+                                      //       offset: 1,
+                                      //       size: 500,
+                                      //       lat: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.latitude)),
+                                      //       lng: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.longitude)),
+                                      //       orderBy: dropdownvalue == "Sort By"
+                                      //           ? ""
+                                      //           : dropdownvalue == "Price: Low - High"
+                                      //           ? "serviceStartingPrice"
+                                      //           : "serviceMaxPrice",
+                                      //       nearest: false,
+                                      //       fourPlusRating: false);
+                                      //
+                                      //   _homeController.doGetPromoCode(
+                                      //       fourPlusRating: false,
+                                      //       homeService: SharedPrefs.readBoolValue(
+                                      //           PrefConstants.isHomeService),
+                                      //       nearest: false,
+                                      //       orderBy: dropdownvalue == "Sort By"
+                                      //           ? ""
+                                      //           : dropdownvalue == "Price: Low - High"
+                                      //           ? "serviceStartingPrice"
+                                      //           : "serviceMaxPrice",
+                                      //       serviceGender: selectedGender.value == 0
+                                      //           ? "male"
+                                      //           : "female",
+                                      //       lat: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.latitude)),
+                                      //       lng: double.parse(
+                                      //           SharedPrefs.readStringValue(
+                                      //               PrefConstants.longitude)));
+                                      // }
+                                      // Row 26 (updated): Budget = price low-to-high.
+                                      _budgetLowToHigh = !_budgetLowToHigh;
+                                    });
+                                  },
+                                  child: Container(
+                                    width: Get.width * 0.28,
+                                    height: 30,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: _budgetLowToHigh //budget selected
+                                          ? changeTheme(
+                                              SharedPrefs.readStringValue(
+                                                  PrefConstants.gender))
+                                          : ColorConstant.whiteColor,
+                                      border: Border.all(
+                                          color: ColorConstant.grayBorderColor,
+                                          width: 1),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        "Budget",
+                                        style: AppTextTheme.medium.copyWith(
+                                          fontFamily: "Outfit", // ✅ added
+                                          fontWeight:
+                                              FontWeight.w400, // ✅ Regular
+                                          fontSize: 14, // ✅ Figma size
+                                          color:
+                                              _budgetLowToHigh //budget selected
+                                                  ? ColorConstant.whiteColor
+                                                  : ColorConstant.blackColor,
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          ), /*const SizedBox(width: 4),
+                                ), /*const SizedBox(width: 4),
                             InkWell(
                               onTap: () {
                                 setState(() {
@@ -2699,17 +2867,17 @@ class _HomePageState extends State<HomePage>
                                 ),
                               ),
                             ),*/
-                        ],
-                      )
-                    ],
+                              ],
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 5),
+                ],
               ),
             ),
-            const SizedBox(height: 5),
-          ],
-        ),
-      ),
     );
   }
 
