@@ -111,7 +111,8 @@ class HomeAPI {
       'limit': size,
       "lat": lat == 0.0 ? 00.00 : lat,
       "lng": lng == 0.0 ? 00.00 : lng,
-      "distanceRadius": 50000,
+      // Operational-area threshold: 12 km (in meters), matching the backend.
+      "distanceRadius": 12000,
       "homeService": homeService,
       "orderDirection": orderBy == "name" ? "ASC" : "DESC",
       "nearest": nearest,
