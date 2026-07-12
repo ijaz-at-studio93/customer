@@ -212,8 +212,8 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                               final code = _couponController.text.trim().toLowerCase();
 
                               final matchingPromo = _homeController
-                                  .getPromoCodeModelList.data
-                                  ?.firstWhereOrNull((promo) =>
+                                  .getAllPromoCodes
+                                  .firstWhereOrNull((promo) =>
                               (promo.code?.toLowerCase() ?? '') == code);
 
                               if (matchingPromo != null) {
@@ -279,14 +279,12 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
               child: Obx(
                       () => _homeController.showProgress
                       ? const ProgressBarView()
-                      : _homeController.getPromoCodeModelList.data?.isEmpty ?? false
+                      : _homeController.getAllPromoCodes.isEmpty
                       ? const NoItemsWidget(
                     text: "Promo code not available there",
                   )
                       : ListView.builder(
-                      itemCount: _homeController
-                          .getPromoCodeModelList.data?.length ??
-                          0,
+                      itemCount: _homeController.getAllPromoCodes.length,
                       shrinkWrap: true,
                       // itemBuilder: (context, i) {
                       //   return PromoCodeListTile(
@@ -342,7 +340,7 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                       //   );
                       // }),
                       itemBuilder: (context, i) {
-                        final promo = _homeController.getPromoCodeModelList.data?[i];
+                        final promo = _homeController.getAllPromoCodes[i];
 
                         /// PRE-GST cart total
                         final int cartAmount =
@@ -365,7 +363,18 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
 
                         final bool isMinOrderFail = cartAmount < minOrder;
 
-                        final bool isDisabled = isMinOrderFail || !isDayValid;
+                        // Row 39: a category-scoped coupon is only valid when
+                        // the cart contains a service from one of its
+                        // categories (mirrors the applicableDays rule).
+                        final applicableCategories = promo?.applicableCategories;
+                        final bool isCategoryValid = applicableCategories ==
+                                null ||
+                            applicableCategories.isEmpty ||
+                            applicableCategories
+                                .any(_homeController.cartCategoryIds().contains);
+
+                        final bool isDisabled =
+                            isMinOrderFail || !isDayValid || !isCategoryValid;
                         final bool isDayFail = !isDayValid;
 
                         final int remainingAmount =
@@ -389,6 +398,14 @@ class _PromoCodeSheetWidgetState extends State<PromoCodeSheetWidget> {
                           isDayValid: isDayValid,
                           isMinOrderFail: isMinOrderFail,
                           applicableDays: applicableDays,
+
+                          // Row 39: category-scoped coupon info.
+                          isCategoryValid: isCategoryValid,
+                          applicableCategoryNames: applicableCategories
+                              ?.map((id) =>
+                                  _homeController.categoryNameById(id))
+                              .where((n) => n.isNotEmpty)
+                              .toList(),
 
                           onTapApplyBtn: isDisabled
                               ? null

@@ -19,7 +19,7 @@ class APIConstants {
   /// available (a full http(s) URL is used as-is; a relative path is prefixed
   /// with [image]). Empty string hides the demo video. Placeholder = a public
   /// sample MP4 for local testing.
-  static const String paymentDemoVideoUrl = '';
+  static const String paymentDemoVideoUrl = 'https://www.w3schools.com/html/mov_bbb.mp4';
 
   /// Socket.IO server origin (same host/port as [baseUrl], without `/api/v1/`).
   static String get socketUrl {

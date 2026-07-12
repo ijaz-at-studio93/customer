@@ -396,6 +396,19 @@ class HomeController extends GetxController {
 
   set setPromoCodeModelList(val) => _promoCodeModelList.value = val;
 
+  List<PromoCode> get getAllPromoCodes {
+    final cartPromos = _promoCodeModelList.value.data ?? <PromoCode>[];
+    final salonPromos = _salonPromoCodeModel.value.data ?? <PromoCode>[];
+    final map = <String, PromoCode>{};
+    for (var p in cartPromos) {
+      if (p.id != null) map[p.id!] = p;
+    }
+    for (var p in salonPromos) {
+      if (p.id != null) map[p.id!] = p;
+    }
+    return map.values.toList();
+  }
+
   /*-------------  category Id  -----------------*/
   final RxList categoryId = [].obs;
 
@@ -1528,10 +1541,12 @@ class HomeController extends GetxController {
   }
 
   /*---------------- Get Blog Data ----------------*/
-  Future<void> doGetBlogData({required double lat, required double lng}) async {
+  Future<void> doGetBlogData(
+      {required double lat, required double lng, String? search}) async {
     try {
       _showProgress.value = true;
-      _blogDataModel.value = await HomeAPI.getBlogData(lat: lat, lng: lng);
+      _blogDataModel.value =
+          await HomeAPI.getBlogData(lat: lat, lng: lng, search: search);
     } catch (e) {
       showError(e);
       if (kDebugMode) {

@@ -1618,29 +1618,17 @@ class _SaloonAfterSelectingServicesPageState
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      (_homeController.homeSalonDetailsData.data?.reviewCount ??
-                                  0) ==
+                      // reviewCount on the salon-details model is a String, so
+                      // parse it before comparing — comparing a String to int 0
+                      // is always false, which is why the "New" pill never showed.
+                      (int.tryParse(_homeController
+                                      .homeSalonDetailsData.data?.reviewCount ??
+                                  "0") ??
+                              0) ==
                               0
-                          // No reviews yet → "New" tag instead of a 0 rating.
-                          ? Container(
-                              height: 26,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF16A34A),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Text(
-                                "New",
-                                style: TextStyle(
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            )
+                          // No reviews yet → hide the photo rating badge; the
+                          // "New" chip now lives in the action row instead.
+                          ? const SizedBox.shrink()
                           : Row(
                         children: [
                           Container(
@@ -2078,6 +2066,36 @@ class _SaloonAfterSelectingServicesPageState
               ),
 
               //const SizedBox(width: 8),
+
+              /// NEW CHIP — shown just before the Content button when the salon
+              /// has no reviews yet. reviewCount is a String on the details
+              /// model, so parse it before comparing.
+              if ((int.tryParse(_homeController
+                              .homeSalonDetailsData.data?.reviewCount ??
+                          "0") ??
+                      0) ==
+                  0) ...[
+                Container(
+                  height: 30,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF16A34A),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    "New",
+                    textScaler: const TextScaler.linear(0.85),
+                    style: AppTextTheme.semibold.copyWith(
+                      fontSize: 13,
+                      color: Colors.white,
+                      fontFamily: 'Outfit',
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 6),
+              ],
 
               /// CONTENT REDIRECT (Row 15) — opens this salon's content
               GestureDetector(

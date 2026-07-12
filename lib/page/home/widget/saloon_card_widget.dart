@@ -378,15 +378,15 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     child: Container(
                       width: double.infinity,
                       height: Get.height * 0.25,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            ColorConstant.blackColor,
-                            Colors.black.withOpacity(0),
-                            Colors.black.withOpacity(0),
+                            Color(0x73000000),
+                            Color(0x00000000),
                           ],
+                          stops: [0.0, 0.35],
                         ),
                       ),
                     ),
