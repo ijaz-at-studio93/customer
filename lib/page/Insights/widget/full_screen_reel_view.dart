@@ -38,6 +38,8 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
 
     return Scaffold(
       backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
+      extendBody: true,
       body: Stack(
         children: [
           /// 🔥 MEDIA
@@ -52,109 +54,121 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
                     ? CachedNetworkImage(
                         imageUrl: "${APIConstants.image}$image",
                         fit: BoxFit.cover,
+                        placeholder: (context, url) =>
+                            Container(color: Colors.black),
+                        errorWidget: (context, url, error) =>
+                            Container(color: Colors.black),
                       )
                     : Container(color: Colors.black),
           ),
 
           /// 🔥 BACK BUTTON
           Positioned(
-            top: 40,
+            top: 10,
             left: 12,
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: const BoxDecoration(
-                  color: Colors.black54,
-                  shape: BoxShape.circle,
+            child: SafeArea(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.arrow_back,
+                      color: Colors.white, size: 22),
                 ),
-                child:
-                    const Icon(Icons.arrow_back, color: Colors.white, size: 22),
               ),
             ),
           ),
 
           /// 🔥 SALON NAME
           Positioned(
-            top: 40,
+            top: 10,
             left: 60,
-            child: GestureDetector(
-              onTap: (widget.data.salon?.id == null)
-                  ? null
-                  : () async {
-                      _pauseNotifier.value = true;
-                      await Get.to(() => SaloonAfterSelectingServicesPage(
-                            isPayNowMode: true,
-                            id: widget.data.salon!.id ?? "",
-                            callback: () {},
-                          ));
-                      _pauseNotifier.value = false;
-                    },
-              child: Opacity(
-                opacity: (widget.data.salon?.id == null) ? 0.8 : 0.9,
-                child: Container(
-                    height: 44,
-                    constraints: BoxConstraints(
-                      maxWidth: Get.width *
-                          0.4, // 👈 prevents it from growing too much
-                    ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.7),
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: Center(
-                      child: Text(
-                        widget.data.salon?.displayName ?? "By Scuts",
-                        textAlign: TextAlign.center,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: ColorConstant.primaryColor,
-                          fontSize: 12,
-                          fontFamily: 'Outfit',
-                          fontWeight: FontWeight.w600,
-                        ),
+            child: SafeArea(
+              child: GestureDetector(
+                onTap: (widget.data.salon?.id == null)
+                    ? null
+                    : () async {
+                        _pauseNotifier.value = true;
+                        await Get.to(() => SaloonAfterSelectingServicesPage(
+                              isPayNowMode: true,
+                              id: widget.data.salon!.id ?? "",
+                              callback: () {},
+                            ));
+                        _pauseNotifier.value = false;
+                      },
+                child: Opacity(
+                  opacity: (widget.data.salon?.id == null) ? 0.8 : 0.9,
+                  child: Container(
+                      height: 44,
+                      constraints: BoxConstraints(
+                        maxWidth: Get.width *
+                            0.4, // 👈 prevents it from growing too much
                       ),
-                    )),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.7),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Center(
+                        child: Text(
+                          widget.data.salon?.displayName ?? "By Scuts",
+                          textAlign: TextAlign.center,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: ColorConstant.primaryColor,
+                            fontSize: 12,
+                            fontFamily: 'Outfit',
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )),
+                ),
               ),
             ),
           ),
 
           /// 🔥 LIKE BUTTON (FIXED)
           Positioned(
-            top: 40,
+            top: 10,
             right: 16,
-            child: GestureDetector(
-              onTap: () {
-                setState(() {
-                  widget.data.isFavourite = !(widget.data.isFavourite ?? false);
+            child: SafeArea(
+              child: GestureDetector(
+                onTap: () {
+                  setState(() {
+                    widget.data.isFavourite =
+                        !(widget.data.isFavourite ?? false);
 
-                  if (widget.data.isFavourite ?? false) {
-                    _homeController.doAddFavBlog(
-                      callback: () {},
-                      blogId: widget.data.id ?? "",
-                    );
-                  } else {
-                    _homeController.doRemoveBlog(
-                      callback: () {},
-                      blogId: widget.data.id ?? "",
-                    );
-                  }
-                });
-              },
-              child: Container(
-                width: 44,
-                height: 44,
-                decoration: const BoxDecoration(
-                  color: Colors.black54,
-                  shape: BoxShape.circle,
-                ),
-                child: Center(
-                  child: widget.data.isFavourite ?? false
-                      ? const Icon(Icons.favorite, color: Colors.red)
-                      : const Icon(Icons.favorite_border, color: Colors.white),
+                    if (widget.data.isFavourite ?? false) {
+                      _homeController.doAddFavBlog(
+                        callback: () {},
+                        blogId: widget.data.id ?? "",
+                      );
+                    } else {
+                      _homeController.doRemoveBlog(
+                        callback: () {},
+                        blogId: widget.data.id ?? "",
+                      );
+                    }
+                  });
+                },
+                child: Container(
+                  width: 44,
+                  height: 44,
+                  decoration: const BoxDecoration(
+                    color: Colors.black54,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: widget.data.isFavourite ?? false
+                        ? const Icon(Icons.favorite, color: Colors.red)
+                        : const Icon(Icons.favorite_border,
+                            color: Colors.white),
+                  ),
                 ),
               ),
             ),
@@ -162,88 +176,92 @@ class _FullScreenReelViewState extends State<FullScreenReelView> {
 
           /// 🔥 BOTTOM CONTENT
           Positioned(
-            bottom: 30,
+            bottom: 10,
             left: 16,
-            right: 16,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween, // 👈 KEY
-              children: [
-                /// 🔵 LEFT → DESCRIPTION
-                SizedBox(
-                  width: Get.width * 0.5, // 👈 only 80% width
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      final description = widget.data.description ?? "";
-                      final hasOverflow =
-                          isTextOverflowing(description, constraints.maxWidth);
+            right: 16, // 👈 bound the width so Row's spaceBetween can lay out
+            child: SafeArea(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween, // 👈 KEY
+                children: [
+                  /// 🔵 LEFT → DESCRIPTION
+                  SizedBox(
+                    width: Get.width * 0.5, // 👈 only 80% width
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final description = widget.data.description ?? "";
+                        final hasOverflow = isTextOverflowing(
+                            description, constraints.maxWidth);
 
-                      return GestureDetector(
-                        onTap: hasOverflow
-                            ? () {
-                                setState(() {
-                                  isExpanded = !isExpanded;
-                                });
-                              }
-                            : null,
-                        child: RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 13,
+                        return GestureDetector(
+                          onTap: hasOverflow
+                              ? () {
+                                  setState(() {
+                                    isExpanded = !isExpanded;
+                                  });
+                                }
+                              : null,
+                          child: RichText(
+                            text: TextSpan(
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                              ),
+                              children: [
+                                TextSpan(text: description),
+                                if (hasOverflow && !isExpanded)
+                                  const TextSpan(
+                                    text: "  Read more",
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                if (hasOverflow && isExpanded)
+                                  const TextSpan(
+                                    text: "  Read less",
+                                    style: TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                              ],
                             ),
-                            children: [
-                              TextSpan(text: description),
-                              if (hasOverflow && !isExpanded)
-                                const TextSpan(
-                                  text: "  Read more",
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              if (hasOverflow && isExpanded)
-                                const TextSpan(
-                                  text: "  Read less",
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                            ],
+                            maxLines: isExpanded ? null : 3,
+                            overflow: isExpanded
+                                ? TextOverflow.visible
+                                : TextOverflow.ellipsis,
                           ),
-                          maxLines: isExpanded ? null : 3,
-                          overflow: isExpanded
-                              ? TextOverflow.visible
-                              : TextOverflow.ellipsis,
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
-                ),
-                const SizedBox(width: 10), // optional spacing
+                  const SizedBox(width: 10), // optional spacing
 
-                /// 🔴 RIGHT → ARTIST
-                if ((widget.data.artist?.name ?? "").isNotEmpty)
-                  Row(
-                    children: [
-                      _artistAvatar(widget.data.artist?.profileImage),
-                      const SizedBox(width: 8),
-                      Flexible(
-                        child: Text(
-                          widget.data.artist?.name ?? "",
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              color: Colors.white, fontSize: 14),
+                  /// 🔴 RIGHT → ARTIST
+                  if ((widget.data.artist?.name ?? "").isNotEmpty)
+                    Flexible(
+                        child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _artistAvatar(widget.data.artist?.profileImage),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            widget.data.artist?.name ?? "",
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 14),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                // Row 9: right-bottom shows the stylist name if present, else
-                // nothing — the description lives on the left only (the stray
-                // duplicate Text(description) that used to render here is gone).
-              ],
+                      ],
+                    )),
+                  // Row 9: right-bottom shows the stylist name if present, else
+                  // nothing — the description lives on the left only (the stray
+                  // duplicate Text(description) that used to render here is gone).
+                ],
+              ),
             ),
           ),
         ],

@@ -313,6 +313,13 @@ class HomeController extends GetxController {
 
   set setBlogDataModel(val) => _blogDataModel.value = val;
 
+  /*------------- Salon-filtered Blog Data ---------------*/
+  final Rx<BlogDataModel> _salonBlogDataModel = BlogDataModel().obs;
+
+  BlogDataModel get getSalonBlogDataModel => _salonBlogDataModel.value;
+
+  set setSalonBlogDataModel(val) => _salonBlogDataModel.value = val;
+
   /*----------------- Fav Blog Data ----------------------*/
   final Rx<BlogDataModel> _favBlogDataModel = BlogDataModel().obs;
 
@@ -1536,6 +1543,25 @@ class HomeController extends GetxController {
       showError(e);
       if (kDebugMode) {
         print("Get Blog Data$e");
+      }
+    } finally {
+      _showProgress.value = false;
+    }
+  }
+
+  /*----------- Get Blog Data for a specific salon -----------*/
+  Future<void> doGetSalonBlogData(
+      {required double lat,
+      required double lng,
+      required String salonId}) async {
+    try {
+      _showProgress.value = true;
+      _salonBlogDataModel.value =
+          await HomeAPI.getBlogData(lat: lat, lng: lng, salonId: salonId);
+    } catch (e) {
+      showError(e);
+      if (kDebugMode) {
+        print("Get Salon Blog Data$e");
       }
     } finally {
       _showProgress.value = false;

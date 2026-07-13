@@ -685,9 +685,16 @@ class HomeAPI {
 
   /*------------------  Get Blog Data ---------------*/
   static Future<BlogDataModel> getBlogData(
-      {required double lat, required double lng}) async {
+      {required double lat,
+      required double lng,
+      String? salonId}) async {
     final response = await DioClient.client.get("user/blog/list",
-        queryParameters: {"lat": lat, "lng": lng, "distanceRadius": 100000000});
+        queryParameters: {
+          "lat": lat,
+          "lng": lng,
+          "distanceRadius": 100000000,
+          if (salonId != null && salonId.isNotEmpty) "salonId": salonId,
+        });
     if (response.isSuccess) {
       return BlogDataModel.fromJson(response.data);
     } else {

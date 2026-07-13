@@ -8,7 +8,6 @@ import 'package:salon_customer/project_specific/progressbar_view.dart';
 import 'package:salon_customer/util/NoItemsWidget.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import '../../constant/color_constant.dart';
-import '../../constant/variable_constant.dart';
 import '../../project_specific/text_theme.dart';
 
 /// Row 15: Salon Page → Content redirect. Shows only the content (blogs/reels)
@@ -33,25 +32,23 @@ class _SalonContentPageState extends State<SalonContentPage> {
   @override
   void initState() {
     super.initState();
-    // Ensure blog data is available (user may reach here without opening the
-    // Content tab first).
+    // Fetch content filtered to this salon directly from the API using the
+    // salonId query param (server-side filter).
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if ((_homeController.getBlogDataModel.data ?? []).isEmpty) {
-        final lat =
-            double.tryParse(SharedPrefs.readStringValue(PrefConstants.latitude));
-        final lng = double.tryParse(
-            SharedPrefs.readStringValue(PrefConstants.longitude));
-        if (lat != null && lng != null) {
-          _homeController.doGetBlogData(lat: lat, lng: lng);
-        }
-      }
+      _homeController.doGetSalonBlogData(
+        lat: double.tryParse(
+                SharedPrefs.readStringValue(PrefConstants.latitude)) ??
+            0.0,
+        lng: double.tryParse(
+                SharedPrefs.readStringValue(PrefConstants.longitude)) ??
+            0.0,
+        salonId: widget.salonId,
+      );
     });
   }
 
   List<BlogData> get _salonBlogs =>
-      (_homeController.getBlogDataModel.data ?? [])
-          .where((b) => b.salon?.id == widget.salonId)
-          .toList();
+      _homeController.getSalonBlogDataModel.data ?? [];
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +59,8 @@ class _SalonContentPageState extends State<SalonContentPage> {
         backgroundColor: ColorConstant.whiteColor,
         leading: GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back_ios, color: ColorConstant.blackColor),
+          child:
+              const Icon(Icons.arrow_back_ios, color: ColorConstant.blackColor),
         ),
         centerTitle: true,
         title: Text(
@@ -97,7 +95,7 @@ class _SalonContentPageState extends State<SalonContentPage> {
               blogData: item,
               onTap: () {
                 _homeController.doAddViewForBlogSection(blogID: item.id ?? "");
-                Get.dialog(FullScreenReelView(data: item));
+                Get.to(() => FullScreenReelView(data: item));
               },
             );
           },
