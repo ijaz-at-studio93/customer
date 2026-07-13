@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:salon_customer/api/auth_api.dart';
 import 'package:salon_customer/api/dio_client.dart';
 import 'package:salon_customer/controller/auth_controller.dart';
 import 'package:salon_customer/controller/home_controller.dart';
@@ -195,11 +196,16 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> initFCM() async {
     // Single listener for token rotation.
-    // TODO: also call your backend update-fcm-token endpoint here so the
+    // Persist the rotated token locally and push it to the backend so the
     // server always has the latest token after FCM rotates it.
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+      final previous = SharedPrefs.readStringValue(PrefConstants.fcmToken);
       await SharedPrefs.writeValue(PrefConstants.fcmToken, newToken);
       print('FCM Token (refresh): $newToken');
+      if (newToken != previous &&
+          SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
+        await AuthAPI.updateFcmToken(newToken);
+      }
     });
 
     try {
@@ -232,6 +238,15 @@ class _MyAppState extends State<MyApp> {
         if (token != null) {
           await SharedPrefs.writeValue(PrefConstants.fcmToken, token);
           print('FCM Token: $token');
+          // Always push the current token to the backend on launch when the
+          // user is logged in. This is the self-healing path: it covers a
+          // token that rotated while the app was closed (onTokenRefresh does
+          // not fire then), a login that happened before FCM resolved the
+          // token (so an empty token was sent), and any earlier sync that
+          // failed on a flaky network — so the server is never left stale.
+          if (SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
+            await AuthAPI.updateFcmToken(token);
+          }
         } else {
           debugPrint(
             'FCM Token: null — iOS: enable Push Notifications + upload APNs key in '

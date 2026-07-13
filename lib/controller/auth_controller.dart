@@ -254,6 +254,15 @@ class AuthController extends GetxController {
         PrefConstants.userId, model.data?.id.toString());
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, true);
 
+    // The login/signup payload carries whatever FCM token existed at call
+    // time, which may have been empty if FCM had not resolved yet. Push the
+    // current token now that we are authenticated so the backend is never
+    // left without a token for a freshly logged-in user.
+    final fcmToken = SharedPrefs.readStringValue(PrefConstants.fcmToken);
+    if (fcmToken.isNotEmpty) {
+      await AuthAPI.updateFcmToken(fcmToken);
+    }
+
     final userId = model.data?.userData?.userId;
     if (userId != null && userId.isNotEmpty) {
       AppsFlyerService.instance.setCustomerUserId(userId);

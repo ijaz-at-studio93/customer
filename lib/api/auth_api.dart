@@ -86,6 +86,23 @@ class AuthAPI {
     }
   }
 
+  /*--------------- Update FCM Token --------------*/
+  static Future<bool> updateFcmToken(String fcmToken) async {
+    if (fcmToken.isEmpty) return false;
+    try {
+      final response = await DioClient.client.post(
+        'auth/fcm-token',
+        data: {"fcmToken": fcmToken},
+      );
+      final success = response.isSuccess;
+      debugPrint('🔥 AuthAPI: updateFcmToken success=$success token=$fcmToken');
+      return success;
+    } catch (e) {
+      debugPrint('🔥 AuthAPI: updateFcmToken failed: $e');
+      return false;
+    }
+  }
+
   /*--------------- Resend OTP --------------*/
   static Future<bool> resendOtp(
       {required String mobileNo, required String cc}) async {
