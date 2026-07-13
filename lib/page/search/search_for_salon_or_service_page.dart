@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/constant/assetsconstant.dart';
@@ -60,50 +61,6 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
           lng: SharedPrefs.readStringValue(PrefConstants.longitude),
           searchBy: _searchMode);
     });
-  }
-
-  /// Row 24: one segment of the Salon/Area mode toggle. Switching modes
-  /// re-runs the current query in the new mode.
-  Widget _searchModeTab({required String label, required String value}) {
-    final bool selected = _searchMode == value;
-    final Color activeColor =
-        changeTheme(SharedPrefs.readStringValue(PrefConstants.gender)) ??
-            ColorConstant.primaryColor;
-    return Expanded(
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          if (_searchMode == value) return;
-          setState(() => _searchMode = value);
-          // Re-run the search in the new mode if there's a query.
-          if (_searchTextEditingController.text.trim().isNotEmpty) {
-            _homeController.doSalonSearch(
-              query: _searchTextEditingController.text,
-              lat: SharedPrefs.readStringValue(PrefConstants.latitude),
-              lng: SharedPrefs.readStringValue(PrefConstants.longitude),
-              searchBy: _searchMode,
-            );
-          }
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: selected ? activeColor : Colors.transparent,
-            borderRadius: BorderRadius.circular(9),
-          ),
-          child: Text(
-            label,
-            style: AppTextTheme.medium.copyWith(
-              color: selected
-                  ? ColorConstant.whiteColor
-                  : ColorConstant.grayTextColor,
-              fontSize: 14,
-            ),
-          ),
-        ),
-      ),
-    );
   }
 
   @override
@@ -316,27 +273,8 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
       color: ColorConstant.whiteColor,
       child: Column(
         children: [
-          /// Row 24: choose search mode — by Salon (name) or by Area, shown as
-          /// a segmented tab toggle.
-          Padding(
-            padding: const EdgeInsets.fromLTRB(15, 12, 15, 0),
-            child: Container(
-              height: 44,
-              padding: const EdgeInsets.all(4),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF2F2F2),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  _searchModeTab(label: "Salon", value: "salon"),
-                  _searchModeTab(label: "Area", value: "area"),
-                ],
-              ),
-            ),
-          ),
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+            margin: const EdgeInsets.fromLTRB(15, 12, 15, 10),
             height: 48,
             width: Get.width,
             decoration: ShapeDecoration(
@@ -413,6 +351,67 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                   ),
                 )
               ],
+            ),
+          ),
+          /// Row 24: choose search mode — by Salon (name) or by Area.
+          /// Style matches bookings home page CupertinoSlidingSegmentedControl.
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: SizedBox(
+              width: Get.width,
+              child: CupertinoSlidingSegmentedControl<String>(
+                backgroundColor: changeTheme(
+                        SharedPrefs.readStringValue(PrefConstants.gender)) ??
+                    Colors.transparent,
+                padding: const EdgeInsets.all(6),
+                groupValue: _searchMode,
+                thumbColor: ColorConstant.whiteColor,
+                children: {
+                  "salon": SizedBox(
+                    width: Get.width,
+                    height: Get.height * 0.05,
+                    child: Center(
+                      child: Text(
+                        "Salon",
+                        style: _searchMode == "salon"
+                            ? AppTextTheme.bold.copyWith(
+                                fontSize: 14,
+                                color: ColorConstant.blackColor,
+                              )
+                            : AppTextTheme.medium.copyWith(
+                                fontSize: 13,
+                                color: ColorConstant.whiteColor,
+                              ),
+                      ),
+                    ),
+                  ),
+                  "area": Text(
+                    "Area",
+                    textAlign: TextAlign.center,
+                    style: _searchMode == "area"
+                        ? AppTextTheme.bold.copyWith(
+                            fontSize: 13,
+                            color: ColorConstant.blackColor,
+                          )
+                        : AppTextTheme.medium.copyWith(
+                            fontSize: 12,
+                            color: ColorConstant.whiteColor,
+                          ),
+                  ),
+                },
+                onValueChanged: (value) {
+                  if (value == null || value == _searchMode) return;
+                  setState(() => _searchMode = value);
+                  if (_searchTextEditingController.text.trim().isNotEmpty) {
+                    _homeController.doSalonSearch(
+                      query: _searchTextEditingController.text,
+                      lat: SharedPrefs.readStringValue(PrefConstants.latitude),
+                      lng: SharedPrefs.readStringValue(PrefConstants.longitude),
+                      searchBy: _searchMode,
+                    );
+                  }
+                },
+              ),
             ),
           ),
           /*_yourCurrentLocationRow(onTap: () {}),*/
