@@ -21,7 +21,7 @@ import '../bottom_navigation_bar.dart';
 import 'package:salon_customer/service/analytics_service.dart';
 import 'package:salon_customer/service/appsflyer_service.dart';
 import 'package:salon_customer/constant/api_constant.dart';
-import 'package:salon_customer/project_specific/network_video_view_widget.dart';
+import 'package:video_player/video_player.dart';
 
 class QRCodePage extends StatefulWidget {
   final String appointmentId;
@@ -695,10 +695,10 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                               strokeWidth: 2.5, color: Colors.white),
                         ),
                       )
-                    : NetworkVideoViewWidget(
-                        videoString: _paymentDemoUrl,
-                        thumbnail: "",
+                    : _DemoVideoView(
+                        url: _paymentDemoUrl,
                         muted: true, // mini preview is always muted
+                        fit: BoxFit.cover,
                       ),
 
                 /// EXPAND → FULLSCREEN (bottom-left)
@@ -759,10 +759,10 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                     ? const Center(
                         child: CircularProgressIndicator(color: Colors.white),
                       )
-                    : NetworkVideoViewWidget(
-                        videoString: _paymentDemoUrl,
-                        thumbnail: "",
+                    : _DemoVideoView(
+                        url: _paymentDemoUrl,
                         muted: fsMuted,
+                        fit: BoxFit.contain,
                       ),
 
                 /// MUTE (top-left)
@@ -2355,5 +2355,108 @@ class _ShineWrapperState extends State<ShineWrapper>
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+}
+
+/// Row 3: payment-demo player built on `video_player` directly (no cache layer).
+/// Scoped to this page only — streams the network URL, loops, and honours a
+/// live mute toggle. Shows a spinner while initializing and a broken-video
+/// glyph (instead of an endless spinner) if initialization fails.
+class _DemoVideoView extends StatefulWidget {
+  final String url;
+  final bool muted;
+  final BoxFit fit;
+
+  const _DemoVideoView({
+    required this.url,
+    this.muted = false,
+    this.fit = BoxFit.cover,
+  });
+
+  @override
+  State<_DemoVideoView> createState() => _DemoVideoViewState();
+}
+
+class _DemoVideoViewState extends State<_DemoVideoView> {
+  VideoPlayerController? _controller;
+  bool _initialized = false;
+  Object? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _controller = controller;
+    try {
+      await controller.initialize();
+      if (!mounted) return;
+      await controller.setLooping(true);
+      await controller.setVolume(widget.muted ? 0.0 : 1.0);
+      await controller.play();
+      setState(() => _initialized = true);
+    } catch (e, st) {
+      debugPrint("Demo video init error for ${widget.url}: $e");
+      debugPrint("$st");
+      if (!mounted) return;
+      setState(() => _error = e);
+    }
+  }
+
+  @override
+  void didUpdateWidget(covariant _DemoVideoView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Live mute/unmute toggle without recreating the controller.
+    if (oldWidget.muted != widget.muted &&
+        (_controller?.value.isInitialized ?? false)) {
+      _controller?.setVolume(widget.muted ? 0.0 : 1.0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_error != null) {
+      return const ColoredBox(
+        color: Colors.black45,
+        child: Center(
+          child: Icon(Icons.videocam_off, color: Colors.white70, size: 28),
+        ),
+      );
+    }
+
+    final controller = _controller;
+    if (!_initialized || controller == null) {
+      return const ColoredBox(
+        color: Colors.black45,
+        child: Center(
+          child: SizedBox(
+            width: 26,
+            height: 26,
+            child: CircularProgressIndicator(
+                strokeWidth: 2.5, color: Colors.white),
+          ),
+        ),
+      );
+    }
+
+    final size = controller.value.size;
+    return FittedBox(
+      fit: widget.fit,
+      clipBehavior: Clip.hardEdge,
+      child: SizedBox(
+        width: size.width,
+        height: size.height,
+        child: VideoPlayer(controller),
+      ),
+    );
   }
 }

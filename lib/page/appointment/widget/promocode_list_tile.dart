@@ -25,18 +25,22 @@ class PromoCodeListTile extends StatelessWidget {
   final bool isDayValid;
   final bool isMinOrderFail;
   final List<int>? applicableDays;
+  // Row 39: category-scoped coupon.
+  final bool isCategoryValid;
+  final List<String>? applicableCategoryNames;
 
 
   const PromoCodeListTile(
       {super.key, this.onTapApplyBtn, required this.amount, required this.maxDiscount, required this.minOrder,
         required this.id, required this.title, required this.description, required this.image, required this.startsAt,
         required this.endsAt, required this.code, required this.type,  this.isDisabled = false, this.unlockAmount = 0,
-        this.isDayValid = true, this.applicableDays,this.isMinOrderFail = false,});
+        this.isDayValid = true, this.applicableDays,this.isMinOrderFail = false,
+        this.isCategoryValid = true, this.applicableCategoryNames,});
 
   @override
   Widget build(BuildContext context) {
     return Opacity(
-      opacity: isDayValid ? 1 : 0.5,
+      opacity: (isDayValid && isCategoryValid) ? 1 : 0.5,
       child:
        Container(
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -92,8 +96,10 @@ class PromoCodeListTile extends StatelessWidget {
                         child: Text(
                           isDisabled
                               ? (isMinOrderFail
-                              ? 'Locked'
-                              : 'Not Today')
+                                  ? 'Locked'
+                                  : !isDayValid
+                                      ? 'Not Today'
+                                      : 'Not applicable')
                               : 'Apply',
                           style: AppTextTheme.bold.copyWith(color: ColorConstant.whiteColor,fontFamily: "Outfit", ),
                         ),
@@ -144,6 +150,20 @@ class PromoCodeListTile extends StatelessWidget {
                       "Valid on ${_getDayNames(applicableDays!)}",
                       style: TextStyle(
                         color: isDayValid ? Colors.green : Colors.grey,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+
+                // Row 39: category-scoped coupon — same treatment as days.
+                if (applicableCategoryNames != null &&
+                    applicableCategoryNames!.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Text(
+                      "Valid for ${applicableCategoryNames!.join(", ")}",
+                      style: TextStyle(
+                        color: isCategoryValid ? Colors.green : Colors.grey,
                         fontSize: 12,
                       ),
                     ),
