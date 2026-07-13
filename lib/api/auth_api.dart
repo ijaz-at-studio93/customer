@@ -12,6 +12,10 @@ import 'package:http_parser/http_parser.dart';
 import '../model/otp_verify_model.dart' hide Data;
 import 'dio_client.dart';
 
+/// Result of an access-token refresh attempt. Lets callers separate an
+/// unrecoverable session (log out) from a recoverable blip (retry/fail only).
+enum TokenRefreshOutcome { success, sessionExpired, transientFailure }
+
 class AuthAPI {
   /*--------------------- CheckMobileNumberIsRegister  Or Not --------------------- */
   static Future<bool> doCheckMobileNumberIsRegister(
@@ -178,18 +182,26 @@ class AuthAPI {
   }
 
   /*--------------- Refresh Access Token --------------*/
-  static Future<bool> refreshAccessToken() async {
+  /// Attempts to obtain a fresh access token using the stored refresh token.
+  ///
+  /// Returns a [TokenRefreshOutcome] so the caller can distinguish an expired
+  /// session (must log out) from a transient failure (must NOT log out):
+  ///   * [TokenRefreshOutcome.success]          — new tokens persisted.
+  ///   * [TokenRefreshOutcome.sessionExpired]   — no/invalid refresh token; the
+  ///                                              session is unrecoverable.
+  ///   * [TokenRefreshOutcome.transientFailure] — network/server blip; the
+  ///                                              session may still be valid.
+  static Future<TokenRefreshOutcome> refreshAccessToken() async {
     try {
       final storedJson = SharedPrefs.read(PrefConstants.userModel);
-      if (storedJson == null) return false;
+      if (storedJson == null) return TokenRefreshOutcome.sessionExpired;
 
       final model = UserResponseModel.fromJson(storedJson);
       var refreshToken = model.data?.refreshToken ?? "";
       if (refreshToken.isEmpty) {
         refreshToken = SharedPrefs.readStringValue(PrefConstants.refreshToken);
       }
-      debugPrint("refreshAccessToken: $refreshToken");
-      if (refreshToken.isEmpty) return false;
+      if (refreshToken.isEmpty) return TokenRefreshOutcome.sessionExpired;
 
       final response = await DioClient.client.get(
         'auth/refresh',
@@ -198,8 +210,15 @@ class AuthAPI {
           extra: {'skipAuth': true, 'isRefreshCall': true},
         ),
       );
+      // Status only — never log the token itself.
+      debugPrint('🔑 refreshAccessToken: status=${response.statusCode}');
 
       final data = Data.fromJson(response.data['data']);
+      if ((data.accessToken ?? '').isEmpty) {
+        // 200 but no token — treat as transient so we don't nuke the session.
+        debugPrint('🔑 refreshAccessToken: 200 but empty accessToken → transient');
+        return TokenRefreshOutcome.transientFailure;
+      }
       model.data = Data(
         id: model.data?.id,
         accessToken: data.accessToken,
@@ -210,14 +229,20 @@ class AuthAPI {
         isNewUser: model.data?.isNewUser,
       );
       await Get.find<AuthController>().userDataStoreToSharedPrefs(model);
-      return true;
+      return TokenRefreshOutcome.success;
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
-        // Refresh token rejected — return false; DioClient calls resetApp().
-        return false;
+      final status = e.response?.statusCode;
+      debugPrint('🔑 refreshAccessToken: DioException status=$status type=${e.type}');
+      if (status == 401 || status == 403) {
+        // Refresh token itself was rejected — the session is truly over.
+        return TokenRefreshOutcome.sessionExpired;
       }
-      // Transient network error — let the caller decide, do not logout
-      rethrow;
+      // Network error / timeout / 5xx — keep the session, just fail this call.
+      return TokenRefreshOutcome.transientFailure;
+    } catch (e) {
+      // Parsing or any other unexpected error — do not log the user out.
+      debugPrint('🔑 refreshAccessToken: unexpected error → transient: $e');
+      return TokenRefreshOutcome.transientFailure;
     }
   }
 

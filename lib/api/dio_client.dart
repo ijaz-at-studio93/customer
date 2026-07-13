@@ -203,10 +203,27 @@ class DioClient {
   static Dio? _dio;
 
   static bool _isRefreshing = false;
-  static Completer<bool>? _refreshCompleter;
+  static Completer<TokenRefreshOutcome>? _refreshCompleter;
+  static bool _isLoggingOut = false;
 
   static Dio get client {
     return Get.find<Dio>();
+  }
+
+  /// Logs the user out exactly once per dead session. Guarded so concurrent
+  /// 401s (or a later request that 401s after teardown began) can't stack up
+  /// multiple [AuthController.resetApp] calls and navigation storms. The guard
+  /// is released by [markSessionActive] when a new session is established.
+  static void _forceLogout() {
+    if (_isLoggingOut) return;
+    _isLoggingOut = true;
+    Get.find<AuthController>().resetApp();
+  }
+
+  /// Called when a fresh session is persisted (login / signup / refresh) so a
+  /// future genuine expiry is able to log the user out again.
+  static void markSessionActive() {
+    _isLoggingOut = false;
   }
 
   static init() {
@@ -266,71 +283,79 @@ class DioClient {
           onError: (DioException error, ErrorInterceptorHandler handler) async {
             final int? statusCode = error.response?.statusCode;
 
-            if (statusCode == 401 || statusCode == 403) {
-              try {
-                final RequestOptions requestOptions = error.requestOptions;
-
-                // Refresh endpoint errors must not re-enter refresh logic (deadlock).
-                if (requestOptions.extra['isRefreshCall'] == true) {
-                  return handler.next(error);
-                }
-
-                // Prevent infinite retry loop on the same request
-                if (requestOptions.extra["retried"] == true) {
-                  return handler.next(error);
-                }
-
-                bool refreshSuccess;
-
-                if (!_isRefreshing) {
-                  // This request owns the refresh; concurrent 401s will wait
-                  _isRefreshing = true;
-                  _refreshCompleter = Completer<bool>();
-
-                  bool result = false;
-                  try {
-                    result = await AuthAPI.refreshAccessToken();
-                  } catch (_) {
-                    result = false;
-                  }
-
-                  _isRefreshing = false;
-                  _refreshCompleter!.complete(result);
-                  _refreshCompleter = null;
-                  refreshSuccess = result;
-                } else {
-                  // Another request is already refreshing — wait for its result
-                  refreshSuccess = await _refreshCompleter!.future.timeout(
-                    const Duration(seconds: 10),
-                    onTimeout: () => false,
-                  );
-                }
-
-                if (!refreshSuccess) {
-                  Get.find<AuthController>().resetApp();
-                  return handler.next(error);
-                }
-
-                // Retry original request with the new token
-                final String newToken = SharedPrefs.readStringValue(PrefConstants.token);
-                requestOptions.headers['Authorization'] = 'Bearer $newToken';
-                requestOptions.headers['x-access-token'] = newToken;
-                requestOptions.extra["retried"] = true;
-
-                final Response retryResponse = await _dio!.fetch(requestOptions);
-                return handler.resolve(retryResponse);
-              } catch (e) {
-                // Transient error during refresh (e.g. SocketException) — do NOT logout
-                _isRefreshing = false;
-                if (_refreshCompleter != null && !_refreshCompleter!.isCompleted) {
-                  _refreshCompleter!.complete(false);
-                  _refreshCompleter = null;
-                }
-                return handler.next(error);
-              }
+            if (statusCode != 401 && statusCode != 403) {
+              return handler.next(error);
             }
 
-            return handler.next(error);
+            final RequestOptions requestOptions = error.requestOptions;
+
+            // The refresh call itself must never re-enter this logic (deadlock),
+            // and a request that already retried once must not loop forever.
+            if (requestOptions.extra['isRefreshCall'] == true ||
+                requestOptions.extra['retried'] == true) {
+              return handler.next(error);
+            }
+
+            // ---- Single-flight refresh --------------------------------------
+            // The first 401 owns the refresh; concurrent 401s await its outcome
+            // instead of each firing their own refresh (and their own logout).
+            final bool isOwner = !_isRefreshing;
+            final Completer<TokenRefreshOutcome> completer;
+
+            if (isOwner) {
+              _isRefreshing = true;
+              _refreshCompleter = Completer<TokenRefreshOutcome>();
+              completer = _refreshCompleter!;
+              try {
+                completer.complete(await AuthAPI.refreshAccessToken());
+              } catch (_) {
+                completer.complete(TokenRefreshOutcome.transientFailure);
+              } finally {
+                _isRefreshing = false;
+                _refreshCompleter = null;
+              }
+            } else {
+              // Capture synchronously — guaranteed non-null while refreshing.
+              completer = _refreshCompleter!;
+            }
+
+            TokenRefreshOutcome outcome;
+            try {
+              outcome = await completer.future.timeout(
+                const Duration(seconds: 15),
+                onTimeout: () => TokenRefreshOutcome.transientFailure,
+              );
+            } catch (_) {
+              outcome = TokenRefreshOutcome.transientFailure;
+            }
+
+            switch (outcome) {
+              case TokenRefreshOutcome.success:
+                final String newToken =
+                    SharedPrefs.readStringValue(PrefConstants.token);
+                requestOptions.headers['Authorization'] = 'Bearer $newToken';
+                requestOptions.headers['x-access-token'] = newToken;
+                requestOptions.extra['retried'] = true;
+                try {
+                  final Response retryResponse =
+                      await _dio!.fetch(requestOptions);
+                  return handler.resolve(retryResponse);
+                } on DioException catch (retryError) {
+                  return handler.next(retryError);
+                }
+
+              case TokenRefreshOutcome.sessionExpired:
+                // Session is genuinely dead. Only the refresh owner tears down
+                // the app so concurrent 401s don't trigger multiple logouts.
+                if (isOwner) {
+                  _forceLogout();
+                }
+                return handler.next(error);
+
+              case TokenRefreshOutcome.transientFailure:
+                // Network/server blip — keep the session, just fail this call.
+                return handler.next(error);
+            }
           },
         ),
       );

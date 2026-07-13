@@ -254,6 +254,10 @@ class AuthController extends GetxController {
         PrefConstants.userId, model.data?.id.toString());
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, true);
 
+    // A live session exists again — re-arm the logout guard so a future genuine
+    // expiry can tear down the session.
+    DioClient.markSessionActive();
+
     // The login/signup payload carries whatever FCM token existed at call
     // time, which may have been empty if FCM had not resolved yet. Push the
     // current token now that we are authenticated so the backend is never

@@ -187,6 +187,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  // The last FCM token successfully pushed to the backend this process.
+  // Guards against the launch double-fire (getToken + onTokenRefresh both
+  // firing for the same token) and redundant pushes on rotation.
+  static String? _lastSyncedFcmToken;
+
   @override
   void initState() {
     super.initState();
@@ -194,18 +199,24 @@ class _MyAppState extends State<MyApp> {
     initNotification();
   }
 
+  /// Pushes [token] to the backend at most once per distinct value while the
+  /// user is logged in. Best-effort — failures are swallowed by updateFcmToken.
+  Future<void> _syncFcmToken(String token) async {
+    if (token.isEmpty) return;
+    if (token == _lastSyncedFcmToken) return;
+    if (!SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) return;
+    final ok = await AuthAPI.updateFcmToken(token);
+    if (ok) _lastSyncedFcmToken = token;
+  }
+
   Future<void> initFCM() async {
     // Single listener for token rotation.
     // Persist the rotated token locally and push it to the backend so the
     // server always has the latest token after FCM rotates it.
     FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
-      final previous = SharedPrefs.readStringValue(PrefConstants.fcmToken);
       await SharedPrefs.writeValue(PrefConstants.fcmToken, newToken);
       print('FCM Token (refresh): $newToken');
-      if (newToken != previous &&
-          SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
-        await AuthAPI.updateFcmToken(newToken);
-      }
+      await _syncFcmToken(newToken);
     });
 
     try {
@@ -238,15 +249,13 @@ class _MyAppState extends State<MyApp> {
         if (token != null) {
           await SharedPrefs.writeValue(PrefConstants.fcmToken, token);
           print('FCM Token: $token');
-          // Always push the current token to the backend on launch when the
-          // user is logged in. This is the self-healing path: it covers a
-          // token that rotated while the app was closed (onTokenRefresh does
-          // not fire then), a login that happened before FCM resolved the
-          // token (so an empty token was sent), and any earlier sync that
-          // failed on a flaky network — so the server is never left stale.
-          if (SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
-            await AuthAPI.updateFcmToken(token);
-          }
+          // Self-healing launch push: covers a token that rotated while the app
+          // was closed (onTokenRefresh does not fire then), a login that
+          // happened before FCM resolved the token (so an empty token was
+          // sent), and any earlier sync that failed on a flaky network — so the
+          // server is never left stale. De-duped via _syncFcmToken so it does
+          // not race the onTokenRefresh listener for the same token.
+          await _syncFcmToken(token);
         } else {
           debugPrint(
             'FCM Token: null — iOS: enable Push Notifications + upload APNs key in '
