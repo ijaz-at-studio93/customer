@@ -243,13 +243,17 @@ class _ContentPageState extends State<ContentPage>
                                 itemCount: salons.length,
                                 itemBuilder: (context, index) {
                                   final salon = salons[index].salon;
-                                  final name = salon?.displayName ??
-                                      salon?.name ??
-                                      "";
+                                  final name =
+                                      salon?.displayName ?? salon?.name ?? "";
                                   return GestureDetector(
                                     onTap: () {
                                       FocusManager.instance.primaryFocus
                                           ?.unfocus();
+                                      _debounce?.cancel();
+                                      _searchController.clear();
+                                      _homeController.getSearchSalonModel.data =
+                                          null;
+                                      setState(() => _query = "");
                                       Get.to(() => SalonContentPage(
                                             salonId: salon?.id ?? "",
                                             salonName: name,
