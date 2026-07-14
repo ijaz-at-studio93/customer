@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/api/auth_api.dart';
 import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/model/app_update_model.dart';
 import 'package:salon_customer/model/otp_verify_model.dart';
 import 'package:salon_customer/model/user_profile.dart';
@@ -272,6 +273,12 @@ class AuthController extends GetxController {
       AppsFlyerService.instance.setCustomerUserId(userId);
     }
     await AppsFlyerService.instance.onUserAuthenticated();
+
+    // Bring up the real-time booking socket for the fresh session so
+    // accept/cancel/reschedule events reflect instantly across the app.
+    if (Get.isRegistered<HomeController>()) {
+      Get.find<HomeController>().ensureBookingConfirmedSocket();
+    }
   }
 
   /*---------------  init User Data -----------*/
@@ -382,6 +389,10 @@ class AuthController extends GetxController {
 
   /*-------------  Reset App ---------------*/
   resetApp() async {
+    // Drop the real-time booking socket for the outgoing session.
+    if (Get.isRegistered<HomeController>()) {
+      Get.find<HomeController>().unbindBookingConfirmedSocket();
+    }
     await SharedPrefs.remove(PrefConstants.token);
     await SharedPrefs.remove(PrefConstants.refreshToken);
     await SharedPrefs.remove(PrefConstants.userModel);

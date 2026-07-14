@@ -149,6 +149,13 @@ void main() async {
 
   await Get.find<AuthController>().initUserData();
 
+  // Connect the booking socket at launch for an already-logged-in user so
+  // accept/cancel/reschedule events reflect instantly on the Bookings list and
+  // Home, not only while the QR page is open.
+  if (SharedPrefs.readBoolValue(PrefConstants.isUserLogin)) {
+    Get.find<HomeController>().ensureBookingConfirmedSocket();
+  }
+
   // Set Firebase Analytics user ID once auth is loaded
   try {
     final userId =

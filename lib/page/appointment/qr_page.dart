@@ -2222,7 +2222,9 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
   @override
   void dispose() {
     razorpay.clear();
-    _homeController.unbindBookingConfirmedSocket();
+    // Keep the session socket alive (it drives real-time Bookings updates);
+    // just stop scoping booking_confirmed to this appointment's QR.
+    _homeController.clearQrAppointmentFilter();
     super.dispose();
   }
 }

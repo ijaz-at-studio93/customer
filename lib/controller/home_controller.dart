@@ -2074,6 +2074,12 @@ class HomeController extends GetxController {
   String? _bookingConfirmedSocketUserId;
   DateTime? _lastBookingConfirmedRefresh;
 
+  /// The appointment currently shown on the QR page, if any. The
+  /// `booking_confirmed` handler refreshes the QR only for this appointment.
+  /// A null value means no QR page is active — the socket stays connected so
+  /// the `onAny` handler can still refresh the booking lists instantly.
+  String? _qrAppointmentId;
+
   void _logBookingSocket(String msg) {
     if (kDebugMode) print('[CustomerSocket] $msg');
   }
@@ -2088,11 +2094,23 @@ class HomeController extends GetxController {
     print('================================');
   }
 
+  /// Connects the customer booking socket for the logged-in user and keeps it
+  /// alive for the whole session so accept/cancel/reschedule events reflect
+  /// instantly everywhere (Bookings list, Home), not only while the QR page is
+  /// open. Safe to call repeatedly — it reuses a healthy connection.
+  ///
+  /// When [appointmentId] is provided (by the QR page), `booking_confirmed`
+  /// QR refreshes are scoped to that appointment. Passing null (app start /
+  /// login) connects the socket for list refreshes only.
   void ensureBookingConfirmedSocket({
-    required String appointmentId,
+    String? appointmentId,
   }) {
+    if (appointmentId != null && appointmentId.isNotEmpty) {
+      _qrAppointmentId = appointmentId;
+    }
+
     final userId = SharedPrefs.readStringValue(PrefConstants.userId);
-    if (userId.isEmpty || appointmentId.isEmpty) return;
+    if (userId.isEmpty) return;
     if (_bookingConfirmedSocket != null &&
         _bookingConfirmedSocketUserId == userId &&
         _bookingConfirmedSocket!.connected) {
@@ -2100,7 +2118,7 @@ class HomeController extends GetxController {
       return;
     }
 
-    unbindBookingConfirmedSocket();
+    unbindBookingConfirmedSocket(clearQrFilter: false);
 
     final refreshToken =
         SharedPrefs.readStringValue(PrefConstants.refreshToken);
@@ -2158,10 +2176,13 @@ class HomeController extends GetxController {
 
     socket.on('booking_confirmed', (dynamic data) {
       _logBookingSocket('booking_confirmed received: $data');
+      // Only the QR page needs the QR image refreshed; without an active QR
+      // page there is nothing to refresh here (onAny handles the lists).
+      final target = _qrAppointmentId;
+      if (target == null || target.isEmpty) return;
       final incomingAppointmentId =
           data is Map ? data['appointmentId']?.toString() : null;
-      if (incomingAppointmentId != null &&
-          incomingAppointmentId != appointmentId) {
+      if (incomingAppointmentId != null && incomingAppointmentId != target) {
         _logBookingSocket(
             'booking_confirmed ignored (different appointmentId)');
         return;
@@ -2174,8 +2195,8 @@ class HomeController extends GetxController {
       }
       _lastBookingConfirmedRefresh = now;
       _logBookingSocket(
-          'booking_confirmed → refresh QR for appointmentId=$appointmentId');
-      _refreshQrCodeSilent(appointmentId);
+          'booking_confirmed → refresh QR for appointmentId=$target');
+      _refreshQrCodeSilent(target);
     });
 
     socket.connect();
@@ -2230,7 +2251,18 @@ class HomeController extends GetxController {
     }
   }
 
-  void unbindBookingConfirmedSocket() {
+  /// Stop scoping `booking_confirmed` to a specific appointment (called when
+  /// the QR page closes) while keeping the session socket connected so the
+  /// booking lists keep updating in real time.
+  void clearQrAppointmentFilter() {
+    _qrAppointmentId = null;
+    _lastBookingConfirmedRefresh = null;
+  }
+
+  /// Tears down the session socket entirely. Call on logout/app reset.
+  /// [clearQrFilter] is false during an internal reconnect so the QR page's
+  /// active appointment scope survives the socket rebuild.
+  void unbindBookingConfirmedSocket({bool clearQrFilter = true}) {
     if (_bookingConfirmedSocket != null) {
       _logBookingSocket(
           'disposing socket (userId=$_bookingConfirmedSocketUserId)');
@@ -2239,6 +2271,7 @@ class HomeController extends GetxController {
     _bookingConfirmedSocket = null;
     _bookingConfirmedSocketUserId = null;
     _lastBookingConfirmedRefresh = null;
+    if (clearQrFilter) _qrAppointmentId = null;
   }
 
   @override
