@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:salon_customer/project_specific/shine_wrapper.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
@@ -1618,29 +1620,17 @@ class _SaloonAfterSelectingServicesPageState
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      (_homeController.homeSalonDetailsData.data?.reviewCount ??
-                                  0) ==
+                      // reviewCount on the salon-details model is a String, so
+                      // parse it before comparing — comparing a String to int 0
+                      // is always false, which is why the "New" pill never showed.
+                      (int.tryParse(_homeController
+                                      .homeSalonDetailsData.data?.reviewCount ??
+                                  "0") ??
+                              0) ==
                               0
-                          // No reviews yet → "New" tag instead of a 0 rating.
-                          ? Container(
-                              height: 26,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFF16A34A),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Text(
-                                "New",
-                                style: TextStyle(
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 15,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            )
+                          // No reviews yet → hide the photo rating badge; the
+                          // "New" chip now lives in the action row instead.
+                          ? const SizedBox.shrink()
                           : Row(
                         children: [
                           Container(
@@ -2079,45 +2069,37 @@ class _SaloonAfterSelectingServicesPageState
 
               //const SizedBox(width: 8),
 
-              /// CONTENT REDIRECT (Row 15) — opens this salon's content
-              GestureDetector(
-                onTap: () {
-                  Get.to(() => SalonContentPage(
-                        salonId: widget.id,
-                        salonName:
-                            _homeController.homeSalonDetailsData.data?.name ??
-                                "",
-                      ));
-                },
-                child: Container(
-                  height: 30,
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender),
+              /// NEW CHIP — shown just before the Content button when the salon
+              /// has no reviews yet. reviewCount is a String on the details
+              /// model, so parse it before comparing.
+              if ((int.tryParse(_homeController
+                              .homeSalonDetailsData.data?.reviewCount ??
+                          "0") ??
+                      0) ==
+                  0) ...[
+                ShineWrapper(
+                  child: Container(
+                    height: 30,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF16A34A),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      "New",
+                      textScaler: const TextScaler.linear(0.85),
+                      style: AppTextTheme.semibold.copyWith(
+                        fontSize: 13,
+                        color: Colors.white,
+                        fontFamily: 'Outfit',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.play_circle_outline,
-                          size: 14, color: Colors.white),
-                      const SizedBox(width: 3),
-                      Text(
-                        "Content",
-                        textScaler: const TextScaler.linear(0.85),
-                        style: AppTextTheme.semibold.copyWith(
-                          fontSize: 13,
-                          color: Colors.white,
-                          fontFamily: 'Outfit',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      )
-                    ],
-                  ),
                 ),
-              ),
-              const SizedBox(width: 6),
+                const SizedBox(width: 6),
+              ],
 
               /// RIGHT SIDE (fixed button)
               GestureDetector(
@@ -2157,6 +2139,59 @@ class _SaloonAfterSelectingServicesPageState
                 ),
               ),
             ],
+          ),
+
+          const SizedBox(height: 10),
+
+          /// CONTENT REDIRECT (Row 15) — opens this salon's content. Placed on
+          /// its own line below the amenities row per the new design.
+          Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () {
+                Get.to(() => SalonContentPage(
+                      salonId: widget.id,
+                      salonName:
+                          _homeController.homeSalonDetailsData.data?.name ?? "",
+                    ));
+              },
+              child: Container(
+                height: 30,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  gradient: const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xFF8454E5),
+                      Color(0xFFCD73B4),
+                    ],
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      AssetsConstant.contentButtonIcon,
+                      width: 14,
+                      height: 14,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      "Content",
+                      textScaler: const TextScaler.linear(0.85),
+                      style: AppTextTheme.semibold.copyWith(
+                        fontSize: 13,
+                        color: Colors.white,
+                        fontFamily: 'Outfit',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),

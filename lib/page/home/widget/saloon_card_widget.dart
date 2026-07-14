@@ -9,11 +9,18 @@ import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/model/home_salon_list_model.dart';
+import 'package:salon_customer/project_specific/shine_wrapper.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+
+/// Bumping this tells every currently-mounted [SaloonCardWidget] to reset its
+/// image carousel back to the first image. Bumped when Home becomes visible
+/// again (e.g. after popping the salon detail page) so carousels always start
+/// from index 0 when the user returns.
+final ValueNotifier<int> salonCarouselResetSignal = ValueNotifier<int>(0);
 
 class SaloonCardWidget extends StatefulWidget {
   final VoidCallback onPress;
@@ -47,7 +54,18 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
     super.initState();
     _images = _getImageList(widget.homeSalonModel); // ← add this line
     _pageController = PageController(initialPage: 0, viewportFraction: 1.0);
+    salonCarouselResetSignal.addListener(_resetCarouselToStart);
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartAutoPlay());
+  }
+
+  /// Snap this card's carousel back to the first image (and restart auto-play).
+  void _resetCarouselToStart() {
+    if (!mounted) return;
+    _currentPage = 0;
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+    _restartAutoPlay();
   }
 
   // @override
@@ -82,6 +100,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
 
   @override
   void dispose() {
+    salonCarouselResetSignal.removeListener(_resetCarouselToStart);
     _autoPlayTimer?.cancel();
     _pageController.dispose();
     super.dispose();
@@ -378,15 +397,15 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                     child: Container(
                       width: double.infinity,
                       height: Get.height * 0.25,
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         gradient: LinearGradient(
                           begin: Alignment.bottomCenter,
                           end: Alignment.topCenter,
                           colors: [
-                            ColorConstant.blackColor,
-                            Colors.black.withOpacity(0),
-                            Colors.black.withOpacity(0),
+                            Color(0x73000000),
+                            Color(0x00000000),
                           ],
+                          stops: [0.0, 0.35],
                         ),
                       ),
                     ),
@@ -857,23 +876,25 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                       ),
                       (widget.homeSalonModel.reviewCount ?? 0) == 0
                           // No reviews yet → show a "New" tag instead of a 0 rating.
-                          ? Container(
-                              height: 26,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: ColorConstant.greenColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                "New",
-                                style: AppTextTheme.medium.copyWith(
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
-                                  color: ColorConstant.whiteColor,
-                                  height: 1.2,
+                          ? ShineWrapper(
+                              child: Container(
+                                height: 26,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: ColorConstant.greenColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  "New",
+                                  style: AppTextTheme.medium.copyWith(
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                    color: ColorConstant.whiteColor,
+                                    height: 1.2,
+                                  ),
                                 ),
                               ),
                             )

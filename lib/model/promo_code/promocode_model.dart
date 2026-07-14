@@ -45,6 +45,7 @@ class PromoCode {
   Salon? salon;
   List<String>? salonId;
   List<int>? applicableDays;
+  List<String>? applicableCategories;
 
   PromoCode(
       {this.amount,
@@ -60,7 +61,8 @@ class PromoCode {
         this.type,
         this.salon,
         this.salonId,
-        this.applicableDays});
+        this.applicableDays,
+        this.applicableCategories});
 
   PromoCode.fromJson(Map<String, dynamic> json) {
     amount = json['amount'];
@@ -80,6 +82,10 @@ class PromoCode {
     }
     if (json['applicableDays'] != null) {
       applicableDays = List<int>.from(json['applicableDays']);
+    }
+    if (json['applicableCategories'] != null) {
+      applicableCategories =
+          List<String>.from(json['applicableCategories'].map((e) => e.toString()));
     }
   }
 
@@ -101,6 +107,7 @@ class PromoCode {
     }
     data['salonId'] = salonId;
     data['applicableDays'] = applicableDays;
+    data['applicableCategories'] = applicableCategories;
     return data;
   }
 }

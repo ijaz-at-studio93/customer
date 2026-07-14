@@ -7,6 +7,7 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/appointment/payment_success_page.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
+import 'package:salon_customer/project_specific/shine_wrapper.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -21,7 +22,7 @@ import '../bottom_navigation_bar.dart';
 import 'package:salon_customer/service/analytics_service.dart';
 import 'package:salon_customer/service/appsflyer_service.dart';
 import 'package:salon_customer/constant/api_constant.dart';
-import 'package:salon_customer/project_specific/network_video_view_widget.dart';
+import 'package:video_player/video_player.dart';
 
 class QRCodePage extends StatefulWidget {
   final String appointmentId;
@@ -654,12 +655,17 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
     );
   }
 
-  /// Full demo video URL from [APIConstants.paymentDemoVideoUrl] (the backend
-  /// swap-in point). Empty until a real URL is set — the mini player then shows
-  /// a loading indicator. Absolute URLs are used as-is; relative paths are
-  /// prefixed with the media base (same as Content).
+  /// Full demo video URL sourced from the app config (`app/config` →
+  /// `paymentDemoVideo`), falling back to [APIConstants.paymentDemoVideoUrl].
+  /// Empty until a real URL is set — the mini player then shows a loading
+  /// indicator. Absolute URLs are used as-is; relative paths are prefixed with
+  /// the media base (same as Content).
   String get _paymentDemoUrl {
-    final u = APIConstants.paymentDemoVideoUrl;
+    final configUrl =
+        _authController.getAppUpdateModel.data?.paymentDemoVideo ?? "";
+    final u = configUrl.isNotEmpty
+        ? configUrl
+        : APIConstants.paymentDemoVideoUrl;
     if (u.isEmpty) return "";
     return u.startsWith("http") ? u : "${APIConstants.image}$u";
   }
@@ -695,10 +701,10 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                               strokeWidth: 2.5, color: Colors.white),
                         ),
                       )
-                    : NetworkVideoViewWidget(
-                        videoString: _paymentDemoUrl,
-                        thumbnail: "",
+                    : _DemoVideoView(
+                        url: _paymentDemoUrl,
                         muted: true, // mini preview is always muted
+                        fit: BoxFit.cover,
                       ),
 
                 /// EXPAND → FULLSCREEN (bottom-left)
@@ -759,10 +765,10 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                     ? const Center(
                         child: CircularProgressIndicator(color: Colors.white),
                       )
-                    : NetworkVideoViewWidget(
-                        videoString: _paymentDemoUrl,
-                        thumbnail: "",
+                    : _DemoVideoView(
+                        url: _paymentDemoUrl,
                         muted: fsMuted,
+                        fit: BoxFit.contain,
                       ),
 
                 /// MUTE (top-left)
@@ -2303,59 +2309,105 @@ class _CancelRadioCircle extends StatelessWidget {
   }
 }
 
-class ShineWrapper extends StatefulWidget {
-  final Widget child;
+/// Row 3: payment-demo player built on `video_player` directly (no cache layer).
+/// Scoped to this page only — streams the network URL, loops, and honours a
+/// live mute toggle. Shows a spinner while initializing and a broken-video
+/// glyph (instead of an endless spinner) if initialization fails.
+class _DemoVideoView extends StatefulWidget {
+  final String url;
+  final bool muted;
+  final BoxFit fit;
 
-  const ShineWrapper({super.key, required this.child});
+  const _DemoVideoView({
+    required this.url,
+    this.muted = false,
+    this.fit = BoxFit.cover,
+  });
 
   @override
-  State<ShineWrapper> createState() => _ShineWrapperState();
+  State<_DemoVideoView> createState() => _DemoVideoViewState();
 }
 
-class _ShineWrapperState extends State<ShineWrapper>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
+class _DemoVideoViewState extends State<_DemoVideoView> {
+  VideoPlayerController? _controller;
+  bool _initialized = false;
+  Object? _error;
 
   @override
   void initState() {
     super.initState();
+    _init();
+  }
 
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    )..repeat(); // infinite loop
+  Future<void> _init() async {
+    final controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
+    _controller = controller;
+    try {
+      await controller.initialize();
+      if (!mounted) return;
+      await controller.setLooping(true);
+      await controller.setVolume(widget.muted ? 0.0 : 1.0);
+      await controller.play();
+      setState(() => _initialized = true);
+    } catch (e, st) {
+      debugPrint("Demo video init error for ${widget.url}: $e");
+      debugPrint("$st");
+      if (!mounted) return;
+      setState(() => _error = e);
+    }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return ShaderMask(
-          shaderCallback: (rect) {
-            final x = _controller.value;
-
-            return LinearGradient(
-              begin: Alignment(-2 + 3 * x, -1), // ← top shifted more to left
-              end: Alignment(-1.2 + 3 * x, 1), // ← bottom stays
-              colors: [
-                Colors.transparent,
-                Colors.white.withOpacity(0.4),
-                Colors.transparent,
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ).createShader(rect);
-          },
-          blendMode: BlendMode.srcATop,
-          child: widget.child,
-        );
-      },
-    );
+  void didUpdateWidget(covariant _DemoVideoView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Live mute/unmute toggle without recreating the controller.
+    if (oldWidget.muted != widget.muted &&
+        (_controller?.value.isInitialized ?? false)) {
+      _controller?.setVolume(widget.muted ? 0.0 : 1.0);
+    }
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_error != null) {
+      return const ColoredBox(
+        color: Colors.black45,
+        child: Center(
+          child: Icon(Icons.videocam_off, color: Colors.white70, size: 28),
+        ),
+      );
+    }
+
+    final controller = _controller;
+    if (!_initialized || controller == null) {
+      return const ColoredBox(
+        color: Colors.black45,
+        child: Center(
+          child: SizedBox(
+            width: 26,
+            height: 26,
+            child: CircularProgressIndicator(
+                strokeWidth: 2.5, color: Colors.white),
+          ),
+        ),
+      );
+    }
+
+    final size = controller.value.size;
+    return FittedBox(
+      fit: widget.fit,
+      clipBehavior: Clip.hardEdge,
+      child: SizedBox(
+        width: size.width,
+        height: size.height,
+        child: VideoPlayer(controller),
+      ),
+    );
   }
 }

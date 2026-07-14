@@ -111,7 +111,8 @@ class HomeAPI {
       'limit': size,
       "lat": lat == 0.0 ? 00.00 : lat,
       "lng": lng == 0.0 ? 00.00 : lng,
-      "distanceRadius": 50000,
+      // Operational-area threshold: 12 km (in meters), matching the backend.
+      "distanceRadius": 12000,
       "homeService": homeService,
       "orderDirection": orderBy == "name" ? "ASC" : "DESC",
       "nearest": nearest,
@@ -685,16 +686,14 @@ class HomeAPI {
 
   /*------------------  Get Blog Data ---------------*/
   static Future<BlogDataModel> getBlogData(
-      {required double lat,
-      required double lng,
-      String? salonId}) async {
-    final response = await DioClient.client.get("user/blog/list",
-        queryParameters: {
-          "lat": lat,
-          "lng": lng,
-          "distanceRadius": 100000000,
-          if (salonId != null && salonId.isNotEmpty) "salonId": salonId,
-        });
+      {required double lat, required double lng, String? salonId}) async {
+    final response =
+        await DioClient.client.get("user/blog/list", queryParameters: {
+      "lat": lat,
+      "lng": lng,
+      "distanceRadius": 100000000,
+      if (salonId != null && salonId.isNotEmpty) "salonId": salonId,
+    });
     if (response.isSuccess) {
       return BlogDataModel.fromJson(response.data);
     } else {

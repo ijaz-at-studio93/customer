@@ -63,11 +63,7 @@ const List<OnboardingPageData> _onboardingPages = [
 ];
 
 class PayAfterServiceOnboardingPage extends StatefulWidget {
-  /// Where to go once onboarding is finished/skipped (resolved by the splash
-  /// router for the logged-in user).
-  final Widget nextPage;
-
-  const PayAfterServiceOnboardingPage({super.key, required this.nextPage});
+  const PayAfterServiceOnboardingPage({super.key});
 
   /// Wraps [destination] in the first-launch onboarding for a logged-in user
   /// who hasn't seen it yet; otherwise returns [destination] unchanged. Use at
@@ -77,12 +73,36 @@ class PayAfterServiceOnboardingPage extends StatefulWidget {
     if (SharedPrefs.readBoolValue(PrefConstants.hasSeenOnboarding)) {
       return destination;
     }
-    return PayAfterServiceOnboardingPage(nextPage: destination);
+    return _OnboardingGateWrapper(destination: destination);
   }
 
   @override
   State<PayAfterServiceOnboardingPage> createState() =>
       _PayAfterServiceOnboardingPageState();
+}
+
+class _OnboardingGateWrapper extends StatefulWidget {
+  final Widget destination;
+  const _OnboardingGateWrapper({required this.destination});
+  @override
+  State<_OnboardingGateWrapper> createState() => _OnboardingGateWrapperState();
+}
+
+class _OnboardingGateWrapperState extends State<_OnboardingGateWrapper> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Get.dialog(
+        const PayAfterServiceOnboardingPage(),
+        barrierDismissible: false,
+      );
+    });
+  }
+  @override
+  Widget build(BuildContext context) {
+    return widget.destination;
+  }
 }
 
 class _PayAfterServiceOnboardingPageState
@@ -100,7 +120,7 @@ class _PayAfterServiceOnboardingPageState
 
   Future<void> _finish() async {
     await SharedPrefs.writeBoolValue(PrefConstants.hasSeenOnboarding, true);
-    Get.offAll(() => widget.nextPage);
+    Get.back();
   }
 
   void _next() {
@@ -116,23 +136,23 @@ class _PayAfterServiceOnboardingPageState
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ColorConstant.whiteColor,
-      body: SafeArea(
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      child: Container(
+        height: Get.height * 0.75, // Make it a popup size instead of full screen
+        decoration: BoxDecoration(
+          color: ColorConstant.whiteColor,
+          borderRadius: BorderRadius.circular(16),
+        ),
         child: Column(
           children: [
-            /// SKIP
+            /// SKIP / CLOSE
             Align(
               alignment: Alignment.centerRight,
-              child: TextButton(
+              child: IconButton(
                 onPressed: _finish,
-                child: Text(
-                  "Skip",
-                  style: AppTextTheme.medium.copyWith(
-                    color: ColorConstant.grayTextColor,
-                    fontSize: 15,
-                  ),
-                ),
+                icon: const Icon(Icons.close, color: ColorConstant.grayTextColor),
               ),
             ),
 
@@ -150,31 +170,6 @@ class _PayAfterServiceOnboardingPageState
             _dots(),
             const SizedBox(height: 24),
 
-            /// NEXT / GET STARTED
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _brandPurple,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                  ),
-                  onPressed: _next,
-                  child: Text(
-                    _isLast ? "Get Started" : "Next",
-                    style: AppTextTheme.bold.copyWith(
-                      color: ColorConstant.whiteColor,
-                      fontSize: 16,
-                    ),
-                  ),
-                ),
-              ),
-            ),
             const SizedBox(height: 20),
           ],
         ),
@@ -262,7 +257,7 @@ class _PayAfterServiceOnboardingPageState
     return Image.asset(
       page.imagePath,
       fit: BoxFit.contain,
-      // Neutral placeholder until the real asset is added.
+      // Neutral placeholder if the asset can't be loaded.
       errorBuilder: (context, error, stackTrace) => Center(
         child: Container(
           width: 180,
