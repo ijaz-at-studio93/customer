@@ -443,6 +443,9 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
 
   /*------------  Do  Create Profile ----*/
   void _doCreateProfile() {
+    // Dismiss the keyboard so bottom snackbars/toasts aren't hidden behind it.
+    FocusManager.instance.primaryFocus?.unfocus();
+
     final name = _nameTextEditingController.text.trim();
     final mobile = _mobileTextEditingController.text.trim();
 

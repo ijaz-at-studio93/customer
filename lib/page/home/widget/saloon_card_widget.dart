@@ -40,6 +40,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   int _currentPage = 0;
   late List<String> _images;
   static const Duration _autoPlayResumeDelay = Duration(seconds: 2);
+  static const Duration _autoPlayInterval = Duration(seconds: 3);
   bool _isUserInteracting = false;
   //static const String kLongPressHintShown = "long_press_image_hint_shown";
 
@@ -123,9 +124,18 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   }
 
   void _startAutoPlay() {
-    // Row 18: auto-scroll of the salon image carousel is disabled.
-    // Images now advance only when the user swipes manually.
     _autoPlayTimer?.cancel();
+    if (_images.length <= 1) return;
+    _autoPlayTimer = Timer.periodic(_autoPlayInterval, (_) {
+      if (!mounted || !_pageController.hasClients || _isUserInteracting) return;
+      // Loop back to the first image after the last one.
+      final nextPage = (_currentPage + 1) % _images.length;
+      _pageController.animateToPage(
+        nextPage,
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOut,
+      );
+    });
   }
 
   void _stopAutoPlay() {
