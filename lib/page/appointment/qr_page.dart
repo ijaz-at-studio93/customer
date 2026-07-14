@@ -17,7 +17,6 @@ import '../../controller/auth_controller.dart';
 import '../../main.dart';
 import '../../util/SharedPrefs.dart';
 import '../../util/snackbar_util.dart';
-import '../booking/booking_home_page.dart';
 import '../bottom_navigation_bar.dart';
 import 'package:salon_customer/service/analytics_service.dart';
 import 'package:salon_customer/service/appsflyer_service.dart';
@@ -502,7 +501,8 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                             text: const TextSpan(
                               children: [
                                 TextSpan(
-                                  text: "(Enter the Actual Bill, Discount will be Auto Applied)",
+                                  text:
+                                      "(Enter the Actual Bill, Discount will be Auto Applied)",
                                   style: TextStyle(
                                     color: ColorConstant.primaryColor,
                                     fontSize: 14,
@@ -569,11 +569,12 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                                   ),
                                   TextSpan(
                                     text: "Add/ Remove",
-                                    style: TextStyle(color: Colors.red), // 🔴 highlight
+                                    style: TextStyle(
+                                        color: Colors.red), // 🔴 highlight
                                   ),
                                   TextSpan(
                                     text:
-                                    " Services At The Salon, You don't have to Book a new Appointment And Pay In The App to Avail Your Discount",
+                                        " Services At The Salon, You don't have to Book a new Appointment And Pay In The App to Avail Your Discount",
                                   ),
                                 ],
                               ),
@@ -663,9 +664,8 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
   String get _paymentDemoUrl {
     final configUrl =
         _authController.getAppUpdateModel.data?.paymentDemoVideo ?? "";
-    final u = configUrl.isNotEmpty
-        ? configUrl
-        : APIConstants.paymentDemoVideoUrl;
+    final u =
+        configUrl.isNotEmpty ? configUrl : APIConstants.paymentDemoVideoUrl;
     if (u.isEmpty) return "";
     return u.startsWith("http") ? u : "${APIConstants.image}$u";
   }
@@ -675,44 +675,44 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
       clipBehavior: Clip.none,
       children: [
         /// MINI PREVIEW
-        Container(
-          width: 110,
-          height: 150,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white, width: 1.5),
-            boxShadow: const [
-              BoxShadow(color: Colors.black26, blurRadius: 8),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Loading indicator until a real video URL is available.
-                _paymentDemoUrl.isEmpty
-                    ? const Center(
-                        child: SizedBox(
-                          width: 26,
-                          height: 26,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2.5, color: Colors.white),
+        GestureDetector(
+          onTap: _openDemoFullscreen,
+          child: Container(
+            width: 110,
+            height: 150,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white, width: 1.5),
+              boxShadow: const [
+                BoxShadow(color: Colors.black26, blurRadius: 8),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Loading indicator until a real video URL is available.
+                  _paymentDemoUrl.isEmpty
+                      ? const Center(
+                          child: SizedBox(
+                            width: 26,
+                            height: 26,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2.5, color: Colors.white),
+                          ),
+                        )
+                      : _DemoVideoView(
+                          url: _paymentDemoUrl,
+                          muted: true, // mini preview is always muted
+                          fit: BoxFit.cover,
                         ),
-                      )
-                    : _DemoVideoView(
-                        url: _paymentDemoUrl,
-                        muted: true, // mini preview is always muted
-                        fit: BoxFit.cover,
-                      ),
 
-                /// EXPAND → FULLSCREEN (bottom-left)
-                Positioned(
-                  bottom: 4,
-                  left: 4,
-                  child: GestureDetector(
-                    onTap: _openDemoFullscreen,
+                  /// EXPAND → FULLSCREEN (bottom-left)
+                  Positioned(
+                    bottom: 4,
+                    left: 4,
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
@@ -723,8 +723,8 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                           color: Colors.white, size: 16),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -1758,7 +1758,6 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
 
         return StatefulBuilder(
           builder: (context, setStateDialog) {
-
             return Center(
                 child: Stack(alignment: Alignment.center, children: [
               Column(
@@ -2100,7 +2099,6 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
     );
 
     try {
-
       await facebookAppEvents.logPurchase(
         amount: paidAmount,
         currency: "INR",
@@ -2116,7 +2114,6 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
       print("✅ FB Purchase Event Sent");
 
       await facebookAppEvents.flush();
-
     } catch (e) {
       print("❌ FB Purchase Error: $e");
     }
