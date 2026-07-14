@@ -16,6 +16,12 @@ import 'dart:async';
 import 'package:flutter/gestures.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
+/// Bumping this tells every currently-mounted [SaloonCardWidget] to reset its
+/// image carousel back to the first image. Bumped when Home becomes visible
+/// again (e.g. after popping the salon detail page) so carousels always start
+/// from index 0 when the user returns.
+final ValueNotifier<int> salonCarouselResetSignal = ValueNotifier<int>(0);
+
 class SaloonCardWidget extends StatefulWidget {
   final VoidCallback onPress;
   final HomeSalonDataList homeSalonModel;
@@ -40,7 +46,6 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   int _currentPage = 0;
   late List<String> _images;
   static const Duration _autoPlayResumeDelay = Duration(seconds: 2);
-  static const Duration _autoPlayInterval = Duration(seconds: 3);
   bool _isUserInteracting = false;
   //static const String kLongPressHintShown = "long_press_image_hint_shown";
 
@@ -49,7 +54,18 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
     super.initState();
     _images = _getImageList(widget.homeSalonModel); // ← add this line
     _pageController = PageController(initialPage: 0, viewportFraction: 1.0);
+    salonCarouselResetSignal.addListener(_resetCarouselToStart);
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartAutoPlay());
+  }
+
+  /// Snap this card's carousel back to the first image (and restart auto-play).
+  void _resetCarouselToStart() {
+    if (!mounted) return;
+    _currentPage = 0;
+    if (_pageController.hasClients) {
+      _pageController.jumpToPage(0);
+    }
+    _restartAutoPlay();
   }
 
   // @override
@@ -84,6 +100,7 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
 
   @override
   void dispose() {
+    salonCarouselResetSignal.removeListener(_resetCarouselToStart);
     _autoPlayTimer?.cancel();
     _pageController.dispose();
     super.dispose();
@@ -124,18 +141,9 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   }
 
   void _startAutoPlay() {
+    // Row 18: auto-scroll of the salon image carousel is disabled.
+    // Images now advance only when the user swipes manually.
     _autoPlayTimer?.cancel();
-    if (_images.length <= 1) return;
-    _autoPlayTimer = Timer.periodic(_autoPlayInterval, (_) {
-      if (!mounted || !_pageController.hasClients || _isUserInteracting) return;
-      // Loop back to the first image after the last one.
-      final nextPage = (_currentPage + 1) % _images.length;
-      _pageController.animateToPage(
-        nextPage,
-        duration: const Duration(milliseconds: 400),
-        curve: Curves.easeInOut,
-      );
-    });
   }
 
   void _stopAutoPlay() {

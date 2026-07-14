@@ -223,6 +223,10 @@ class _HomePageState extends State<HomePage>
                                     ),
                                   );
 
+                                  // Back on Home — reset every salon card
+                                  // carousel to the first image.
+                                  salonCarouselResetSignal.value++;
+
                                   if (!mounted) return;
 
                                   Future.microtask(() {
