@@ -104,9 +104,8 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                   },
                   onTap: (latLng) async {
                     _marker.clear();
-                    List<Placemark> placeMarks = await placemarkFromCoordinates(
-                        latLng.latitude, latLng.longitude);
-                    Placemark place = placeMarks[0];
+                    lat = latLng.latitude;
+                    lng = latLng.longitude;
                     _marker.add(Marker(
                       markerId: const MarkerId('current_Postion23'),
                       position: LatLng(latLng.latitude, latLng.longitude),
@@ -115,14 +114,26 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                       ),
                     ));
 
-                    _authController.userCity = "${place.locality}";
-                    _authController.userCurrentLocation =
-                        "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
-
                     SharedPrefs.writeValue(
                         PrefConstants.longitude, latLng.longitude.toString());
                     SharedPrefs.writeValue(
                         PrefConstants.latitude, latLng.latitude.toString());
+
+                    try {
+                      List<Placemark> placeMarks =
+                          await placemarkFromCoordinates(
+                              latLng.latitude, latLng.longitude);
+                      if (placeMarks.isNotEmpty) {
+                        Placemark place = placeMarks[0];
+                        city = "${place.locality}";
+                        address =
+                            "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+                        _authController.userCity = city;
+                        _authController.userCurrentLocation = address;
+                      }
+                    } catch (e) {
+                      print("Reverse geocoding failed on map tap: $e");
+                    }
                     setState(() {});
                   },
                   markers: Set<Marker>.of(
@@ -208,75 +219,70 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                                       itemBuilder: (context, index) {
                                         return GestureDetector(
                                           onTap: () async {
+                                            final prediction =
+                                                locationData.value[index];
                                             _searchMapLocation.text =
-                                                locationData
-                                                    .value[index].fullText
-                                                    .toString();
+                                                prediction.fullText;
                                             locationData.value = [];
                                             _marker.clear();
-                                            List<Location> location =
-                                                await locationFromAddress(
-                                                    _searchMapLocation.text);
-                                            if (location.isNotEmpty) {
-                                              List<Placemark> placeMarks =
-                                                  await placemarkFromCoordinates(
-                                                      location[0].latitude,
-                                                      location[0].longitude);
-                                              Placemark place = placeMarks[0];
+
+                                            try {
+                                              final placeResult =
+                                                  await places.fetchPlace(
+                                                prediction.placeId,
+                                                fields: const [
+                                                  fp.PlaceField.Location,
+                                                  fp.PlaceField.Address,
+                                                  fp.PlaceField
+                                                      .AddressComponents,
+                                                  fp.PlaceField.Name,
+                                                ],
+                                              );
+                                              final place = placeResult.place;
+                                              final placeLatLng = place?.latLng;
+                                              if (place == null ||
+                                                  placeLatLng == null) {
+                                                showMessage(
+                                                    'Unable to get location details. Please try again.');
+                                                return;
+                                              }
+
+                                              lat = placeLatLng.lat;
+                                              lng = placeLatLng.lng;
+                                              address = place.address ??
+                                                  prediction.fullText;
+                                              city = prediction.primaryText;
+                                              final locality = place
+                                                  .addressComponents
+                                                  ?.where((c) => c.types
+                                                      .contains('locality'));
+                                              if (locality != null &&
+                                                  locality.isNotEmpty) {
+                                                city = locality.first.name;
+                                              }
 
                                               setState(() {
                                                 _marker.add(Marker(
                                                   markerId: const MarkerId(
                                                       'current_Postion'),
-                                                  position: LatLng(
-                                                      location[0].latitude,
-                                                      location[0].longitude),
+                                                  position: LatLng(lat, lng),
                                                   icon: BitmapDescriptor
                                                       .defaultMarkerWithHue(
                                                     BitmapDescriptor.hueViolet,
                                                   ),
                                                 ));
-                                              });
-                                              city = "${place.locality}";
-                                              address =
-                                                  "${place.street}, ${place.subLocality}, ${place.locality},${place.thoroughfare}, ${place.subThoroughfare} , ${place.administrativeArea} ${place.postalCode}, ${place.country}";
-                                              lat = location[0].latitude;
-                                              lng = location[0].longitude;
-
-                                              _marker.add(Marker(
-                                                markerId: const MarkerId('new'),
-                                                position: LatLng(
-                                                    location[0].latitude,
-                                                    location[0].longitude),
-                                                icon: BitmapDescriptor
-                                                    .defaultMarkerWithHue(
-                                                  BitmapDescriptor.hueViolet,
-                                                ),
-                                              ));
-
-                                              _authController
-                                                  .googleMapProgress = true;
-
-                                              setState(() {
                                                 _authController
                                                     .googleMapProgress = false;
-
                                                 _controller?.animateCamera(
                                                     CameraUpdate.newLatLng(
-                                                        LatLng(
-                                                            location[0]
-                                                                .latitude,
-                                                            location[0]
-                                                                .longitude)));
+                                                        LatLng(lat, lng)));
                                               });
-                                              // code of coming to home page automatically when i clicked on any location result
-                                              // Save to controller
+
                                               _authController.userCity = city;
                                               _authController
                                                       .userCurrentLocation =
                                                   address;
 
-                                              // Save to shared prefs
                                               SharedPrefs.writeValue(
                                                   PrefConstants.userCity, city);
                                               SharedPrefs.writeValue(
@@ -289,12 +295,15 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
                                                   PrefConstants.longitude,
                                                   lng.toString());
 
-                                              // Notify home page
                                               widget.callback.call();
 
-                                              // Go back automatically
-                                              if(!context.mounted) return;
+                                              if (!context.mounted) return;
                                               Navigator.of(context).maybePop();
+                                            } catch (e) {
+                                              print(
+                                                  "Failed to fetch place details: $e");
+                                              showMessage(
+                                                  'Unable to get location details. Please try again.');
                                             }
                                           },
                                           child: Container(
@@ -413,16 +422,21 @@ class _GoogleMapGetLocationState extends State<GoogleMapGetLocation> {
         ));
       });
 
-      // reverse geocode
-      final placeMarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
-      if (placeMarks.isNotEmpty) {
-        final place = placeMarks.first;
-        city = place.locality ?? "";
-        address =
-            "${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.postalCode ?? ''}, ${place.country ?? ''}";
-        lat = position.latitude;
-        lng = position.longitude;
+      lat = position.latitude;
+      lng = position.longitude;
+
+      // reverse geocode (non-fatal — coords already available)
+      try {
+        final placeMarks = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+        if (placeMarks.isNotEmpty) {
+          final place = placeMarks.first;
+          city = place.locality ?? "";
+          address =
+              "${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.postalCode ?? ''}, ${place.country ?? ''}";
+        }
+      } catch (e) {
+        print("Reverse geocoding failed for initial location: $e");
       }
     } catch (err) {
       print("Error while setting initial location: $err");

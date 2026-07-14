@@ -2170,21 +2170,29 @@ class _HomePageState extends State<HomePage>
       showMessage("Location permission is needed to show nearby salons.");
     }).onGrantedCallback(() async {
       Position position = await Geolocator.getCurrentPosition();
-      List<Placemark> placeMarks =
-          await placemarkFromCoordinates(position.latitude, position.longitude);
 
       SharedPrefs.writeValue(
           PrefConstants.longitude, position.longitude.toString());
       SharedPrefs.writeValue(
           PrefConstants.latitude, position.latitude.toString());
 
-      Placemark place = placeMarks[0];
-      _authController.userCity = "${place.locality}";
-      _authController.userCurrentLocation =
-          "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
-      SharedPrefs.writeValue(
-          PrefConstants.address, _authController.userCurrentLocation);
-      SharedPrefs.writeValue(PrefConstants.userCity, _authController.userCity);
+      try {
+        List<Placemark> placeMarks = await placemarkFromCoordinates(
+            position.latitude, position.longitude);
+        if (placeMarks.isNotEmpty) {
+          Placemark place = placeMarks[0];
+          _authController.userCity = "${place.locality}";
+          _authController.userCurrentLocation =
+              "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.country}";
+          SharedPrefs.writeValue(
+              PrefConstants.address, _authController.userCurrentLocation);
+          SharedPrefs.writeValue(
+              PrefConstants.userCity, _authController.userCity);
+        }
+      } catch (e) {
+        logger.e("Reverse geocoding failed: $e");
+      }
+
       _homeController.doGetMakePackageData();
       _homeController.doGetHomeCategory(
         gender: selectedGender.value == 0 ? "male" : "female",
