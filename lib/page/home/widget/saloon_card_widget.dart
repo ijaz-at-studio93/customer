@@ -9,6 +9,7 @@ import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/model/home_salon_list_model.dart';
+import 'package:salon_customer/project_specific/shine_wrapper.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:salon_customer/util/SharedPrefs.dart';
 import 'dart:async';
@@ -857,23 +858,25 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
                       ),
                       (widget.homeSalonModel.reviewCount ?? 0) == 0
                           // No reviews yet → show a "New" tag instead of a 0 rating.
-                          ? Container(
-                              height: 26,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 12),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: ColorConstant.greenColor,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                "New",
-                                style: AppTextTheme.medium.copyWith(
-                                  fontFamily: "Outfit",
-                                  fontWeight: FontWeight.w700,
-                                  fontSize: 14,
-                                  color: ColorConstant.whiteColor,
-                                  height: 1.2,
+                          ? ShineWrapper(
+                              child: Container(
+                                height: 26,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 12),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: ColorConstant.greenColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Text(
+                                  "New",
+                                  style: AppTextTheme.medium.copyWith(
+                                    fontFamily: "Outfit",
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 14,
+                                    color: ColorConstant.whiteColor,
+                                    height: 1.2,
+                                  ),
                                 ),
                               ),
                             )

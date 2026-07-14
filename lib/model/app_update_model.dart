@@ -35,6 +35,7 @@ class Data {
   String? salonAppLatestVersion;
   String? userAppMinimumVersion;
   String? salonAppMinimumVersion;
+  String? paymentDemoVideo;
   PersonOfTheYear? personOfTheYear;
 
   Data(
@@ -47,6 +48,7 @@ class Data {
         this.salonAppLatestVersion,
         this.userAppMinimumVersion,
         this.salonAppMinimumVersion,
+        this.paymentDemoVideo,
         this.personOfTheYear});
 
   Data.fromJson(Map<String, dynamic> json) {
@@ -59,6 +61,7 @@ class Data {
     salonAppLatestVersion = json['salonAppLatestVersion'];
     userAppMinimumVersion = json['userAppMinimumVersion'];
     salonAppMinimumVersion = json['salonAppMinimumVersion'];
+    paymentDemoVideo = json['paymentDemoVideo'];
     personOfTheYear = json['personOfTheYear'] != null
         ? PersonOfTheYear.fromJson(json['personOfTheYear'])
         : null;
@@ -75,6 +78,7 @@ class Data {
     data['salonAppLatestVersion'] = salonAppLatestVersion;
     data['userAppMinimumVersion'] = userAppMinimumVersion;
     data['salonAppMinimumVersion'] = salonAppMinimumVersion;
+    data['paymentDemoVideo'] = paymentDemoVideo;
     if (personOfTheYear != null) {
       data['personOfTheYear'] = personOfTheYear!.toJson();
     }

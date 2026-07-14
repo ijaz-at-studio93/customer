@@ -1,5 +1,6 @@
 class AssetsConstant {
   /*-------------------- Horoscope Image ----------- */
+  static const String contentButtonIcon = "assets/icon/content_button_icon.svg";
   static const String bookings = "assets/icon/Bookings.png";
   static const String home = "assets/icon/home.png";
   static const String insights = "assets/icon/Insights.png";

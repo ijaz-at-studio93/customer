@@ -7,6 +7,7 @@ import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/appointment/payment_success_page.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
+import 'package:salon_customer/project_specific/shine_wrapper.dart';
 import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/project_specific/text_theme.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -654,12 +655,17 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
     );
   }
 
-  /// Full demo video URL from [APIConstants.paymentDemoVideoUrl] (the backend
-  /// swap-in point). Empty until a real URL is set — the mini player then shows
-  /// a loading indicator. Absolute URLs are used as-is; relative paths are
-  /// prefixed with the media base (same as Content).
+  /// Full demo video URL sourced from the app config (`app/config` →
+  /// `paymentDemoVideo`), falling back to [APIConstants.paymentDemoVideoUrl].
+  /// Empty until a real URL is set — the mini player then shows a loading
+  /// indicator. Absolute URLs are used as-is; relative paths are prefixed with
+  /// the media base (same as Content).
   String get _paymentDemoUrl {
-    final u = APIConstants.paymentDemoVideoUrl;
+    final configUrl =
+        _authController.getAppUpdateModel.data?.paymentDemoVideo ?? "";
+    final u = configUrl.isNotEmpty
+        ? configUrl
+        : APIConstants.paymentDemoVideoUrl;
     if (u.isEmpty) return "";
     return u.startsWith("http") ? u : "${APIConstants.image}$u";
   }
@@ -2298,63 +2304,6 @@ class _CancelRadioCircle extends StatelessWidget {
             : null,
       ),
     );
-  }
-}
-
-class ShineWrapper extends StatefulWidget {
-  final Widget child;
-
-  const ShineWrapper({super.key, required this.child});
-
-  @override
-  State<ShineWrapper> createState() => _ShineWrapperState();
-}
-
-class _ShineWrapperState extends State<ShineWrapper>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 800),
-    )..repeat(); // infinite loop
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return ShaderMask(
-          shaderCallback: (rect) {
-            final x = _controller.value;
-
-            return LinearGradient(
-              begin: Alignment(-2 + 3 * x, -1), // ← top shifted more to left
-              end: Alignment(-1.2 + 3 * x, 1), // ← bottom stays
-              colors: [
-                Colors.transparent,
-                Colors.white.withOpacity(0.4),
-                Colors.transparent,
-              ],
-              stops: const [0.0, 0.5, 1.0],
-            ).createShader(rect);
-          },
-          blendMode: BlendMode.srcATop,
-          child: widget.child,
-        );
-      },
-    );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 }
 

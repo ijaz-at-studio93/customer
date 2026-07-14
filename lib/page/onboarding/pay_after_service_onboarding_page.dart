@@ -257,7 +257,7 @@ class _PayAfterServiceOnboardingPageState
     return Image.asset(
       page.imagePath,
       fit: BoxFit.contain,
-      // Neutral placeholder until the real asset is added.
+      // Neutral placeholder if the asset can't be loaded.
       errorBuilder: (context, error, stackTrace) => Center(
         child: Container(
           width: 180,

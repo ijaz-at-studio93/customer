@@ -2,6 +2,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:salon_customer/project_specific/shine_wrapper.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
@@ -2075,67 +2077,29 @@ class _SaloonAfterSelectingServicesPageState
                           "0") ??
                       0) ==
                   0) ...[
-                Container(
-                  height: 30,
-                  padding: const EdgeInsets.symmetric(horizontal: 10),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF16A34A),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    "New",
-                    textScaler: const TextScaler.linear(0.85),
-                    style: AppTextTheme.semibold.copyWith(
-                      fontSize: 13,
-                      color: Colors.white,
-                      fontFamily: 'Outfit',
-                      fontWeight: FontWeight.w600,
+                ShineWrapper(
+                  child: Container(
+                    height: 30,
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF16A34A),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      "New",
+                      textScaler: const TextScaler.linear(0.85),
+                      style: AppTextTheme.semibold.copyWith(
+                        fontSize: 13,
+                        color: Colors.white,
+                        fontFamily: 'Outfit',
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
                 const SizedBox(width: 6),
               ],
-
-              /// CONTENT REDIRECT (Row 15) — opens this salon's content
-              GestureDetector(
-                onTap: () {
-                  Get.to(() => SalonContentPage(
-                        salonId: widget.id,
-                        salonName:
-                            _homeController.homeSalonDetailsData.data?.name ??
-                                "",
-                      ));
-                },
-                child: Container(
-                  height: 30,
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(6),
-                    color: changeTheme(
-                      SharedPrefs.readStringValue(PrefConstants.gender),
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.play_circle_outline,
-                          size: 14, color: Colors.white),
-                      const SizedBox(width: 3),
-                      Text(
-                        "Content",
-                        textScaler: const TextScaler.linear(0.85),
-                        style: AppTextTheme.semibold.copyWith(
-                          fontSize: 13,
-                          color: Colors.white,
-                          fontFamily: 'Outfit',
-                          fontWeight: FontWeight.w600,
-                        ),
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 6),
 
               /// RIGHT SIDE (fixed button)
               GestureDetector(
@@ -2175,6 +2139,59 @@ class _SaloonAfterSelectingServicesPageState
                 ),
               ),
             ],
+          ),
+
+          const SizedBox(height: 10),
+
+          /// CONTENT REDIRECT (Row 15) — opens this salon's content. Placed on
+          /// its own line below the amenities row per the new design.
+          Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () {
+                Get.to(() => SalonContentPage(
+                      salonId: widget.id,
+                      salonName:
+                          _homeController.homeSalonDetailsData.data?.name ?? "",
+                    ));
+              },
+              child: Container(
+                height: 30,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  gradient: const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xFF8454E5),
+                      Color(0xFFCD73B4),
+                    ],
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SvgPicture.asset(
+                      AssetsConstant.contentButtonIcon,
+                      width: 14,
+                      height: 14,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      "Content",
+                      textScaler: const TextScaler.linear(0.85),
+                      style: AppTextTheme.semibold.copyWith(
+                        fontSize: 13,
+                        color: Colors.white,
+                        fontFamily: 'Outfit',
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
         ],
       ),

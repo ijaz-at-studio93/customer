@@ -182,33 +182,6 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
               ),
 
               const SizedBox(height: 20),
-
-              /// BOOKING ID (OUTSIDE CARD)
-              RichText(
-                text: TextSpan(
-                  style: const TextStyle(
-                    fontFamily: "Outfit",
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  children: [
-                    const TextSpan(
-                      text: "Booking Id : ",
-                      style: TextStyle(color: Colors.black),
-                    ),
-                    TextSpan(
-                      text: widget.bookingId,
-                      style: TextStyle(
-                        color: changeTheme(
-                          SharedPrefs.readStringValue(PrefConstants.gender),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
             ],
           ),
         ),
