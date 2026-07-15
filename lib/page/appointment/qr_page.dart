@@ -645,7 +645,7 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                     ),
                   ))),
 
-          /// Row 3: dismissible payment demo video (bottom-left)
+          /// Row 3: dismissible payment demo video (bottom-left, tap = fullscreen)
           if (_showDemoVideo && paymentStatus == "pending")
             Positioned(
               left: 12,
@@ -676,44 +676,50 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
       clipBehavior: Clip.none,
       children: [
         /// MINI PREVIEW
-        Container(
-          width: 110,
-          height: 150,
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.white, width: 1.5),
-            boxShadow: const [
-              BoxShadow(color: Colors.black26, blurRadius: 8),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                // Loading indicator until a real video URL is available.
-                _paymentDemoUrl.isEmpty
-                    ? const Center(
-                        child: SizedBox(
-                          width: 26,
-                          height: 26,
-                          child: CircularProgressIndicator(
-                              strokeWidth: 2.5, color: Colors.white),
+        // 110x238 matches the demo video's aspect ratio (888x1920 ≈ 0.462), so
+        // the full frame shows with no crop and no letterboxing.
+        GestureDetector(
+          onTap: _openDemoFullscreen,
+          child: Container(
+            width: 110,
+            height: 238,
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.white, width: 1.5),
+              boxShadow: const [
+                BoxShadow(color: Colors.black26, blurRadius: 8),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Loading indicator until a real video URL is available.
+                  _paymentDemoUrl.isEmpty
+                      ? const Center(
+                          child: SizedBox(
+                            width: 26,
+                            height: 26,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2.5, color: Colors.white),
+                          ),
+                        )
+                      : _DemoVideoView(
+                          url: _paymentDemoUrl,
+                          // contain, not cover: guarantees the full frame is
+                          // always visible. If the backend swaps in a video with
+                          // a different aspect ratio it letterboxes rather than
+                          // silently cropping content away.
+                          muted: true, // mini preview is always muted
+                          fit: BoxFit.contain,
                         ),
-                      )
-                    : _DemoVideoView(
-                        url: _paymentDemoUrl,
-                        muted: true, // mini preview is always muted
-                        fit: BoxFit.cover,
-                      ),
 
-                /// EXPAND → FULLSCREEN (bottom-left)
-                Positioned(
-                  bottom: 4,
-                  left: 4,
-                  child: GestureDetector(
-                    onTap: _openDemoFullscreen,
+                  /// EXPAND → FULLSCREEN (bottom-left)
+                  Positioned(
+                    bottom: 4,
+                    left: 4,
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
@@ -724,8 +730,8 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                           color: Colors.white, size: 16),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
@@ -906,9 +912,6 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
   }
 
   Widget buildStylistSection(data) {
-    final isPending = (data?.orderStatus ?? "").toLowerCase() == "pending";
-
-    //if (isPending) {
     final stylists = data?.selectedStylists ?? [];
 
     if (stylists.isEmpty) {
@@ -965,21 +968,6 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     }
-  }
-
-  void _startPayment() {
-    final amount =
-        (_homeController.getUserBookingQrCodeModel.data?.orderAmount ?? 0) *
-            100;
-
-    final options = {
-      'key': _homeController.getOrderIdModel.data?.razorpayKey ?? "",
-      'amount': amount.toInt(),
-      'name': 'Scuts',
-      'order_id': _homeController.getOrderIdModel.data?.orderId ?? "",
-    };
-
-    razorpay.open(options);
   }
 
   bool isNightTime() {
@@ -2398,6 +2386,7 @@ class _DemoVideoViewState extends State<_DemoVideoView> {
       );
     }
 
-    return AspectRatio(aspectRatio: 9 / 16, child: VideoPlayer(player.controller));
+    return AspectRatio(
+        aspectRatio: 9 / 16, child: VideoPlayer(player.controller));
   }
 }
