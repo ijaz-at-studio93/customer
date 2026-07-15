@@ -757,68 +757,95 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
   }
 
   /// Fullscreen demo player — sound on by default, with mute + ✕ overlays.
+  /// Opens/closes with a scale+fade that expands from the bottom-left mini
+  /// player and contracts back into it on dismiss.
   void _openDemoFullscreen() {
-    showDialog(
+    showGeneralDialog(
       context: context,
+      barrierDismissible: true,
+      barrierLabel: "PaymentDemoVideo",
       barrierColor: Colors.black,
-      builder: (_) {
+      transitionDuration: const Duration(milliseconds: 280),
+      pageBuilder: (_, __, ___) {
         bool fsMuted = false; // fullscreen starts with sound.
         return StatefulBuilder(
           builder: (context, setSheet) {
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                _paymentDemoUrl.isEmpty
-                    ? const Center(
-                        child: CircularProgressIndicator(color: Colors.white),
-                      )
-                    : _DemoVideoView(
-                        url: _paymentDemoUrl,
-                        muted: fsMuted,
-                        fit: BoxFit.contain,
-                      ),
+            return Material(
+              color: Colors.transparent,
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _paymentDemoUrl.isEmpty
+                      ? const Center(
+                          child:
+                              CircularProgressIndicator(color: Colors.white),
+                        )
+                      : _DemoVideoView(
+                          url: _paymentDemoUrl,
+                          muted: fsMuted,
+                          fit: BoxFit.contain,
+                        ),
 
-                /// MUTE (top-left)
-                Positioned(
-                  top: 40,
-                  left: 16,
-                  child: GestureDetector(
-                    onTap: () => setSheet(() => fsMuted = !fsMuted),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: Colors.black54,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        fsMuted ? Icons.volume_off : Icons.volume_up,
-                        color: Colors.white,
-                        size: 22,
+                  /// MUTE (top-left)
+                  // Positioned(
+                  //   top: 40,
+                  //   left: 16,
+                  //   child: GestureDetector(
+                  //     onTap: () => setSheet(() => fsMuted = !fsMuted),
+                  //     child: Container(
+                  //       padding: const EdgeInsets.all(8),
+                  //       decoration: const BoxDecoration(
+                  //         color: Colors.black54,
+                  //         shape: BoxShape.circle,
+                  //       ),
+                  //       child: Icon(
+                  //         fsMuted ? Icons.volume_off : Icons.volume_up,
+                  //         color: Colors.white,
+                  //         size: 22,
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+
+                  /// ✕ CLOSE (top-right)
+                  Positioned(
+                    top: 20,
+                    right: 16,
+                    child: SafeArea(
+                      child: GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: Colors.black54,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.close,
+                              color: Colors.white, size: 22),
+                        ),
                       ),
                     ),
                   ),
-                ),
-
-                /// ✕ CLOSE (top-right)
-                Positioned(
-                  top: 40,
-                  right: 16,
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(
-                        color: Colors.black54,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.close,
-                          color: Colors.white, size: 22),
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             );
           },
+        );
+      },
+      transitionBuilder: (_, anim, __, child) {
+        final curved = CurvedAnimation(
+          parent: anim,
+          curve: Curves.easeOutCubic,
+          reverseCurve: Curves.easeInCubic,
+        );
+        return FadeTransition(
+          opacity: curved,
+          child: ScaleTransition(
+            // Grow out of / shrink into the bottom-left mini player.
+            alignment: Alignment.bottomLeft,
+            scale: Tween<double>(begin: 0.28, end: 1.0).animate(curved),
+            child: child,
+          ),
         );
       },
     );
