@@ -2397,15 +2397,6 @@ class _DemoVideoViewState extends State<_DemoVideoView> {
       );
     }
 
-    final size = controller.value.size;
-    return FittedBox(
-      fit: widget.fit,
-      clipBehavior: Clip.hardEdge,
-      child: SizedBox(
-        width: size.width,
-        height: size.height,
-        child: VideoPlayer(controller),
-      ),
-    );
+    return AspectRatio(aspectRatio: 9/16 ,child: VideoPlayer(controller));
   }
 }
