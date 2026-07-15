@@ -675,11 +675,9 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
       clipBehavior: Clip.none,
       children: [
         /// MINI PREVIEW
-        // 110x238 matches the demo video's aspect ratio (888x1920 ≈ 0.462), so
-        // the full frame shows with no crop and no letterboxing.
         Container(
           width: 110,
-          height: 238,
+          height: 150,
           decoration: BoxDecoration(
             color: Colors.black,
             borderRadius: BorderRadius.circular(12),
@@ -705,12 +703,8 @@ class _QRCodePageState extends State<QRCodePage> with TickerProviderStateMixin {
                       )
                     : _DemoVideoView(
                         url: _paymentDemoUrl,
-                        // contain, not cover: guarantees the full frame is
-                        // always visible. If the backend swaps in a video with
-                        // a different aspect ratio it letterboxes rather than
-                        // silently cropping content away.
                         muted: true, // mini preview is always muted
-                        fit: BoxFit.contain,
+                        fit: BoxFit.cover,
                       ),
 
                 /// EXPAND → FULLSCREEN (bottom-left)
