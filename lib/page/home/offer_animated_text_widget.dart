@@ -38,6 +38,10 @@ class _OfferAnimatedTextWidgetState extends State<OfferAnimatedTextWidget> {
       });
 
       await Future.delayed(const Duration(seconds: 2));
+      // The widget can be disposed during any await above (e.g. the offers
+      // carousel jumping pages tears down this page's children), and
+      // `while (mounted)` only re-checks at the top of the loop.
+      if (!mounted) return;
 
       /// transition
       setState(() {

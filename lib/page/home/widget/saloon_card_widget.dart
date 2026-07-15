@@ -53,7 +53,14 @@ class _SaloonCardWidgetState extends State<SaloonCardWidget> {
   void initState() {
     super.initState();
     _images = _getImageList(widget.homeSalonModel); // ← add this line
-    _pageController = PageController(initialPage: 0, viewportFraction: 1.0);
+    // keepPage:false — otherwise PageStorage restores this slot's last saved
+    // page on attach and overrides initialPage, so a recycled card can open on
+    // the previous card's image instead of the first one.
+    _pageController = PageController(
+      initialPage: 0,
+      viewportFraction: 1.0,
+      keepPage: false,
+    );
     salonCarouselResetSignal.addListener(_resetCarouselToStart);
     WidgetsBinding.instance.addPostFrameCallback((_) => _maybeStartAutoPlay());
   }
