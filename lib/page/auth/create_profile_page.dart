@@ -28,7 +28,9 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
   final _emailTextEditingController = TextEditingController();
   final _authController = Get.find<AuthController>();
 
-  int selectGender = 1;
+  /// Null until the user picks one — gender is mandatory, so nothing is
+  /// pre-selected and [_doCreateProfile] blocks until a choice is made.
+  int? selectGender;
   @override
   void initState() {
     super.initState();
@@ -483,6 +485,12 @@ class _CreateProfilePageState extends State<CreateProfilePage> {
 
     if (!RegExp(r'^[0-9]+$').hasMatch(mobile)) {
       showMessage("Invalid mobile number");
+      return;
+    }
+
+    // 🔹 GENDER VALIDATION
+    if (selectGender == null) {
+      showMessage("Please select your gender");
       return;
     }
 
