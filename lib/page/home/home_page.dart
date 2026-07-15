@@ -44,8 +44,10 @@ class _HomePageState extends State<HomePage>
 
   final _authController = Get.find<AuthController>();
   final _homeController = Get.find<HomeController>();
+  // keepPage:false — same reason as the salon card carousel: PageStorage would
+  // otherwise restore the last page on re-attach and undo the reset to 0.
   final PageController _offerPageController =
-      PageController(viewportFraction: 1.0);
+      PageController(viewportFraction: 1.0, keepPage: false);
   Timer? _offerAutoScrollTimer;
   int _currentOfferPage = 0;
 
@@ -108,6 +110,17 @@ class _HomePageState extends State<HomePage>
         }
       });
     });
+  }
+
+  /// Snap the offers carousel back to the first offer. HomePage is kept alive
+  /// (wantKeepAlive), so initState never re-runs — without this the carousel
+  /// stays wherever the auto-scroll timer left it when the user returns.
+  void _resetOfferCarousel() {
+    _currentOfferPage = 0;
+    if (_offerPageController.hasClients) {
+      _offerPageController.jumpToPage(0);
+    }
+    _startOfferAutoScroll();
   }
 
   void _startOfferAutoScroll() {
@@ -211,6 +224,10 @@ class _HomePageState extends State<HomePage>
                               final salon = orderedSalons[index];
 
                               return SaloonCardWidget(
+                                // Ties State (and its carousel) to the salon
+                                // rather than the list slot, so cards aren't
+                                // recycled across different salons.
+                                key: ValueKey(salon.id ?? 'salon_$index'),
                                 homeSalonModel: salon,
                                 onPress: () async {
                                   await _markSalonVisited();
@@ -228,6 +245,9 @@ class _HomePageState extends State<HomePage>
                                   salonCarouselResetSignal.value++;
 
                                   if (!mounted) return;
+
+                                  // Same for the offers carousel above them.
+                                  _resetOfferCarousel();
 
                                   Future.microtask(() {
                                     if (_shouldShowSalonDialog()) {
