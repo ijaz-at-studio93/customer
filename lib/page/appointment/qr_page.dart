@@ -22,6 +22,7 @@ import '../bottom_navigation_bar.dart';
 import 'package:salon_customer/service/analytics_service.dart';
 import 'package:salon_customer/service/appsflyer_service.dart';
 import 'package:salon_customer/constant/api_constant.dart';
+import 'package:cached_video_player_plus/cached_video_player_plus.dart';
 import 'package:video_player/video_player.dart';
 
 class QRCodePage extends StatefulWidget {
@@ -2307,10 +2308,11 @@ class _CancelRadioCircle extends StatelessWidget {
   }
 }
 
-/// Row 3: payment-demo player built on `video_player` directly (no cache layer).
-/// Scoped to this page only — streams the network URL, loops, and honours a
-/// live mute toggle. Shows a spinner while initializing and a broken-video
-/// glyph (instead of an endless spinner) if initialization fails.
+/// Row 3: payment-demo player built on `cached_video_player_plus`, so the demo
+/// is fetched once and replayed from disk on later visits. Scoped to this page
+/// only — loops, and honours a live mute toggle. Shows a spinner while
+/// initializing and a broken-video glyph (instead of an endless spinner) if
+/// initialization fails.
 class _DemoVideoView extends StatefulWidget {
   final String url;
   final bool muted;
@@ -2327,7 +2329,7 @@ class _DemoVideoView extends StatefulWidget {
 }
 
 class _DemoVideoViewState extends State<_DemoVideoView> {
-  VideoPlayerController? _controller;
+  CachedVideoPlayerPlus? _player;
   bool _initialized = false;
   Object? _error;
 
@@ -2338,14 +2340,14 @@ class _DemoVideoViewState extends State<_DemoVideoView> {
   }
 
   Future<void> _init() async {
-    final controller = VideoPlayerController.networkUrl(Uri.parse(widget.url));
-    _controller = controller;
+    final player = CachedVideoPlayerPlus.networkUrl(Uri.parse(widget.url));
+    _player = player;
     try {
-      await controller.initialize();
+      await player.initialize();
       if (!mounted) return;
-      await controller.setLooping(true);
-      await controller.setVolume(widget.muted ? 0.0 : 1.0);
-      await controller.play();
+      await player.controller.setLooping(true);
+      await player.controller.setVolume(widget.muted ? 0.0 : 1.0);
+      await player.controller.play();
       setState(() => _initialized = true);
     } catch (e, st) {
       debugPrint("Demo video init error for ${widget.url}: $e");
@@ -2358,16 +2360,16 @@ class _DemoVideoViewState extends State<_DemoVideoView> {
   @override
   void didUpdateWidget(covariant _DemoVideoView oldWidget) {
     super.didUpdateWidget(oldWidget);
-    // Live mute/unmute toggle without recreating the controller.
+    // Live mute/unmute toggle without recreating the player.
     if (oldWidget.muted != widget.muted &&
-        (_controller?.value.isInitialized ?? false)) {
-      _controller?.setVolume(widget.muted ? 0.0 : 1.0);
+        (_player?.controller.value.isInitialized ?? false)) {
+      _player?.controller.setVolume(widget.muted ? 0.0 : 1.0);
     }
   }
 
   @override
   void dispose() {
-    _controller?.dispose();
+    _player?.dispose();
     super.dispose();
   }
 
@@ -2382,8 +2384,8 @@ class _DemoVideoViewState extends State<_DemoVideoView> {
       );
     }
 
-    final controller = _controller;
-    if (!_initialized || controller == null) {
+    final player = _player;
+    if (!_initialized || player == null) {
       return const ColoredBox(
         color: Colors.black45,
         child: Center(
@@ -2397,6 +2399,6 @@ class _DemoVideoViewState extends State<_DemoVideoView> {
       );
     }
 
-    return AspectRatio(aspectRatio: 9/16 ,child: VideoPlayer(controller));
+    return AspectRatio(aspectRatio: 9 / 16, child: VideoPlayer(player.controller));
   }
 }
