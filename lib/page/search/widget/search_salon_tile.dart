@@ -97,22 +97,22 @@ class SearchSalonTile extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: AppTextTheme.bold.copyWith(
                           fontFamily: 'Outfit',
-                          fontSize: 17,
+                          fontSize: 14,
                           color: ColorConstant.blackColor,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         salon?.address ?? "",
-                        maxLines: 1,
+                        maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: AppTextTheme.medium.copyWith(
                           fontFamily: 'Outfit',
-                          fontSize: 13,
+                          fontSize: 10,
                           color: ColorConstant.grayTextColor,
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 6),
                       _ratingOrNew(salon),
                     ],
                   ),
@@ -168,7 +168,7 @@ class SearchSalonTile extends StatelessWidget {
         // Sized to match the rating pill below.
         ? ShineWrapper(
             child: Container(
-              height: 26,
+              height: 24,
               width: _ratingChipWidth,
               alignment: Alignment.center,
               decoration: BoxDecoration(
@@ -188,7 +188,7 @@ class SearchSalonTile extends StatelessWidget {
             ),
           )
         : Container(
-            height: 26,
+            height: 24,
             width: _ratingChipWidth,
             decoration: BoxDecoration(
               color: ColorConstant.greenColor,
@@ -223,7 +223,7 @@ class SearchSalonTile extends StatelessWidget {
   /// the offer icon followed by "X% Off".
   Widget _discountBadge(String discountText) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: const EdgeInsets.fromLTRB(0, 5, 10, 5),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.7),
         borderRadius: BorderRadius.circular(4),
