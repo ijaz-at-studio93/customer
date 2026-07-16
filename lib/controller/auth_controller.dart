@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:salon_customer/api/auth_api.dart';
 import 'package:salon_customer/api/dio_client.dart';
+import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/model/app_update_model.dart';
 import 'package:salon_customer/model/otp_verify_model.dart';
@@ -162,6 +163,15 @@ class AuthController extends GetxController {
 
       // ✅ STORE TOKENS
       await userDataStoreToSharedPrefs(_userResponseModel.value);
+
+      // The user explicitly chose their gender during signup, so apply it as the
+      // active selection right now. This opens the app on the correct theme
+      // immediately instead of defaulting to male and re-deriving it from a later
+      // profile fetch (the source of the "male shows female colours" mismatch).
+      final bool isFemale = gender.toUpperCase() == "FEMALE";
+      await SharedPrefs.writeValue(PrefConstants.gender, isFemale ? "1" : "0");
+      await SharedPrefs.writeValue(PrefConstants.isSelectedGender, true);
+      selectedGender.value = isFemale ? 1 : 0;
 
       // 📊 AppsFlyer: user registration
       AppsFlyerService.instance.logRegistration();
@@ -397,7 +407,12 @@ class AuthController extends GetxController {
     await SharedPrefs.remove(PrefConstants.refreshToken);
     await SharedPrefs.remove(PrefConstants.userModel);
     await SharedPrefs.writeValue(PrefConstants.isUserLogin, false);
+    // Fully clear the gender selection — both the persisted pref AND the
+    // in-memory toggle — so the next user who signs in doesn't inherit the
+    // previous session's gender or theme.
     await SharedPrefs.writeValue(PrefConstants.gender, "0");
+    await SharedPrefs.writeValue(PrefConstants.isSelectedGender, false);
+    selectedGender.value = 0;
     await SharedPrefs.writeValue(PrefConstants.isFirstTime, false);
     await SharedPrefs.remove(PrefConstants.resumePayBillAppointmentId);
     Get.offAll(() => const LoginPage(splashPage: false));

@@ -197,12 +197,11 @@ class _SaloonAfterSelectingServicesPageState
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                      ? "1"
-                      : "0",
-                ) ??
-                ColorConstant.primaryColor,
+            // This switch shows the *other* gender you can flip to, so it uses
+            // the opposite accent colour to the one currently selected.
+            color: selectedGender.value == 0
+                ? ColorConstant.primary2
+                : ColorConstant.primaryColor,
             width: 2, // 👈 adjust thickness if needed
           ),
         ),
@@ -228,11 +227,11 @@ class _SaloonAfterSelectingServicesPageState
                 fontWeight: FontWeight.w800,
                 fontSize: 14,
                 //color: Colors.white,
-                color: changeTheme(
-                  SharedPrefs.readStringValue(PrefConstants.gender) == "0"
-                      ? "1"
-                      : "0",
-                ),
+                // Label reflects the *other* gender you can switch to, so it
+                // uses the opposite accent colour to the current selection.
+                color: selectedGender.value == 0
+                    ? ColorConstant.primary2
+                    : ColorConstant.primaryColor,
               ),
             ),
           ],

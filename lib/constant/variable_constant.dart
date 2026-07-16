@@ -6,14 +6,18 @@ const double fixPadding = 10.0;
 const SizedBox heightSpace = SizedBox(height: fixPadding);
 
 /*----------- dynamic Color Change ------------*/
-Color? changeTheme(String data) {
-  if (data.isEmpty) {
-    return ColorConstant.primaryColor;
-  } else if (data == "0") {
-    return ColorConstant.primaryColor;
-  } else {
-    return ColorConstant.primary2;
-  }
+/// Single source of truth for the gender accent colour.
+///
+/// The colour derives ONLY from [selectedGender] — the exact same value the
+/// Men/Women toggle reads — so the toggle and every themed widget can never
+/// disagree (e.g. "Men" selected while the UI shows the female pink). The
+/// [data] parameter is ignored and kept only so existing call sites keep
+/// compiling; a caller that needs the *opposite* gender's colour must compute
+/// it explicitly instead of passing a flipped string here.
+Color? changeTheme([String? data]) {
+  return selectedGender.value == 1
+      ? ColorConstant.primary2 // female → pink
+      : ColorConstant.primaryColor; // male / default → purple
 }
 
 
