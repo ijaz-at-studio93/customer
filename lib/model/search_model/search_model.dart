@@ -138,6 +138,9 @@ class Salon {
   String? image;
   String? homeService;
   String? serviceGender;
+  // Nullable — the offer badge ("Get X% OFF via LUZO") only renders when the
+  // backend sends a discount percentage; otherwise the tile hides it.
+  num? discountPercentage;
 
   Salon(
       {this.rating,
@@ -149,7 +152,8 @@ class Salon {
         this.distance,
         this.image,
         this.homeService,
-        this.serviceGender});
+        this.serviceGender,
+        this.discountPercentage});
 
   Salon.fromJson(Map<String, dynamic> json) {
     rating = json['rating'].toString();
@@ -162,6 +166,7 @@ class Salon {
     image = json['image'];
     homeService = json['homeService'];
     serviceGender = json['serviceGender'];
+    discountPercentage = json['discountPercentage'] as num?;
   }
 
   Map<String, dynamic> toJson() {
@@ -176,6 +181,7 @@ class Salon {
     data['image'] = image;
     data['homeService'] = homeService;
     data['serviceGender'] = serviceGender;
+    data['discountPercentage'] = discountPercentage;
     return data;
   }
 }

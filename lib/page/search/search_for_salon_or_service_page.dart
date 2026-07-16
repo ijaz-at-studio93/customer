@@ -8,7 +8,7 @@ import 'package:salon_customer/constant/color_constant.dart';
 import 'package:salon_customer/constant/variable_constant.dart';
 import 'package:salon_customer/controller/home_controller.dart';
 import 'package:salon_customer/page/home/saloon_after_selecting_page.dart';
-import 'package:salon_customer/page/search/widget/location_title_widget.dart';
+import 'package:salon_customer/page/search/widget/search_salon_tile.dart';
 import 'package:salon_customer/page/search/widget/service_list_tile.dart';
 import 'package:salon_customer/page/search/widget/stylist_list_tile_widget.dart';
 import 'package:salon_customer/project_specific/progressbar_view.dart';
@@ -99,24 +99,15 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                 )
                     : ListView.separated(
                     separatorBuilder: (context, index) {
-                      return Column(
-                        children: [
-                          const SizedBox(height: 15),
-                          Container(
-                            height: 1,
-                            width: Get.width,
-                            color: ColorConstant.dividerColor,
-                          ),
-                          const SizedBox(height: 15),
-                        ],
-                      );
+                      // No dividers between cards — clean spacing only.
+                      return const SizedBox(height: 14);
                     },
                     itemCount: _homeController
                         .getSearchSalonModel.data?.length ??
                         0,
                     shrinkWrap: true,
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 5),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 8),
                     itemBuilder: (context, index) {
                       return _homeController.getSearchSalonModel
                           .data?[index].isService ??
@@ -240,7 +231,7 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
                               ));
                         },
                       )
-                          : LocationTileWidget(
+                          : SearchSalonTile(
                         salonListData: _homeController
                             .getSearchSalonModel
                             .data![index],
@@ -268,7 +259,7 @@ class _SearchForSalonServiceState extends State<SearchForSalonService> {
   }
 
   /*-----------------  Search TextField -------------------*/
-  _searchTextField() {
+  Container _searchTextField() {
     return Container(
       color: ColorConstant.whiteColor,
       child: Column(
